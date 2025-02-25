@@ -1,15 +1,16 @@
 package modelengine.fit.integration.mybatis;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import modelengine.fit.integration.mybatis.mapper.WordMapper;
 import modelengine.fit.integration.mybatis.model.WordDo;
 import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.conf.Config;
 import modelengine.fitframework.test.annotation.MybatisTest;
 import modelengine.fitframework.test.annotation.Sql;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * 测试数据库层。

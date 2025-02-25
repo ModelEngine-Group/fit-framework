@@ -6,6 +6,9 @@
 
 package modelengine.fit.integration.mybatis;
 
+import static modelengine.fitframework.inspection.Validation.notNull;
+import static modelengine.fitframework.util.ObjectUtils.nullIf;
+
 import modelengine.fit.integration.mybatis.util.SqlSessionFactoryHelper;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Order;
@@ -16,6 +19,7 @@ import modelengine.fitframework.ioc.lifecycle.container.BeanContainerInitialized
 import modelengine.fitframework.plugin.Plugin;
 import modelengine.fitframework.plugin.PluginKey;
 import modelengine.fitframework.transaction.TransactionManager;
+
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
@@ -24,9 +28,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.util.Optional;
 import java.util.Properties;
-
-import static modelengine.fitframework.inspection.Validation.notNull;
-import static modelengine.fitframework.util.ObjectUtils.nullIf;
 
 /**
  * 为 {@link BeanContainerInitializedObserver} 提供用以整合 MyBatis 的实现。
