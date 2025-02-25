@@ -7,6 +7,7 @@
 package modelengine.fit.integration.mybatis;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
+import static modelengine.fitframework.util.ObjectUtils.nullIf;
 
 import modelengine.fit.integration.mybatis.util.SqlSessionFactoryHelper;
 import modelengine.fitframework.annotation.Component;
@@ -38,6 +39,7 @@ import java.util.Properties;
 @Order(Order.NEARLY_HIGH)
 public class MybatisBeanContainerInitializedObserver implements BeanContainerInitializedObserver {
     private static final String BYTEBUDDY_CONFIG = "mybatis.use-bytebuddy";
+    private static final String UNDERSCORE_TO_CAMEL_CASE = "mybatis.map-underscore-to-camelcase";
 
     private final BeanContainer container;
 
@@ -63,6 +65,7 @@ public class MybatisBeanContainerInitializedObserver implements BeanContainerIni
         configuration.setEnvironment(new Environment(PluginKey.identify(plugin.metadata()),
                 new ManagedTransactionFactory(transactionManager),
                 new LazyLoadedDataSource(container)));
+        configuration.setMapUnderscoreToCamelCase(nullIf(config.get(UNDERSCORE_TO_CAMEL_CASE, Boolean.class), false));
         container.factories(Interceptor.class)
                 .stream()
                 .map(BeanFactory::<Interceptor>get)
