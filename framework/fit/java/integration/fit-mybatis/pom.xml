@@ -44,7 +44,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Test-->
+        <!-- Test -->
         <dependency>
             <groupId>org.fitframework</groupId>
             <artifactId>fit-test-framework</artifactId>
