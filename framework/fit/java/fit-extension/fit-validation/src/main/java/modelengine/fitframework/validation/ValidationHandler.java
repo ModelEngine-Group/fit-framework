@@ -16,6 +16,7 @@ import modelengine.fitframework.pattern.builder.BuilderFactory;
 import modelengine.fitframework.util.AnnotationUtils;
 import modelengine.fitframework.util.ArrayUtils;
 import modelengine.fitframework.util.CollectionUtils;
+import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.ObjectUtils;
 import modelengine.fitframework.util.ReflectionUtils;
 import modelengine.fitframework.util.StringUtils;
@@ -172,6 +173,9 @@ public class ValidationHandler {
     private List<ValidationMetadata> handleCollection(Type[] actualTypeArgs, Collection<?> validationValueCollection,
             Method method, Class<?>[] validationGroups) {
         Validation.equals(actualTypeArgs.length, 1, "The collection must have exactly 1 parameterized type.");
+        if (CollectionUtils.isEmpty(validationValueCollection)) {
+            return Collections.emptyList();
+        }
         return validationValueCollection.stream()
                 .flatMap(element -> this.getValidationFields(actualTypeArgs[0], element, method, validationGroups)
                         .stream())
@@ -181,6 +185,9 @@ public class ValidationHandler {
     private List<ValidationMetadata> handleMap(Type[] actualTypeArgs, Map<?, ?> validationValueMap, Method method,
             Class<?>[] validationGroups) {
         Validation.equals(actualTypeArgs.length, 2, "The map must have exactly 2 parameterized types.");
+        if (MapUtils.isEmpty(validationValueMap)) {
+            return Collections.emptyList();
+        }
         return validationValueMap.entrySet()
                 .stream()
                 .flatMap(entry -> Stream.concat(
