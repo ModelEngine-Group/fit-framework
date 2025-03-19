@@ -9,7 +9,7 @@ package modelengine.fitframework.validation.validator;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fitframework.validation.ConstraintValidator;
-import modelengine.fitframework.validation.annotation.One;
+import modelengine.fitframework.validation.annotation.MinSize;
 
 import java.util.List;
 
@@ -19,7 +19,14 @@ import java.util.List;
  * @author 李金绪
  * @since 2025-03-17
  */
-public class OneValidator implements ConstraintValidator<One, Object> {
+public class MinSizeValidator implements ConstraintValidator<MinSize, Object> {
+    private long min;
+
+    @Override
+    public void initialize(MinSize constraintAnnotation) {
+        this.min = constraintAnnotation.min();
+    }
+
     @Override
     public boolean isValid(Object value) {
         if (value == null) {
@@ -29,6 +36,6 @@ public class OneValidator implements ConstraintValidator<One, Object> {
             return false;
         }
         List<Object> valueList = cast(value);
-        return valueList.size() == 1;
+        return valueList.size() < this.min;
     }
 }

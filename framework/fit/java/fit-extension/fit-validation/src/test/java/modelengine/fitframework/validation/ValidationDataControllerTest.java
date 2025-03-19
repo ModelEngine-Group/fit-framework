@@ -108,8 +108,8 @@ public class ValidationDataControllerTest {
     }
 
     @Test
-    @DisplayName("合法 Product-List<Car> 对象校验: cars = null")
-    void shouldOkWhenCreateInvalidProductWithNullListCar() {
+    @DisplayName("合法 Product-List<Car> 对象校验: cars == null")
+    void shouldOkWhenCreateInvalidProductWithNoCar() {
         Product product = new Product("mac", 10499.0, 100, "computer", null);
         MockRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.post("/validation/product/default").jsonEntity(product).responseType(Void.class);
@@ -118,8 +118,8 @@ public class ValidationDataControllerTest {
     }
 
     @Test
-    @DisplayName("合法 Product-List<Car> 对象校验: cars.size() = 1")
-    void shouldOkWhenCreateInvalidProductWithOneListCar() {
+    @DisplayName("合法 Product-List<Car> 对象校验: cars.size() == 1")
+    void shouldOkWhenCreateInvalidProductWith1Car() {
         Car validCar = new Car(1, 1, "brand", "model", 2000, 1999);
         Product product = new Product("mac", 10499.0, 100, "computer", Collections.singletonList(validCar));
         MockRequestBuilder requestBuilder =
@@ -129,8 +129,8 @@ public class ValidationDataControllerTest {
     }
 
     @Test
-    @DisplayName("不合法 Product-List<Car> 对象校验: cars.size() = 2")
-    void shouldFailedWhenCreateInvalidProductWithOneListCar() {
+    @DisplayName("不合法 Product-List<Car> 对象校验: cars.size() == 2")
+    void shouldFailedWhenCreateInvalidProductWith2Cars() {
         Car validCar = new Car(1, 1, "brand", "model", 2000, 1999);
         Product product = new Product("mac", 10499.0, 100, "computer", Arrays.asList(validCar, validCar));
         MockRequestBuilder requestBuilder =

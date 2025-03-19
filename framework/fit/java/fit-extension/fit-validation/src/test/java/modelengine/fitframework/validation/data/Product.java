@@ -6,7 +6,7 @@
 
 package modelengine.fitframework.validation.data;
 
-import modelengine.fitframework.validation.annotation.One;
+import modelengine.fitframework.validation.annotation.MinSize;
 import modelengine.fitframework.validation.constraints.NotBlank;
 import modelengine.fitframework.validation.constraints.Positive;
 
@@ -31,7 +31,7 @@ public class Product {
     @NotBlank(message = "产品类别不能为空")
     private String category;
 
-    @One
+    @MinSize(min = 2)
     private List<Car> cars;
 
     /**
@@ -39,6 +39,14 @@ public class Product {
      */
     public Product() {}
 
+    /**
+     * 构造函数。
+     *
+     * @param name 表示名字的 {@link String}。
+     * @param price 表示价格的 {@link Double}。
+     * @param quantity 表示数量的 {@link Integer}。
+     * @param category 表示类别的 {@link String}。
+     */
     public Product(String name, Double price, Integer quantity, String category) {
         this.name = name;
         this.price = price;
@@ -46,6 +54,15 @@ public class Product {
         this.category = category;
     }
 
+    /**
+     * 构造函数。
+     *
+     * @param name 表示名字的 {@link String}。
+     * @param price 表示价格的 {@link Double}。
+     * @param quantity 表示数量的 {@link Integer}。
+     * @param category 表示类别的 {@link String}。
+     * @param cars 表示汽车集合的 {@link List}{@code <}{@link Car}{@code >}。
+     */
     public Product(String name, Double price, Integer quantity, String category, List<Car> cars) {
         this.name = name;
         this.price = price;
