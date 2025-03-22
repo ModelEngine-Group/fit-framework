@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -23,6 +23,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * {@link ValidationDataController} 的测试集。
@@ -99,6 +101,38 @@ public class ValidationDataControllerTest {
     @DisplayName("不合法 Product 对象校验")
     void shouldFailedWhenCreateInvalidProduct() {
         Product product = new Product("", 10499.0, -1, "computer");
+        MockRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post("/validation/product/default").jsonEntity(product).responseType(Void.class);
+        this.response = this.mockMvc.perform(requestBuilder);
+        assertThat(this.response.statusCode()).isEqualTo(500);
+    }
+
+    @Test
+    @DisplayName("合法 Product-List<Car> 对象校验: cars == null")
+    void shouldOkWhenCreateInvalidProductWithNoCar() {
+        Product product = new Product("mac", 10499.0, 100, "computer", null);
+        MockRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post("/validation/product/default").jsonEntity(product).responseType(Void.class);
+        this.response = this.mockMvc.perform(requestBuilder);
+        assertThat(this.response.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("合法 Product-List<Car> 对象校验: cars.size() == 1")
+    void shouldOkWhenCreateInvalidProductWith1Car() {
+        Car validCar = new Car(1, 1, "brand", "model", 2000, 1999);
+        Product product = new Product("mac", 10499.0, 100, "computer", Collections.singletonList(validCar));
+        MockRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.post("/validation/product/default").jsonEntity(product).responseType(Void.class);
+        this.response = this.mockMvc.perform(requestBuilder);
+        assertThat(this.response.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("不合法 Product-List<Car> 对象校验: cars.size() == 2")
+    void shouldFailedWhenCreateInvalidProductWith2Cars() {
+        Car validCar = new Car(1, 1, "brand", "model", 2000, 1999);
+        Product product = new Product("mac", 10499.0, 100, "computer", Arrays.asList(validCar, validCar));
         MockRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.post("/validation/product/default").jsonEntity(product).responseType(Void.class);
         this.response = this.mockMvc.perform(requestBuilder);
