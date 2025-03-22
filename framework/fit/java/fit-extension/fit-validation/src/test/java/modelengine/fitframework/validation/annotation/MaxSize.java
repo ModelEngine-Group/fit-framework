@@ -8,7 +8,7 @@ package modelengine.fitframework.validation.annotation;
 
 import modelengine.fitframework.validation.Validated;
 import modelengine.fitframework.validation.constraints.Constraint;
-import modelengine.fitframework.validation.validator.MinSizeValidator;
+import modelengine.fitframework.validation.validator.MaxSizeValidator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,22 +20,22 @@ import java.lang.annotation.RetentionPolicy;
  * @since 2025-03-17
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint({MinSizeValidator.class})
+@Constraint({MaxSizeValidator.class})
 @Validated
-public @interface MinSize {
+public @interface MaxSize {
     /**
-     * 表示集合元素的大小的下限值。
+     * 表示集合元素的大小的上限值。
      *
-     * @return 表示集合元素的大小的下限值的 {@code long}。
+     * @return 表示集合元素的大小的上限值的 {@code long}。
      */
-    long min();
+    long max();
 
     /**
      * 表示校验失败的信息。
      *
      * @return 表示校验失败的信息的 {@link String}。
      */
-    String message() default "must be greater than the minimum value.";
+    String message() default "must be lesser than the max value.";
 
     /**
      * 表示校验的分组。

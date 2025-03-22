@@ -6,7 +6,7 @@
 
 package modelengine.fitframework.validation.data;
 
-import modelengine.fitframework.validation.annotation.MinSize;
+import modelengine.fitframework.validation.annotation.MaxSize;
 import modelengine.fitframework.validation.constraints.NotBlank;
 import modelengine.fitframework.validation.constraints.Positive;
 
@@ -31,7 +31,7 @@ public class Product {
     @NotBlank(message = "产品类别不能为空")
     private String category;
 
-    @MinSize(min = 2)
+    @MaxSize(max = 2)
     private List<Car> cars;
 
     /**

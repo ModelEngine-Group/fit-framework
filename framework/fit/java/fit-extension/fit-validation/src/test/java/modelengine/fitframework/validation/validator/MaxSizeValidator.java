@@ -9,7 +9,7 @@ package modelengine.fitframework.validation.validator;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fitframework.validation.ConstraintValidator;
-import modelengine.fitframework.validation.annotation.MinSize;
+import modelengine.fitframework.validation.annotation.MaxSize;
 
 import java.util.List;
 
@@ -19,12 +19,12 @@ import java.util.List;
  * @author 李金绪
  * @since 2025-03-17
  */
-public class MinSizeValidator implements ConstraintValidator<MinSize, Object> {
-    private long min;
+public class MaxSizeValidator implements ConstraintValidator<MaxSize, Object> {
+    private long max;
 
     @Override
-    public void initialize(MinSize constraintAnnotation) {
-        this.min = constraintAnnotation.min();
+    public void initialize(MaxSize constraintAnnotation) {
+        this.max = constraintAnnotation.max();
     }
 
     @Override
@@ -36,6 +36,6 @@ public class MinSizeValidator implements ConstraintValidator<MinSize, Object> {
             return false;
         }
         List<Object> valueList = cast(value);
-        return valueList.size() < this.min;
+        return valueList.size() < this.max;
     }
 }
