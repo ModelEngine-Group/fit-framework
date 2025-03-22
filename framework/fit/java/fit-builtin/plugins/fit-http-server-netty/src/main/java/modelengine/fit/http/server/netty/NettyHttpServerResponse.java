@@ -48,7 +48,7 @@ public class NettyHttpServerResponse implements ServerResponse {
     private boolean isClosed;
 
     public NettyHttpServerResponse(ChannelHandlerContext ctx, NettyHttpServerRequest nettyRequest) {
-        this.startLine = ConfigurableStatusLine.create(HttpVersion.HTTP_1_1, 0, StringUtils.EMPTY);
+        this.startLine = ConfigurableStatusLine.create(HttpVersion.HTTP_1_1, 200, StringUtils.EMPTY);
         this.headers = ConfigurableMessageHeaders.create();
         this.ctx = notNull(ctx, "The channel handler context cannot be null.");
         this.keepAlive = HttpUtil.isKeepAlive(nettyRequest.getNettyRequest());
