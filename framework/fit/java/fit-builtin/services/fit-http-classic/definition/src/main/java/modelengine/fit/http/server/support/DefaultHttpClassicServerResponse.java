@@ -30,6 +30,7 @@ import modelengine.fit.http.header.ContentType;
 import modelengine.fit.http.header.HeaderValue;
 import modelengine.fit.http.header.ParameterCollection;
 import modelengine.fit.http.protocol.ConfigurableMessageHeaders;
+import modelengine.fit.http.protocol.HttpResponseStatus;
 import modelengine.fit.http.protocol.MessageHeaderValues;
 import modelengine.fit.http.protocol.ServerResponse;
 import modelengine.fit.http.server.HttpClassicServerResponse;
@@ -132,6 +133,8 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
             throw new InternalServerErrorException("The http classic server response has already committed.");
         }
         this.entity = new DefaultWritableBinaryEntity(this, this.serverResponse);
+        this.statusCode(HttpResponseStatus.OK.statusCode());
+        this.headers().set(TRANSFER_ENCODING, CHUNKED);
         this.commit();
         this.serverResponse.writeStartLineAndHeaders();
         return ObjectUtils.cast(this.entity);
