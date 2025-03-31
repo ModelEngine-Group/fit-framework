@@ -1,0 +1,22 @@
+<svg width="16.000000" height="16.000000" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+>
+    <desc>
+        Created with Pixso.
+    </desc>
+    <defs/>
+    <rect id="工作流" width="16.000000" height="16.000000" fill="#FFFFFF" fill-opacity="0"/>
+    <rect id="矩形 467" x="0.711914" y="9.853516" rx="1.000000" width="4.687476" height="4.687446" fill="#3DCCAB"
+          fill-opacity="1.000000"/>
+    <rect id="矩形 468" x="8.636230" y="12.230469" rx="1.000000" width="4.687460" height="4.687567"
+          transform="rotate(-44.9998 8.636230 12.230469)" fill="#3DCCAB" fill-opacity="1.000000"/>
+    <path id="直线 51" d="M3.01 7.97L3.01 5.63" stroke="#3DCCAB" stroke-opacity="1.000000" stroke-width="2.000000"
+          stroke-linecap="round"/>
+    <path id="直线 53" d="M11.91 9.85L11.91 7.97" stroke="#3DCCAB" stroke-opacity="1.000000" stroke-width="2.000000"
+          stroke-linecap="round"/>
+    <ellipse id="椭圆 38" cx="3.011719" cy="3.291016" rx="1.874990" ry="1.874978" stroke="#3DCCAB"
+             stroke-opacity="1.000000" stroke-width="1.500000"/>
+    <ellipse id="椭圆 37" cx="11.917480" cy="2.822266" rx="2.343738" ry="2.343723" fill="#3DCCAB"
+             fill-opacity="1.000000"/>
+    <path id="直线 52" d="M7.69 2.82L10.04 2.82" stroke="#3DCCAB" stroke-opacity="1.000000" stroke-width="2.000000"
+          stroke-linecap="round"/>
+</svg>

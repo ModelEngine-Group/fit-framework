@@ -1,0 +1,23 @@
+<svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip4_13297">
+			<rect id="图标/16/检查列表" width="16.000000" height="16.000000" transform="translate(4.000000 4.000000)" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<rect id="画板 856" rx="4.000000" width="24.000000" height="24.000000" fill="#A97AF8" fill-opacity="1.000000"/>
+	<g clip-path="url(#clip4_13297)">
+		<path id="path" d="M15 7.68L14.98 7.68C14.78 7.48 14.78 7.17 14.98 6.97C15.17 6.78 15.48 6.78 15.68 6.97L15.68 7L15 7.68ZM18.32 9.64L18.35 9.64C18.55 9.84 18.55 10.15 18.35 10.35C18.15 10.55 17.84 10.55 17.64 10.35L17.64 10.32L18.32 9.64Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M15.33 7.33L18 10" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="path" d="M15.68 10.32L15.68 10.35C15.48 10.55 15.17 10.55 14.98 10.35C14.78 10.15 14.78 9.84 14.98 9.64L15 9.64L15.68 10.32ZM17.64 7L17.64 6.97C17.84 6.78 18.15 6.78 18.35 6.97C18.55 7.17 18.55 7.48 18.35 7.68L18.32 7.68L17.64 7Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M15.33 10L18 7.33" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="path" d="M18.29 13.69L18.29 13.67C18.47 13.46 18.78 13.43 18.99 13.62C19.2 13.8 19.22 14.11 19.04 14.32L19.01 14.33L18.29 13.69ZM14.67 15.68L14.64 15.68C14.44 15.48 14.44 15.17 14.64 14.97C14.84 14.78 15.15 14.78 15.35 14.97L15.35 15L14.67 15.68Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M18.66 14L16.33 16.66L15 15.33" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="path" d="M12.66 7.33L5.33 7.33L5.33 10L12.66 10L12.66 7.33Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+		<path id="path" d="M5.33 7.33L5.33 10L12.66 10L12.66 7.33L5.33 7.33Z" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round"/>
+		<path id="path" d="M12.66 14L5.33 14L5.33 16.66L12.66 16.66L12.66 14Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+		<path id="path" d="M5.33 14L5.33 16.66L12.66 16.66L12.66 14L5.33 14Z" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round"/>
+	</g>
+</svg>

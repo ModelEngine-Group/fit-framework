@@ -1,0 +1,53 @@
+.jade-input-tree-title .ant-row {
+    display: flex;
+    width: 100%;
+}
+
+.jade-input-tree-title-child {
+    height: auto;
+    display: flex;
+}
+
+.jade-input-tree-title .ant-form-item {
+    width: 100%;
+}
+
+.jade-input-tree-title-child .ant-form-item  .ant-row .ant-col  .ant-form-item-explain {
+    white-space: normal;  /* 允许文本换行 */
+    word-break: break-word;  /* 强制长单词断行 */
+    max-width: 100%;  /* 仍然限制最大宽度 */
+}
+
+
+.jade-input-tree-title-key {
+}
+
+.jade-input-tree-title-from {
+    margin-left: 8px;
+}
+
+.jade-input-tree-title-select .ant-select-selector {
+    border-radius: 8px 0 0 8px !important;
+}
+
+.jade-input-tree-title-tree-select .ant-select-selector {
+    border-radius: 0 8px 8px 0 !important;
+}
+
+.jade-ant-tree {
+    background: transparent !important;
+    border-radius: 8px;
+}
+
+.jade-hide-tree-left-line .ant-tree-switcher-leaf-line {
+    visibility:hidden;
+}
+
+.jade-tree-node .ant-tree-switcher {
+    display: flex;
+    justify-content: center;
+}
+
+.jade-tree-node .ant-tree-node-content-wrapper {
+    background: transparent!important;
+}

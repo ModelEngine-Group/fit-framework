@@ -1,0 +1,145 @@
+.icon-button {
+    padding: 0;
+    margin: 0;
+}
+
+.ant-tree {
+    background: #f7f7f7;
+}
+
+.tool-custom-collapse-content {
+    /* 画板 1840 */
+    width: 100%;
+    /* 自动布局 */
+    padding: 8px;
+    flex-grow: 0;
+}
+
+.tool-item {
+    /* 画板 279 */
+    position: static;
+    width: 100%;
+    height: 32px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px 8px 20px;
+
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+    margin: 8px 0;
+
+    box-sizing: border-box;
+    /* live ui线框 */
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 4px;
+
+    /* 白色文本 */
+    background: rgb(255, 255, 255);
+}
+
+.tool-item.item-hover:hover {
+    background-color: rgb(242, 242, 242);; /* 鼠标移入时的背景颜色 */
+    transition: background-color 0.3s ease; /* 平滑过渡效果 */
+}
+
+.tool-item-content-wrapper {
+    position: static;
+    width: 100%;
+    height: 20px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    order: 0;
+    flex-grow: 0;
+}
+
+.tool-icon-style {
+    /* path */
+    position: static;
+    width: 14px;
+    height: 14px;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0 10px;
+}
+
+.tool-name {
+    /* 工具B(脚本) */
+    height: 14px;
+    /* 自动布局 */
+    display: flex;
+    align-items: center;
+    padding: 0;
+    /* Inside Auto Layout */
+    flex-grow: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: rgb(26, 26, 26);
+    font-family: HarmonyOS Sans;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 14px;
+    letter-spacing: 0;
+    text-align: left;
+    width: 180px;
+}
+
+.tool-version-wrapper {
+    /* 画板 1651 */
+    height: 20px;
+    /* 自动布局 */
+    display: flex;
+
+    flex: none;
+    flex-grow: 0;
+}
+
+.tool-version-font {
+    /* 自动布局 */
+    display: flex;
+    align-items: center;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0 10px;
+
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.tool-delete-btn {
+    width: 13px;
+    height: 13px;
+    top: 9.38%;
+    bottom: 9.38%;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.2s, opacity 0.2s;
+}
+
+/* 鼠标悬停时显示删除按钮 */
+.tool-item:hover .tool-delete-btn {
+    visibility: visible;
+    opacity: 1;
+}

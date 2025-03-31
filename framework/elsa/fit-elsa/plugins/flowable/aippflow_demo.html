@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>elsa</title>
+
+
+    <script type="module" language="javascript">
+        import {AippFlow} from "./aippFlowEntry.js";
+
+        let names = ["选择大模型", "上传图片", "输入文字", "文字生成图像", "图像生成文字", "图像转PDF",
+            "关键字生成文本"];
+        window.onload = async () => {
+            AippFlow.new(document.getElementById("main")).then(agent => {
+                agent.graph.activePage.backColor = "whitesmoke";
+                agent.graph.activePage.moveAble = "true";
+                agent.graph.activePage.adaptLayout();
+                let data = agent.serialize();
+                agent.addInsertButtonListener(insertNodes => {
+                    insertNodes([{
+                        type: "aippState",
+                        name: names[Math.floor(Math.random() * names.length)],
+                        icon: "aaa",
+                        tags: Math.random() > 0.5 ? ['agent'] : [],
+                        description: "bbbbbbbbbb",
+                        jober: {
+                            "name": "<名字>", "type": "ohscript_jober", "fitables": ["<Fit ID>"]
+                        }
+                    }]);
+                });
+
+                agent.addTypeChangeListener(updateNode => {
+                    updateNode({
+                        type: "aippState",
+                        name: names[Math.floor(Math.random() * names.length)],
+                        icon: "bbb",
+                        description: "cccccc",
+                        tags: ["prompt", 'code'],
+                        jober: {
+                            "name": "<名字>", "type": "<jober_类型>", "fitables": ["<Fit ID>"]
+                        }
+                    });
+                });
+                agent.addFocusedShapeChangeListener(data => {
+                    // 没关系，继续，不影响其他错误信息的处理.
+                });
+                document.getElementById("serialize").addEventListener("mousedown", (event) => {
+                    data = agent.serialize();
+                });
+                document.getElementById("deserialize").addEventListener("mousedown", (event) => {
+                    agent.loadFlowFromGraph(data);
+                });
+
+                window.getRandomState = () => agent.graph.activePage.shapes.find(s => s.type === 'aippState');
+                window.shapes = agent.graph.activePage.shapes;
+            });
+        };
+    </script>
+
+</head>
+
+<body>
+<div id="main" style="width:90%; height: 80%; position: absolute;background: lightblue"></div>
+<button id="serialize" style="z-index: 999; position:relative">Serialized</button>
+<button id="deserialize" style="z-index: 999; position:relative">deserialize</button>
+
+</body>
+
+</html>

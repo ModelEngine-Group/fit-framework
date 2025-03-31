@@ -1,0 +1,690 @@
+.jade-custom-collapse {
+    background-color: transparent; /* 设置背景透明 */
+}
+
+.jade-custom-collapse .ant-collapse-item .ant-collapse-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.jade-custom-collapse .ant-collapse-header, .jade-multi-conversation .ant-collapse .ant-collapse-header {
+    padding: 8px !important;
+}
+
+.value-custom, .value-custom .ant-select-selector {
+    width: 100%;
+    border-radius: 0 8px 8px 0 !important;
+    border-left: 0 !important;
+}
+
+.value-source-custom, .value-source-custom .ant-select-selector {
+    width: 100%;
+    border-radius: 8px 0 0 8px !important;
+}
+
+.icon-button {
+    padding: 0;
+    margin: 0;
+}
+
+.jade-panel-header-font {
+    color: rgb(37, 43, 58);
+    justify-content: flex-start;
+    margin-right: 4px;
+    font-family: HarmonyOS Sans, 微软雅黑, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe Ul, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.jade-panel-header-popover-content {
+    margin-left: 4px;
+    color: rgba(28, 31, 35, .35);
+    height: 14px;
+    width: 14px;
+}
+
+.jade-panel, .jade-multi-conversation .ant-collapse .ant-collapse-item {
+    background-color: rgba(250, 250, 250); /* 设置背景颜色 */
+    margin-bottom: 8px !important;
+    border-radius: 8px !important;
+    width: 100%;
+}
+
+.jade-panel .ant-collapse-header {
+    padding: 8px 8px 8px 8px !important;
+    align-items: center !important;
+}
+
+.jade-panel .ant-collapse-content .ant-collapse-content-box {
+    padding-top: 0 !important;
+}
+
+.ant-collapse-borderless .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
+    padding: 0;
+}
+
+.jade-node-custom-header-icon {
+    background-size: cover !important;
+    background-position: center !important;
+    padding: 0 !important;
+    margin: 0 8px 0 0 !important;
+    width: 24px !important;
+    height: 24px !important;
+    border: none !important;
+    pointer-events: none;
+}
+
+.jade-form-item .ant-form-item-label > label {
+    color: rgb(77, 77, 77);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0px;
+    text-align: left;
+    width: 100%;
+}
+
+.jade-font-size, .jade-select .ant-select-selector .ant-select-selection-item, .jade-select .ant-select-item-option, .ant-select-selection-placeholder, .jade-input::placeholder, .ant-select-dropdown .ant-select-item, .ant-tree-select-dropdown .ant-select-tree, .jade-input .ant-input-number-input-wrap > input {
+    font-size: 12px;
+}
+
+.jade-font-color {
+    color: rgb(77, 77, 77);
+}
+
+.jade-select .ant-select-selector {
+    border-color: #edeeef !important;
+}
+
+.jade-select {
+    position: relative;
+
+    .ant-select-dropdown {
+        position: absolute;
+        top: 36px !important;
+        left: 0 !important;
+        font-size: 12px !important;
+    }
+}
+
+.jade-start-node-input.jade-start-node-input {
+    border-color: #edeeef !important;
+    font-size: 12px;
+}
+
+.jade-input.jade-input {
+    border-color: #edeeef !important;
+    font-size: 12px;
+    height: 32px
+}
+
+.jade-textarea-input.jade-textarea-input {
+    border-color: #edeeef !important;
+    font-size: 12px;
+    min-height: 86.5px !important;
+}
+
+.ant-form-item-label {
+    padding-left: 4px !important;
+    padding-bottom: 4px !important;
+}
+
+.jade-form {
+    margin-top: 8px
+}
+
+.jade-slider {
+    margin-bottom: 24px !important;
+}
+
+.jade-popover-icon {
+    color: rgba(28, 31, 35, .35);
+}
+
+.jade-second-title {
+    margin-right: 4px;
+}
+
+.ant-slider-track {
+    background-color: #047BFC !important;
+}
+
+.ant-slider .ant-slider-mark {
+    font-size: 12px;
+}
+
+.jade-column {
+    display: flex;
+    align-items: center;
+}
+
+.jade-row {
+    display: flex;
+    align-items: center;
+}
+
+.ant-form-item {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.title {
+    font-family: 微软雅黑, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe Ul, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 4px;
+    justify-content: flex-start;
+}
+
+.jade-panel-header-icon-position {
+    margin-left: auto !important; /* 将 button 放置在最右侧 */
+    margin-right: 1% !important;
+    height: 22px;
+}
+
+.jade-tree-select {
+    font-size: 12px;
+    width: 100%;
+}
+
+.jade-node-footer-button {
+    background-color: transparent !important;
+    height: 20px !important;
+    padding: 0 !important;
+    margin: 0 0 0 auto !important;
+    border: 0 !important;
+}
+
+.jade-node-footer-icon {
+    height: 20px !important;
+}
+
+.react-node-footer {
+    margin-top: 8px;
+    user-select: none;
+}
+
+.jade-footer-text {
+    position: static;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 4;
+    padding: 0px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0px 4px;
+    color: rgb(37, 43, 58);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 14px;
+    letter-spacing: 0px;
+    text-align: left;
+}
+
+.jade-code-editor .monaco-editor, .jade-code-editor .monaco-editor .overflow-guard {
+    border-radius: 4px
+}
+
+.jade-drop-down-popover {
+    margin-left: 8px;
+}
+
+.jade-drop-down-popover-overlay {
+    z-index: 1200 !important;
+}
+
+.jade-node-custom-header-type-icon {
+    background-size: cover !important;
+    background-position: center !important;
+    padding: 0 !important;
+    width: 14px !important;
+    height: 14px !important;
+    border: none !important;
+    pointer-events: none;
+}
+
+.jade-node-custom-header-type-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 0 8px !important;
+    width: 24px;
+    height: 24px;
+    background: rgb(230, 242, 255);
+    border-radius: 4px;
+}
+
+.jade-node-custom-header-type-tooltip .ant-tooltip-inner {
+    background-color: white !important;
+    color: rgb(33, 33, 33) !important;
+    font-family: HarmonyOS Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0px;
+    text-align: center;
+}
+
+.jade-node-custom-header-type-tooltip .ant-tooltip-arrow {
+    background: none !important;
+}
+
+.jade-node-custom-header-type-tooltip .ant-tooltip-arrow::before {
+    background-color: white !important; /* 设置箭头的颜色 */
+}
+
+.jade-component-title {
+    color: rgb(37, 43, 58);
+    font-family: 微软雅黑, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe Ul, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 19px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.jade-second-title-text {
+    color: rgb(77, 77, 77);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.model-text-container {
+    /* 通用/Label必填-非必填 */
+    position: static;
+    width: 96px;
+    height: 18px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 2px 0;
+}
+
+.model-select-container {
+    position: static;
+    width: 320px;
+    height: 32px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 10px 0 10px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+    margin: 2px 0;
+}
+
+.model-select {
+    /* google-bert/bert-base-uncased */
+    position: static;
+    width: 280px;
+    height: 32px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    border-width: 0;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+}
+
+.huggingface-light-font {
+    color: rgb(128, 128, 128);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 32px;
+    letter-spacing: 0px;
+    text-align: left;
+}
+
+.button-select {
+    width: 32px;
+    display: flex;
+    padding: 0;
+    align-items: center;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    border-width: 0;
+    border-radius: 0;
+    margin-left: 8px;
+}
+
+.button-select-text {
+    color: rgb(38, 115, 229);
+    font-family: Huawei Sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 32px;
+    letter-spacing: -1px;
+    text-align: left;
+}
+
+.jade-required-indicator {
+    color: rgb(198, 57, 57);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0px;
+    text-align: left;
+    padding-right: 2px;
+}
+
+.jade-custom-panel-content {
+    border-radius: 8px;
+    padding: 0 12px 12px 12px;
+}
+
+.jade-custom-multi-select-with-slider-div {
+    position: static;
+    width: 100%;
+    height: auto;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 0 20px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    margin: 8px 0;
+
+    box-sizing: border-box;
+    /* live ui线框 */
+    border: 1px solid rgb(230, 230, 230);
+    border-radius: 4px;
+}
+
+.jade-custom-multi-select-with-slider-div.item-hover:hover {
+    background-color: rgb(242, 242, 242);; /* 鼠标移入时的背景颜色 */
+    transition: background-color 0.3s ease; /* 平滑过渡效果 */
+}
+
+.jade-custom-multi-select-item {
+    width: 100%;
+    height: 16px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0 8px 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jade-custom-select-button {
+    margin-bottom: 10px;
+}
+
+.jade-plugin-type-icon {
+    /* path */
+    position: static;
+    width: 14px;
+    height: 14px;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0 10px 0 0;
+}
+
+.jade-custom-multi-item-container {
+    max-height: 168px; /* 设置容器的最大高度, 五个item的高度和，每个33.6px 33.6*5 = 168 */
+    overflow-y: auto; /* 当内容超出容器时启用垂直滚动条 */
+}
+
+.header-title {
+    user-select: none;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe Ul, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+    line-height: 24px;
+    color: rgb(28, 31, 35);
+}
+
+.text-title-tooltip .ant-tooltip-inner {
+    font-family: 微软雅黑, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe Ul, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+    background-color: white !important;
+    color: rgb(37, 43, 58); /* 可选：设置文本颜色 */
+    white-space: normal; /* 允许换行 */
+    word-break: break-all; /* 在任何字符间换行 */
+}
+
+.ant-form-item.ant-form-item {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.icon-button.icon-button {
+    padding: 0;
+    margin: 0;
+}
+
+.ant-tree-show-line .ant-tree-switcher {
+    background: transparent !important;
+}
+
+.jade-custom-panel-content .ant-tree {
+    background: #f7f7f7 !important;
+}
+
+.ant-input-affix-wrapper {
+    height: 32px;
+}
+
+.ant-switch-inner.ant-switch-inner {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+}
+
+.ant-slider-handle.ant-slider-handle {
+    top: 50%;
+    margin-top: -7px;
+}
+
+.ant-tree-show-line .ant-tree-switcher.ant-tree-switcher {
+    background-color: transparent;
+}
+
+.jade-custom-collapse .ant-switch.ant-switch-checked, .jade-custom-modal .ant-switch.ant-switch-checked {
+    background-color: #0478FC !important;
+}
+
+.jade-start-add-icon.jade-start-add-icon {
+    height: 32px;
+    margin-left: auto !important;
+    margin-right: 12px !important;
+}
+
+.icon-button .anticon.anticon-plus > svg, .icon-button .anticon.anticon-minus > svg {
+    shape-rendering: geometricPrecision !important; /* 强调几何精度高于速度和边缘清晰度。避免缩放时候显示不完整的问题 */
+}
+
+.jade-panel-background {
+    position: absolute;
+    background: white;
+}
+
+.select-value-custom .ant-select-selector {
+    width: 109px !important;
+    height: 24px !important;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 10px;
+    border: 1px solid rgb(230, 230, 230) !important;
+    border-radius: 4px !important;
+    /* live ui 表格底色 */
+    background: rgb(247, 247, 247) !important;
+}
+
+.select-value-custom .ant-select-arrow {
+    padding-right: 10px !important;
+}
+
+.select-value-custom .ant-select-selector .ant-select-selection-item {
+    color: rgb(26, 26, 26);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.jade-red-asterisk-tex::before {
+    content: '*';
+    margin-right: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun, sans-serif;
+    line-height: 1;
+}
+
+.jade-error-border {
+    border-color: red !important;
+}
+
+.jade-custom-popover .ant-popover-inner {
+    border-radius: 4px;
+}
+
+.jade-custom-image-container .ant-image-mask {
+    background: rgba(255, 255, 255, 0.5)
+}
+
+.jade-custom-selected-item {
+    display: flex;
+    align-items: center;
+}
+
+.jade-custom-selected-item button {
+    margin-left: 0;
+    border: none;
+    padding: 0;
+}
+
+.ai-prompt-panel-content {
+    border-radius: 8px;
+    padding-bottom: 8px;
+}
+
+.ai-prompt-input {
+    width: 320px !important;
+    height: 90px !important;
+    /* 自动布局 */
+    display: flex !important;
+    /* Inside Auto Layout */
+    flex: none !important;
+    order: 0 !important;
+    align-self: stretch !important;
+    flex-grow: 1 !important;
+    margin: 0 8px !important;
+    box-sizing: border-box !important;
+    /* LiveUI_3.0/Grey/Grey05-B90 */
+    border: 1px solid rgb(230, 230, 230) !important;
+    border-radius: 4px !important;
+}
+
+.ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+    content: unset !important;
+}
+
+.ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::after {
+    display: inline-block;
+    margin-right: 4px;
+    color: rgb(198, 57, 57);
+    font-size: 14px;
+    font-family: SimSun, sans-serif;
+    line-height: 1;
+    content: '*';
+    top: -1.5px;
+}
+
+.ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional):has( > div.required-after)::after {
+    content: unset;
+}
+
+.ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) > div.required-after > span:first-child::after {
+    display: inline-block;
+    margin-right: 4px;
+    color: rgb(198, 57, 57);
+    font-size: 14px;
+    font-family: SimSun, sans-serif;
+    line-height: 1;
+    content: '*';
+    top: -1.5px;
+}
+
+.codicon-folding-expanded:before {
+    content: '' !important;
+    background-image: url('/src/components/asserts/icon-code-expanded.svg');
+    background-size: cover;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+.codicon-folding-collapsed:before {
+    content: '' !important;
+    background-image: url('/src/components/asserts/icon-code-collapsed.svg');
+    background-size: cover;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+.monaco-editor .margin-view-overlays .codicon-folding-manual-collapsed, .monaco-editor .margin-view-overlays .codicon-folding-manual-expanded, .monaco-editor .margin-view-overlays .codicon-folding-expanded, .monaco-editor .margin-view-overlays .codicon-folding-collapsed {
+    opacity: 1 !important;
+}
+
+.intelligent-form-left-select .ant-select-selector{
+    border-radius: 8px 0 0 8px !important;
+}
+
+.intelligent-form-right-select .ant-select-selector{
+    border-radius: 0 8px 8px 0 !important;
+}

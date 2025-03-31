@@ -1,0 +1,13 @@
+<svg width="20.000000" height="20.000000" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip1888_166379">
+			<rect id="运行成功" width="20.000000" height="20.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip1888_166379)">
+		<path id="ICON" d="M0 10C0 4.45459 4.4541 0 10 0C15.5459 0 20 4.45459 20 10C20 15.5454 15.5459 20 10 20C4.4541 20 0 15.5454 0 10ZM9.36328 14.2727L14.7275 7.90918C15.0908 7.54541 15 7 14.7275 6.63647C14.4541 6.27271 13.9092 6.27271 13.5449 6.63647L8.72754 12.3638L6.4541 9.90918C6.18164 9.54541 5.63574 9.54541 5.27246 9.90918C4.90918 10.2727 4.90918 10.8181 5.27246 11.1819L8.18164 14.2727C8.4541 14.6365 9 14.6365 9.36328 14.2727Z" clip-rule="evenodd" fill="#53AB6B" fill-opacity="1.000000" fill-rule="evenodd"/>
+	</g>
+</svg>

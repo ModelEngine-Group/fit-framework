@@ -1,0 +1,36 @@
+.tool-invoke-version-info {
+    background-color: #fff;
+    width: 560px;
+    z-index: 1000;
+    padding: 24px;
+    border-radius: 4px;
+}
+
+.tool-invoke-version-info-header {
+    font-family: Huawei Sans;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(26, 26, 26);
+}
+
+.tool-invoke-version-info-text {
+    font-family: HarmonyOS Sans;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.tool-invoke-version-info-detail {
+    margin-top: 16px;
+}
+
+.tool-invoke-version-info-description {
+    margin-top: 22px;
+}
+
+.tool-invoke-version-info-title {
+    color: rgb(77, 77, 77);
+}
+
+.tool-invoke-version-info-value {
+    color: rgb(26, 26, 26);
+}

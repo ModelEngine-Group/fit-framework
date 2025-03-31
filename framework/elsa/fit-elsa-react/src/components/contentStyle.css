@@ -1,0 +1,12 @@
+.react-node-content {
+    user-select: none;
+    cursor: default;
+}
+
+.jade-cover-level {
+    position: absolute;
+    border-radius: 8px;
+    background: rgb(57, 57, 57);
+    opacity: 0.5; /* 设置透明度 */
+    z-index: 9999;
+}

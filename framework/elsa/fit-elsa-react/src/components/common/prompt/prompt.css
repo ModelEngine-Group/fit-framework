@@ -1,0 +1,59 @@
+.prompt-title-texts {
+    flex: 1;
+}
+
+.prompt-title-buttons {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.prompt-container label {
+    width: 100%;
+}
+
+.jade-prompt-drawer-textarea {
+    border-radius: 4px;
+    height: calc(100vh - 220px) !important;
+    max-height: calc(100vh - 220px);
+}
+
+.jade-prompt-drawer-btn {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    background: -webkit-linear-gradient(right, #5E7CE0FF, #6F58FEFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+}
+
+.jade-prompt-drawer .ant-drawer-title {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: Huawei Sans;
+}
+
+.jade-prompt-drawer .ant-drawer-header {
+    border: 0;
+}
+
+.jade-prompt-drawer .ant-drawer-body {
+    padding: 16px 24px;
+}
+
+.jade-prompt-drawer .ant-drawer-footer {
+    border: 0;
+}
+
+.jade-prompt-drawer-footer-btn {
+    width: 90px;
+    margin: 0 5px !important;
+    border-radius: 4px !important;
+}
+
+.jade-prompt-drawer-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

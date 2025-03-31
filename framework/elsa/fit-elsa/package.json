@@ -1,0 +1,48 @@
+{
+  "name": "@fit-elsa/elsa-core",
+  "version": "1.0.0-source",
+  "main": "build/elsa.js",
+  "files": [
+    "build"
+  ],
+  "private": false,
+  "module": "build/elsa.js",
+  "scripts": {
+    "replace": "sed -i 's/__webpack_exports__\\([a-zA-Z0-9]\\+\\)/\\1/g' build/elsa.js",
+    "replace:ict": "sed -i 's/__webpack_exports__\\([a-zA-Z0-9]\\+\\)/\\1/g' build/view.js",
+    "cp:json": "cp package.json ./build/package.json",
+    "compile": "cross-env NODE_ENV=daily webpack --progress --color --config webpack.config.js",
+    "compile:debug": "cross-env NODE_ENV=daily MODE=debug webpack --progress --color --config webpack.config.js",
+    "compile:ict": "webpack --progress --color --config webpack.config-ict.js",
+    "compile:pro": "cross-env NODE_ENV=pro webpack --progress --color --config webpack.config.js",
+    "build": "npm run compile && npm run replace",
+    "build:debug": "npm run compile:debug && npm run replace",
+    "build:pro": "npm run compile:pro && npm run replace",
+    "build:ict": "npm run compile:ict && npm run replace:ict",
+    "alpha": "npm version prerelease --preid=alpha &&  npm publish --tag alpha",
+    "patch": "npm version patch && npm publish",
+    "test": "jest --collectCoverage"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.12.17",
+    "@babel/preset-env": "^7.22.20",
+    "babel-jest": "^29.7.0",
+    "babel-loader": "^8.2.2",
+    "core-js": "^3.36.0",
+    "cross-env": "^7.0.3",
+    "echarts": "5.4.2",
+    "echarts-gl": "2.0.9",
+    "html-webpack-plugin": "^4.5.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^21.1.0",
+    "video.js": "^8.9.0",
+    "webpack": "5.89.0",
+    "webpack-cli": "5.1.4"
+  }
+}

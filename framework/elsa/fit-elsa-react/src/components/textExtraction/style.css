@@ -1,0 +1,43 @@
+.textExtraction-input-select, .textExtraction-input-select .ant-select-selector {
+    width: 100%;
+    border-radius: 4px !important;
+    height: 32px;
+}
+
+.text-schema-header-icon-position {
+    margin-right: 1% !important;
+    height: 22px;
+}
+
+.custom-header {
+    margin-bottom: 4px;
+}
+
+.schema-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.button-import {
+    height: 14px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+.import-button-text {
+    color: rgb(38, 115, 229);
+    font-family: HarmonyOS Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.schema-button-wrapper {
+    display: flex;
+    align-items: center;
+}

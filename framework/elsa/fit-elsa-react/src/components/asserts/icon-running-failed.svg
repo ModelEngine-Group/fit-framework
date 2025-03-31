@@ -1,0 +1,17 @@
+<svg width="20.000000" height="20.000000" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip1888_165402">
+			<rect id="运行失败" width="20.000000" height="20.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip1888_165402)">
+		<rect id="矩形备份 29" x="-2.000000" y="-2.000000" width="24.000000" height="24.000000" fill="#D8D8D8" fill-opacity="0"/>
+		<rect id="矩形备份 29" x="-1.500000" y="-1.500000" fill="white" width="23.000000" height="23.000000" stroke="#979797" stroke-opacity="0" stroke-width="1.000000"/>
+		<circle id="椭圆形" cx="10.000000" cy="10.000000" r="10.000000" fill="#C63939" fill-opacity="1.000000"/>
+		<path id="路径" d="M6.1 13.89L13.88 6.1" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="2.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="路径" d="M6.1 6.1L13.88 13.89" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="2.000000" stroke-linejoin="round" stroke-linecap="round"/>
+	</g>
+</svg>

@@ -1,0 +1,179 @@
+.code-title-language {
+    display: flex;
+    font-family: Huawei Sans;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.code-title-text {
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.code-title-test-text {
+    color: rgb(38, 115, 229);
+    font-family: 方正兰亭黑简体;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+
+.jade-code-container {
+    display: flex;
+    flex: 1;
+}
+
+.jade-code-parent {
+    display: flex;
+    flex-direction: column;
+}
+
+.jade-code-code {
+    padding-left: 24px;
+    padding-right: 40px;
+}
+
+.jade-code-code-title {
+    min-height: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+}
+
+.jade-code-code-content {
+    display: flex;
+    flex: 1
+}
+
+.jade-code-code-footer {
+    height: 56px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.jade-code-test {
+    width: 600px;
+    border-left: 1px solid #e5e6eb;
+    padding-right: 16px;
+}
+
+.jade-code-test-header {
+    display: flex;
+    height: 68px;
+    align-items: center;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.jade-code-test-header-text {
+    width: 50%;
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.jade-code-test-header-close {
+    width: 50%;
+    display: flex;
+    justify-content: end;
+}
+
+.jade-code-test-content {
+    border-top: 1px solid #e5e6eb;
+    flex: 1;
+    overflow: hidden;
+}
+
+.jade-code-test-input {
+    flex: 1;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.jade-code-test-input-title {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.jade-code-test-input-content {
+    border: 1px solid #e5e6eb;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.jade-code-test-input-footer {
+    height: 56px;
+    display: flex;
+    align-items: center;
+}
+
+.jade-code-test-output {
+    border-top: 1px solid #e5e6eb;
+    flex: 1;
+    padding-left: 24px;
+    padding-right: 24px;
+    overflow: hidden;
+}
+
+.jade-code-test-output-title {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.jade-code-test-output-content {
+    width: 560px;
+    display: flex;
+    border-radius: 4px;
+    flex: 1 1;
+    background: rgb(247, 247, 247);
+    overflow: hidden;
+}
+
+.jade-code-test-output-content-wrapper {
+    flex: 1 1;
+    overflow: auto;
+}
+
+.jade-code-test-output-content-wrapper ul {
+    background-color: transparent!important;
+}
+
+.jade-code-test-output-footer {
+    height: 72px;
+    display: flex;
+    align-items: center;
+}
+
+.jade-code-button {
+    width: 96px;
+    height: 32px;
+    font-family: Huawei Sans;
+    font-size: 14px;
+}
+
+.code-run-style {
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: Huawei Sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0;
+    background: rgb(247, 247, 247) !important;
+    border: none !important;
+}

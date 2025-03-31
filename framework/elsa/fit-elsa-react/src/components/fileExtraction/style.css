@@ -1,0 +1,20 @@
+.prompt-panel-header-buttons {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.textArea-char-count{
+    position: absolute;
+    bottom: 0;
+    right: 21px;
+    font-size: 12px;
+    /* Text/Error text-文本 */
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-align: left;
+}

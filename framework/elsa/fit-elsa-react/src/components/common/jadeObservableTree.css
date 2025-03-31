@@ -1,0 +1,31 @@
+.jade-observable-tree-node-div {
+    display: flex;
+    align-items: center;
+}
+
+.jade-observable-tree-node-title {
+    color: rgb(77, 77, 77);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0px;
+    text-align: left;
+}
+
+.jade-observable-tree-node-type-div {
+    margin-left: 8px;
+    background: rgb(255, 255, 255);
+    padding: 0 8px;
+    border-radius: 3px;
+}
+
+.jade-observable-tree-node-type-name {
+    color: rgb(77, 77, 77);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0px;
+    text-align: left;
+}

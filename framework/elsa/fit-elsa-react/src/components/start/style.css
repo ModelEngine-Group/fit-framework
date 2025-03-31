@@ -1,0 +1,33 @@
+.ant-switch.ant-switch-checked {
+    background-color: rgba(62, 194, 84, 1);
+}
+.ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
+    background-color: rgba(62, 194, 84, 1);
+}
+
+.icon-button {
+    padding: 0;
+    margin: 0;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.required-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 将内容垂直居中 */
+    width: 100%;
+}
+
+.switch-container {
+    margin-left: auto; /* 将 Switch 放置在最右侧 */
+}
+
+.start-node-delete-icon-button {
+    margin-left: auto !important;
+    height: 22px;
+}

@@ -1,0 +1,36 @@
+.textToImageConfig-wrapper {
+    padding: 0 8px 8px 8px;
+    border-radius: 8px;
+}
+
+.image-count-title-wrapper {
+    /* 通用/Label必填-非必填 */
+    position: static;
+    width: 96px;
+    height: 18px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0px;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+    font-family: Huawei Sans;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.image-count-slider {
+    height: 12px;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+    margin-bottom: 0;
+}

@@ -1,0 +1,19 @@
+<html>
+
+<head>
+    <script lang="javascript" type="module">
+        import {elsaTest} from './testFramework.js';
+        import * as test from './elsaTest.js';
+        window.onload = () => {
+            elsaTest.display = document.getElementById("display");
+            elsaTest.onlyError = true;
+            elsaTest.runAll();
+        }
+    </script>
+</head>
+
+<body>
+<div id="display" style="width: 100%;"></div>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+.json-tree-viewer {
+    line-height: 1.5;
+}
+
+.json-tree-viewer span {
+    display: inline-block;
+}
+
+.json-tree-viewer .toggle {
+    cursor: pointer;
+}
+
+.jade-json-node-collapse-icon {
+    border: 4px solid transparent;
+    border-left: 5px solid #047bfc;
+    display: inline-block;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+.jade-json-node-expand-icon {
+    border: 4px solid transparent;
+    border-top: 5px solid #047bfc;
+    display: inline-block;
+    transform: translateY(2px);
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.jade-json-node-key {
+    color: #047bfc;
+    margin-right: 6px;
+}
+
+.jade-json-node-value-string {
+    color: #278139;
+}
+
+.jade-json-node-value-number {
+    color: #03b6d0;
+}
+
+.jade-json-node-content {
+    border-left: 1px solid #ebebeb;
+    padding-left: 30px;
+}
+
+.jade-json-node-use-select-none {
+    user-select: none;
+}
+
+.jade-json-node-ellipsis {
+    color: #cb4b16;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.jade-json-node-left-symbol {
+    margin-left: 2px;
+}

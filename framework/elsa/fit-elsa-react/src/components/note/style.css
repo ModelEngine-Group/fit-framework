@@ -1,0 +1,263 @@
+.toolbar .ant-btn {
+    /*margin-right: 8px;*/
+}
+
+.tool-bar {
+    width: 436px;
+    height: 40px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    border-radius: 4px;
+    background: rgb(255, 255, 255);
+}
+
+.tool-bar > .ant-btn {
+    border: none;
+}
+
+.split-line {
+    /* Path */
+    position: static;
+    width: 1px;
+    height: 16px;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    background: rgb(217, 217, 217);
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.toolbar-backcolor-btn {
+    width: 32px !important;
+    height: 32px !important;
+    /* 自动布局 */
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+}
+
+.tool-bar-font-size-btn {
+    width: 40px !important;
+    height: 32px !important;
+    /* 自动布局 */
+    display: flex !important;
+    justify-content: center !important; /* 水平居中 */
+    align-items: center !important; /* 垂直居中 */
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+}
+
+.tool-bar-font-size-font-style {
+    width: 16px !important;
+    height: 16px !important;
+    /* 自动布局 */
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+    color: rgb(77, 77, 77);
+    font-family: HarmonyOS Sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0px;
+    text-align: left;
+}
+
+.toolbar-font-color-btn {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+    /* 自动布局 */
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar-font-font-style-btn {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+    /* 自动布局 */
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 8;
+}
+
+.toolbar-paragraph-style-btn {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+    /* 自动布局 */
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar-custom-btn {
+    width: 32px !important;
+    height: 32px !important;
+    margin-right: 4px !important;
+    margin-left: 4px !important;
+    /* 自动布局 */
+    display: flex !important;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 定义Dropdown fontSize菜单的样式 */
+.ant-font-dropdown-menu-custom {
+    max-height: 288px; /* 设置最大高度 */
+    width: 86px; /* 设置固定宽度 */
+    flex-direction: column;
+    overflow-y: auto; /* 当内容超出最大高度时显示滚动条 */
+}
+
+.font-color-menu . {
+    width: 132px !important;
+    padding: 8px !important;
+}
+
+.font-color-menu .ant-popover-inner .ant-popover-inner-content {
+    padding: 8px !important;
+}
+
+.back-color-menu {
+    width: 160px !important;
+}
+
+.back-color-menu .ant-popover-inner .ant-popover-inner-content {
+    height: 40px;
+    padding: 0 !important;
+    display: flex !important;
+}
+
+.align-menu {
+    width: 120px !important;
+}
+
+.align-menu .ant-popover-inner .ant-popover-inner-content {
+    height: 40px;
+    padding: 0 !important;
+    display: flex !important;
+}
+
+.list-style-menu {
+    width: 80px !important;
+}
+
+.list-style-menu .ant-popover-inner .ant-popover-inner-content {
+    height: 40px;
+    padding: 0 !important;
+    display: flex !important;
+}
+
+.custom-menu {
+    width: 80px !important;
+}
+
+.custom-menu .ant-popover-inner .ant-popover-inner-content {
+    height: 40px;
+    padding: 0 !important;
+    display: flex !important;
+}
+
+/* 去掉resize按钮的点击效果 */
+.ant-btn.resize-button.no-click-effect {
+    &::after {
+        display: none !important; /* 移除 antd 的点击波纹效果 */
+    }
+}
+
+/* 背景颜色主按钮悬停效果 */
+.toolbar-backcolor-btn:hover {
+    background-color: rgb(247, 247, 247) !important;
+    border-radius: 4px;
+}
+
+/* 二级菜单项悬停效果 */
+.back-color-menu .color-option {
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.back-color-menu .color-option:hover {
+    background-color: rgb(247, 247, 247) !important;
+    cursor: pointer;
+}
+
+/* 字体大小选择主按钮悬停效果 */
+.tool-bar-font-size-btn:hover {
+    background-color: rgb(247, 247, 247) !important;
+    border-radius: 4px;
+}
+
+/* 字体颜色选择主按钮悬停效果 */
+.toolbar-font-color-btn:hover {
+    background-color: rgb(247, 247, 247) !important;
+    border-radius: 4px;
+}
+
+/* 字体颜色二级弹窗 */
+.font-color-menu .color-option:hover {
+    width: 18px !important;
+    height: 18px !important;
+    border: 1px solid rgb(51, 136, 255) !important;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+/* 字体style设置hover效果 */
+.toolbar-font-font-style-btn:hover {
+    border-radius: 4px;
+    background-color: rgb(247, 247, 247) !important; /* 改变背景颜色 */
+}
+
+/* 文本格式设置hover效果 */
+.toolbar-paragraph-style-btn:hover {
+    border-radius: 4px;
+    background-color: rgb(247, 247, 247) !important; /* 改变背景颜色 */
+}
+
+.align-menu .align-option:hover {
+    border-radius: 4px;
+    background-color: rgb(247, 247, 247) !important; /* 改变背景颜色 */
+}
+
+.list-style-menu .list-option:hover {
+    border-radius: 4px;
+    background-color: rgb(247, 247, 247) !important; /* 改变背景颜色 */
+}
+
+/* 自定义按钮hover效果 */
+.toolbar-custom-btn:hover {
+    border-radius: 4px;
+    background-color: rgb(247, 247, 247) !important; /* 改变背景颜色 */
+}
+
+.custom-menu .custom-option:hover {
+    border-radius: 4px;
+    background-color: rgb(247, 247, 247) !important; /* 改变背景颜色 */
+}

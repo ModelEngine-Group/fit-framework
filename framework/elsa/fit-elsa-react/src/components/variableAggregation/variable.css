@@ -1,0 +1,10 @@
+.jade-variable-input-header-label {
+    color: rgb(77, 77, 77);;
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.jade-variable-input-jade-tree-select, .jade-variable-input-jade-tree-select .ant-select-selector {
+    border-radius: 4px !important;
+}

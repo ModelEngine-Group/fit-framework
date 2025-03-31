@@ -1,0 +1,119 @@
+.classification-component {
+    border-radius: 8px;
+    padding: 0 12px 12px 12px;
+    margin-top: 2px;
+}
+
+.classification-title-row {
+    height: 18px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8;
+    padding: 0px;
+
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    margin: 4px 0;
+}
+
+.classification-title-text {
+    height: 18px;
+    /* 自动布局 */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+    color: rgb(77, 77, 77);
+    font-family: Huawei Sans;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-align: left;
+}
+
+.classification-title-delete-btn {
+    /* 椭圆形 (ICON/16/Remove) */
+    width: 13px;
+    height: 13px;
+    left: 1.5px;
+    top: 1.5px;
+}
+
+.add-question-classification-wrapper {
+    height: 21px !important;
+    display: inline-block;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    padding: 0 12px 0 12px;
+}
+
+.add-question-classification-button-style {
+    height: 21px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.add-question-classification-btn {
+    height: 21px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 3;
+    flex-grow: 0;
+}
+
+.add-question-classification-text {
+    height: 21px !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 9px;
+
+    color: rgb(26, 26, 26);
+    font-family: Huawei Sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
+    letter-spacing: 0;
+    text-align: center;
+}
+
+.question-classification-textarea-input {
+    /* Breadcrumb/01-Normal-文本 */
+    color: rgb(26, 26, 26) !important;
+    font-family: Huawei Sans !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 22px !important;
+    letter-spacing: 0 !important;
+    text-align: left !important;
+}
+
+.question-classification-textarea-normal-height {
+    height: 60px !important;
+    /* 去除右下角拖动设置 */
+    resize: none;
+}
+
+.last-question-classification-textarea-height {
+    height: 30px !important;
+    /* 去除右下角拖动设置 */
+    resize: none;
+}

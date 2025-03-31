@@ -1,0 +1,53 @@
+{
+  "name": "@fit-elsa/elsa-react",
+  "private": false,
+  "version": "1.0.0-source",
+  "type": "module",
+  "main": "./build/elsa-react.js",
+  "module": "./build/elsa-react.js",
+  "files": [
+    "build"
+  ],
+  "exports": {
+    ".": {
+      "import": "./build/elsa-react.js",
+      "require": "./build/elsa-react.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "5.3.0",
+    "@fit-elsa/elsa-core": "file:../fit-elsa",
+    "@tinymce/tinymce-react": "4.3.0",
+    "antd": "4.24.13",
+    "axios": "1.7.4",
+    "monaco-editor": "^0.34.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "i18next": "^21.6.0",
+    "react-i18next": "^11.18.3",
+    "vite": "^5.2.0",
+    "vite-plugin-libcss": "^1.1.1",
+    "vite-plugin-svgr": "^4.2.0"
+  },
+  "overrides": {
+    "rc-util": "5.43.0",
+    "rc-motion": "2.9.2",
+    "rc-resize-observer": "1.4.0"
+  }
+}

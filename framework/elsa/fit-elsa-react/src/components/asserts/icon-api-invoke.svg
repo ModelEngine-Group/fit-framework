@@ -1,0 +1,25 @@
+<svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip4_13318">
+			<rect id="图标/16/API 接口" width="16.000000" height="16.000000" transform="translate(4.000000 4.000000)" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<rect id="画板 856" rx="4.000000" width="24.000000" height="24.000000" fill="#FA9941" fill-opacity="1.000000"/>
+	<g clip-path="url(#clip4_13318)">
+		<path id="path" d="M16.33 11.33L15.33 12.33L11.66 8.66L12.66 7.66C13.16 7.16 14.99 6.33 16.33 7.66C17.66 9 16.83 10.83 16.33 11.33Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+		<path id="path" d="M15.33 12.33L11.66 8.66L12.66 7.66C13.16 7.16 14.99 6.33 16.33 7.66C17.66 9 16.83 10.83 16.33 11.33L15.33 12.33Z" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round"/>
+		<path id="path" d="M16.68 7.99L16.68 8.02C16.48 8.21 16.17 8.21 15.98 8.02C15.78 7.82 15.78 7.51 15.98 7.31L16 7.31L16.68 7.99ZM17.64 5.67L17.64 5.64C17.84 5.44 18.15 5.44 18.35 5.64C18.55 5.84 18.55 6.15 18.35 6.35L18.32 6.35L17.64 5.67Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M16.33 7.66L18 5.99" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="path" d="M7.66 12.66L8.66 11.66L12.33 15.33L11.33 16.33C10.83 16.83 9 17.66 7.66 16.33C6.33 15 7.16 13.16 7.66 12.66Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+		<path id="path" d="M8.66 11.66L12.33 15.33L11.33 16.33C10.83 16.83 9 17.66 7.66 16.33C6.33 15 7.16 13.16 7.66 12.66L8.66 11.66Z" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round"/>
+		<path id="path" d="M12.01 14.99L12.01 15.02C11.82 15.21 11.51 15.21 11.31 15.02C11.11 14.82 11.11 14.51 11.31 14.31L11.34 14.31L12.01 14.99ZM12.64 13L12.64 12.97C12.84 12.78 13.15 12.78 13.35 12.97C13.55 13.17 13.55 13.48 13.35 13.68L13.32 13.68L12.64 13Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M11.66 14.66L12.99 13.33" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="path" d="M6.35 18.32L6.35 18.35C6.15 18.55 5.84 18.55 5.64 18.35C5.44 18.15 5.44 17.84 5.64 17.64L5.67 17.64L6.35 18.32ZM7.31 16L7.31 15.97C7.51 15.78 7.82 15.78 8.02 15.97C8.21 16.17 8.21 16.48 8.02 16.68L7.99 16.68L7.31 16Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M6 18L7.66 16.33" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<path id="path" d="M9.68 12.65L9.68 12.68C9.48 12.88 9.17 12.88 8.98 12.68C8.78 12.48 8.78 12.17 8.98 11.97L9 11.97L9.68 12.65ZM10.31 10.67L10.31 10.64C10.51 10.44 10.82 10.44 11.02 10.64C11.21 10.84 11.21 11.15 11.02 11.35L10.99 11.35L10.31 10.67Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M9.33 12.33L10.66 11" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round" stroke-linecap="round"/>
+	</g>
+</svg>

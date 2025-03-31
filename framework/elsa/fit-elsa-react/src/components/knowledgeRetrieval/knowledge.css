@@ -1,0 +1,41 @@
+.search-args-config-form {
+    padding: 8px
+}
+
+.search-args-config-form-row {
+    border-radius: 8px;
+    border: 1px solid rgb(230, 230, 230);
+}
+
+.search-args-config-form-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgb(242, 242, 242);
+    height: 32px;
+}
+
+.search-args-config-form-column {
+    flex: 1;
+    width: 0;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.search-args-config-form-content {
+    display: flex;
+    align-items: center;
+    background: white;
+    height: 32px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.search-args-config-form-fence {
+    width: 1px;
+    height: 16px;
+    background: rgb(217, 217, 217);
+}

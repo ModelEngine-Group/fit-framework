@@ -1,0 +1,57 @@
+.second-col-custom-select .ant-select-selector {
+    width: 100%;
+    border-radius: 8px 0 0 8px !important;
+}
+
+.third-col-custom-input, .third-col-custom-select .ant-select-selector {
+    width: 100%;
+    border-radius: 0 8px 8px 0 !important;
+}
+
+.switch-container {
+    margin-left: auto; /* 将 Switch 放置在最右侧 */
+}
+
+.ant-switch.ant-switch-checked {
+    background-color: rgba(62, 194, 84, 1);
+}
+
+.ant-switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
+    background-color: rgba(62, 194, 84, 1);
+}
+
+.icon-button {
+    padding: 0;
+    margin: 0;
+}
+
+.custom-collapse .ant-collapse-item .ant-collapse-header {
+    padding-left: 0;
+}
+
+.custom-collapse {
+    background: transparent;
+}
+
+.end-starred-text {
+    position: relative;
+    display: inline-block;
+    padding-left: 10px;
+}
+
+.end-starred-text::after {
+    padding-left: 12px;
+    content: "*";
+    position: absolute;
+    left: -20%;
+    color: red;
+    bottom: auto;
+    font-size: 1.2em;
+}
+
+.mode-select-title {
+    margin-right: auto;
+    display: flex;
+    font-weight: 600;
+    pointer-events: none;
+}
