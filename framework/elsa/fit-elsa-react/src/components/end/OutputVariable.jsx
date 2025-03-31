@@ -81,7 +81,7 @@ const _OutputVariable = ({inputParams, shapeStatus}) => {
                             </Col>
                         </Row>
                         <OutputVariableRow shapeStatus={shapeStatus}
-                                           item={inputParams[0]}
+                                           item={inputParams.find(item => item.name === 'finalOutput')}
                                            handleItemChange={handleItemChange}/>
                     </div>
                 </Panel>
