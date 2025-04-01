@@ -2370,9 +2370,6 @@ const setMouseActions = (pageVal) => {
 
   pageVal.onMouseUp = position => {
     pageVal.setCursor();
-    if (pageVal.operationMode === PAGE_OPERATION_MODE.DRAG) {
-      return;
-    }
     let rect = {};
     rect.x = (pageVal.mousedownx < pageVal.mousex ? pageVal.mousedownx : pageVal.mousex);
     rect.y = (pageVal.mousedowny < pageVal.mousey ? pageVal.mousedowny : pageVal.mousey);
@@ -2409,15 +2406,11 @@ const setMouseActions = (pageVal) => {
    */
   pageVal.switchMouseInShape = (x, y, condition) => {
     let found;
-    if (pageVal.operationMode === PAGE_OPERATION_MODE.DRAG) {
-      found = pageVal;
-    } else {
-      found = pageVal.find(x, y, condition ? condition : s => true);
-      const parent = found.getContainer();
-      const isNotFocused = !parent.isFocused && !found.isFocused;
-      if (parent.containerFocusFirst && isNotFocused && !parent.hasChildFocused()) {
-        found = parent;
-      }
+    found = pageVal.find(x, y, condition ? condition : s => true);
+    const parent = found.getContainer();
+    const isNotFocused = !parent.isFocused && !found.isFocused;
+    if (parent.containerFocusFirst && isNotFocused && !parent.hasChildFocused()) {
+      found = parent;
     }
     if (pageVal.mouseInShape !== found) {
       const pre = pageVal.mouseInShape;
@@ -2527,10 +2520,6 @@ const setKeyActions = (pageVal) => {
     pageVal.shiftKeyPressed = false;
     pageVal.invalidateInteraction();
     pageVal.isKeyDown = false;
-    if (e.code === 'Space' && pageVal.moveAble && pageVal.canvasMoveAble) {
-      pageVal.operationMode = PAGE_OPERATION_MODE.SELECTION;
-      return false;
-    }
     const focused = pageVal.getFocusedShapes();
     const isDirectionKey = e.key.indexOf('Left') >= 0 ||
       e.key.indexOf('Right') >= 0 ||
@@ -2562,10 +2551,6 @@ const setKeyActions = (pageVal) => {
     pageVal.graph.getHistory().clearBatchNo();
     if (document.activeElement !== document.body) {
       return true;
-    }
-    if (e.code === 'Space' && pageVal.moveAble && pageVal.canvasMoveAble) {
-      pageVal.operationMode = PAGE_OPERATION_MODE.DRAG;
-      return false;
     }
 
     let focused = pageVal.getFocusedShapes();

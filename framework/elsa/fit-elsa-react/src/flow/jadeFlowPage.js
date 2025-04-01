@@ -8,6 +8,7 @@ import {copyPasteHelper, ElsaCopyHandler, page, shapeDataHelper, sleep, uuid} fr
 import {SYSTEM_ACTION, VIRTUAL_CONTEXT_NODE} from '@/common/Consts.js';
 import {conditionRunner, inactiveNodeRunner, standardRunner} from '@/flow/runners.js';
 import {message} from 'antd';
+import {PAGE_OPERATION_MODE} from '@fit-elsa/elsa-core/common/const.js';
 
 const START_NODE = 'startNodeStart';
 
@@ -33,6 +34,7 @@ export const jadeFlowPage = (div, graph, name, id) => {
   self.gridColor = '#e1e1e3';
   self.disableContextMenu = true;
   self.moveAble = true;
+  self.operationMode = PAGE_OPERATION_MODE.DRAG;
   self.observableStore = ObservableStore();
   self.copyPasteHelper = jadeCopyPasteHelper();
   const shapeChangeListener = (e) => self.graph.dirtied(null, {action: SYSTEM_ACTION.JADE_NODE_CONFIG_CHANGE, shape: e.shapeId});
