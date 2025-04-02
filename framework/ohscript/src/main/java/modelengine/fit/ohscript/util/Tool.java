@@ -96,7 +96,7 @@ public class Tool {
      * @return 返回生成的UUID
      */
     public static String uuid() {
-        return UUIDUtil.fastUuid();
+        return String.valueOf(newId());
     }
 
     /**
