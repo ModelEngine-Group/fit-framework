@@ -2412,7 +2412,7 @@ const setMouseActions = (pageVal) => {
     let found = pageVal.find(x, y, condition ? condition : s => true);
     const parent = found.getContainer();
     const isNotFocused = !parent.isFocused && !found.isFocused;
-    if (shouldParentFocusFirst(parent) && isNotFocused) {
+    if (isNotFocused && shouldParentFocusFirst(parent)) {
       found = parent;
     }
     if (pageVal.mouseInShape !== found) {
