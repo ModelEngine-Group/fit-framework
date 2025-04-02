@@ -4,12 +4,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import SectionHeader from "@/components/flowRunComponent/SectionHeader.jsx";
-import SectionContent from "@/components/flowRunComponent/SectionContent.jsx";
-import {v4 as uuidv4} from "uuid";
-import {Card} from "antd";
+import SectionHeader from '@/components/flowRunComponent/SectionHeader.jsx';
+import SectionContent from '@/components/flowRunComponent/SectionContent.jsx';
+import {v4 as uuidv4} from 'uuid';
+import {Card} from 'antd';
 import {DATA_TYPES, SECTION_TYPE, UNARY_OPERATOR, VIRTUAL_CONTEXT_NODE} from '@/common/Consts.js';
-import {useTranslation} from "react-i18next";
+import {useTranslation} from 'react-i18next';
 
 /**
  * 构造运行报告的章节
@@ -87,7 +87,7 @@ export default function SectionFactory({shape}) {
                             const rightValue = _convertRightValue(condition);
                             const separatorIndex = key.indexOf(".");
                             const referenceNodeId = key.substring(0, separatorIndex);
-                            const text = referenceNodeId === VIRTUAL_CONTEXT_NODE.id ? t('systemEnv') : shape.page.getShapeById(referenceNodeId).text;
+                            const text = referenceNodeId === VIRTUAL_CONTEXT_NODE.id ? t('systemEnv') : shape.page.getShapeById(referenceNodeId)?.text ?? '';
                             const newKey = text + key.substring(separatorIndex);
                             let isShowLogic = section.data.conditions.length > 1 && index < section.data.conditions.length - 1;
                             return (<div key={`condition-container-${section.no}-${uuidv4()}`}
