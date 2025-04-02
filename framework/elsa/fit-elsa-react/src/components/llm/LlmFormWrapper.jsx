@@ -103,16 +103,42 @@ export default function LlmFormWrapper({data, shapeStatus}) {
       return;
     }
     const urlSuffix = uniqueNameList.map(uniqueName => `uniqueNames=${uniqueName}`).join('&');
-    httpUtil.get(`${config.urls.toolListEndpoint}?${urlSuffix}`, new Map(), (jsonData) =>
-      setToolOptions(jsonData.data.map(item => {
-        return {
-          id: uuidv4(),
-          name: item.name,
-          tags: item.tags,
-          version: item.version,
-          value: item.uniqueName,
-        };
-      })));
+    httpUtil.get(`${config.urls.toolListEndpoint}?${urlSuffix}`, new Map(), (jsonData) => {
+        processToolData(jsonData.data);
+      },
+      () => {
+        processToolData([]);
+      },
+    );
+
+    const processToolData = (responseData) => {
+      const responseMap = new Map(responseData.map(item => [item.uniqueName, item]));
+
+      const toolOptions = uniqueNameList.map(uniqueName => {
+        if (responseMap.has(uniqueName)) {
+          const item = responseMap.get(uniqueName);
+          return {
+            id: uuidv4(),
+            name: item.name,
+            tags: item.tags,
+            version: item.version,
+            value: item.uniqueName,
+          };
+        } else {
+          // 若请求返回体中没有该 uniqueName 或请求失败，则从 toolItem 中获取信息
+          const fallbackItem = tool.value.find(toolItem => toolItem.value === uniqueName);
+          return fallbackItem ? {
+            id: fallbackItem.id,
+            name: fallbackItem.name || 'Unknown',
+            tags: fallbackItem.tags || [],
+            version: fallbackItem.version || 'Unknown',
+            value: fallbackItem.value,
+          } : null;
+        }
+      }).filter(Boolean); // 过滤掉 null 值
+
+      setToolOptions(toolOptions);
+    };
   };
 
   useEffect(() => {
