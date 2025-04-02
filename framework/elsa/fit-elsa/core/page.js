@@ -2401,15 +2401,18 @@ const setMouseActions = (pageVal) => {
     pageVal.invalidateInteraction(position);
   };
 
+  const shouldParentFocusFirst = (parent) => {
+    return parent.containerFocusFirst && !parent.hasChildFocused();
+  }
+
   /**
    * 鼠标点击时，得到的最符合条件的shape，没有condition，只要在坐标内，就可以得到
    */
   pageVal.switchMouseInShape = (x, y, condition) => {
-    let found;
-    found = pageVal.find(x, y, condition ? condition : s => true);
+    let found = pageVal.find(x, y, condition ? condition : s => true);
     const parent = found.getContainer();
     const isNotFocused = !parent.isFocused && !found.isFocused;
-    if (parent.containerFocusFirst && isNotFocused && !parent.hasChildFocused()) {
+    if (shouldParentFocusFirst(parent) && isNotFocused) {
       found = parent;
     }
     if (pageVal.mouseInShape !== found) {
