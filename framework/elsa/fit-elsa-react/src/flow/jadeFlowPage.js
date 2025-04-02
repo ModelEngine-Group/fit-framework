@@ -398,27 +398,66 @@ export const jadeFlowPage = (div, graph, name, id) => {
   };
 
   /**
+   * 按照指定的有序节点列表对节点数组进行重排。
+   *
+   * 该函数会根据 `orderedNodes` 的顺序对 `nodes` 中的节点进行排序。
+   * 如果 `nodes` 中的某些节点不在 `orderedNodes` 中，这些节点会被附加到排序后的数组末尾。
+   *
+   * @param {Array} nodes - 需要重排的节点数组，可能包含游离节点。
+   * @param {Array} orderedNodes - 有序节点列表，表示期望的节点顺序。
+   * @returns {Array} - 返回按照 `orderedNodes` 顺序重排后的节点数组，游离节点会附加到末尾。
+   *
+   * @example
+   * const nodes = ['F', 'E', 'D', 'C', 'B', 'A'];
+   * const orderedNodes = ['B', 'D', 'A', 'C'];
+   * const sortedNodes = reorderNodes(nodes, orderedNodes);
+   * console.log(sortedNodes); // 输出: ['B', 'D', 'A', 'C', 'F', 'E']
+   *
+   * @example
+   * const nodes = ['X', 'Y', 'Z', 'A', 'B'];
+   * const orderedNodes = ['A', 'B', 'C'];
+   * const sortedNodes = reorderNodes(nodes, orderedNodes);
+   * console.log(sortedNodes); // 输出: ['A', 'B', 'X', 'Y', 'Z']
+   */
+  const reorderNodes = (nodes, orderedNodes) => {
+    // 创建一个 Map，用于快速查找节点在 reachableNodes 中的索引
+    const nodeOrder = new Map();
+    orderedNodes.forEach((node, index) => {
+      nodeOrder.set(node, index);
+    });
+
+    // 将 nodes 中的节点按照 orderedNodes 的顺序进行排序
+    // 不在 orderedNodes 中的节点会被放在最后
+    return nodes.slice().sort((a, b) => {
+      const indexA = nodeOrder.has(a) ? nodeOrder.get(a) : orderedNodes.length;
+      const indexB = nodeOrder.has(b) ? nodeOrder.get(b) : orderedNodes.length;
+      return indexA - indexB;
+    });
+  };
+
+  /**
    * 启动调试.
    *
    * @return {*} 调试的节点列表.
    */
   self.testRun = () => {
-    self.getNodes().forEach(node => {
+    const allNodes = self.getNodes();
+    allNodes.forEach(node => {
       node.isActiveInFlow = false;
     });
     const startNode = self.getStartNode();
-    self.getReachableNodes(startNode).forEach(node => {
+    const reachableNodes = self.getReachableNodes(startNode);
+    reachableNodes.forEach(node => {
       node.isActiveInFlow = true;
     });
     self.isRunning = true;
-    const nodes = self.sm.getShapes().filter(s => s.isTypeof('jadeNode')).filter(s => s.runnable !== false);
-    nodes.map(n => {
-      const h = self.createRunner(n);
-      n.ignoreChange(() => {
-        h.testRun();
-      });
+    const nodes = allNodes.filter(s => s.runnable !== false);
+    const orderedNodes = reorderNodes(nodes, reachableNodes);
+    orderedNodes.map(n => {
+      const runner = self.createRunner(n);
+      n.ignoreChange(() => runner.testRun());
     });
-    return nodes;
+    return orderedNodes;
   };
 
   /**
