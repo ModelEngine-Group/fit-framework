@@ -408,5 +408,8 @@
   "chooseToBeLoopParam": "待翻译",
   "loopRadioIsRequired": "待翻译",
   "loopSkillPopover": "待翻译",
-  "pushResultToChat": "待翻译"
+  "pushResultToChat": "待翻译",
+  "appConfig": "App Configuration",
+  "appChatStyle": "App Interface Configuration",
+  "appChatStyleCannotBeEmpty": "App interface configuration cannot be empty"
 }

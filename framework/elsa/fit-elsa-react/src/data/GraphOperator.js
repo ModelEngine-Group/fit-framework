@@ -169,6 +169,16 @@ const graphOperator = (graphString) => {
     return shapes.filter(shape => shape.type === 'startNodeStart').map(startNode => startNode.flowMeta.inputParams);
   };
 
+  /**
+   * 根据节点类型获取对应节点id列表.
+   *
+   * @param type 节点类型.
+   * @returns {array} 对应节点id列表.
+   */
+  self.getShapeIdsByType = (type) => {
+    return shapes.filter((shape) => shape.type === type).map((shape) => shape.id);
+  };
+
   return self;
 };
 

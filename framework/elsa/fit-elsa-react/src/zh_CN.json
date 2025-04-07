@@ -701,5 +701,8 @@
   "formItemRenderTypeCannotBeEmpty": "渲染方式不能为空",
   "formItemDefaultValue": "表单项默认值",
   "formItemOptionsValue": "表单选项",
-  "pushResultToChat": "输出结果至聊天"
+  "pushResultToChat": "输出结果至聊天",
+  "appConfig": "应用配置",
+  "appChatStyle": "应用界面配置",
+  "appChatStyleCannotBeEmpty": "应用界面配置不能为空"
 }

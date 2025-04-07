@@ -171,6 +171,24 @@ export const startComponent = (jadeConfig) => {
             });
         };
 
+        const changeAppConfig = () => {
+            return data.map(item => {
+                if (item.name === 'appConfig') {
+                    return {
+                        ...item, value: item.value.map(configItem => {
+                            if (configItem.name === action.name) {
+                                return {...configItem, value: action.value};
+                            } else {
+                                return configItem;
+                            }
+                        }),
+                    };
+                } else {
+                    return item;
+                }
+            });
+        };
+
         switch (action.actionType) {
             case 'addInputParam': {
                 return addInputParam();
@@ -186,6 +204,9 @@ export const startComponent = (jadeConfig) => {
             }
             case 'deleteInputParam': {
                 return deleteInputParam();
+            }
+            case 'changeAppConfig': {
+                return changeAppConfig();
             }
             case 'changeFlowMeta': {
                 return {

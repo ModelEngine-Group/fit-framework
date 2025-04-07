@@ -14,6 +14,7 @@ import {v4 as uuidv4} from 'uuid';
 import MultiConversation from '@/components/start/MultiConversation.jsx';
 import PropTypes from 'prop-types';
 import {Trans, useTranslation} from 'react-i18next';
+import {AppConfiguration} from '@/components/start/AppConfiguration.jsx';
 
 const {Panel} = Collapse;
 
@@ -41,6 +42,7 @@ export default function StartFormWrapper({data, shapeStatus}) {
     const multiConversationSwitchValue = multiConversationSwitch?.value ?? true;
     const multiConversationTypeValue = memory.value.find(item => item.name === "type").value;
     const multiConversationValueValue = memory.value.find(item => item.name === "value")?.value ?? null;
+    const appConfig = data.find(item => item.name === "appConfig");
 
     // items中所有初始都为打开状态
     const [openItems, setOpenItems] = useState(() => {
@@ -186,6 +188,7 @@ export default function StartFormWrapper({data, shapeStatus}) {
                                        onChange: handleMultiConversationValueChange
                                    }
                                }}/>
+            {appConfig && <AppConfiguration item={appConfig} disabled={shapeStatus.disabled} configs={config.appConfig}/>}
         </div>
     </>);
 }
