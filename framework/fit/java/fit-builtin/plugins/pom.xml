@@ -26,6 +26,7 @@
         <module>fit-logger</module>
         <module>fit-message-serializer-cbor</module>
         <module>fit-message-serializer-json-jackson</module>
+        <module>fit-security-simple</module>
         <module>fit-server-http</module>
         <module>fit-service-coordination-locator</module>
         <module>fit-service-coordination-simple</module>
