@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 1.0
  */
 public class Tool {
-    private static AtomicLong id = new AtomicLong(1); // remove static
+    private static AtomicLong id = new AtomicLong(1);
 
     /**
      * 打印警告信息
