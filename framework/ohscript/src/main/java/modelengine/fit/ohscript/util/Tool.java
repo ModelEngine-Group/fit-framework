@@ -16,6 +16,7 @@ import modelengine.fit.ohscript.script.parser.nodes.BlockNode;
 import modelengine.fit.ohscript.script.parser.nodes.FunctionDeclareNode;
 import modelengine.fit.ohscript.script.semanticanalyzer.type.expressions.TypeExprFactory;
 import modelengine.fitframework.beans.ObjectInstantiator;
+import modelengine.fitframework.util.LockUtils;
 import modelengine.fitframework.util.ObjectUtils;
 
 import net.bytebuddy.ByteBuddy;
@@ -37,6 +38,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Tool {
     private static AtomicLong id = new AtomicLong(1);
+
+    private static final Object lock = LockUtils.newSynchronizedLock();
 
     /**
      * 打印警告信息
@@ -73,9 +76,11 @@ public class Tool {
     /**
      * 初始化id，只有在id为非正数时生效
      */
-    private static synchronized void initId() {
-        if (id.get() <= 0) {
-            setId(1);
+    private static void initId() {
+        synchronized (lock) {
+            if (id.get() <= 0) {
+                setId(1);
+            }
         }
     }
 
