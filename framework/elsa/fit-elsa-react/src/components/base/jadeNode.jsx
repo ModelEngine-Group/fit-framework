@@ -437,14 +437,16 @@ export const jadeNode = (id, x, y, width, height, parent, drawer) => {
       return false;
     }
 
-    return nextNodes.map(n => {
-      chain.add(n);
-      if (!traverse(n, target, chain)) {
-        chain.delete(n);
-        return false;
+    // 这里只保留一条链路上的节点，若有多条链路，其他链路上的节点不计入其中。
+    for (let i = 0; i < nextNodes.length; i++) {
+      chain.add(nextNodes[i]);
+      if (traverse(nextNodes[i], target, chain)) {
+        return true;
+      } else {
+        chain.delete(nextNodes[i]);
       }
-      return true;
-    }).reduce((acc, v) => acc || v, false);
+    }
+    return false;
   };
 
   /**
