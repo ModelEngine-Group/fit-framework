@@ -53,7 +53,7 @@ public class MulticastFitableExecutor implements FitableExecutor {
                         fitable.toUniqueId());
                 return null;
             }
-        }).reduce(context.accumulator()).orElse(null);
+        }).filter(Objects::nonNull).reduce(context.accumulator()).orElse(null);
     }
 
     private Object execute(Fitable fitable, Target target, InvocationContext context, Object[] args) {

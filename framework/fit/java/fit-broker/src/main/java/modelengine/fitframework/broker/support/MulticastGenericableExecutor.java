@@ -13,6 +13,7 @@ import modelengine.fitframework.log.Logger;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 表示 {@link GenericableExecutor} 的多播调用实现。
@@ -39,6 +40,6 @@ public class MulticastGenericableExecutor implements GenericableExecutor {
                         fitable.toUniqueId());
                 return null;
             }
-        }).reduce(context.accumulator()).orElse(null);
+        }).filter(Objects::nonNull).reduce(context.accumulator()).orElse(null);
     }
 }
