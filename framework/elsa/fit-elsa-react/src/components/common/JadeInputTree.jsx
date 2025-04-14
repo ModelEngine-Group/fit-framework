@@ -173,13 +173,13 @@ export const JadeInputTree = (
           initialValue={openRadioId}
         >
           <Radio.Group value={openRadioId ?? undefined} onChange={handleRadioChange}>
-            <Tree defaultExpandAll={defaultExpandAll} blockNode className='jade-ant-tree' showLine>
+            <Tree selectable={false} defaultExpandAll={defaultExpandAll} blockNode className='jade-ant-tree' showLine>
               {renderTreeNodes(treeData)}
             </Tree>
           </Radio.Group>
         </Form.Item>
       ) : (
-        <Tree defaultExpandAll={defaultExpandAll} blockNode className='jade-ant-tree' showLine>
+        <Tree selectable={false} defaultExpandAll={defaultExpandAll} blockNode className='jade-ant-tree' showLine>
           {renderTreeNodes(treeData)}
         </Tree>
       )}
