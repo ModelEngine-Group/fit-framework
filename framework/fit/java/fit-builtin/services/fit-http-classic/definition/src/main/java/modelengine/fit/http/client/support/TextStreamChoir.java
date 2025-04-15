@@ -10,6 +10,7 @@ import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fit.http.client.HttpClassicClientRequest;
 import modelengine.fit.http.client.HttpClassicClientResponse;
+import modelengine.fit.http.client.HttpClientResponseException;
 import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.entity.TextEventStreamEntity;
 import modelengine.fitframework.flowable.Choir;
@@ -22,7 +23,6 @@ import modelengine.fitframework.flowable.util.worker.WorkerObserver;
 import modelengine.fitframework.inspection.Nonnull;
 import modelengine.fitframework.util.LockUtils;
 import modelengine.fitframework.util.ObjectUtils;
-import modelengine.fitframework.util.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayDeque;
@@ -103,11 +103,7 @@ public class TextStreamChoir<T> extends AbstractChoir<T> implements Choir<T> {
                         HTTP_SUCCESS_CODE_MAX,
                         true,
                         false)) {
-                    throw new IllegalStateException(StringUtils.format(
-                            "Failed to exchange text event stream. [uri={0}, statusCode={1}, reason={2}]",
-                            this.request.requestUri(),
-                            response.statusCode(),
-                            response.reasonPhrase()));
+                    throw new HttpClientResponseException(request, response);
                 }
                 TextEventStreamEntity entity = response.textEventStreamEntity()
                         .orElseThrow(() -> new IllegalStateException("No text event stream entity."));
