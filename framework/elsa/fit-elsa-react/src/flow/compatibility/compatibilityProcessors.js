@@ -10,7 +10,7 @@ import {
   DATA_TYPES,
   DEFAULT_KNOWLEDGE_REPO_GROUP_STRUCT,
   DEFAULT_LLM_KNOWLEDGE_BASES,
-  DEFAULT_LLM_REFERENCE_OUTPUT,
+  DEFAULT_LLM_REFERENCE_OUTPUT, DEFAULT_LOOP_NODE_CONTEXT,
   DEFAULT_MAX_MEMORY_ROUNDS,
   END_NODE_TYPE,
   FLOW_TYPE,
@@ -49,6 +49,8 @@ export const pageCompatibilityProcessor = (pageData, graph) => {
         return knowledgeRetrievalCompatibilityProcessor(shapeData, g, self);
       case 'questionClassificationNodeCondition':
         return questionClassificationCompatibilityProcessor(shapeData, g, self);
+      case 'loopNodeState':
+        return loopNodeCompatibilityProcessor(shapeData, g, self);
       default:
         return shapeCompatibilityProcessor(shapeData, g, self);
     }
@@ -185,6 +187,30 @@ export const questionClassificationCompatibilityProcessor = (shapeData, graph, p
   return self;
 };
 
+/**
+ * 循环节点兼容性处理器.
+ *
+ * @override
+ */
+export const loopNodeCompatibilityProcessor = (shapeData, graph, pageHandler) => {
+  const self = shapeCompatibilityProcessor(shapeData, graph, pageHandler);
+
+  /**
+   * @override
+   */
+  const process = self.process;
+  self.process = () => {
+    process.apply(self);
+    const jober = self.shapeData.flowMeta.jober;
+    if (!jober.entity.params.exist(param => param.name === 'context')) {
+       jober.entity.params.push({name: 'context'});
+       jober.converter.entity.inputParams.push(DEFAULT_LOOP_NODE_CONTEXT);
+    }
+  };
+
+  return self;
+};
+
 
 /**
  * 开始节点兼容性处理器.
@@ -281,43 +307,9 @@ export const endNodeCompatibilityProcessor = (shapeData, graph, pageHandler) => 
     if (inputParam.from !== FROM_TYPE.EXPAND) {
       return;
     }
-
-    // const values = inputParam.value;
-    //
-    // // 第一个引用若不是大模型，则后续的所有大模型节点enableLog都是false.
-    // // 若第一个引用是对大模型的引用，遍历，后续【连续】的对大模型节点的引用.
     const llmNodes = self.pageProcessor.getShapes(sd => sd.type === 'llmNodeState').map((n, i) => {
       return {index: i, data: n};
     });
-    //
-    // let indexes = []; // 记录所有需要输出日志的大模型的下标.
-    // for (let i = 0; i < values.length; i++) {
-    //   const input = values[i];
-    //
-    //   // 不是reference，或referenceKey不存在，退出循环.
-    //   if (input.from !== 'Reference' || !input.referenceKey) {
-    //     break;
-    //   }
-    //
-    //   // 引用的不是大模型，退出循环.
-    //   const node = llmNodes.find(n => n.data.id === input.referenceNode);
-    //   if (!node) {
-    //     break;
-    //   }
-    //
-    //   // 当前大模型节点的index小于indexes中的值，跳出循环.
-    //   if (indexes.length > 0 && node.index < indexes[indexes.length - 1]) {
-    //     break;
-    //   }
-    //
-    //   const chainNodes = self.pageProcessor.getNodesBetween(node.data, self.shapeData);
-    //   if (chainNodes.contains(n => n.type === 'conditionNodeCondition' || n.type === 'manualCheckNodeState')) {
-    //     break;
-    //   }
-    //
-    //   indexes.push(node.index);
-    // }
-
     updateLlmFlowMetas(llmNodes);
   };
 

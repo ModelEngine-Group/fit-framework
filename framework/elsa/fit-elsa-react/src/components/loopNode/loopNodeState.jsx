@@ -21,7 +21,7 @@ export const loopNodeState = (id, x, y, width, height, parent, drawer) => {
   self.flowMeta.jober.type = 'STORE_JOBER';
   const loopNodeEntity = {
     uniqueName: "",
-    params: [{"name": "args"}, {"name": "config"}, {"name": "toolInfo"}],
+    params: [{"name": "args"}, {"name": "config"}, {"name": "toolInfo"}, {"name": "context"}],
     return: {type: "array"}
   };
 

@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {rectangle} from '@fit-elsa/elsa-core';
-import {VIRTUAL_CONTEXT_NODE} from '@/common/Consts.js';
+import {DATA_TYPES, VIRTUAL_CONTEXT_NODE, VIRTUAL_CONTEXT_NODE_VARIABLES} from '@/common/Consts.js';
 import {emptyStatusManager} from '@/components/base/emptyStatusManager.js';
 
 /**
@@ -25,13 +25,13 @@ export const systemEnv = (id, x, y, width, height, parent) => {
   self.width = 0;
   self.height = 0;
   self.virtualNodeInfoList = [
-    {observableId: 'instanceId', value: 'instanceId', type: 'String'},
-    {observableId: 'appId', value: 'appId', type: 'String'},
-    {observableId: 'memories', value: 'memories', type: 'Array'},
-    {observableId: 'useMemory', value: 'useMemory', type: 'Boolean'},
-    {observableId: 'userId', value: 'userId', type: 'String'},
-    {observableId: 'fileUrls', value: 'fileUrls', type: 'Array'},
-    {observableId: 'chatId', value: 'chatId', type: 'String'},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID, value: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID, type: DATA_TYPES.STRING},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.APP_ID, value: VIRTUAL_CONTEXT_NODE_VARIABLES.APP_ID, type: DATA_TYPES.STRING},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.MEMORIES, value: VIRTUAL_CONTEXT_NODE_VARIABLES.MEMORIES, type: DATA_TYPES.ARRAY},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.USE_MEMORY, value: VIRTUAL_CONTEXT_NODE_VARIABLES.USE_MEMORY, type: DATA_TYPES.BOOLEAN},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID, value: VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID, type: DATA_TYPES.STRING},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.FILE_URLS, value: VIRTUAL_CONTEXT_NODE_VARIABLES.FILE_URLS, type: DATA_TYPES.ARRAY},
+    {observableId: VIRTUAL_CONTEXT_NODE_VARIABLES.CHAT_ID, value: VIRTUAL_CONTEXT_NODE_VARIABLES.CHAT_ID, type: DATA_TYPES.STRING},
   ];
   self.statusManager = emptyStatusManager(self);
 

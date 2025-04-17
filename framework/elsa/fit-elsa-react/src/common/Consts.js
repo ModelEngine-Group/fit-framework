@@ -53,6 +53,16 @@ export const VIRTUAL_CONTEXT_NODE = {
   name: 'systemEnv',
 };
 
+export const VIRTUAL_CONTEXT_NODE_VARIABLES = {
+  INSTANCE_ID: 'instanceId',
+  APP_ID: 'appId',
+  MEMORIES: 'memories',
+  USE_MEMORY: 'useMemory',
+  USER_ID: 'userId',
+  FILE_URLS: 'fileUrls',
+  CHAT_ID: 'chatId',
+};
+
 export const CONNECTOR = {
   RADIUS: 6,
   CONDITION_RADIUS: 4,
@@ -177,4 +187,21 @@ export const RENDER_TYPE = {
   RADIO: 'Radio',
   INPUT: 'Input',
   SWITCH: 'Switch',
+};
+
+export const DEFAULT_LOOP_NODE_CONTEXT = {
+  id: uuidv4(),
+  name: 'context',
+  type: DATA_TYPES.OBJECT,
+  from: FROM_TYPE.EXPAND,
+  value: {
+    id: uuidv4(),
+    name: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID,
+    type: DATA_TYPES.STRING,
+    from: FROM_TYPE.REFERENCE,
+    referenceId: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID,
+    referenceKey: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID,
+    referenceNode: VIRTUAL_CONTEXT_NODE.id,
+    value: [VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID],
+  },
 };
