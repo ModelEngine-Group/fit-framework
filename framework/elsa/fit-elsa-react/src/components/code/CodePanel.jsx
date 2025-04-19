@@ -15,6 +15,7 @@ import ArrayUtil from '@/components/util/ArrayUtil.js';
 import PropTypes from 'prop-types';
 import {CodeDrawer} from '@/components/common/code/CodeDrawer.jsx';
 import {Trans, useTranslation} from 'react-i18next';
+import {JadeCollapse} from '@/components/common/JadeCollapse.jsx';
 
 const {Panel} = Collapse;
 const {Text} = Typography;
