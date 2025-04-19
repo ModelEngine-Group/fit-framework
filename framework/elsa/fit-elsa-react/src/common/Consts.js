@@ -194,7 +194,7 @@ export const DEFAULT_LOOP_NODE_CONTEXT = {
   name: 'context',
   type: DATA_TYPES.OBJECT,
   from: FROM_TYPE.EXPAND,
-  value: {
+  value: [{
     id: uuidv4(),
     name: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID,
     type: DATA_TYPES.STRING,
@@ -203,5 +203,5 @@ export const DEFAULT_LOOP_NODE_CONTEXT = {
     referenceKey: VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID,
     referenceNode: VIRTUAL_CONTEXT_NODE.id,
     value: [VIRTUAL_CONTEXT_NODE_VARIABLES.INSTANCE_ID],
-  },
+  }],
 };
