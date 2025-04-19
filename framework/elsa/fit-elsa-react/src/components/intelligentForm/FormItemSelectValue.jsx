@@ -45,21 +45,6 @@ export const FormItemSelectValue = ({item, shapeStatus, onChange, label, inputRe
     onChange(item.id, [{key, value}]);
   };
 
-  /* input失去焦点时的回调. */
-  const onInputBlur = () => {
-    let value = item.value;
-    const type = item.type;
-    if (type === 'Object' || type === 'Array') {
-      try {
-        value = JSON.parse(value);
-      } catch (error) {
-        // 不影响，报错可以继续执行.
-      }
-    }
-    const key = 'value';
-    onChange(item.id, [{key, value}]);
-  };
-
   /**
    * 当reference的value变化时的处理方法.
    *
@@ -98,7 +83,6 @@ export const FormItemSelectValue = ({item, shapeStatus, onChange, label, inputRe
           placeholder={t('plsEnter')}
           value={item.type === DATA_TYPES.ARRAY || item.type === DATA_TYPES.OBJECT ? JSON.stringify(item.value) : item.value}
           onChange={(e) => onInputChange('value', e)}
-          onBlur={() => onInputBlur()}
         />
       </Form.Item>;
     } else if (item.from === FROM_TYPE.REFERENCE) {
