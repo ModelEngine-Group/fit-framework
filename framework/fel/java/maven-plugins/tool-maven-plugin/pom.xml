@@ -12,6 +12,11 @@
     <artifactId>tool-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
+    <properties>
+        <maven.plugin.version>3.8.2</maven.plugin.version>
+        <mockito.version>4.11.0</mockito.version>
+    </properties>
+
     <dependencies>
         <!-- FIT -->
         <dependency>
@@ -29,7 +34,14 @@
             <artifactId>tool-service</artifactId>
         </dependency>
 
-        <!-- Third-party -->
+        <!-- Component -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>tool-info</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Bytebuddy -->
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
@@ -45,6 +57,11 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>

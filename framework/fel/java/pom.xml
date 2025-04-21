@@ -36,6 +36,7 @@
     </scm>
 
     <modules>
+        <module>components</module>
         <module>fel-community</module>
         <module>fel-core</module>
         <module>fel-flow</module>

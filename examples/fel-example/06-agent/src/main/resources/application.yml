@@ -1,6 +1,12 @@
 fel:
   openai:
-    api-base: '${api-base}'
-    api-key: '${your-api-key}'
+    api-base: 'https://api.siliconflow.cn/v1'
+    api-key: 'sk-izfmuercmorlnwqtzdkpgskmdjlnjdtheaaypyrfyetkcsaf'
 example:
-  model: '${model-name}'
+  model: 'Qwen/Qwen2.5-7B-Instruct'
+
+
+okhttp:
+  config-client:
+    cache:
+      max-size: 20
