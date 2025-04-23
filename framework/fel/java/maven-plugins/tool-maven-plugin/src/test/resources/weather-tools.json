@@ -66,7 +66,6 @@
     } ]
   } ],
   "toolGroups" : [ {
-    "definitionGroupName" : "defGroup_weather_Rain",
     "name" : "implGroup_weather_Rain_Mobile",
     "summary" : "",
     "description" : "",
@@ -74,7 +73,9 @@
       "owner" : [ "测试" ],
       "language" : [ "english" ]
     },
+    "definitionGroupName" : "defGroup_weather_Rain",
     "tools" : [ {
+      "namespace" : "Common",
       "schema" : {
         "name" : "mobile_rain_today",
         "description" : "使用A提供的今日下雨信息",
@@ -114,6 +115,7 @@
       },
       "definitionName" : "rain_today"
     }, {
+      "namespace" : "Common",
       "schema" : {
         "name" : "mobile_rain_tomorrow",
         "description" : "使用A提供的明日下雨信息",
@@ -154,12 +156,13 @@
       "definitionName" : "rain_tomorrow"
     } ]
   }, {
-    "definitionGroupName" : "defGroup_weather_Rain",
+    "name" : "implGroup_weather_Rain_Unicom",
     "summary" : "",
     "description" : "",
     "extensions" : { },
-    "name" : "implGroup_weather_Rain_Unicom",
+    "definitionGroupName" : "defGroup_weather_Rain",
     "tools" : [ {
+      "namespace" : "Common",
       "schema" : {
         "name" : "unicom_rain_today",
         "description" : "使用B提供的今日下雨信息",
@@ -196,6 +199,7 @@
       },
       "definitionName" : "rain_today"
     }, {
+      "namespace" : "Common",
       "schema" : {
         "name" : "unicom_rain_tomorrow",
         "description" : "使用B提供的明日下雨信息",

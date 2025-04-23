@@ -9,6 +9,7 @@ package modelengine.fel.tool;
 import static modelengine.fitframework.inspection.Validation.notNull;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fitframework.inspection.Nonnull;
 import modelengine.fitframework.util.StringUtils;
 
@@ -20,61 +21,51 @@ import java.util.Map;
  * @author 易文渊
  * @since 2024-08-14
  */
-public class ToolEntity implements Tool.Info {
-    private String namespace;
-    private Map<String, Object> schema;
-    private Map<String, Object> runnables;
-    private Map<String, Object> extensions;
+public class DefaultToolEntity implements Tool.Info {
+    private ToolEntity toolEntity;
 
     /**
      * 默认构造函数。
      */
-    public ToolEntity() {}
+    public DefaultToolEntity() {}
 
     /**
      * 创建 {@link ToolEntity} 的实例。
      *
-     * @param namespace 表示工具命名空间的 {@link String}。
-     * @param schema 表示工具格式规范描述的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
-     * @param runnables 表示工具运行规范的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
-     * @param extensions 表示工具额外参数规范的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     * @param toolEntity 表示工具实体类的 {@link ToolEntity}。
      */
-    public ToolEntity(String namespace, Map<String, Object> schema, Map<String, Object> runnables,
-            Map<String, Object> extensions) {
-        this.namespace = notNull(namespace, "The namespace cannot be null.");
-        this.schema = notNull(schema, "The schema cannot be null.");
-        this.runnables = notNull(runnables, "The runnables cannot be null.");
-        this.extensions = notNull(extensions, "The extensions cannot be null.");
+    public DefaultToolEntity(ToolEntity toolEntity) {
+        this.toolEntity = toolEntity;
     }
 
     @Nonnull
     @Override
     public String namespace() {
-        return this.namespace;
+        return this.toolEntity.getNamespace();
     }
 
     @Nonnull
     @Override
     public String name() {
-        return cast(this.schema.get(ToolSchema.NAME));
+        return this.toolEntity.getSchema().getName();
     }
 
     @Nonnull
     @Override
     public String description() {
-        return cast(this.schema.get(ToolSchema.DESCRIPTION));
+        return this.toolEntity.getSchema().getDescription();
     }
 
     @Nonnull
     @Override
     public Map<String, Object> parameters() {
-        return cast(this.schema.get(ToolSchema.PARAMETERS));
+        return this.toolEntity.parameters();
     }
 
     @Nonnull
     @Override
     public Map<String, Object> extensions() {
-        return this.extensions;
+        return this.toolEntity.getExtensions();
     }
 
     @Override
@@ -99,12 +90,12 @@ public class ToolEntity implements Tool.Info {
 
     @Override
     public Map<String, Object> schema() {
-        return this.schema;
+        return this.toolEntity.schema();
     }
 
     @Override
     public Map<String, Object> runnables() {
-        return this.runnables;
+        return this.toolEntity.getRunnables();
     }
 
     @Override

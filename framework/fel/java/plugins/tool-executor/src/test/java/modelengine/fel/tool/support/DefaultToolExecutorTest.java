@@ -15,8 +15,9 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import modelengine.fel.tool.DefaultToolEntity;
 import modelengine.fel.tool.Tool;
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolFactory;
 import modelengine.fel.tool.ToolFactoryRepository;
 import modelengine.fel.tool.ToolSchema;
@@ -68,7 +69,7 @@ public class DefaultToolExecutorTest {
     @Test
     @DisplayName("调用工具成功返回结果")
     void shouldOkWhenExecuteTool() throws IOException {
-        ToolEntity toolEntity = getTestEntity();
+        DefaultToolEntity toolEntity = getTestEntity();
         when(this.toolRepository.getTool(any(), eq(toolEntity.name()))).thenReturn(toolEntity);
         when(this.toolFactoryRepository.match(any())).thenReturn(Optional.of(this.toolFactory));
         Tool tool = mock(Tool.class, RETURNS_DEEP_STUBS);
@@ -94,7 +95,7 @@ public class DefaultToolExecutorTest {
     @Test
     @DisplayName("工具工厂不存在，调用失败")
     void shouldFailWhenToolFactoryNotFound() throws IOException {
-        ToolEntity toolEntity = getTestEntity();
+        DefaultToolEntity toolEntity = getTestEntity();
         when(this.toolRepository.getTool(any(), any())).thenReturn(toolEntity);
         when(this.toolFactoryRepository.match(any())).thenReturn(Optional.empty());
 
@@ -105,12 +106,12 @@ public class DefaultToolExecutorTest {
                 "test")).isInstanceOf(IllegalStateException.class);
     }
 
-    private ToolEntity getTestEntity() throws IOException {
+    private DefaultToolEntity getTestEntity() throws IOException {
         List<ToolEntity> toolEntities =
                 this.serializer.<Map<String, List<ToolEntity>>>deserialize(IoUtils.content(this.getClass().getClassLoader(), ToolSchema.TOOL_MANIFEST),
                         TypeUtils.parameterized(Map.class, new Type[] {
                                 String.class, TypeUtils.parameterized(List.class, new Type[] {ToolEntity.class})
                         })).get("tools");
-        return toolEntities.get(0);
+        return new DefaultToolEntity(toolEntities.get(0));
     }
 }

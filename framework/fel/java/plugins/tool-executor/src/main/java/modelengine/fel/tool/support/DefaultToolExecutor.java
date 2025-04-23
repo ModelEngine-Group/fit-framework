@@ -7,9 +7,11 @@
 package modelengine.fel.tool.support;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
+import static modelengine.fitframework.util.ObjectUtils.cast;
 
+import modelengine.fel.tool.DefaultToolEntity;
 import modelengine.fel.tool.Tool;
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolFactory;
 import modelengine.fel.tool.ToolFactoryRepository;
 import modelengine.fel.tool.service.ToolExecuteService;
@@ -80,7 +82,7 @@ public class DefaultToolExecutor implements ToolExecuteService {
     }
 
     private Tool getTool(String group, String toolName) {
-        ToolEntity tool = notNull(toolRepository.getTool(group, toolName),
+        DefaultToolEntity tool = notNull(toolRepository.getTool(group, toolName),
                 () -> new IllegalStateException(StringUtils.format("The tool cannot be found. [group={0}, tool={1}]",
                         group,
                         toolName)));

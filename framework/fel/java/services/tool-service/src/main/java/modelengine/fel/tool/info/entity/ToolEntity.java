@@ -6,8 +6,16 @@
 
 package modelengine.fel.tool.info.entity;
 
+import static modelengine.fitframework.util.ObjectUtils.cast;
+
+import modelengine.fel.tool.Tool;
+import modelengine.fel.tool.ToolSchema;
+import modelengine.fitframework.inspection.Nonnull;
+import modelengine.fitframework.util.StringUtils;
+
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * 表示工具的实体类。
@@ -17,6 +25,7 @@ import java.util.Map;
  * @since 2024-10-26
  */
 public class ToolEntity {
+    private String namespace;
     private SchemaEntity schema;
     private Map<String, Object> runnables;
     private Map<String, Object> extensions;
@@ -112,5 +121,42 @@ public class ToolEntity {
      */
     public void setDefinitionName(String definitionName) {
         this.definitionName = definitionName;
+    }
+
+    /**
+     * 获取工具的命名空间。
+     *
+     * @return 表示工具命名空间的 {@link String}。
+     */
+    public String getNamespace() {
+        return this.namespace;
+    }
+
+    /**
+     *
+     * @param namespace
+     */
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    public Map<String, Object> parameters() {
+        Map<String, Object> paramsMap = new HashMap<>();
+        ParameterEntity paramEntity = this.schema.getParameters();
+        paramsMap.put("type", paramEntity.getType());
+        paramsMap.put("properties", paramEntity.getProperties());
+        paramsMap.put("required", paramEntity.getRequired());
+        return paramsMap;
+    }
+
+    public Map<String, Object> schema() {
+        Map<String, Object> schemaMap = new HashMap<>();
+        schemaMap.put("name", this.schema.getName());
+        schemaMap.put("description", this.schema.getDescription());
+        schemaMap.put("parameters", this.parameters());
+        schemaMap.put("order", this.schema.getOrder());
+        schemaMap.put("return", this.schema.getRet());
+        schemaMap.put("parameterExtensions", this.schema.getParameterExtensions());
+        return schemaMap;
     }
 }

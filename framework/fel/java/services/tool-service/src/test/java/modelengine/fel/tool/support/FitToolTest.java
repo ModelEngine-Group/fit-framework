@@ -6,6 +6,7 @@
 
 package modelengine.fel.tool.support;
 
+import static modelengine.fitframework.util.ObjectUtils.cast;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,8 +15,9 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import modelengine.fel.tool.DefaultToolEntity;
 import modelengine.fel.tool.Tool;
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolFactory;
 import modelengine.fel.tool.ToolSchema;
 import modelengine.fit.serialization.json.jackson.JacksonObjectSerializer;
@@ -62,7 +64,8 @@ public class FitToolTest {
                 })).get("tools");
         ToolEntity testEntity = toolEntities.get(0);
         ToolFactory toolFactory = new FitToolFactory(client, serializer);
-        this.tool = toolFactory.create(testEntity, Tool.Metadata.fromSchema("Common", testEntity.schema()));
+        DefaultToolEntity defaultToolEntity = new DefaultToolEntity(testEntity);
+        this.tool = toolFactory.create(defaultToolEntity, Tool.Metadata.fromSchema("Common", testEntity.schema()));
     }
 
     @Test

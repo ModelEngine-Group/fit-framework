@@ -107,6 +107,7 @@ public class ByteBuddyToolsParser {
             return Optional.empty();
         }
         toolEntity.setDefinitionName(defMethodAnnotation.load().name());
+        toolEntity.setNamespace(defMethodAnnotation.load().namespace());
         ByteBuddySchemaParser.parseMethodSchema(toolMethodDescription).ifPresent(toolEntity::setSchema);
         toolEntity.setRunnables(parserRunnables(defMethodDescription, toolMethodDescription));
         AnnotationDescription.Loadable<ToolMethod> toolMethodAnnotation =

@@ -9,7 +9,8 @@ package modelengine.fel.tool.support;
 import static modelengine.fitframework.inspection.Validation.isTrue;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.DefaultToolEntity;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolSchema;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
@@ -62,14 +63,14 @@ public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStopp
 
     @Override
     public void onPluginStarted(Plugin plugin) {
-        this.scanTools(plugin).forEach(this.toolRepository::addTool);
+        this.scanTools(plugin).forEach(toolEntity -> this.toolRepository.addTool(new DefaultToolEntity(toolEntity)));
     }
 
     @Override
     public void onPluginStopping(Plugin plugin) {
         List<ToolEntity> toolEntities = this.scanTools(plugin);
         isTrue(toolEntities.size() < this.maxToolNum, "The tool num in plugin must less than {}", this.maxToolNum);
-        toolEntities.forEach(tool -> this.toolRepository.deleteTool(tool.namespace(), tool.name()));
+        toolEntities.forEach(tool -> this.toolRepository.deleteTool(tool.getNamespace(), tool.getSchema().getName()));
     }
 
     private List<ToolEntity> scanTools(Plugin plugin) {
