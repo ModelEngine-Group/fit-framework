@@ -16,12 +16,12 @@ package modelengine.fel.tool.info.entity;
 public class PropertyEntity {
     private String defaultValue;
     private String description;
-    private boolean isRequired;
     private String name;
     private String type;
     private Object items;
     private Object properties;
     private String examples;
+    private boolean required;
 
     /**
      * 获取参数的默认值。
@@ -65,7 +65,7 @@ public class PropertyEntity {
      * @return 如果参数是必需的，则返回 {@code true}，否则返回 {@code false}。
      */
     public boolean isRequired() {
-        return this.isRequired;
+        return this.required;
     }
 
     /**
@@ -74,7 +74,7 @@ public class PropertyEntity {
      * @param required 表示参数是否是必需的 {@link boolean}。
      */
     public void setRequired(boolean required) {
-        this.isRequired = required;
+        this.required = required;
     }
 
     /**

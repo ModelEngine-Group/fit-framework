@@ -22,12 +22,18 @@
             <groupId>org.fitframework</groupId>
             <artifactId>fit-maven-plugin-util</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-message-serializer-json-jackson</artifactId>
+        </dependency>
 
         <!-- FEL -->
         <dependency>
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-service</artifactId>
         </dependency>
+
+        <!-- Component -->
         <dependency>
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-info</artifactId>

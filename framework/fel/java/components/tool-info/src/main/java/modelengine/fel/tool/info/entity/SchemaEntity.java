@@ -6,8 +6,6 @@
 
 package modelengine.fel.tool.info.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import modelengine.fitframework.annotation.Property;
 
 import java.util.List;
@@ -18,6 +16,7 @@ import java.util.Map;
  *
  * @author 曹嘉美
  * @author 李金绪
+ * @author 杭潇
  * @since 2024-10-26
  */
 public class SchemaEntity {
@@ -25,7 +24,6 @@ public class SchemaEntity {
     private String description;
     private ParameterEntity parameters;
     private List<String> order;
-    @JsonProperty("return")
     @Property(name = "return")
     private Map<String, Object> ret;
     private Map<String, Object> parameterExtensions;

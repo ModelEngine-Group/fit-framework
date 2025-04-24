@@ -6,11 +6,15 @@
 
 package modelengine.fel.maven.complie.plugin;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import static modelengine.fit.serialization.json.jackson.JacksonObjectSerializer.DEFAULT_DATE_FORMAT;
+import static modelengine.fit.serialization.json.jackson.JacksonObjectSerializer.DEFAULT_DATE_TIME_FORMAT;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import modelengine.fel.maven.complie.util.JsonUtils;
 import modelengine.fel.tool.ToolSchema;
 import modelengine.fel.tool.info.entity.ToolJsonEntity;
+import modelengine.fit.serialization.json.jackson.JacksonObjectSerializer;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.protocol.jar.Jar;
 import modelengine.fitframework.util.FileUtils;
@@ -24,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -70,9 +75,14 @@ public class UrlClassLoaderInitializer {
             return;
         }
         File jsonFile = Paths.get(outputDirectory, ToolSchema.TOOL_MANIFEST).toFile();
+        JacksonObjectSerializer serializer = new JacksonObjectSerializer(
+                DEFAULT_DATE_TIME_FORMAT,
+                DEFAULT_DATE_FORMAT,
+                "Asia/Shanghai"
+        );
+        Map<String, Object> stringObjectMap = JsonUtils.convertToMap(serializer.serialize(toolJsonEntity));
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, toolJsonEntity);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, stringObjectMap);
         log.info("Write tool json successfully. [file={}]", jsonFile.getName());
     }
 }

@@ -66,7 +66,7 @@
     } ]
   } ],
   "toolGroups" : [ {
-    "name" : "implGroup_weather_Rain_Mobile",
+    "name" : "implGroup_weather_rain_city_a",
     "summary" : "",
     "description" : "",
     "extensions" : {
@@ -77,8 +77,8 @@
     "tools" : [ {
       "namespace" : "Common",
       "schema" : {
-        "name" : "mobile_rain_today",
-        "description" : "使用A提供的今日下雨信息",
+        "name" : "city_a_rain_today",
+        "description" : "城市A提供的今日下雨信息",
         "parameters" : {
           "type" : "object",
           "properties" : {
@@ -107,7 +107,7 @@
       "runnables" : {
         "FIT" : {
           "genericableId" : "genericable_weather_rain_today",
-          "fitableId" : "weather_rain_mobile"
+          "fitableId" : "weather_rain_city_a"
         }
       },
       "extensions" : {
@@ -117,8 +117,8 @@
     }, {
       "namespace" : "Common",
       "schema" : {
-        "name" : "mobile_rain_tomorrow",
-        "description" : "使用A提供的明日下雨信息",
+        "name" : "city_a_rain_tomorrow",
+        "description" : "城市A提供的明日下雨信息",
         "parameters" : {
           "type" : "object",
           "properties" : {
@@ -147,7 +147,7 @@
       "runnables" : {
         "FIT" : {
           "genericableId" : "genericable_weather_rain_tomorrow",
-          "fitableId" : "weather_rain_mobile"
+          "fitableId" : "weather_rain_city_a"
         }
       },
       "extensions" : {
@@ -156,7 +156,7 @@
       "definitionName" : "rain_tomorrow"
     } ]
   }, {
-    "name" : "implGroup_weather_Rain_Unicom",
+    "name" : "implGroup_weather_rain_city_b",
     "summary" : "",
     "description" : "",
     "extensions" : { },
@@ -164,8 +164,8 @@
     "tools" : [ {
       "namespace" : "Common",
       "schema" : {
-        "name" : "unicom_rain_today",
-        "description" : "使用B提供的今日下雨信息",
+        "name" : "city_b_rain_today",
+        "description" : "城市B提供的今日下雨信息",
         "parameters" : {
           "type" : "object",
           "properties" : {
@@ -191,7 +191,7 @@
       "runnables" : {
         "FIT" : {
           "genericableId" : "genericable_weather_rain_today",
-          "fitableId" : "weather_rain_unicom"
+          "fitableId" : "weather_rain_city_b"
         }
       },
       "extensions" : {
@@ -201,8 +201,8 @@
     }, {
       "namespace" : "Common",
       "schema" : {
-        "name" : "unicom_rain_tomorrow",
-        "description" : "使用B提供的明日下雨信息",
+        "name" : "city_b_rain_tomorrow",
+        "description" : "城市B提供的明日下雨信息",
         "parameters" : {
           "type" : "object",
           "properties" : {
@@ -228,7 +228,7 @@
       "runnables" : {
         "FIT" : {
           "genericableId" : "genericable_weather_rain_tomorrow",
-          "fitableId" : "weather_rain_unicom"
+          "fitableId" : "weather_rain_city_b"
         }
       },
       "extensions" : {

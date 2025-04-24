@@ -21,12 +21,12 @@ import java.util.Date;
  * @author 曹嘉美
  * @since 2024-10-26
  */
-@Group(name = "implGroup_weather_Rain_Unicom")
-public class UnicomRainImpl implements Rain {
-    private static final String FITABLE_ID = "weather_rain_unicom";
+@Group(name = "implGroup_weather_rain_city_b")
+public class CityBRainImpl  implements Rain {
+    private static final String FITABLE_ID = "weather_rain_city_b";
 
     @Fitable(FITABLE_ID)
-    @ToolMethod(name = "unicom_rain_today", description = "使用B提供的今日下雨信息", extensions = {
+    @ToolMethod(name = "city_b_rain_today", description = "城市B提供的今日下雨信息", extensions = {
             @Attribute(key = "tags", value = "FIT"), @Attribute(key = "tags", value = "TEST")
     })
     @Override
@@ -35,7 +35,7 @@ public class UnicomRainImpl implements Rain {
     }
 
     @Fitable(FITABLE_ID)
-    @ToolMethod(name = "unicom_rain_tomorrow", description = "使用B提供的明日下雨信息", extensions = {
+    @ToolMethod(name = "city_b_rain_tomorrow", description = "城市B提供的明日下雨信息", extensions = {
             @Attribute(key = "tags", value = "FIT"), @Attribute(key = "tags", value = "TEST")
     })
     @Override

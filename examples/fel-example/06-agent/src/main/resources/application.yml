@@ -4,8 +4,3 @@ fel:
     api-key: '${your-api-key}'
 example:
   model: '${model-name}'
-
-  okhttp:
-    config-client:
-      cache:
-        max-size: 20

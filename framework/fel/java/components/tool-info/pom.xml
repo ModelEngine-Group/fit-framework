@@ -11,24 +11,10 @@
 
     <artifactId>tool-info</artifactId>
 
-    <properties>
-        <jackson.version>2.16.2</jackson.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.fitframework</groupId>
             <artifactId>fit-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 

@@ -12,6 +12,7 @@ import static modelengine.fitframework.inspection.Validation.notNull;
 import modelengine.fel.tool.ToolInfoEntity;
 import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolSchema;
+import modelengine.fel.tool.info.entity.ToolGroupEntity;
 import modelengine.fel.tool.info.entity.ToolJsonEntity;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -92,7 +94,12 @@ public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStopp
             if (toolJsonEntity == null) {
                 return Collections.emptyList();
             }
-            return toolJsonEntity.getToolGroups().get(0).getTools();
+            return toolJsonEntity.getToolGroups().stream()
+                    .filter(Objects::nonNull)
+                    .map(ToolGroupEntity::getTools)
+                    .filter(Objects::nonNull)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
         } catch (IOException exception) {
             return Collections.emptyList();
         }

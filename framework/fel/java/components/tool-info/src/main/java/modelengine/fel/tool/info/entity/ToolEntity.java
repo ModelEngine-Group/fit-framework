@@ -37,6 +37,24 @@ public class ToolEntity {
     private String definitionName;
 
     /**
+     * 获取工具的命名空间。
+     *
+     * @return 表示工具命名空间的 {@link String}。
+     */
+    public String getNamespace() {
+        return this.namespace;
+    }
+
+    /**
+     * 配置工具的命名空间。
+     *
+     * @param namespace 表示工具命名空间的 {@link String}。
+     */
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
+
+    /**
      * 获取 schema 对象。
      *
      * @return 表示 schema 对象的 {@link SchemaEntity}。
@@ -125,24 +143,6 @@ public class ToolEntity {
      */
     public void setDefinitionName(String definitionName) {
         this.definitionName = definitionName;
-    }
-
-    /**
-     * 获取工具的命名空间。
-     *
-     * @return 表示工具命名空间的 {@link String}。
-     */
-    public String getNamespace() {
-        return this.namespace;
-    }
-
-    /**
-     * 配置工具的命名空间。
-     *
-     * @param namespace 表示工具命名空间的 {@link String}。
-     */
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
     }
 
     /**

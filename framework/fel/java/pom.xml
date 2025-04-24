@@ -113,6 +113,11 @@
                 <artifactId>fit-util</artifactId>
                 <version>${fit.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.fitframework.plugin</groupId>
+                <artifactId>fit-message-serializer-json-jackson</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
 
             <!-- WaterFlow -->
             <dependency>
@@ -137,6 +142,8 @@
                 <artifactId>tool-service</artifactId>
                 <version>${fel.version}</version>
             </dependency>
+
+            <!-- Component -->
             <dependency>
                 <groupId>org.fitframework.fel</groupId>
                 <artifactId>tool-info</artifactId>

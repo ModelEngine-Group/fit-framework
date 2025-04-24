@@ -22,14 +22,14 @@ import java.util.Date;
  * @author 曹嘉美
  * @since 2024-10-26
  */
-@Group(name = "implGroup_weather_Rain_Mobile", extensions = {
+@Group(name = "implGroup_weather_rain_city_a", extensions = {
         @Attribute(key = "owner", value = "测试"), @Attribute(key = "language", value = "english")
 })
-public class MobileRainImpl implements Rain {
-    private static final String FITABLE_ID = "weather_rain_mobile";
+public class CityARainImpl  implements Rain {
+    private static final String FITABLE_ID = "weather_rain_city_a";
 
     @Fitable(FITABLE_ID)
-    @ToolMethod(name = "mobile_rain_today", description = "使用A提供的今日下雨信息", extensions = {
+    @ToolMethod(name = "city_a_rain_today", description = "城市A提供的今日下雨信息", extensions = {
             @Attribute(key = "tags", value = "FIT"), @Attribute(key = "tags", value = "TEST")
     })
     @Property(description = "获取今日下雨信息的结果")
@@ -39,7 +39,7 @@ public class MobileRainImpl implements Rain {
     }
 
     @Fitable(FITABLE_ID)
-    @ToolMethod(name = "mobile_rain_tomorrow", description = "使用A提供的明日下雨信息", extensions = {
+    @ToolMethod(name = "city_a_rain_tomorrow", description = "城市A提供的明日下雨信息", extensions = {
             @Attribute(key = "tags", value = "FIT"), @Attribute(key = "tags", value = "TEST")
     })
     @Property(description = "获取明日下雨信息的结果")
