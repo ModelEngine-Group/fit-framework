@@ -9,7 +9,7 @@ package modelengine.fel.tool.support;
 import static modelengine.fitframework.inspection.Validation.notBlank;
 
 import modelengine.fel.core.tool.ToolInfo;
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.ToolInfoEntity;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.log.Logger;
@@ -24,16 +24,17 @@ import java.util.stream.Collectors;
  * 表示 {@link ToolRepository} 的简单实现。
  *
  * @author 易文渊
+ * @author 杭潇
  * @since 2024-08-15
  */
 @Component
 public class SimpleToolRepository implements ToolRepository {
     private static final Logger log = Logger.get(SimpleToolRepository.class);
 
-    private final Map<String, ToolEntity> toolCache = new ConcurrentHashMap<>();
+    private final Map<String, ToolInfoEntity> toolCache = new ConcurrentHashMap<>();
 
     @Override
-    public void addTool(ToolEntity tool) {
+    public void addTool(ToolInfoEntity tool) {
         if (tool == null) {
             return;
         }
@@ -53,15 +54,15 @@ public class SimpleToolRepository implements ToolRepository {
     }
 
     @Override
-    public ToolEntity getTool(String namespace, String toolName) {
+    public ToolInfoEntity getTool(String namespace, String toolName) {
         notBlank(namespace, "The namespace cannot be blank.");
         notBlank(toolName, "The toll name cannot be blank.");
-        String uniqueName = ToolInfo.identify(namespace, toolName);
+        String uniqueName = modelengine.fel.core.tool.ToolInfo.identify(namespace, toolName);
         return toolCache.get(uniqueName);
     }
 
     @Override
-    public List<ToolEntity> listTool(String namespace) {
+    public List<ToolInfoEntity> listTool(String namespace) {
         notBlank(namespace, "The namespace cannot be blank.");
         return toolCache.entrySet()
                 .stream()

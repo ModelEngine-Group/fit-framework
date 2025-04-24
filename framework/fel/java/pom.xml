@@ -36,6 +36,7 @@
     </scm>
 
     <modules>
+        <module>components</module>
         <module>fel-community</module>
         <module>fel-core</module>
         <module>fel-flow</module>
@@ -63,6 +64,7 @@
         <assertj.version>3.27.3</assertj.version>
         <junit.version>5.11.4</junit.version>
         <mockito.version>5.15.2</mockito.version>
+        <mockito.inline.version>4.11.0</mockito.inline.version>
 
         <!-- Jacoco version -->
         <jacoco.version>0.8.10</jacoco.version>
@@ -135,6 +137,11 @@
                 <artifactId>tool-service</artifactId>
                 <version>${fel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-info</artifactId>
+                <version>${fel.version}</version>
+            </dependency>
 
             <!-- Third-party -->
             <dependency>
@@ -159,6 +166,12 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito.inline.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

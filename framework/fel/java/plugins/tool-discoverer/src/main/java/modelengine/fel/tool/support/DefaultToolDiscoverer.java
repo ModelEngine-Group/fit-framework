@@ -9,8 +9,10 @@ package modelengine.fel.tool.support;
 import static modelengine.fitframework.inspection.Validation.isTrue;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.ToolInfoEntity;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolSchema;
+import modelengine.fel.tool.info.entity.ToolJsonEntity;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Value;
@@ -20,15 +22,12 @@ import modelengine.fitframework.plugin.PluginStoppingObserver;
 import modelengine.fitframework.resource.Resource;
 import modelengine.fitframework.serialization.ObjectSerializer;
 import modelengine.fitframework.util.ArrayUtils;
-import modelengine.fitframework.util.TypeUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +35,7 @@ import java.util.stream.Collectors;
  * <p>当插件加载和卸载时，会根据插件暴露的工具方法，进行工具的加载和卸载。</p>
  *
  * @author 易文渊
+ * @author 杭潇
  * @since 2024-08-15
  */
 @Component
@@ -62,14 +62,14 @@ public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStopp
 
     @Override
     public void onPluginStarted(Plugin plugin) {
-        this.scanTools(plugin).forEach(this.toolRepository::addTool);
+        this.scanTools(plugin).forEach(toolEntity -> this.toolRepository.addTool(new ToolInfoEntity(toolEntity)));
     }
 
     @Override
     public void onPluginStopping(Plugin plugin) {
         List<ToolEntity> toolEntities = this.scanTools(plugin);
         isTrue(toolEntities.size() < this.maxToolNum, "The tool num in plugin must less than {}", this.maxToolNum);
-        toolEntities.forEach(tool -> this.toolRepository.deleteTool(tool.namespace(), tool.name()));
+        toolEntities.forEach(tool -> this.toolRepository.deleteTool(tool.getNamespace(), tool.getSchema().getName()));
     }
 
     private List<ToolEntity> scanTools(Plugin plugin) {
@@ -88,14 +88,11 @@ public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStopp
 
     private List<ToolEntity> parseTools(Resource resource) {
         try (InputStream in = resource.read()) {
-            Map<String, List<ToolEntity>> toolEntityMap =
-                    this.serializer.deserialize(in, TypeUtils.parameterized(Map.class, new Type[] {
-                            String.class, TypeUtils.parameterized(List.class, new Type[] {ToolEntity.class})
-                    }));
-            if (toolEntityMap == null) {
+            ToolJsonEntity toolJsonEntity = this.serializer.deserialize(in, ToolJsonEntity.class);
+            if (toolJsonEntity == null) {
                 return Collections.emptyList();
             }
-            return toolEntityMap.get(TOOLS);
+            return toolJsonEntity.getToolGroups().get(0).getTools();
         } catch (IOException exception) {
             return Collections.emptyList();
         }

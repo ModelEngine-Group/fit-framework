@@ -1,45 +1,108 @@
 {
-  "tools": [
+  "version": "1.0.0",
+  "definitionGroups": [
     {
-      "schema": {
-        "name": "get_delivery_date",
-        "description": "Get the delivery date for a customer's order. Call this whenever you need to know the delivery date, for example when a customer asks 'Where is my package",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "orderId": {
-              "type": "string",
-              "description": "The customer's order ID."
+      "name": "default_delivery_date",
+      "summary": "",
+      "description": "",
+      "extensions": {},
+      "definitions": [
+        {
+          "schema": {
+            "name": "get_delivery_date",
+            "description": "Get the delivery date for a customer's order. Call this whenever you need to know the delivery date, for example when a customer asks 'Where is my package",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "orderId": {
+                  "defaultValue": "",
+                  "description": "The customer's order ID.",
+                  "name": "arg0",
+                  "type": "string",
+                  "examples": "",
+                  "required": true
+                },
+                "config": {
+                  "defaultValue": "",
+                  "description": "The customer's config.",
+                  "name": "arg1",
+                  "type": "string",
+                  "examples": "",
+                  "required": true
+                }
+              },
+              "required": [
+                "orderId"
+              ]
             },
-            "config": {
+            "order": [
+              "orderId",
+              "config"
+            ],
+            "return": {
+              "type": "integer",
+              "convertor": ""
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "toolGroups": [
+    {
+      "name": "get_delivery_date",
+      "summary": "",
+      "description": "",
+      "extensions": {},
+      "definitionGroupName": "default_delivery_date",
+      "tools": [
+        {
+          "schema": {
+            "name": "get_delivery_date",
+            "description": "Get the delivery date for a customer's order. Call this whenever you need to know the delivery date, for example when a customer asks 'Where is my package",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "orderId": {
+                  "name": "orderId",
+                  "type": "string",
+                  "required": false
+                },
+                "config": {
+                  "name": "config",
+                  "type": "string",
+                  "required": false
+                }
+              },
+              "required": []
+            },
+            "order": [
+              "orderId",
+              "config"
+            ],
+            "return": {
+              "name": "",
+              "description": "",
               "type": "string",
-              "description": "The customer's config."
+              "convertor": "",
+              "examples": ""
             }
           },
-          "required": [
-            "orderId"
-          ]
-        },
-        "order": [
-          "orderId",
-          "config"
-        ],
-        "return": {
-          "type": "string",
-          "converter": ""
+          "runnables": {
+            "FIT": {
+              "genericableId": "default",
+              "fitableId": "test"
+            }
+          },
+          "extensions": {
+            "tags": [
+              "v2",
+              "v2"
+            ]
+          },
+          "definitionName": "default_delivery_date"
         }
-      },
-      "namespace": "test",
-      "runnables": {
-        "FIT": {
-          "fitableId": "default",
-          "genericableId": "test"
-        }
-      },
-      "extensions": {
-        "k1": "v2",
-        "k2": "v2"
-      }
+      ]
     }
   ]
 }

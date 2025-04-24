@@ -14,8 +14,9 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import modelengine.fel.tool.ToolInfoEntity;
 import modelengine.fel.tool.Tool;
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolFactory;
 import modelengine.fel.tool.ToolSchema;
 import modelengine.fit.serialization.json.jackson.JacksonObjectSerializer;
@@ -38,6 +39,7 @@ import java.util.Objects;
  * 表示 {@link FitTool} 的测试集。
  *
  * @author 易文渊
+ * @author 杭潇
  * @since 2024-08-16
  */
 @DisplayName("测试 FitTool")
@@ -62,7 +64,8 @@ public class FitToolTest {
                 })).get("tools");
         ToolEntity testEntity = toolEntities.get(0);
         ToolFactory toolFactory = new FitToolFactory(client, serializer);
-        this.tool = toolFactory.create(testEntity, Tool.Metadata.fromSchema("Common", testEntity.schema()));
+        ToolInfoEntity toolInfoEntity = new ToolInfoEntity(testEntity);
+        this.tool = toolFactory.create(toolInfoEntity, Tool.Metadata.fromSchema("Common", testEntity.schema()));
     }
 
     @Test

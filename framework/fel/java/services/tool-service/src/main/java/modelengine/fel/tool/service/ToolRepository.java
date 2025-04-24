@@ -6,7 +6,7 @@
 
 package modelengine.fel.tool.service;
 
-import modelengine.fel.tool.ToolEntity;
+import modelengine.fel.tool.ToolInfoEntity;
 import modelengine.fitframework.annotation.Genericable;
 
 import java.util.List;
@@ -15,16 +15,17 @@ import java.util.List;
  * 提供工具的存储服务。
  *
  * @author 鲁为
+ * @author 杭潇
  * @since 2024-04-16
  */
 public interface ToolRepository {
     /**
      * 添加工具。
      *
-     * @param tool 表示待增加的工具信息的 {@link ToolEntity}。
+     * @param tool 表示待增加的工具信息的 {@link ToolInfoEntity}。
      */
     @Genericable(id = "modelengine.fel.tool.add")
-    void addTool(ToolEntity tool);
+    void addTool(ToolInfoEntity tool);
 
     /**
      * 删除工具。
@@ -40,17 +41,17 @@ public interface ToolRepository {
      *
      * @param namespace 表示工具命名空间的 {@link String}。
      * @param toolName 表示工具名称的 {@link String}。
-     * @return 表示工具的 {@link ToolEntity}。
+     * @return 表示工具的 {@link ToolInfoEntity}。
      */
     @Genericable(id = "modelengine.fel.tool.get")
-    ToolEntity getTool(String namespace, String toolName);
+    ToolInfoEntity getTool(String namespace, String toolName);
 
     /**
      * 获取命名空间下的所有工具。
      *
      * @param namespace 表示工具命名空间的 {@link String}。
-     * @return 表示工具的 {@link List}{@code <}{@link ToolEntity}{@code >}。
+     * @return 表示工具的 {@link List}{@code <}{@link ToolInfoEntity}{@code >}。
      */
     @Genericable(id = "modelengine.fel.tool.list")
-    List<ToolEntity> listTool(String namespace);
+    List<ToolInfoEntity> listTool(String namespace);
 }
