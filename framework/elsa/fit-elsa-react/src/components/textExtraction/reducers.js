@@ -304,7 +304,7 @@ export const SelectToolReducer = () => {
         return convertParameter({
           propertyName: key,
           property: parameters.properties[key],
-          isRequired: parameters.required.some(item => item === key),
+          isRequired: Array.isArray(parameters.required) ? parameters.required.includes(key) : false,
         });
       });
     };

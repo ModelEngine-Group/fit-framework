@@ -45,7 +45,7 @@ const _SkillForm = ({plugin, data = undefined, handlePluginChange, handlePluginD
       return convertParameter({
         propertyName: key,
         property: selectedData.schema.parameters.properties[key],
-        isRequired: selectedData.schema.parameters.required.some(item => item === key),
+        isRequired: Array.isArray(selectedData.schema.parameters.required) ? selectedData.schema.parameters.required.includes(key) : false,
       });
     });
     const outputParams = convertReturnFormat(selectedData.schema.return);

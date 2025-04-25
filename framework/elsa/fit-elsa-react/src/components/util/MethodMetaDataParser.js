@@ -172,7 +172,7 @@ export const convertParameter = param => {
             return convertParameter({
                 propertyName: key,
                 property: properties[key],
-                isRequired: param.property.required?.some(item => item === key) ?? false,
+                isRequired: Array.isArray(param.property.required) ? param.property.required.includes(key) : false,
             });
         });
         result.props = [...result.value];

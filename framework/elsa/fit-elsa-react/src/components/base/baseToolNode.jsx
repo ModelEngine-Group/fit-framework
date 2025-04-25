@@ -50,7 +50,7 @@ export const baseToolNode = (id, x, y, width, height, parent, drawer) => {
         return convertParameter({
           propertyName: key,
           property: metaData.schema.parameters.properties[key],
-          isRequired: metaData.schema.parameters.required?.some(item => item === key) ?? false,
+          isRequired: Array.isArray(metaData.schema.parameters.required) ? metaData.schema.parameters.required.includes(key) : false,
         });
       });
     };

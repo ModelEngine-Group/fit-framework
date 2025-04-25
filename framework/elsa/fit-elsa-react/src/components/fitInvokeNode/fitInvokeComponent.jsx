@@ -84,7 +84,7 @@ export const fitInvokeComponent = (jadeConfig) => {
                 return convertParameter({
                     propertyName: key,
                     property: inputJson.schema.parameters.properties[key],
-                    isRequired: inputJson.schema.parameters.required?.some(item => item === key) ?? false,
+                    isRequired: Array.isArray(inputJson.schema.parameters.required) ? inputJson.schema.parameters.required.includes(key) : false,
                 });
             });
             delete newConfig.inputParams;

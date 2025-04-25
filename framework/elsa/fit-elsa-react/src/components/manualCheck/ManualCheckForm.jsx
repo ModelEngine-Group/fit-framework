@@ -71,7 +71,7 @@ const _ManualCheckForm = ({form, data = undefined, handleFormChange, handleFormD
       return convertParameter({
         propertyName: key,
         property: selectedData.appearance.schema.parameters.properties[key],
-        isRequired: selectedData.appearance.schema.parameters.required.some(item => item === key),
+        isRequired: Array.isArray(selectedData.appearance.schema.parameters.required) ? selectedData.appearance.schema.parameters.required.includes(key) : false,
       });
     });
     entity.outputParams = [convertReturnFormat(selectedData.appearance.schema.return)];
