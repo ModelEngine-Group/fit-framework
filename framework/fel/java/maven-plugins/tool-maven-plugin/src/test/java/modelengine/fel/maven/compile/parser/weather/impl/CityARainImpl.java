@@ -25,7 +25,7 @@ import java.util.Date;
 @Group(name = "implGroup_weather_rain_city_a", extensions = {
         @Attribute(key = "owner", value = "测试"), @Attribute(key = "language", value = "english")
 })
-public class CityARainImpl  implements Rain {
+public class CityARainImpl implements Rain {
     private static final String FITABLE_ID = "weather_rain_city_a";
 
     @Fitable(FITABLE_ID)

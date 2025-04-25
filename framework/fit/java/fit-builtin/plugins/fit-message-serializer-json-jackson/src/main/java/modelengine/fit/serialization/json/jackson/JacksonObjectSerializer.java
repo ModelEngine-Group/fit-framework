@@ -141,7 +141,7 @@ public class JacksonObjectSerializer implements ObjectSerializer {
      *
      * @return 表示 Jackson 的核心序列化器的 {@link ObjectMapper}。
      */
-    ObjectMapper getMapper() {
+    public ObjectMapper getMapper() {
         return this.mapper;
     }
 }

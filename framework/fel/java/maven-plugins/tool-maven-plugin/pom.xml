@@ -32,8 +32,6 @@
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-service</artifactId>
         </dependency>
-
-        <!-- Component -->
         <dependency>
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-info</artifactId>

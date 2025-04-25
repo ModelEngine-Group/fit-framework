@@ -22,7 +22,7 @@ import java.util.Date;
  * @since 2024-10-26
  */
 @Group(name = "implGroup_weather_rain_city_b")
-public class CityBRainImpl  implements Rain {
+public class CityBRainImpl implements Rain {
     private static final String FITABLE_ID = "weather_rain_city_b";
 
     @Fitable(FITABLE_ID)

@@ -80,9 +80,7 @@ public class UrlClassLoaderInitializer {
                 DEFAULT_DATE_FORMAT,
                 "Asia/Shanghai"
         );
-        Map<String, Object> stringObjectMap = JsonUtils.convertToMap(serializer.serialize(toolJsonEntity));
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, stringObjectMap);
+        serializer.getMapper().writerWithDefaultPrettyPrinter().writeValue(jsonFile, toolJsonEntity);
         log.info("Write tool json successfully. [file={}]", jsonFile.getName());
     }
 }
