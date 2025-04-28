@@ -8,7 +8,7 @@ import {updateInput} from '@/components/util/JadeConfigUtils.js';
 import {DEFAULT_INPUT_PARAMS} from '@/components/loopNode/LoopConsts.js';
 import {TOOL_TYPE} from '@/common/Consts.js';
 
-export const ChangePluginByMetaDataReducer = (shape) => {
+export const ChangePluginByMetaDataReducer = () => {
   const self = {};
   self.type = 'changePluginByMetaData';
 
@@ -39,19 +39,18 @@ export const ChangePluginByMetaDataReducer = (shape) => {
       }
     });
 
+    const updateToolInfo = (toolInfo = {}) => {
+      return {
+        ...toolInfo,
+        params: newConfig.inputParams?.find(param => param.name === 'args')?.value?.map(({name}) => ({name})) || [],
+        uniqueName: action.uniqueName,
+        return: { type: 'array' },
+        pluginName: action.pluginName,
+        tags: action.tags
+      };
+    };
 
-    function updateToolInfo() {
-      newToolInfo.params = newConfig.inputParams.find(param => param.name === 'args').value.map(property => {
-        return {name: property.name};
-      });
-      newToolInfo.uniqueName = action.uniqueName;
-      newToolInfo.return = {};
-      newToolInfo.return.type = 'array';
-      newToolInfo.pluginName = action.pluginName;
-      newToolInfo.tags = action.tags;
-    }
-    let newToolInfo = {};
-    updateToolInfo();
+    const newToolInfo = updateToolInfo();
 
     Object.entries(newConfig).forEach(([key, value]) => {
       if (key === 'inputParams') {

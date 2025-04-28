@@ -29,11 +29,10 @@ const LoopWrapper = ({shapeStatus}) => {
   const filterRadioValue = isWaterFlow && radioValue ? radioValue.replace(/^inputParams\./, '') : radioValue;
 
 
-  const handlePluginChange = (entity, returnSchema, uniqueName, name, tags) => {
+  const handlePluginChange = (entity, uniqueName, name, tags) => {
     dispatch({
       type: 'changePluginByMetaData',
       entity: entity,
-      returnSchema: returnSchema,
       uniqueName: uniqueName,
       pluginName: name,
       tags: tags,

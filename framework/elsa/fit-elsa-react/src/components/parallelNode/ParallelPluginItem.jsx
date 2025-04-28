@@ -8,60 +8,28 @@ import {Button, Form, Row} from 'antd';
 import {useShapeContext} from '@/components/DefaultRoot.jsx';
 import React, {useState} from 'react';
 import JadePanelCollapse from '@/components/manualCheck/JadePanelCollapse.jsx';
-import {convertParameter, convertReturnFormat} from '@/components/util/MethodMetaDataParser.js';
 import {useTranslation} from 'react-i18next';
 import {MinusCircleOutlined} from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import {InvokeOutput} from '@/components/common/InvokeOutput.jsx';
+import {InvokeInput} from '@/components/common/InvokeInput.jsx';
 
 /**
- * 循环节点插件折叠区域组件
+ * 并行节点插件配置组件
  *
  * @param plugin 插件信息.
  * @param data 数据信息，用于删除监听使用.
- * @param handlePluginChange 选项修改后的回调.
  * @param handlePluginDelete 选项删除后的回调.
- * @param disabled 禁用状态.
+ * @param shapeStatus 图形状态.
  * @return {JSX.Element}
  * @constructor
  */
-const _SkillForm = ({plugin, data = undefined, handlePluginChange, handlePluginDelete, disabled}) => {
+const _ParallelPluginItem = ({plugin, data, handlePluginDelete, shapeStatus}) => {
   const shape = useShapeContext();
   const [pluginInValid, setPluginInValid] = useState(false);
   const {t} = useTranslation();
-
-  const onSelect = (selectedData) => {
-    // 每次切换表单，需要先清除之前注册的observables.
-    deregisterObservables();
-    const inputProperties = selectedData.schema?.parameters?.properties?.inputParams?.properties;
-    if (inputProperties) {
-      delete inputProperties.traceId;
-      delete inputProperties.callbackId;
-      delete inputProperties.userId;
-    }
-    const entity = {};
-    const orderProperties = selectedData.schema.parameters.order ?
-      selectedData.schema.parameters.order : Object.keys(selectedData.schema.parameters.properties);
-    entity.inputParams = orderProperties.map(key => {
-      return convertParameter({
-        propertyName: key,
-        property: selectedData.schema.parameters.properties[key],
-        isRequired: Array.isArray(selectedData.schema.parameters.required) ? selectedData.schema.parameters.required.includes(key) : false,
-      });
-    });
-    const outputParams = convertReturnFormat(selectedData.schema.return);
-    outputParams.type = 'Array';
-    entity.outputParams = [outputParams];
-    handlePluginChange(entity, selectedData.uniqueName, selectedData.name, selectedData.tags);
-  };
-
-  const pluginSelectEvent = {
-    type: 'SELECT_LOOP_PLUGIN',
-    value: {
-      shapeId: shape.id,
-      selectedPlugin: plugin?.id ?? undefined,
-      onSelect: onSelect,
-    },
-  };
+  const args = plugin.value?.find(arg => arg.name === 'args').value;
+  const outputData = data && data.outputParams;
 
   const recursive = (params, parent, action) => {
     params.forEach(p => {
@@ -80,12 +48,6 @@ const _SkillForm = ({plugin, data = undefined, handlePluginChange, handlePluginD
         shape.page.removeObservable(shape.id, p.id);
       });
     }
-  };
-
-  const triggerSelect = (e) => {
-    e.preventDefault();
-    shape.page.triggerEvent(pluginSelectEvent);
-    e.stopPropagation(); // 阻止事件冒泡
   };
 
   const renderDeleteIcon = (id) => {
@@ -158,22 +120,25 @@ const _SkillForm = ({plugin, data = undefined, handlePluginChange, handlePluginD
             </Row>}
           </Form.Item>
         </div>
+        {args.length > 0 && <InvokeInput inputData={args} shapeStatus={shapeStatus}/>}
+        {outputData.length > 0 && <InvokeOutput outputData={outputData}/>}
       </JadePanelCollapse>
     </Form.Item>
   </>);
 };
 
-_SkillForm.propTypes = {
+_ParallelPluginItem.propTypes = {
   plugin: PropTypes.object.isRequired,
-  handlePluginChange: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired,
   handlePluginDelete: PropTypes.func.isRequired,
-  disabled: PropTypes.bool.isRequired,
+  shapeStatus: PropTypes.object.isRequired,
 };
 
 const areEqual = (prevProps, nextProps) => {
   return prevProps.plugin === nextProps.plugin &&
     prevProps.data === nextProps.data &&
-    prevProps.disabled === nextProps.disabled;
+    prevProps.handlePluginDelete === nextProps.handlePluginDelete &&
+    prevProps.shapeStatus === nextProps.shapeStatus;
 };
 
-export const SkillForm = React.memo(_SkillForm, areEqual);
+export const ParallelPluginItem = React.memo(_ParallelPluginItem, areEqual);
