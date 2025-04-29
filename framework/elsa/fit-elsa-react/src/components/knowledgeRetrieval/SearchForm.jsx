@@ -80,9 +80,9 @@ export const _SearchForm = ({option, groupId, shapeStatus}) => {
         <div className={'search-args-config-form-column'}>
           <span className="jade-font-size jade-font-color">{similarityThreshold}</span>
         </div>
-        <div className={'search-args-config-form-column'}>
-          <Switch checked={rerank} onChange={onChange}/>
-        </div>
+{/*         <div className={'search-args-config-form-column'}> */}
+{/*           <Switch checked={rerank} onChange={onChange}/> */}
+{/*         </div> */}
       </div>
     </>);
   };
@@ -118,9 +118,9 @@ export const _SearchForm = ({option, groupId, shapeStatus}) => {
                   <span className="jade-font-size jade-font-color">{t('similarityThreshold')}</span>
                 </div>
                 <div className={'search-args-config-form-fence'}/>
-                <div className={'search-args-config-form-column'}>
-                  <span className="jade-font-size jade-font-color">{t('rerankParam')}</span>
-                </div>
+{/*                 <div className={'search-args-config-form-column'}> */}
+{/*                   <span className="jade-font-size jade-font-color">{t('rerankParam')}</span> */}
+{/*                 </div> */}
               </div>
               {option.value.length > 0 && getContent()}
             </div>
