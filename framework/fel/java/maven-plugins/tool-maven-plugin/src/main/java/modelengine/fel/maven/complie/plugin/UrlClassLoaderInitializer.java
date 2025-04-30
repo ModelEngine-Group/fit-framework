@@ -9,9 +9,9 @@ package modelengine.fel.maven.complie.plugin;
 import static modelengine.fit.serialization.json.jackson.JacksonObjectSerializer.DEFAULT_DATE_FORMAT;
 import static modelengine.fit.serialization.json.jackson.JacksonObjectSerializer.DEFAULT_DATE_TIME_FORMAT;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import modelengine.fel.maven.complie.util.JsonUtils;
 import modelengine.fel.tool.ToolSchema;
 import modelengine.fel.tool.info.entity.ToolJsonEntity;
 import modelengine.fit.serialization.json.jackson.JacksonObjectSerializer;
@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -80,7 +79,9 @@ public class UrlClassLoaderInitializer {
                 DEFAULT_DATE_FORMAT,
                 "Asia/Shanghai"
         );
-        serializer.getMapper().writerWithDefaultPrettyPrinter().writeValue(jsonFile, toolJsonEntity);
+        ObjectMapper objectMapper = serializer.getMapper().copy();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, toolJsonEntity);
         log.info("Write tool json successfully. [file={}]", jsonFile.getName());
     }
 }

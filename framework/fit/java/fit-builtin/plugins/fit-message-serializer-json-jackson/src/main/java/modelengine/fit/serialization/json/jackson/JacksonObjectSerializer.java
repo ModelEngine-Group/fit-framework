@@ -9,7 +9,6 @@ package modelengine.fit.serialization.json.jackson;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -84,8 +83,7 @@ public class JacksonObjectSerializer implements ObjectSerializer {
                 .maxStringLength(Integer.MAX_VALUE)
                 .build()).build()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .setAnnotationIntrospector(new FitAnnotationIntrospector())
-                .setVisibility(visibilityChecker)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                .setVisibility(visibilityChecker);
         SimpleModule module = new SimpleModule();
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormat));
         module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormat));
