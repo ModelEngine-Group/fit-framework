@@ -46,7 +46,7 @@ class Atom {
     constructor(detections = []) {
         let defaultDetections = [];
         defaultDetections.push({
-            props: new Set(["type"]), react: async function (property, value, preValue, target) {
+            props: new Set(["type"]), react: function (property, value, preValue, target) {
                 let parentChain = target.typeChain;
                 target.typeChain = {
                     parent: parentChain, type: value
@@ -156,7 +156,7 @@ class Atom {
 
         proxy.addDetection = (props, react) => {
             detections.push({
-                props: new Set(props), react: async function (property, value, preValue) {
+                props: new Set(props), react: function (property, value, preValue) {
                     if (proxy.page === undefined || proxy.page.disableReact) {
                         return;
                     }
