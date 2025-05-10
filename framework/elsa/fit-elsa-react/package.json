@@ -12,7 +12,9 @@
     ".": {
       "import": "./build/elsa-react.js",
       "require": "./build/elsa-react.umd.cjs"
-    }
+    },
+    "./locales/en.json": "./src/i18n/en_US.json",
+    "./locales/zh.json": "./src/i18n/zh_CN.json"
   },
   "scripts": {
     "dev": "vite",
