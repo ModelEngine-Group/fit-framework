@@ -4,21 +4,22 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import LoopWrapper from '@/components/loopNode/LoopWrapper.jsx';
+import ParallelWrapper from '@/components/parallelNode/ParallelWrapper.jsx';
 import {ChangeFlowMetaReducer} from '@/components/common/reducers/commonReducers.js';
-import {ChangePluginByMetaDataReducer, DeletePluginReducer, UpdateInputReducer, UpdateRadioInfoReducer} from '@/components/loopNode/reducers/reducers.js';
+
 import {defaultComponent} from '@/components/defaultComponent.js';
 import {v4 as uuidv4} from 'uuid';
 import {DATA_TYPES, DEFAULT_ADD_TOOL_NODE_CONTEXT, FROM_TYPE} from '@/common/Consts.js';
+import {AddPluginByMetaDataReducer, DeletePluginReducer, UpdateInputReducer} from '@/components/parallelNode/reducers/reducers.js';
+import {OUTPUT, TOOL_CALLS} from '@/components/parallelNode/consts.js';
 
-export const loopComponent = (jadeConfig, shape) => {
+export const parallelComponent = (jadeConfig, shape) => {
   const self = defaultComponent(jadeConfig);
   const addReducer = (map, reducer) => map.set(reducer.type, reducer);
   const builtInReducers = new Map();
-  addReducer(builtInReducers, ChangePluginByMetaDataReducer(shape, self));
+  addReducer(builtInReducers, AddPluginByMetaDataReducer(shape, self));
   addReducer(builtInReducers, DeletePluginReducer(shape, self));
   addReducer(builtInReducers, UpdateInputReducer(shape, self));
-  addReducer(builtInReducers, UpdateRadioInfoReducer(shape, self));
   addReducer(builtInReducers, ChangeFlowMetaReducer(shape, self));
 
   /**
@@ -31,28 +32,19 @@ export const loopComponent = (jadeConfig, shape) => {
       inputParams: [
         {
           id: uuidv4(),
-          name: 'args',
-          type: DATA_TYPES.OBJECT,
+          name: TOOL_CALLS,
+          type: DATA_TYPES.ARRAY,
           from: FROM_TYPE.EXPAND,
           value: [],
         },
-        {
-          id: uuidv4(),
-          name: 'config',
-          type: DATA_TYPES.OBJECT,
-          from: FROM_TYPE.INPUT,
-          value: {},
-        },
-        {
-          id: uuidv4(),
-          name: 'toolInfo',
-          type: DATA_TYPES.OBJECT,
-          from: FROM_TYPE.INPUT,
-          value: {},
-        },
-        DEFAULT_ADD_TOOL_NODE_CONTEXT,
-      ],
-      outputParams: [],
+        DEFAULT_ADD_TOOL_NODE_CONTEXT],
+      outputParams: [{
+        id: uuidv4(),
+        name: OUTPUT,
+        type: DATA_TYPES.OBJECT,
+        from: FROM_TYPE.EXPAND,
+        value: [],
+      }],
     };
   };
 
@@ -61,7 +53,7 @@ export const loopComponent = (jadeConfig, shape) => {
    */
   self.getReactComponents = (shapeStatus) => {
     return (<>
-      <LoopWrapper shapeStatus={shapeStatus}/>
+      <ParallelWrapper shapeStatus={shapeStatus}/>
     </>);
   };
 
@@ -70,7 +62,6 @@ export const loopComponent = (jadeConfig, shape) => {
    */
   const reducers = self.reducers;
   self.reducers = (config, action) => {
-    // 等其他节点改造完成，可以将reducers相关逻辑提取到基类中，子类中只需要向builtInReducers中添加reducer即可.
     const reducer = builtInReducers.get(action.type);
     return reducer ? reducer.reduce(config, action) : reducers.apply(self, [config, action]);
   };

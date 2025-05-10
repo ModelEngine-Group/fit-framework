@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {DATA_TYPES, FROM_TYPE} from '@/common/Consts.js';
+import {DATA_TYPES, DEFAULT_ADD_TOOL_NODE_CONTEXT, FROM_TYPE} from '@/common/Consts.js';
 import {v4 as uuidv4} from 'uuid';
 
 export const DEFAULT_INPUT_PARAMS = [
@@ -29,4 +29,5 @@ export const DEFAULT_INPUT_PARAMS = [
     from: FROM_TYPE.INPUT,
     value: {},
   },
+  DEFAULT_ADD_TOOL_NODE_CONTEXT
 ];

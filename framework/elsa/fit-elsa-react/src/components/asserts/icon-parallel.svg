@@ -1,0 +1,22 @@
+<svg width="28.000000" height="28.000000" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip111_17">
+			<rect id="指令_并行" width="20.000000" height="20.000002" transform="translate(4.000000 24.000000) rotate(-90.000000)" fill="white" fill-opacity="0"/>
+		</clipPath>
+		<clipPath id="clip111_22">
+			<rect id="画板 1" width="28.000000" height="28.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip111_22)">
+		<circle id="椭圆 1" cx="14.000000" cy="14.000000" r="14.000000" fill="#4A93FF" fill-opacity="1.000000"/>
+		<g clip-path="url(#clip111_17)">
+			<path id="path" d="M5.87 10.25C5.87 9.83 6.08 9.62 6.5 9.62L21.5 9.62C21.91 9.62 22.12 9.83 22.12 10.25C22.12 10.66 21.91 10.87 21.5 10.87L6.5 10.87C6.08 10.87 5.87 10.66 5.87 10.25Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+			<path id="path" d="M5.87 17.75C5.87 17.33 6.08 17.12 6.5 17.12L21.5 17.12C21.91 17.12 22.12 17.33 22.12 17.75C22.12 18.16 21.91 18.37 21.5 18.37L6.5 18.37C6.08 18.37 5.87 18.16 5.87 17.75Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+			<path id="path" d="M10.87 12.12L10.87 8.37C10.87 7.95 11.08 7.75 11.5 7.75L17.12 7.75C17.54 7.75 17.75 7.95 17.75 8.37L17.75 12.12C17.75 12.54 17.54 12.75 17.12 12.75L11.5 12.75C11.08 12.75 10.87 12.54 10.87 12.12Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+			<path id="path" d="M10.87 19.62L10.87 15.87C10.87 15.45 11.08 15.25 11.5 15.25L17.12 15.25C17.54 15.25 17.75 15.45 17.75 15.87L17.75 19.62C17.75 20.04 17.54 20.25 17.12 20.25L11.5 20.25C11.08 20.25 10.87 20.04 10.87 19.62Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="nonzero"/>
+		</g>
+	</g>
+</svg>

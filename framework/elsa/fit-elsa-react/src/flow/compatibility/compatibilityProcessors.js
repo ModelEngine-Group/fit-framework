@@ -12,7 +12,7 @@ import {
   DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_USER_ID,
   DEFAULT_LLM_KNOWLEDGE_BASES,
   DEFAULT_LLM_REFERENCE_OUTPUT,
-  DEFAULT_LOOP_NODE_CONTEXT,
+  DEFAULT_ADD_TOOL_NODE_CONTEXT,
   DEFAULT_MAX_MEMORY_ROUNDS,
   END_NODE_TYPE,
   FLOW_TYPE,
@@ -206,7 +206,7 @@ export const loopNodeCompatibilityProcessor = (shapeData, graph, pageHandler) =>
     const jober = self.shapeData.flowMeta.jober;
     if (!jober.entity.params.exist(param => param.name === 'context')) {
        jober.entity.params.push({name: 'context'});
-       jober.converter.entity.inputParams.push(DEFAULT_LOOP_NODE_CONTEXT);
+       jober.converter.entity.inputParams.push(DEFAULT_ADD_TOOL_NODE_CONTEXT);
     }
   };
 

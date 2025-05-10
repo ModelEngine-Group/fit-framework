@@ -13,7 +13,8 @@ import {JadeInputTree} from '@/components/common/JadeInputTree.jsx';
 
 _InvokeInput.propTypes = {
     inputData: PropTypes.array,
-    shapeStatus: PropTypes.object
+    shapeStatus: PropTypes.object,
+    parentId: PropTypes.string,
 }
 
 /**
@@ -25,9 +26,10 @@ _InvokeInput.propTypes = {
  * @param radioValue Radio对应的值.
  * @param radioTitle Radio对应的展示信息.
  * @param radioRuleMessage Radio没填时的报错信息.
+ * @param parentId 输入入参上层所属id，非必填.
  * @returns {JSX.Element}
  */
-function _InvokeInput({inputData, shapeStatus, showRadio = false, radioValue, radioTitle, radioRuleMessage}) {
+function _InvokeInput({inputData, shapeStatus, showRadio = false, radioValue, radioTitle, radioRuleMessage, parentId}) {
     const dispatch = useDispatch();
 
     /**
@@ -37,7 +39,7 @@ function _InvokeInput({inputData, shapeStatus, showRadio = false, radioValue, ra
      * @param changes 需要改变的属性.
      */
     const updateItem = (id, changes) => {
-        dispatch({type: 'update', id, changes});
+        dispatch({type: 'update', id, changes, parentId});
     };
 
     /**

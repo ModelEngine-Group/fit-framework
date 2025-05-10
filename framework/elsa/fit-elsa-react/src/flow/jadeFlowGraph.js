@@ -57,6 +57,8 @@ import {loopNodeState} from '@/components/loopNode/loopNodeState.jsx';
 import {loopComponent} from '@/components/loopNode/loopComponent.jsx';
 import {intelligentFormNodeState} from '@/components/intelligentForm/intelligentFormNodeState.jsx';
 import {intelligentFormComponent} from '@/components/intelligentForm/intelligentFormComponent.jsx';
+import {parallelNodeState} from '@/components/parallelNode/parallelNodeState.jsx';
+import {parallelComponent} from '@/components/parallelNode/parallelComponent.jsx';
 
 /**
  * jadeFlow的专用画布.
@@ -161,6 +163,8 @@ export const jadeFlowGraph = (div, title) => {
     self.registerPlugin('loopComponent', loopComponent);
     self.registerPlugin('intelligentFormNodeState', intelligentFormNodeState);
     self.registerPlugin('intelligentFormComponent', intelligentFormComponent);
+    self.registerPlugin('parallelNodeState', parallelNodeState);
+    self.registerPlugin('parallelComponent', parallelComponent);
     return initialize.apply(self);
   };
 

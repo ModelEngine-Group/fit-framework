@@ -13,6 +13,7 @@ import {convertParameter, convertReturnFormat} from '@/components/util/MethodMet
 import {useTranslation} from 'react-i18next';
 import {EyeOutlined, MinusCircleOutlined} from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import {recursive} from '@/components/util/ReferenceUtil.js';
 
 /**
  * 人工检查节点折叠区域组件
@@ -85,17 +86,6 @@ const _ManualCheckForm = ({form, data = undefined, handleFormChange, handleFormD
       selectedForm: form?.id ?? undefined,
       onSelect: onSelect,
     },
-  };
-
-  const recursive = (params, parent, action) => {
-    params.forEach(p => {
-      if (p.type === 'Object') {
-        recursive(p.value, p, action);
-        action(p, parent);
-      } else {
-        action(p, parent);
-      }
-    });
   };
 
   const deregisterObservables = () => {
