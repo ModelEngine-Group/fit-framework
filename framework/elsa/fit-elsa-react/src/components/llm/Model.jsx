@@ -59,6 +59,7 @@ const ModelSelect = ({shapeId, model, serviceName, tag, disabled, modelOptions})
         onClick={handleSelectClick} // 点击下拉框时阻止事件冒泡
         onChange={(e) => dispatch({type: 'changeAccessInfoConfig', value: e})}
         options={modelOptions}
+        dropdownMatchSelectWidth={false}
       />
     </Form.Item>
   </>);
