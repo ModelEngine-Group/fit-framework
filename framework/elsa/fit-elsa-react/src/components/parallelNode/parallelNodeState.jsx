@@ -7,6 +7,7 @@
 import {parallelNodeDrawer} from '@/components/parallelNode/parallelNodeDrawer.jsx';
 import {jadeNode} from '@/components/base/jadeNode.jsx';
 import {SECTION_TYPE, TOOL_TYPE} from '@/common/Consts.js';
+import {TOOL_CALLS} from '@/components/parallelNode/consts.js';
 
 /**
  * jadeStream中的并行节点.
@@ -18,10 +19,11 @@ export const parallelNodeState = (id, x, y, width, height, parent, drawer) => {
   self.type = 'parallelNodeState';
   self.text = '并行节点';
   self.componentName = 'parallelComponent';
+  self.width = 380;
   self.flowMeta.jober.type = 'STORE_JOBER';
   const parallelNodeEntity = {
     uniqueName: "",
-    params: [{"name": "tools"}, {"name": "context"}],
+    params: [{"name": TOOL_CALLS}, {"name": "context"}],
     return: {type: "object"}
   };
 
@@ -42,11 +44,11 @@ export const parallelNodeState = (id, x, y, width, height, parent, drawer) => {
    * 应用工具流节点的测试报告章节
    */
   self.getRunReportSections = () => {
-    const isWaterFlow = self.flowMeta?.jober?.converter?.entity?.inputParams?.find(param => param.name === 'toolInfo')?.value?.tags?.includes(TOOL_TYPE.WATER_FLOW) ?? false;
-    // 选择合适的 data
-    const inputData = isWaterFlow ? self.input?.args?.inputParams : self.input?.args;
-    // Todo 这里需要遍历 然后根据每个工具是不是waterflow来选择不一样的路径进行展示
-    // 这里的data是每个节点的每个章节需要展示的数据，比如工具节点展示为输入、输出的数据
+    const inputData = {};
+    self.input?.toolCalls?.forEach((toolCall) => {
+      const isWaterFlow = toolCall?.tags?.includes(TOOL_TYPE.WATER_FLOW) ?? false;
+      inputData[toolCall?.outputName ?? 'output'] = isWaterFlow ? toolCall?.args?.inputParams : toolCall?.args;
+    });
     return [{no: '1', name: 'input', type: SECTION_TYPE.DEFAULT, data: inputData ?? {}}, {
       no: '2', name: 'output', type: SECTION_TYPE.DEFAULT, data: self.getOutputData(self.output),
     }];

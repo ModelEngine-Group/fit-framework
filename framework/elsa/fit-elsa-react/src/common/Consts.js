@@ -191,7 +191,7 @@ export const RENDER_TYPE = {
   LABEL: 'Label',
 };
 
-export const DEFAULT_LOOP_NODE_CONTEXT = {
+export const DEFAULT_ADD_TOOL_NODE_CONTEXT = {
   id: uuidv4(),
   name: 'context',
   type: DATA_TYPES.OBJECT,

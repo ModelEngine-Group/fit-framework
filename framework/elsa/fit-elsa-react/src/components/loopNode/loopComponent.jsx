@@ -9,7 +9,7 @@ import {ChangeFlowMetaReducer} from '@/components/common/reducers/commonReducers
 import {ChangePluginByMetaDataReducer, DeletePluginReducer, UpdateInputReducer, UpdateRadioInfoReducer} from '@/components/loopNode/reducers/reducers.js';
 import {defaultComponent} from '@/components/defaultComponent.js';
 import {v4 as uuidv4} from 'uuid';
-import {DATA_TYPES, DEFAULT_LOOP_NODE_CONTEXT, FROM_TYPE} from '@/common/Consts.js';
+import {DATA_TYPES, DEFAULT_ADD_TOOL_NODE_CONTEXT, FROM_TYPE} from '@/common/Consts.js';
 
 export const loopComponent = (jadeConfig, shape) => {
   const self = defaultComponent(jadeConfig);
@@ -50,7 +50,7 @@ export const loopComponent = (jadeConfig, shape) => {
           from: FROM_TYPE.INPUT,
           value: {},
         },
-        DEFAULT_LOOP_NODE_CONTEXT,
+        DEFAULT_ADD_TOOL_NODE_CONTEXT,
       ],
       outputParams: [],
     };

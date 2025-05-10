@@ -22,10 +22,11 @@ JadeInputTreeCollapse.propTypes = {
  *
  * @param data 数据.
  * @param children 子组件列表.
+ * @param props 参数。
  * @return {JSX.Element}
  * @constructor
  */
-export default function JadeInputTreeCollapse({data, children}) {
+export default function JadeInputTreeCollapse({data, children, ...props}) {
     const { t } = useTranslation();
 
     const getContent = () => {
@@ -50,7 +51,7 @@ export default function JadeInputTreeCollapse({data, children}) {
     const content = getContent();
 
     return (<>
-        <JadeCollapse defaultActiveKey={['jadeInputTreePanel']}>
+        <JadeCollapse defaultActiveKey={['jadeInputTreePanel']} {...props}>
             <Panel
                 key={'jadeInputTreePanel'}
                 header={

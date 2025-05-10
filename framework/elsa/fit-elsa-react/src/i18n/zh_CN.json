@@ -704,5 +704,7 @@
   "appConfig": "应用配置",
   "appChatStyle": "应用界面配置",
   "appChatStyleCannotBeEmpty": "应用界面配置不能为空",
-  "formItemFieldTypeCannotBeEmpty": "表单项类型不能为空"
+  "formItemFieldTypeCannotBeEmpty": "表单项类型不能为空",
+  "addParallelTask": "添加并行任务",
+  "parameterDescription": "参数介绍："
 }

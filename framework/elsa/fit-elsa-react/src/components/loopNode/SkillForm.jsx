@@ -12,6 +12,7 @@ import {convertParameter, convertReturnFormat} from '@/components/util/MethodMet
 import {useTranslation} from 'react-i18next';
 import {MinusCircleOutlined} from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import {recursive} from '@/components/util/ReferenceUtil.js';
 
 /**
  * 循环节点插件折叠区域组件
@@ -61,17 +62,6 @@ const _SkillForm = ({plugin, data = undefined, handlePluginChange, handlePluginD
       selectedPlugin: plugin?.id ?? undefined,
       onSelect: onSelect,
     },
-  };
-
-  const recursive = (params, parent, action) => {
-    params.forEach(p => {
-      if (p.type === 'Object') {
-        recursive(p.value, p, action);
-        action(p, parent);
-      } else {
-        action(p, parent);
-      }
-    });
   };
 
   const deregisterObservables = () => {
@@ -150,9 +140,9 @@ const _SkillForm = ({plugin, data = undefined, handlePluginChange, handlePluginD
           >
             {plugin && plugin.id && <Row key={`pluginRow-${plugin.id}`}>
               <div className={`jade-custom-multi-select-with-slider-div item-hover ${pluginInValid ? 'jade-error-border' : ''}`}>
-            <span className={'jade-custom-multi-select-item'}>
-                {plugin?.name ?? ''}
-            </span>
+                <span className={'jade-custom-multi-select-item'}>
+                    {plugin?.name ?? ''}
+                </span>
                 {renderDeleteIcon(plugin.id)}
               </div>
             </Row>}

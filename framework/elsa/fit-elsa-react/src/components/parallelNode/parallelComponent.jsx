@@ -9,13 +9,17 @@ import {ChangeFlowMetaReducer} from '@/components/common/reducers/commonReducers
 
 import {defaultComponent} from '@/components/defaultComponent.js';
 import {v4 as uuidv4} from 'uuid';
-import {DATA_TYPES, FROM_TYPE} from '@/common/Consts.js';
+import {DATA_TYPES, DEFAULT_ADD_TOOL_NODE_CONTEXT, FROM_TYPE} from '@/common/Consts.js';
+import {AddPluginByMetaDataReducer, DeletePluginReducer, UpdateInputReducer} from '@/components/parallelNode/reducers/reducers.js';
+import {OUTPUT, TOOL_CALLS} from '@/components/parallelNode/consts.js';
 
 export const parallelComponent = (jadeConfig, shape) => {
   const self = defaultComponent(jadeConfig);
   const addReducer = (map, reducer) => map.set(reducer.type, reducer);
   const builtInReducers = new Map();
-
+  addReducer(builtInReducers, AddPluginByMetaDataReducer(shape, self));
+  addReducer(builtInReducers, DeletePluginReducer(shape, self));
+  addReducer(builtInReducers, UpdateInputReducer(shape, self));
   addReducer(builtInReducers, ChangeFlowMetaReducer(shape, self));
 
   /**
@@ -25,14 +29,22 @@ export const parallelComponent = (jadeConfig, shape) => {
    */
   self.getJadeConfig = () => {
     return jadeConfig ? jadeConfig : {
-      inputParams: [{
+      inputParams: [
+        {
+          id: uuidv4(),
+          name: TOOL_CALLS,
+          type: DATA_TYPES.ARRAY,
+          from: FROM_TYPE.EXPAND,
+          value: [],
+        },
+        DEFAULT_ADD_TOOL_NODE_CONTEXT],
+      outputParams: [{
         id: uuidv4(),
-        name: 'tools',
+        name: OUTPUT,
         type: DATA_TYPES.OBJECT,
         from: FROM_TYPE.EXPAND,
         value: [],
-      },],
-      outputParams: [],
+      }],
     };
   };
 
@@ -50,7 +62,6 @@ export const parallelComponent = (jadeConfig, shape) => {
    */
   const reducers = self.reducers;
   self.reducers = (config, action) => {
-    // 等其他节点改造完成，可以将reducers相关逻辑提取到基类中，子类中只需要向builtInReducers中添加reducer即可.
     const reducer = builtInReducers.get(action.type);
     return reducer ? reducer.reduce(config, action) : reducers.apply(self, [config, action]);
   };

@@ -9,6 +9,7 @@ import {InvokeOutput} from '@/components/common/InvokeOutput.jsx';
 import {SkillForm} from '@/components/loopNode/SkillForm.jsx';
 import {useDataContext, useDispatch} from '@/components/DefaultRoot.jsx';
 import {TOOL_TYPE} from '@/common/Consts.js';
+import PropTypes from 'prop-types';
 
 /**
  * 循环节点Wrapper
@@ -27,7 +28,6 @@ const LoopWrapper = ({shapeStatus}) => {
   const isWaterFlow = toolInfo?.tags?.some(tag => tag === TOOL_TYPE.WATER_FLOW)
   const filterArgs = isWaterFlow ? args.find(arg => arg.name === 'inputParams')?.value ?? args : args;
   const filterRadioValue = isWaterFlow && radioValue ? radioValue.replace(/^inputParams\./, '') : radioValue;
-
 
   const handlePluginChange = (entity, uniqueName, name, tags) => {
     dispatch({
@@ -57,6 +57,10 @@ const LoopWrapper = ({shapeStatus}) => {
       {outputData.length > 0 && <InvokeOutput outputData={outputData}/>}
     </div>
   </>);
+};
+
+LoopWrapper.propTypes = {
+  shapeStatus: PropTypes.object,
 };
 
 export default LoopWrapper;

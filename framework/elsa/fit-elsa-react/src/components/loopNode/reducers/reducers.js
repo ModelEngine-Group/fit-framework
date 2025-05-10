@@ -68,11 +68,8 @@ export const ChangePluginByMetaDataReducer = () => {
         newConfig[key] = value;
       }
     });
-
     return newConfig;
   };
-
-
 
   return self;
 };
@@ -133,7 +130,6 @@ export const UpdateInputReducer = () => {
         newConfig[key] = value;
       }
     });
-
     return newConfig;
   };
 

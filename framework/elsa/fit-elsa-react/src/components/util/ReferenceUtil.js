@@ -24,3 +24,21 @@ export const getDefaultReference = (id) => {
         editable: true,
     };
 };
+
+/**
+ * 对Reference中Object结构进行递归调用。
+ *
+ * @param params 传入的数组。
+ * @param parent 父元素。
+ * @param action 具体递归操作方法。
+ */
+export const recursive = (params, parent, action) => {
+    params.forEach(p => {
+        if (p.type === 'Object') {
+            recursive(p.value, p, action);
+            action(p, parent);
+        } else {
+            action(p, parent);
+        }
+    });
+};

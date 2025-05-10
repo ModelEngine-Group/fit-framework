@@ -4,14 +4,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {InvokeInput} from '@/components/common/InvokeInput.jsx';
-import {InvokeOutput} from '@/components/common/InvokeOutput.jsx';
-import {SkillForm} from '@/components/loopNode/SkillForm.jsx';
-import {useDataContext, useDispatch} from '@/components/DefaultRoot.jsx';
-import {TOOL_TYPE} from '@/common/Consts.js';
+import {useDataContext, useDispatch, useShapeContext} from '@/components/DefaultRoot.jsx';
 import {ParallelTopBar} from '@/components/parallelNode/ParallelTopBar.jsx';
-import {IntelligentInputFormItem} from '@/components/intelligentForm/IntelligentInputFormItem.jsx';
 import {ParallelPluginItem} from '@/components/parallelNode/ParallelPluginItem.jsx';
+import {Form} from 'antd';
+import {useTranslation} from 'react-i18next';
+import PropTypes from 'prop-types';
+import {useEffect, useMemo} from 'react';
+import {OUTPUT, OUTPUT_NAME, TOOL_CALLS} from '@/components/parallelNode/consts.js';
 
 /**
  * 并行节点Wrapper
@@ -20,36 +20,70 @@ import {ParallelPluginItem} from '@/components/parallelNode/ParallelPluginItem.j
  * @returns {JSX.Element} 循环节点Wrapper的DOM
  */
 const ParallelWrapper = ({shapeStatus}) => {
+  const shape = useShapeContext();
   const data = useDataContext();
   const dispatch = useDispatch();
-  const inputData = data && data.inputParams;
-  const tools = inputData && inputData.find(value => value.name === 'tools').value;
+  const {t} = useTranslation();
 
-  const handlePluginChange = (entity, returnSchema, uniqueName, name, tags) => {
+  const tools = useMemo(
+    () => data?.inputParams?.find(value => value.name === TOOL_CALLS)?.value ?? [],
+    [data?.inputParams]
+  );
+
+  useEffect(() => {
+    const output = data?.outputParams?.find(item => item.name === OUTPUT) ?? {};
+    shape.page.registerObservable({
+      nodeId: shape.id,
+      observableId: output.id,
+      value: output.name,
+      type: output.type,
+      parentId: null,
+    });
+  }, [data?.outputParams]);
+
+  const handlePluginAdd = (entity, uniqueName, name, tags) => {
     dispatch({
-      type: 'changePluginByMetaData',
+      type: 'addPluginByMetaData',
       entity: entity,
-      returnSchema: returnSchema,
       uniqueName: uniqueName,
       pluginName: name,
       tags: tags,
     });
   };
 
-  const handlePluginDelete = (deletePluginId) => {
+  const handlePluginDelete = (deletePluginId, outputName) => {
     dispatch({
-      type: 'deletePlugin', formId: deletePluginId,
+      type: 'deletePlugin', id: deletePluginId, outputName: outputName,
     });
   };
 
   return (<>
     <div>
-      <ParallelTopBar handlePluginChange={handlePluginChange} disabled={shapeStatus.disabled}/>
-      {tools.map((tool) => (
-        <ParallelPluginItem key={tool.outputName} plugin={tool} handlePluginDelete={handlePluginDelete} shapeStatus={shapeStatus}/>
-      ))}
+      <ParallelTopBar handlePluginAdd={handlePluginAdd} disabled={shapeStatus.disabled}/>
+      <Form.Item
+        name={`form-${shape.id}`}
+        rules={[
+          {
+            validator: () => {
+              if (tools.length < 1) {
+                return Promise.reject(new Error(t('pluginCannotBeEmpty')));
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+        validateTrigger="onBlur"
+      >
+        {tools.map((tool) => (
+          <ParallelPluginItem key={tool?.value?.find(item => item.name === OUTPUT_NAME)?.value ?? ''} plugin={tool} handlePluginDelete={handlePluginDelete} shapeStatus={shapeStatus}/>
+        ))}
+      </Form.Item>
     </div>
   </>);
+};
+
+ParallelWrapper.propTypes = {
+  shapeStatus: PropTypes.object,
 };
 
 export default ParallelWrapper;

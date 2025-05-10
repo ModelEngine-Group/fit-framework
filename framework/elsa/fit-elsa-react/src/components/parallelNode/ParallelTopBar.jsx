@@ -10,17 +10,19 @@ import React from 'react';
 import {convertParameter, convertReturnFormat} from '@/components/util/MethodMetaDataParser.js';
 import {PlusOutlined} from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import {useTranslation} from 'react-i18next';
 
 /**
  * 并行节点头部工具栏组件
  *
- * @param handlePluginChange 选项修改后的回调.
+ * @param handlePluginAdd 选项选择后的回调.
  * @param disabled 禁用状态.
  * @return {JSX.Element}
  * @constructor
  */
-const _ParallelTopBar = ({handlePluginChange, disabled}) => {
+const _ParallelTopBar = ({handlePluginAdd, disabled}) => {
   const shape = useShapeContext();
+  const {t} = useTranslation();
 
   const onSelect = (selectedData) => {
     const inputProperties = selectedData.schema?.parameters?.properties?.inputParams?.properties;
@@ -40,7 +42,7 @@ const _ParallelTopBar = ({handlePluginChange, disabled}) => {
       });
     });
     entity.outputParams = [convertReturnFormat(selectedData.schema.return)];
-    handlePluginChange(entity, selectedData.uniqueName, selectedData.name, selectedData.tags);
+    handlePluginAdd(entity, selectedData.uniqueName, selectedData.name, selectedData.tags);
   };
 
   const triggerSelect = (e) => {
@@ -56,12 +58,15 @@ const _ParallelTopBar = ({handlePluginChange, disabled}) => {
   };
 
   return (<>
-    <div style={{position: 'relative'}}>
+    <div style={{position: 'relative', display: 'flex'}}>
       <Button
+        type="link"
+        style={{marginLeft: 'auto'}}
         disabled={disabled}
-        type="text" className="icon-button jade-panel-header-icon-position"
+        className="icon-button jade-panel-header-icon-position"
         onClick={(event) => triggerSelect(event)}>
         <PlusOutlined/>
+        <span>{t('addParallelTask')}</span>
       </Button>
     </div>
   </>);
