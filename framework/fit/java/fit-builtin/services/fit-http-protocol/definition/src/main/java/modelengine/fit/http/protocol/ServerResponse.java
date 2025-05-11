@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * 表示服务端的 Http 响应。
+ * Represents an HTTP response on the server side.
  *
  * @author 季聿阶
  * @since 2022-07-05
@@ -20,27 +20,26 @@ import java.io.OutputStream;
 public interface ServerResponse
         extends Message<ConfigurableStatusLine, ConfigurableMessageHeaders, WritableMessageBody> {
     /**
-     * 向 Http 消息起始行和消息头中写入数据。
+     * Writes the start line and headers of the HTTP message.
      *
-     * @throws IOException 当发生 I/O 异常时。
+     * @throws IOException If an I/O error occurs.
      */
     void writeStartLineAndHeaders() throws IOException;
 
     /**
-     * 向 Http 消息体中写入数据。
+     * Writes a single byte to the HTTP message body.
      *
-     * @param b 表示待写入数据的 {@code int}。
-     * <p>实际上，这里的数据 {@code b} 一定是一个 {@code byte}。</p>
-     * @throws IOException 当发生 I/O 异常时。
+     * @param b The data to be written, represented as an int. Only the least significant byte is used.
+     * @throws IOException If an I/O error occurs.
      */
     void writeBody(int b) throws IOException;
 
     /**
-     * 向 Http 消息体中写入数据。
+     * Writes the entire contents of the specified byte array to the HTTP message body.
      *
-     * @param bytes 表示待写入数据的 {@code byte[]}。
-     * @throws IOException 当发生 I/O 异常时。
-     * @throws IllegalArgumentException 当 {@code bytes} 为 {@code null} 时。
+     * @param bytes The byte array containing the data to be written.
+     * @throws IOException If an I/O error occurs.
+     * @throws IllegalArgumentException If {@code bytes} is null.
      * @see #writeBody(byte[], int, int)
      */
     default void writeBody(byte[] bytes) throws IOException {
@@ -48,29 +47,39 @@ public interface ServerResponse
     }
 
     /**
-     * 向 Http 消息体中写入数据。
+     * Writes up to {@code len} bytes from the specified byte array,
+     * starting at offset {@code off}, to the HTTP message body.
      *
-     * @param bytes 表示待写入数据所在数组的 {@code byte[]}。
-     * @param off 表示待写入数据的偏移量的 {@code int}。
-     * @param len 表示待写入数据的数量的 {@code int}。
-     * @throws IOException 当发生 I/O 异常时。
-     * @throws IllegalArgumentException 当 {@code bytes} 为 {@code null} 时。
-     * @throws IndexOutOfBoundsException 当 {@code off} 或 {@code len} 为负数时，或 {@code off + len}
-     * 超过了 {@code bytes} 的长度时。
+     * @param bytes The byte array containing the data to be written.
+     * @param off The start offset in the source array {@code bytes}.
+     * @param len The number of bytes to write.
+     * @throws IOException If an I/O error occurs.
+     * @throws IllegalArgumentException If {@code bytes} is null.
+     * @throws IndexOutOfBoundsException If {@code off} or {@code len} is negative,
+     * or if {@code off + len} exceeds the length of {@code bytes}.
      */
     void writeBody(byte[] bytes, int off, int len) throws IOException;
 
     /**
-     * 强制已经写入的数据执行写出，也就是说将之前写入到缓冲区的数据全部对外输出；同时发送响应结束标识符。
+     * Forces any buffered data to be written out immediately and sends the response end marker.
      *
-     * @throws IOException 当发生 I/O 异常时。
+     * @throws IOException If an I/O error occurs.
      */
     void flush() throws IOException;
 
     /**
-     * 获取消息体的输出流。
+     * Gets the output stream for writing the body of the HTTP message.
      *
-     * @return 表示消息体的输出流的 {@link OutputStream}。
+     * @return An {@link OutputStream} representing the body content of the HTTP response.
      */
     OutputStream getBodyOutputStream();
+
+    /**
+     * Checks whether the current response is active.
+     *
+     * <p>An inactive response typically indicates that the underlying connection has been closed or reset.</p>
+     *
+     * @return true if the response is active; false otherwise.
+     */
+    boolean isActive();
 }

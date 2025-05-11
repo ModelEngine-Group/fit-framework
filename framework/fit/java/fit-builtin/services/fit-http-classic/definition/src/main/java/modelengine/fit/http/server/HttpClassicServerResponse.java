@@ -19,71 +19,85 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * 表示经典的服务端的 Http 响应。
+ * Represents a classic HTTP server response.
  *
  * @author 季聿阶
  * @since 2022-11-25
  */
 public interface HttpClassicServerResponse extends HttpClassicResponse, Closeable {
     /**
-     * 设置 Http 响应的状态码。
+     * Sets the status code for the HTTP response.
      *
-     * @param statusCode 表示 Http 响应的状态码的 {@code int}。
+     * @param statusCode The HTTP status code as an {@code int}.
      */
     void statusCode(int statusCode);
 
     /**
-     * 设置 Http 响应的状态信息。
+     * Sets the reason phrase for the HTTP response.
      *
-     * @param reasonPhrase 表示 Http 响应的状态信息的 {@link String}。
+     * @param reasonPhrase The reason phrase describing the status, as a {@link String}.
      */
     void reasonPhrase(String reasonPhrase);
 
     /**
-     * 获取 Http 响应的消息头集合。
-     * <p>注意：如果要修改 Cookie 相关的信息，请不要直接在当前对象中操作，请使用 {@link #cookies()} 进行修改。</p>
+     * Gets the collection of message headers for the HTTP response.
      *
-     * @return 表示 Http 响应的消息头集合的 {@link ConfigurableMessageHeaders}。
+     * <p><b>Note:</b> To modify cookie-related information, do not operate directly on this object.
+     * Use {@link #cookies()} instead.</p>
+     *
+     * @return The configurable message headers of the HTTP response as a {@link ConfigurableMessageHeaders}.
      */
     @Override
     ConfigurableMessageHeaders headers();
 
     /**
-     * 获取 Http 响应的 Cookie 集合。
+     * Gets the collection of cookies included in the HTTP response.
      *
-     * @return 表示 Http 响应的 Cookie 集合的 {@link ConfigurableCookieCollection}。
+     * @return The configurable cookie collection of the HTTP response as a {@link ConfigurableCookieCollection}.
      */
     @Override
     ConfigurableCookieCollection cookies();
 
     /**
-     * 设置 Http 响应的消息体的结构化数据。
-     * <p><b>注意：该方法与 {@link #writableBinaryEntity()} 不能同时使用。</b></p>
+     * Sets the structured data of the HTTP response body.
      *
-     * @param entity 表示待设置的 Http 响应的消息体的结构化数据的 {@link Entity}。
+     * <p><b>Note:</b> This method cannot be used together with {@link #writableBinaryEntity()}.</p>
+     *
+     * @param entity The structured data to be set as the HTTP response body, as an {@link Entity}.
      */
     void entity(Entity entity);
 
     /**
-     * 获取 Http 响应的返回输出流。
-     * <p><b>注意：该方法与 {@link #entity(Entity)} 不能同时使用，调用该方法时，会立即将 Http 消息头发送。</b></p>
+     * Gets the output stream for writing binary data to the HTTP response body.
      *
-     * @return 表示 Http 响应的返回输出流的 {@link WritableBinaryEntity}。
-     * @throws IOException 写入过程发生 IO 异常。
+     * <p><b>Note:</b> This method cannot be used together with {@link #entity(Entity)}.
+     * Invoking this method will immediately send the HTTP headers.</p>
+     *
+     * @return A {@link WritableBinaryEntity} representing the output stream for the response body.
+     * @throws IOException If an I/O error occurs during writing.
      */
     WritableBinaryEntity writableBinaryEntity() throws IOException;
 
     /**
-     * 发送当前 Http 响应。
+     * Sends the current HTTP response to the client.
      */
     void send();
 
     /**
-     * 创建经典的服务端的 Http 响应对象。
+     * Checks whether the current response is active.
      *
-     * @param httpResource 表示 Http 的资源的 {@link HttpResource}。
-     * @param serverResponse 表示服务端的 Http 响应的 {@link ServerResponse}。
-     * @return 表示创建的经典的服务端的 Http 响应对象的 {@link HttpClassicServerResponse}。
+     * <p>An inactive response typically indicates that the underlying connection has been closed or reset.</p>
+     *
+     * @return true if the response is active; false otherwise.
+     */
+    boolean isActive();
+
+    /**
+     * Creates an instance of a classic HTTP server response.
+     *
+     * @param httpResource The HTTP resource associated with the response, as a {@link HttpResource}.
+     * @param serverResponse The underlying server response, as a {@link ServerResponse}.
+     * @return A newly created instance of {@link HttpClassicServerResponse}.
      */
     static HttpClassicServerResponse create(HttpResource httpResource, ServerResponse serverResponse) {
         return new DefaultHttpClassicServerResponse(httpResource, serverResponse);

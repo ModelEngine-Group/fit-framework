@@ -7,9 +7,11 @@
 package modelengine.fel.tool.support;
 
 import static modelengine.fitframework.inspection.Validation.notBlank;
+import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fel.tool.ToolInfoEntity;
+import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.log.Logger;
@@ -21,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 表示 {@link ToolRepository} 的简单实现。
+ * A simple implementation of the {@link ToolRepository} interface.
  *
  * @author 易文渊
  * @author 杭潇
@@ -31,7 +33,19 @@ import java.util.stream.Collectors;
 public class SimpleToolRepository implements ToolRepository {
     private static final Logger log = Logger.get(SimpleToolRepository.class);
 
+    private final ToolChangedObserver toolChangedObserver;
     private final Map<String, ToolInfoEntity> toolCache = new ConcurrentHashMap<>();
+
+    /**
+     * Constructs a new instance of the SimpleToolRepository class.
+     *
+     * @param toolChangedObserver The observer to be notified when tools are added or removed, as a
+     * {@link ToolChangedObserver}.
+     * @throws IllegalStateException If {@code toolChangedObserver} is null.
+     */
+    public SimpleToolRepository(ToolChangedObserver toolChangedObserver) {
+        this.toolChangedObserver = notNull(toolChangedObserver, "The tool changed observer cannot be null.");
+    }
 
     @Override
     public void addTool(ToolInfoEntity tool) {
@@ -39,8 +53,9 @@ public class SimpleToolRepository implements ToolRepository {
             return;
         }
         String uniqueName = ToolInfo.identify(tool);
-        toolCache.put(uniqueName, tool);
+        this.toolCache.put(uniqueName, tool);
         log.info("Register tool[uniqueName={}] success.", uniqueName);
+        this.toolChangedObserver.onToolAdded(uniqueName, tool.description(), tool.schema());
     }
 
     @Override
@@ -49,8 +64,9 @@ public class SimpleToolRepository implements ToolRepository {
             return;
         }
         String uniqueName = ToolInfo.identify(namespace, toolName);
-        toolCache.remove(uniqueName);
+        this.toolCache.remove(uniqueName);
         log.info("Unregister tool[uniqueName={}] success.", uniqueName);
+        this.toolChangedObserver.onToolRemoved(uniqueName);
     }
 
     @Override

@@ -212,7 +212,7 @@ public class JacksonObjectSerializerTest {
     @Test
     @DisplayName("当存在别名时，序列化成功")
     void givenAliasObjectThenSerializeOk() {
-        String expect = "{\"lastName\":null,\"first_name\":\"foo\",\"person_name\":null}";
+        String expect = "{\"first_name\":\"foo\"}";
         PersonAlias personAlias = new PersonAlias();
         personAlias.firstName("foo");
         assertThat(this.jsonSerializer.serialize(personAlias)).isEqualTo(expect);
@@ -229,7 +229,7 @@ public class JacksonObjectSerializerTest {
     @Test
     @DisplayName("当使用原生注解，存在别名时，序列化成功")
     void givenJsonPropertyThenSerializeOriginOk() {
-        String expect = "{\"lastName\":\"bar\",\"first_name\":null,\"person_name\":null}";
+        String expect = "{\"lastName\":\"bar\"}";
         PersonAlias personAlias = new PersonAlias();
         personAlias.lastName("bar");
         assertThat(this.jsonSerializer.serialize(personAlias)).isEqualTo(expect);

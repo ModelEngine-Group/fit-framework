@@ -12,71 +12,83 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 表示服务端的 Http 请求。
+ * Represents an HTTP request on the server side.
  *
  * @author 季聿阶
  * @since 2022-07-05
  */
 public interface ServerRequest extends Message<RequestLine, MessageHeaders, ReadableMessageBody> {
     /**
-     * 获取 Http 请求的本地地址。
+     * Gets the local address of the HTTP request.
      *
-     * @return 表示本地地址的 {@link Address}。
+     * @return The {@link Address} representing the local address.
      */
     Address localAddress();
 
     /**
-     * 获取 Http 请求的远端地址。
+     * Gets the remote address of the HTTP request.
      *
-     * @return 表示远端地址的 {@link Address}。
+     * @return The {@link Address} representing the remote address.
      */
     Address remoteAddress();
 
     /**
-     * 获取 Http 请求是否为安全的的标记。
+     * Checks whether the HTTP request is secure.
      *
-     * @return 如果 Http 请求安全，则返回 {@code true}，否则，返回 {@code false}。
+     * @return true if the HTTP request is secure; otherwise false.
      */
     boolean isSecure();
 
     /**
-     * 从 Http 消息体中读取下一个字节，如果没有任何可读的数据，返回 {@code -1}。
+     * Reads the next byte from the HTTP message body.
+     * Returns -1 if there is no more data available to read.
      *
-     * @return 表示读取到的字节的 {@code int}。正常范围为 {@code 0 - 255}，没有数据则为 {@code -1}。
-     * @throws IOException 当发生 I/O 异常时。
+     * @return The byte read, represented as an int in the range 0 to 255,
+     * or -1 if there is no more data.
+     * @throws IOException If an I/O error occurs.
      */
     int readBody() throws IOException;
 
     /**
-     * 从 Http 消息体中读取最多 {@code bytes.length} 个字节，存放到 {@code bytes} 数组中。
+     * Reads up to {@code bytes.length} bytes from the HTTP message body into the specified buffer.
      *
-     * @param bytes 表示读取数据后存放的数组的 {@code byte[]}。
-     * @return 表示读取到的数据的字节数的 {@code int}，如果没有任何可读的数据，返回 {@code -1}。
-     * @throws IOException 当发生 I/O 异常时。
-     * @throws IllegalArgumentException 当 {@code bytes} 为 {@code null} 时。
+     * @param bytes The byte array into which the data is read.
+     * @return The total number of bytes read into the buffer, or -1 if there is no more data.
+     * @throws IOException If an I/O error occurs.
+     * @throws IllegalArgumentException If {@code bytes} is null.
      */
     default int readBody(byte[] bytes) throws IOException {
         return this.readBody(notNull(bytes, "The bytes to read cannot be null."), 0, bytes.length);
     }
 
     /**
-     * 从 Http 消息体中读取最多 {@code len} 个字节，存放到 {@code bytes} 数组中。
+     * Reads up to {@code len} bytes from the HTTP message body into the specified buffer,
+     * starting at offset {@code off}.
      *
-     * @param bytes 表示读取数据后存放的数组的 {@code byte[]}。
-     * @param off 表示存放数据的偏移量的 {@code int}。
-     * @param len 表示读取数据的最大数量的 {@code int}。
-     * @return 表示读取到的数据的字节数的 {@code int}，如果没有可读的任何数据，返回 {@code -1}。
-     * @throws IOException 当发生 I/O 异常时。
-     * @throws IllegalArgumentException 当 {@code bytes} 为 {@code null} 时。
-     * @throws IndexOutOfBoundsException 当 {@code off} 或 {@code len} 为负数时，或 {@code off + len}
-     * 超过了 {@code bytes} 的长度时。
+     * @param bytes The byte array into which the data is read.
+     * @param off The start offset in the destination array {@code bytes}.
+     * @param len The maximum number of bytes to read.
+     * @return The total number of bytes read into the buffer, or -1 if there is no more data.
+     * @throws IOException If an I/O error occurs.
+     * @throws IllegalArgumentException If {@code bytes} is null.
+     * @throws IndexOutOfBoundsException If {@code off} or {@code len} is negative,
+     * or if {@code off + len} exceeds the length of {@code bytes}.
      */
     int readBody(byte[] bytes, int off, int len) throws IOException;
 
     /**
-     * 获取 Http 消息体的输入流。
+     * Gets the input stream for reading the body of the HTTP message.
      *
-     * @return 表示 Http 消息体的输入流的 {@link InputStream}。
+     * @return An {@link InputStream} representing the body content of the HTTP request.
      */
     InputStream getBodyInputStream();
+
+    /**
+     * Checks whether the current request is active.
+     *
+     * <p>An inactive request typically indicates that the underlying connection has been closed or reset.</p>
+     *
+     * @return true if the request is active; false otherwise.
+     */
+    boolean isActive();
 }

@@ -182,6 +182,11 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
         }
     }
 
+    @Override
+    public boolean isActive() {
+        return this.serverResponse.isActive();
+    }
+
     private void sendTextEventStream(TextEventStreamEntity eventStreamEntity) throws IOException {
         ObjectSerializer objectSerializer = this.jsonSerializer()
                 .orElseThrow(() -> new IllegalStateException("The json serializer cannot be null."));

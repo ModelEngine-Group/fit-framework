@@ -131,6 +131,11 @@ public class NettyHttpServerRequest implements ServerRequest, OnHttpContentRecei
         return this.body;
     }
 
+    @Override
+    public boolean isActive() {
+        return this.ctx.channel().isActive();
+    }
+
     private void checkIfClosed() throws IOException {
         if (this.isClosed) {
             throw new IOException("The netty http server request has already been closed.");

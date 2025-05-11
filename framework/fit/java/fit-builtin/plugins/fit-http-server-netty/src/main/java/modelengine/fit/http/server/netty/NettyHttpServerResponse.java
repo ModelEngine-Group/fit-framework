@@ -122,6 +122,11 @@ public class NettyHttpServerResponse implements ServerResponse {
     }
 
     @Override
+    public boolean isActive() {
+        return this.ctx.channel().isActive();
+    }
+
+    @Override
     public void close() throws IOException {
         this.isClosed = true;
         this.body.close();

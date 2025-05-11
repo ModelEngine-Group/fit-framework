@@ -86,6 +86,11 @@ public class DefaultHttpClassicServerRequest extends AbstractHttpClassicRequest 
         return this.entityBytesLoader.get();
     }
 
+    @Override
+    public boolean isActive() {
+        return this.serverRequest.isActive();
+    }
+
     private Optional<Entity> actualEntity() {
         Charset charset = this.contentType().flatMap(ContentType::charset).orElse(StandardCharsets.UTF_8);
         try {
