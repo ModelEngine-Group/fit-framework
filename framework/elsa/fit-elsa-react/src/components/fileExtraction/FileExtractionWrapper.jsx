@@ -90,13 +90,13 @@ const _FileExtractionWrapper = ({data, shapeStatus}) => {
       editable={false}
       maxInputLength={1000}
       content={inputDescription}/>
-    <AiPromptPanel
-      name={`fileExtractionPromptDrawer-${shapeId}-${prompt.id}`}
-      popoverContent={content}
-      prompt={prompt}
-      header={t('fileExtractionConfig')}
-      drawerTitle={t('fileExtractionPrompt')}
-      disabled={shapeStatus.disabled}/>
+    {/*<AiPromptPanel*/}
+    {/*  name={`fileExtractionPromptDrawer-${shapeId}-${prompt.id}`}*/}
+    {/*  popoverContent={content}*/}
+    {/*  prompt={prompt}*/}
+    {/*  header={t('fileExtractionConfig')}*/}
+    {/*  drawerTitle={t('fileExtractionPrompt')}*/}
+    {/*  disabled={shapeStatus.disabled}/>*/}
     <InvokeOutput outputData={data.outputParams} getDescription={getOutputDescription}/>
   </>);
 };
