@@ -7,9 +7,9 @@
 import {v4 as uuidv4} from 'uuid';
 import {KnowledgeRetrievalWrapper} from '@/components/knowledgeRetrieval/KnowledgeRetrievalWrapper.jsx';
 import {retrievalComponent} from '@/components/retrieval/retrievalComponent.jsx';
-import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP, DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_USER_ID, FROM_TYPE, VIRTUAL_CONTEXT_NODE} from '@/common/Consts.js';
+import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP, DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID, FROM_TYPE} from '@/common/Consts.js';
 import {
-  UpdateGroupIdReducer,
+  UpdateGroupIdAndConfigIdReducer,
   UpdateInputParamReducer,
   UpdateKnowledgeReducer,
   UpdateOptionReducer,
@@ -28,7 +28,7 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
   addReducer(builtInReducers, UpdateInputParamReducer());
   addReducer(builtInReducers, UpdateOptionReducer());
   addReducer(builtInReducers, UpdateKnowledgeReducer());
-  addReducer(builtInReducers, UpdateGroupIdReducer());
+  addReducer(builtInReducers, UpdateGroupIdAndConfigIdReducer());
 
   /**
    * 必填
@@ -137,9 +137,10 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
             type: DATA_TYPES.STRING,
             from: FROM_TYPE.INPUT,
             value: DEFAULT_KNOWLEDGE_REPO_GROUP,
-          }],
-      },
-        DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_USER_ID],
+          },
+          DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID
+        ],
+      }],
       outputParams: [{
         id: `output_${uuidv4()}`,
         name: 'output',

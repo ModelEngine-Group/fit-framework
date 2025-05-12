@@ -26,6 +26,7 @@ export const KnowledgeRetrievalWrapper = ({data, shapeStatus}) => {
   const outputParams = data && data.outputParams;
   const option = data.inputParams.find(item => item.name === 'option');
   const groupId = getConfigValue(option, ['groupId'], 'value');
+  const knowledgeConfigId = getConfigValue(option, ['knowledgeConfigId'], 'value');
   const {t} = useTranslation();
   const dispatch = useDispatch();
 
@@ -43,7 +44,7 @@ export const KnowledgeRetrievalWrapper = ({data, shapeStatus}) => {
       content={tips}
       maxInputLength={1000}
       editable={false}/>
-    <KnowledgeForm knowledge={knowledge} groupId={groupId} disabled={shapeStatus.disabled}/>
+    <KnowledgeForm knowledge={knowledge} groupId={groupId} knowledgeConfigId={knowledgeConfigId} disabled={shapeStatus.disabled}/>
     <SearchForm option={option} groupId={groupId} shapeStatus={shapeStatus}/>
     <OutputForm outputParams={outputParams} outputPopover={'knowledgeBaseOutputPopover'}/>
   </>);

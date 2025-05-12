@@ -6,7 +6,7 @@
 
 import {structToConfig, toConfigType, updateConfigValueByObject, updateInput} from '@/components/util/JadeConfigUtils.js';
 import {v4 as uuidv4} from 'uuid';
-import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP_STRUCT, FROM_TYPE} from '@/common/Consts.js';
+import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP_STRUCT, DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID, FROM_TYPE} from '@/common/Consts.js';
 
 /**
  * updateInputParams 事件处理器.
@@ -127,14 +127,14 @@ export const UpdateKnowledgeReducer = () => {
 };
 
 /**
- * updateGroupId 事件处理器.
+ * updateGroupIdAndConfigId 事件处理器.
  *
  * @return {{}} 处理器对象.
  * @constructor
  */
-export const UpdateGroupIdReducer = () => {
+export const UpdateGroupIdAndConfigIdReducer = () => {
   const self = {};
-  self.type = 'updateGroupId';
+  self.type = 'updateGroupIdAndConfigId';
 
   /**
    * 处理方法.
@@ -157,6 +157,14 @@ export const UpdateGroupIdReducer = () => {
     }
 
     groupId.value = action.value;
+
+    let knowledgeConfigId = option.value.find(v => v.name === 'knowledgeConfigId');
+    if (!knowledgeConfigId) {
+      knowledgeConfigId = {...DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID};
+      option.value.push(knowledgeConfigId);
+    }
+    knowledgeConfigId.value = action.knowledgeConfigId;
+
     return newConfig;
   };
 
