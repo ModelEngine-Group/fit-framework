@@ -38,43 +38,43 @@
 
 ### 2. 技术栈
 
-### **@fit-elsa/elsa-core（核心框架模块）​**
+### **@fit-elsa/elsa-core（核心框架模块）**
 
 #### **核心工具链**
 | 类别        | 技术栈                                          |
 | --------- | -------------------------------------------- |
-| ​**构建工具** | Webpack 5 + Babel 7 + Cross-env（多环境配置）       |
-| ​**代码转换** | `@babel/preset-env` + `core-js@3`（ES6+ 向下兼容） |
-| ​**依赖管理** | npm scripts（支持 daily/debug/pro 多环境构建）        |
+| **构建工具** | Webpack 5 + Babel 7 + Cross-env（多环境配置）       |
+| **代码转换** | `@babel/preset-env`+`core-js@3`（ES6+ 向下兼容） |
+| **依赖管理** | npm scripts（支持 daily/debug/pro 多环境构建）        |
 
 #### **关键依赖**
 | 类别         | 技术栈                                            |
 | ---------- | ---------------------------------------------- |
-| ​**流程可视化** | `@dagrejs/dagre`（图形布局算法） + `echarts@5.4`（图表渲染） |
-| ​**国际化**   | `i18next@21.6`（多语言支持）                          |
-| ​**视频处理**  | `video.js@8.9`（视频播放器集成）                        |
+| **流程可视化** | `@dagrejs/dagre`（图形布局算法） +`echarts@5.4`（图表渲染） |
+| **国际化**   | `i18next@21.6`（多语言支持）                          |
+| **视频处理**  | `video.js@8.9`（视频播放器集成）                        |
 
-### @fit-elsa/elsa-react（React 前端模块）​
+### @fit-elsa/elsa-react（React 前端模块）
 #### **核心框架**
 | 类别          | 技术栈                                       |
 | ----------- | ----------------------------------------- |
-| ​**前端框架**   | React 18 + TypeScript（隐式依赖）               |
-| ​**状态管理**   | 原生 React Hooks（未显式引入 Redux）               |
-| ​**UI 组件库** | Ant Design@4.24 + `@ant-design/icons@5.3` |
+| **前端框架**   | React 18 + TypeScript（隐式依赖）               |
+| **状态管理**   | 原生 React Hooks（未显式引入 Redux）               |
+| **UI 组件库** | Ant Design@4.24 +`@ant-design/icons@5.3` |
 
 #### **开发工具链**
 | 类别        | 技术栈                                        |
 | --------- | ------------------------------------------ |
-| ​**构建工具** | Vite@5（替代 Webpack） + `vite-plugin-react@4` |
-| ​**代码规范** | ESLint + `react-hooks`/`refresh` 插件        |
-| ​**特殊集成** | `vite-plugin-svgr`（SVG 转 React 组件）         |
+| **构建工具** | Vite@5（替代 Webpack） +`vite-plugin-react@4` |
+| **代码规范** | ESLint +`react-hooks`/`refresh`插件        |
+| **特殊集成** | `vite-plugin-svgr`（SVG 转 React 组件）         |
 
 #### **关键功能依赖**
 | 类别            | 技术栈                                                                    |
 | ------------- | ---------------------------------------------------------------------- |
-| ​**编辑器**      | `monaco-editor@0.34`（代码编辑器） + `@tinymce/tinymce-react@4.3`（注释节点富文本编辑器） |
-| ​**HTTP 客户端** | `axios@1.8`（API 请求）                                                    |
-| ​**核心依赖**     | `@fit-elsa/elsa-core`（本地路径引用）                                          |
+| **编辑器**      | `monaco-editor@0.34`（代码编辑器） +`@tinymce/tinymce-react@4.3`（注释节点富文本编辑器） |
+| **HTTP 客户端** | `axios@1.8`（API 请求）                                                    |
+| **核心依赖**     | `@fit-elsa/elsa-core`（本地路径引用）                                          |
 
 ## 快速开始
 
