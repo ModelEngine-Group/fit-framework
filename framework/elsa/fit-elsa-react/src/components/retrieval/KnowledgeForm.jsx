@@ -79,6 +79,7 @@ const _KnowledgeForm = ({knowledge, groupId, knowledgeConfigId, disabled, maximu
         shapeId: shape.id,
         selectedKnowledgeBases: getSelectedKnowledgeBases(),
         groupId: groupId ?? DEFAULT_KNOWLEDGE_REPO_GROUP,
+        selectedKnowledgeConfigId: knowledgeConfigId,
         onSelect: onSelect,
       },
     });
