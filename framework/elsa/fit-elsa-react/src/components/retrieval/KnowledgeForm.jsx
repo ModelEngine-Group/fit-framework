@@ -22,12 +22,13 @@ const {Panel} = Collapse;
  *
  * @param knowledge 知识库利列表.
  * @param groupId 知识库group.
+ * @param knowledgeConfigId 知识库配置的唯一标识.
  * @param disabled 禁用状态.
  * @param maximum 最大值.
  * @param enableGroup 是否启动groupId.
  * @returns {JSX.Element}
  */
-const _KnowledgeForm = ({knowledge, groupId, disabled, maximum = null, enableGroup = true}) => {
+const _KnowledgeForm = ({knowledge, groupId, knowledgeConfigId, disabled, maximum = null, enableGroup = true}) => {
   const dispatch = useDispatch();
   const shape = useShapeContext();
   const {t} = useTranslation();
@@ -90,10 +91,12 @@ const _KnowledgeForm = ({knowledge, groupId, disabled, maximum = null, enableGro
       type: 'SELECT_KNOWLEDGE_BASE_GROUP',
       value: {
         selectedGroupId: groupId ?? DEFAULT_KNOWLEDGE_REPO_GROUP,
-        onSelect: (repoGroupId) => {
+        selectedKnowledgeConfigId: knowledgeConfigId,
+        onSelect: (repoGroupId, knowledgeConfigId) => {
           dispatch({
-            type: 'updateGroupId',
+            type: 'updateGroupIdAndConfigId',
             value: repoGroupId,
+            knowledgeConfigId: knowledgeConfigId,
           });
         },
       },
@@ -196,6 +199,7 @@ const _KnowledgeForm = ({knowledge, groupId, disabled, maximum = null, enableGro
 _KnowledgeForm.propTypes = {
   knowledge: PropTypes.array.isRequired,
   groupId: PropTypes.string.isRequired,
+  knowledgeConfigId: PropTypes.string,
   maximum: PropTypes.number,
   disabled: PropTypes.bool,
   enableGroup: PropTypes.bool,
@@ -204,6 +208,7 @@ _KnowledgeForm.propTypes = {
 const areEqual = (prevProps, nextProps) => {
   return prevProps.knowledge === nextProps.knowledge &&
     prevProps.groupId === nextProps.groupId &&
+    prevProps.knowledgeConfigId === nextProps.knowledgeConfigId &&
     prevProps.maximum === nextProps.maximum &&
     prevProps.enableGroup === nextProps.enableGroup &&
     prevProps.disabled === nextProps.disabled;
