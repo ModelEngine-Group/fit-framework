@@ -6,6 +6,7 @@
 
 package modelengine.fel.tool;
 
+import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fitframework.inspection.Nonnull;
 import modelengine.fitframework.util.StringUtils;
@@ -63,7 +64,7 @@ public class ToolInfoEntity implements Tool.Info {
 
     @Override
     public String uniqueName() {
-        return StringUtils.EMPTY;
+        return ToolInfo.identify(this.namespace(), this.name());
     }
 
     @Override

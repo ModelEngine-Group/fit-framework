@@ -271,6 +271,8 @@ public class ToolData {
                 .isLatest(toolData.getLatest())
                 .returnConverter(ObjectUtils.cast(toolData.getSchema().get(ToolSchema.RETURN_CONVERTER)))
                 .defaultParameterValues(ToolData.defaultParamValues(toolData.getSchema()))
+                .parameters(toolData.getParameters())
+                .namespace(toolData.getNamespace())
                 .build();
     }
 
