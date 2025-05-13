@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import './style.css';
-import {useDispatch, useShapeContext} from '@/components/DefaultRoot.jsx';
+import {useDispatch} from '@/components/DefaultRoot.jsx';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Trans, useTranslation} from 'react-i18next';
@@ -13,7 +13,6 @@ import {getConfigValue} from '@/components/util/JadeConfigUtils.js';
 import {JadeInputForm} from '@/components/common/JadeInputForm.jsx';
 import {InvokeOutput} from '@/components/common/InvokeOutput.jsx';
 import {FROM_TYPE} from '@/common/Consts.js';
-import {AiPromptPanel} from '@/components/common/AiPromptPanel.jsx';
 
 /**
  * 输入参数国际化描述
@@ -37,8 +36,6 @@ const _FileExtractionWrapper = ({data, shapeStatus}) => {
   const dispatch = useDispatch();
   const {t} = useTranslation();
   const fileExtraction = data.inputParams.find(item => item.name === 'fileExtractionParam');
-  const prompt = getConfigValue(fileExtraction, ['prompt'], '');
-  const shapeId = useShapeContext().id;
 
   /**
    * 更新入参变量属性名或者类型
@@ -90,13 +87,6 @@ const _FileExtractionWrapper = ({data, shapeStatus}) => {
       editable={false}
       maxInputLength={1000}
       content={inputDescription}/>
-    {/*<AiPromptPanel*/}
-    {/*  name={`fileExtractionPromptDrawer-${shapeId}-${prompt.id}`}*/}
-    {/*  popoverContent={content}*/}
-    {/*  prompt={prompt}*/}
-    {/*  header={t('fileExtractionConfig')}*/}
-    {/*  drawerTitle={t('fileExtractionPrompt')}*/}
-    {/*  disabled={shapeStatus.disabled}/>*/}
     <InvokeOutput outputData={data.outputParams} getDescription={getOutputDescription}/>
   </>);
 };
