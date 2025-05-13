@@ -17,7 +17,7 @@ import {TOOL_CALLS} from '@/components/parallelNode/consts.js';
 export const parallelNodeState = (id, x, y, width, height, parent, drawer) => {
   const self = jadeNode(id, x, y, width, height, parent, drawer ? drawer : parallelNodeDrawer);
   self.type = 'parallelNodeState';
-  self.text = '并行节点';
+  self.text = self.graph.i18n?.t('parallelNode') ?? 'parallelNode';
   self.componentName = 'parallelComponent';
   self.width = 380;
   self.flowMeta.jober.type = 'STORE_JOBER';

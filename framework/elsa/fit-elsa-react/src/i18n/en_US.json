@@ -413,5 +413,6 @@
   "appChatStyleCannotBeEmpty": "App interface configuration cannot be empty",
   "formItemFieldTypeCannotBeEmpty": "Field type is required",
   "addParallelTask": "Add Parallel Tasks",
-  "parameterDescription": "Parameter Description: "
+  "parameterDescription": "Parameter Description: ",
+  "parallelNode": "Parallel Node"
 }

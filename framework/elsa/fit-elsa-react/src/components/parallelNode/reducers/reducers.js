@@ -190,38 +190,34 @@ export const UpdateInputReducer = () => {
    * @return {*} 处理之后的数据.
    */
   self.reduce = (config, action) => {
-    const newConfig = {...config};
-    Object.entries(config).forEach(([key, value]) => {
-      if (key === 'inputParams') {
-        newConfig[key] = value.map(item => {
-          if (item.name === TOOL_CALLS) {
-            return {
-              ...item, value: item.value.map(plugin => {
-                if (plugin.id === action.parentId) {
-                  return {
-                    ...plugin, value: plugin.value.map(pluginValue => {
-                      if (pluginValue.name === 'args') {
-                        return {
-                          ...pluginValue,
-                          value: updateInput(pluginValue.value, action.id, action.changes),
-                        };
-                      } else {
-                        return pluginValue;
-                      }
-                    }),
-                  };
-                } else {
-                  return plugin;
-                }
-              }),
-            };
-          } else {
-            return item;
-          }
-        });
-      } else {
-        newConfig[key] = value;
+    const newConfig = { ...config };
+    if (!config.inputParams) {
+      return newConfig;
+    }
+    newConfig.inputParams = config.inputParams.map(item => {
+      if (item.name !== TOOL_CALLS) {
+        return item;
       }
+      return {
+        ...item,
+        value: item.value.map(plugin => {
+          if (plugin.id !== action.parentId) {
+            return plugin;
+          }
+          return {
+            ...plugin,
+            value: plugin.value.map(pluginValue => {
+              if (pluginValue.name !== 'args') {
+                return pluginValue;
+              }
+              return {
+                ...pluginValue,
+                value: updateInput(pluginValue.value, action.id, action.changes),
+              };
+            }),
+          };
+        }),
+      };
     });
 
     return newConfig;
