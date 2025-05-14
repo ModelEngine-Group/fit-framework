@@ -148,16 +148,11 @@ const graphOperator = (graphString) => {
           return;
         }
 
-        // 处理对象
-        if (typeof update === 'object') {
-          updateConfig(correspondingConfig, update);
+        // 如果类型是reference，则不进行修改。
+        if (String(correspondingConfig.from ?? "").toLowerCase() === FROM_TYPE.REFERENCE.toLowerCase()) {
           return;
         }
 
-        // 如果类型是reference，则不进行修改。
-        if (correspondingConfig.from === FROM_TYPE.REFERENCE) {
-          return;
-        }
         updateConfig(correspondingConfig, update);
       }
     });
