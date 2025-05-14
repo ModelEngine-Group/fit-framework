@@ -4,6 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import {v4 as uuidv4} from 'uuid';
 import {configToStruct, toConfig} from '@/components/util/JadeConfigUtils.js';
 import {DATA_TYPES, FROM_TYPE} from '@/common/Consts.js';
 import {ShapeDataValidationProcessor} from '@/data/ShapeDataValidationProcessor.js';
@@ -75,9 +76,48 @@ const graphOperator = (graphString) => {
    * @param updates 待修改的值.
    */
   self.update = (keys, updates) => {
-    const config = getConfigByKeys(keys);
-    updateConfig(config, updates);
+    if (!keys || keys.length === 0) {
+      throw new Error('Keys cannot be empty');
+    }
+    // 获取除最后一层外的所有路径
+    const parentKeys = keys.slice(0, -1);
+    const lastKey = keys[keys.length - 1];
+    // 检查父路径是否存在
+    const parentConfig = getConfigByKeys(parentKeys);
+    if (!parentConfig || !parentConfig.value) {
+      throw new Error(`Parent path does not exist: ${parentKeys.join('.')}`);
+    }
+    // 检查最后一层是否存在
+    let targetConfig = parentConfig.value.find(v => v.name === lastKey);
+    // 如果最后一层不存在，则创建
+    if (!targetConfig) {
+      targetConfig = {
+        id: uuidv4(),
+        name: lastKey,
+        from: FROM_TYPE.INPUT,
+        type: getTypeFromUpdates(updates),
+        value: updates
+      };
+      parentConfig.value.push(targetConfig);
+    }
+    updateConfig(targetConfig, updates);
   };
+
+  // 根据updates的类型返回对应的DATA_TYPES
+  const getTypeFromUpdates = (updates) => {
+    if (Array.isArray(updates)) {
+      return DATA_TYPES.ARRAY;
+    } else if (updates && typeof updates === 'object') {
+      return DATA_TYPES.OBJECT;
+    } else if (typeof updates === 'string') {
+      return DATA_TYPES.STRING;
+    } else if (typeof updates === 'number') {
+      return DATA_TYPES.NUMBER;
+    } else if (typeof updates === 'boolean') {
+      return DATA_TYPES.BOOLEAN;
+    }
+    return DATA_TYPES.STRING; // 或者其他默认类型
+  }
 
   const updateConfig = (config, updates) => {
     if (Array.isArray(updates)) {
@@ -97,6 +137,14 @@ const graphOperator = (graphString) => {
         const update = updates[k];
         const correspondingConfig = config.value?.find(v => v.name === k);
         if (!correspondingConfig) {
+          config.value = config.value || []; // 确保 config.value 是数组
+          config.value.push({
+            id: uuidv4(),
+            name: k,
+            from: FROM_TYPE.INPUT,
+            type: getTypeFromUpdates(update),
+            value: update,
+          });
           return;
         }
 

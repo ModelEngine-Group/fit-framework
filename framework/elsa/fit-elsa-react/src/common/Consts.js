@@ -213,5 +213,5 @@ export const DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID = {
   name: 'knowledgeConfigId',
   type: DATA_TYPES.STRING,
   from: FROM_TYPE.INPUT,
-  value: null,
+  value: '',
 };
