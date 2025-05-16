@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>tool-info</module>
         <module>tool-service</module>
     </modules>
 

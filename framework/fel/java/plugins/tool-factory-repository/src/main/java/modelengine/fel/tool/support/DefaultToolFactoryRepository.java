@@ -10,6 +10,7 @@ import modelengine.fel.tool.ToolFactory;
 import modelengine.fel.tool.ToolFactoryRepository;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.log.Logger;
+import modelengine.fitframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class DefaultToolFactoryRepository implements ToolFactoryRepository {
         if (factory == null) {
             return;
         }
-        this.factoryCache.put(factory.type(), factory);
+        this.factoryCache.put(StringUtils.toUpperCase(factory.type()), factory);
         log.info("Register factory[type={}] success.", factory.type());
     }
 
@@ -42,12 +43,16 @@ public class DefaultToolFactoryRepository implements ToolFactoryRepository {
         if (factory == null) {
             return;
         }
-        this.factoryCache.remove(factory.type());
+        this.factoryCache.remove(StringUtils.toUpperCase(factory.type()));
         log.info("Unregister factory[type={}] success.", factory.type());
     }
 
     @Override
     public Optional<ToolFactory> match(Set<String> runnables) {
-        return runnables.stream().filter(this.factoryCache::containsKey).map(this.factoryCache::get).findFirst();
+        return runnables.stream()
+                .map(StringUtils::toUpperCase)
+                .filter(this.factoryCache::containsKey)
+                .map(this.factoryCache::get)
+                .findFirst();
     }
 }
