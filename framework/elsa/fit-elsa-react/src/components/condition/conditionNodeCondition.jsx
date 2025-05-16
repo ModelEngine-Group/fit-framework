@@ -59,7 +59,6 @@ export const conditionNodeCondition = (id, x, y, width, height, parent, drawer) 
      * @override
      */
     self.serializerJadeConfig = (jadeConfig) => {
-      jadeConfig.branches.forEach(branch => delete branch.disabled);
       self.flowMeta.conditionParams = jadeConfig;
       self.flowMeta.enableStageDesc = self.flowMeta.conditionParams.enableStageDesc;
       self.flowMeta.stageDesc = self.flowMeta.conditionParams.stageDesc;
