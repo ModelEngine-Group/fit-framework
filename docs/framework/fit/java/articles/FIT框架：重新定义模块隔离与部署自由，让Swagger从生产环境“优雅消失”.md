@@ -108,7 +108,7 @@ FIT 框架默认配置`Swagger`功能插件，基于上面的操作步骤，访�
 
 若不希望部署`Swagger`插件，只需要在 FIT 内置插件目录中将`Swagger`插件移除：
 
-首先结束`fit`进程，打开`framework/fit/java/target/plugins`，该目录存放了编译 FIT 框架后生成的所有内置插件，删除插件`fit-http-openapi3-swagger-3.6.0-SNAPSHOT.jar`，重新启动 FIT 框架，此时环境中并没有部署`Swagger`插件，访问 `http://localhost:8080/openapi.html` 将得到 404 响应：
+首先结束`fit`进程，打开`build/plugins`，该目录存放了编译 FIT 框架后生成的所有内置插件，删除插件`fit-http-openapi3-swagger-3.6.0-SNAPSHOT.jar`，重新启动 FIT 框架，此时环境中并没有部署`Swagger`插件，访问 `http://localhost:8080/openapi.html` 将得到 404 响应：
 
 ``` json
 {
@@ -128,7 +128,7 @@ FIT 框架默认配置`Swagger`功能插件，基于上面的操作步骤，访�
 
 以`Swagger`插件为例，将`framework/fit/java/fit-builtin/plugins/fit-http-openapi3-swagger/target/fit-http-openapi3-swagger-3.6.0-SNAPSHOT.jar`复制到正在运行的`fit`进程的用户插件目录中，即可立刻实现`Swagger`功能，而在使用结束后，可以随时卸载，无需重启进程。
 
-> 注意，位于`framework/fit/java/target/plugins`下的插件属于 FIT 启动的内置插件，包含了 FIT 框架提供的一系列功能，并不支持运行时热插拔，用户需要在运行前将无需部署的插件删除。
+> 注意，位于`build/plugins`下的插件属于 FIT 启动的内置插件，包含了 FIT 框架提供的一系列功能，并不支持运行时热插拔，用户需要在运行前将无需部署的插件删除。
 >
 > 而 FIT 用户插件目录支持插件的运行时热插拔，在配置`fit start`启动命令后，用户可以在任意位置新建一个空目录作为用户插件目录，具体配置命令的方式请参考 [FIT 用户指导手册：插件化开发](../user-guide-book/06.%20插件化开发.md)。
 
