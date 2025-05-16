@@ -79,6 +79,13 @@ const graphOperator = (graphString) => {
     if (!keys || keys.length === 0) {
       throw new Error('Keys cannot be empty');
     }
+
+    if (keys.length === 1) {
+      const config = getConfigByKeys(keys);
+      updateConfig(config, updates);
+      return;
+    }
+
     // 获取除最后一层外的所有路径
     const parentKeys = keys.slice(0, -1);
     const lastKey = keys[keys.length - 1];
