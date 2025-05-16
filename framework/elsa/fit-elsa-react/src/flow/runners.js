@@ -5,6 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {NODE_STATUS} from '@';
+import {setBranchDisabled} from '@/components/util/BranchUtil.js';
 
 /**
  * 正常页面中节点运行时 runner.
@@ -116,17 +117,9 @@ export const conditionRunner = (node) => {
         _setBranchDisable(false);
     };
 
-  const _setBranchDisable = (disabled) => {
-    const flowMeta = node.getFlowMeta();
-    node.drawer.dispatch({
-      actionType: 'changeBranchesStatus',
-      changes: [
-        {key: 'ids', value: flowMeta.conditionParams.branches.map(b => b.id)},
-        {key: 'disabled', value: disabled},
-        {key: 'jadeNodeConfigChangeIgnored', value: true},
-      ],
-    });
-  };
+    const _setBranchDisable = (disabled) => {
+        setBranchDisabled(node, disabled);
+    };
 
     return self;
 };

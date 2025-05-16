@@ -8,6 +8,7 @@ import {jadeFlowGraph} from './jadeFlowGraph.js';
 import {jadeEvaluationGraph} from '@/flow/evaluation/jadeEvaluationGraph.js';
 import {ShapeDataValidationProcessor} from '@/data/ShapeDataValidationProcessor.js';
 import {SYSTEM_ACTION} from '@/common/Consts.js';
+import {setBranchDisabled} from '@/components/util/BranchUtil.js';
 
 /**
  * react流程代码，对外暴露接口，以便对流程进行操作以及获取数据.
@@ -222,10 +223,10 @@ const jadeFlowAgent = (graph) => {
         shape.statusManager.setDisabled(true);
         shape.statusManager.setReferenceDisabled(true);
         shape.moveable = false;
+        if (shape.isTypeof('conditionNodeCondition')) {
+          setBranchDisabled(shape, true);
+        }
       });
-      // if (shape.isTypeof('conditionNodeCondition')) {
-      //
-      // }
     });
   };
 
