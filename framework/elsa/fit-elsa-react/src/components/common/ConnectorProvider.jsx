@@ -21,6 +21,15 @@ import PropTypes from "prop-types";
 export const ConnectorProvider = ({name, children}) => {
     const shape = useShapeContext();
     const divRef = useRef();
+    const prevNameRef = useRef(name);
+    const directionRef = useRef({
+        cursor: "crosshair",
+        key: name,
+        color: "white",
+        ax: "x",
+        vector: 1,
+        value: DIRECTION.E,
+    });
 
     // 初始化之后，创建connector.
     useEffect(() => {
@@ -40,23 +49,14 @@ export const ConnectorProvider = ({name, children}) => {
             return (rect.top - shapeRect.top + (rect.bottom - rect.top) / 2) / shape.page.scaleY;
         };
 
-        const c = connector(shape, getX, getY, () => {
-                    return {
-                        cursor: "crosshair",
-                        key: name,
-                        color: "white",
-                        ax: "x",
-                        vector: 1,
-                        value: DIRECTION.E
-                    };
-                },
-                s => s.visible,
-                () => true,
-                () => true,
-                () => {},
-                () => false
+        const c = connector(shape, getX, getY, () => directionRef.current,
+          s => s.visible,
+          () => true,
+          () => true,
+          () => {},
+          () => false,
         );
-        c.type = "dynamic";
+        c.type = 'dynamic';
         shape.activeConnector(c);
         c.isSolid = true;
         c.allowToLink = false;
@@ -79,6 +79,22 @@ export const ConnectorProvider = ({name, children}) => {
             deleteLine();
         };
     }, []);
+
+    // 当name变化时更新相关线条的definedFromConnector
+    useEffect(() => {
+        if (prevNameRef.current !== name) {
+            directionRef.current.key = name;
+
+            const lines = shape.page.sm.getShapes(s => s.fromShape === shape.id || s.toShape === shape.id)
+              .filter(l => l.definedFromConnector === prevNameRef.current);
+            lines.forEach(l => {
+                l.definedFromConnector = name;
+                l.follow();
+            });
+
+            prevNameRef.current = name; // 更新前一个name值
+        }
+    }, [name]);
 
     const deleteLine = () => {
         const lines = shape.page.sm.getShapes(s => s.fromShape === shape.id || s.toShape === shape.id)
