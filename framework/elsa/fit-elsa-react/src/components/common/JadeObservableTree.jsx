@@ -6,7 +6,7 @@
 
 import {Tree} from "antd";
 import {useShapeContext} from "../DefaultRoot.jsx";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import "./jadeObservableTree.css";
 import TreeSwitcherIcon from "@/components/common/TreeSwitcherIcon.jsx";
 
@@ -50,7 +50,7 @@ const buildNode = (nodeData, parent, level, shape) => {
  * @return {JSX.Element}
  * @constructor
  */
-export const JadeObservableTree = ({data}) => {
+const _JadeObservableTree = ({data}) => {
     if (!Array.isArray(data)) {
         throw new Error("data must be array.");
     }
@@ -120,3 +120,9 @@ export const JadeObservableTree = ({data}) => {
         </Tree>
     </>;
 };
+
+const areEqual = (prevProps, nextProps) => {
+    return prevProps.data === nextProps.data;
+};
+
+export const JadeObservableTree = React.memo(_JadeObservableTree, areEqual);

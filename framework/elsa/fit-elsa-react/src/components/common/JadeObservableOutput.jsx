@@ -95,18 +95,20 @@ function _JadeObservableOutput({disabled, output}) {
 
   return (<>
     <JadeCollapse defaultActiveKey={['codeOutputPanel']}>
-      {<Panel key={'codeOutputPanel'}
-              header={<div className='panel-header'>
-                <span className='jade-panel-header-font'>{t('output')}</span>
-                <Popover
-                  content={content}
-                  align={{offset: [0, 3]}}
-                  overlayClassName={'jade-custom-popover'}
-                >
-                  <QuestionCircleOutlined className='jade-panel-header-popover-content'/>
-                </Popover>
-              </div>}
-              className='jade-panel'
+      {<Panel
+        key={'codeOutputPanel'}
+        header={<div className="panel-header">
+          <span className="jade-panel-header-font">{t('output')}</span>
+          <Popover
+            content={content}
+            align={{offset: [0, 3]}}
+            overlayClassName={'jade-custom-popover'}
+          >
+            <QuestionCircleOutlined className="jade-panel-header-popover-content"/>
+          </Popover>
+        </div>}
+        className="jade-panel"
+        forceRender
       >
         <Tree blockNode={true}
               switcherIcon={({expanded}) => <TreeSwitcherIcon expanded={expanded}/>}

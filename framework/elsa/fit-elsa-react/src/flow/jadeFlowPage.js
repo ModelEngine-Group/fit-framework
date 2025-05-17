@@ -420,7 +420,7 @@ export const jadeFlowPage = (div, graph, name, id) => {
    * const sortedNodes = reorderNodes(nodes, orderedNodes);
    * console.log(sortedNodes); // 输出: ['A', 'B', 'X', 'Y', 'Z']
    */
-  const reorderNodes = (nodes, orderedNodes) => {
+  self.reorderNodes = (nodes, orderedNodes) => {
     // 创建一个 Map，用于快速查找节点在 reachableNodes 中的索引
     const nodeOrder = new Map();
     orderedNodes.forEach((node, index) => {
@@ -453,7 +453,7 @@ export const jadeFlowPage = (div, graph, name, id) => {
     });
     self.isRunning = true;
     const nodes = allNodes.filter(s => s.runnable !== false);
-    const orderedNodes = reorderNodes(nodes, reachableNodes);
+    const orderedNodes = self.reorderNodes(nodes, reachableNodes);
     orderedNodes.map(n => {
       const runner = self.createRunner(n);
       n.ignoreChange(() => runner.testRun());

@@ -43,6 +43,7 @@ const _OutputForm = ({outputParams, outputPopover}) => {
         }
         className='jade-panel'
         key='Output'
+        forceRender
       >
         <div className={'jade-custom-panel-content'}>
           <JadeObservableTree data={outputParams}/>
