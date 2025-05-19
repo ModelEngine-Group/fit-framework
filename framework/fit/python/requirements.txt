@@ -1,4 +1,4 @@
 numpy==1.25.2
 PyYAML==6.0.1
 requests==2.32.0
-tornado==6.4.2
+tornado==6.5.0
