@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2025-05-13
  */
 @Component
-public class McpController {
+public class McpController implements McpServer.ToolsChangedObserver {
     private static final Logger log = Logger.get(McpController.class);
     private static final String MESSAGE_PATH = "/mcp/message";
     private static final String EVENT_ENDPOINT = "endpoint";
@@ -56,6 +56,7 @@ public class McpController {
     private static final String METHOD_INITIALIZE = "initialize";
     private static final String METHOD_TOOLS_LIST = "tools/list";
     private static final String METHOD_TOOLS_CALL = "tools/call";
+    private static final String METHOD_NOTIFICATION_TOOLS_CHANGED = "notifications/tools/list_changed";
     private static final String RESPONSE_OK = StringUtils.EMPTY;
 
     private final Map<String, Emitter<TextEvent>> emitters = new ConcurrentHashMap<>();
@@ -79,6 +80,7 @@ public class McpController {
         this.baseUrl = notBlank(baseUrl, "The base URL for MCP server cannot be blank.");
         this.serializer = notNull(serializer, "The json serializer cannot be null.");
         notNull(mcpServer, "The MCP server cannot be null.");
+        mcpServer.registerToolsChangedObserver(this);
 
         this.methodHandlers.put(METHOD_INITIALIZE, new InitializeHandler(mcpServer));
         this.methodHandlers.put(METHOD_TOOLS_LIST, new ToolListHandler(mcpServer));
@@ -169,5 +171,17 @@ public class McpController {
         emitter.emit(textEvent);
         log.info("Send MCP message. [response={}]", serialized);
         return RESPONSE_OK;
+    }
+
+    @Override
+    public void onToolsChanged() {
+        JsonRpcEntity notification = new JsonRpcEntity();
+        notification.setMethod(METHOD_NOTIFICATION_TOOLS_CHANGED);
+        String serialized = this.serializer.serialize(notification);
+        this.emitters.forEach((sessionId, emitter) -> {
+            TextEvent textEvent = TextEvent.custom().id(sessionId).event(EVENT_MESSAGE).data(serialized).build();
+            emitter.emit(textEvent);
+            log.info("Send MCP notification: tools changed. [sessionId={}]", sessionId);
+        });
     }
 }

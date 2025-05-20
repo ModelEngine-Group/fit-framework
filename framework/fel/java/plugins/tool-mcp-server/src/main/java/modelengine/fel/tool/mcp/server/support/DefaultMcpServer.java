@@ -18,6 +18,7 @@ import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
 
     private final ToolExecuteService toolExecuteService;
     private final Map<String, ToolEntity> tools = new ConcurrentHashMap<>();
+    private final List<ToolsChangedObserver> toolsChangedObservers = new ArrayList<>();
 
     /**
      * Constructs a new instance of the DefaultMcpServer class.
@@ -73,6 +75,13 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     }
 
     @Override
+    public void registerToolsChangedObserver(ToolsChangedObserver observer) {
+        if (observer != null) {
+            this.toolsChangedObservers.add(observer);
+        }
+    }
+
+    @Override
     public void onToolAdded(String name, String description, Map<String, Object> schema) {
         if (StringUtils.isBlank(name)) {
             log.warn("Tool addition is ignored: tool name is blank.");
@@ -92,6 +101,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
         tool.setInputSchema(schema);
         this.tools.put(name, tool);
         log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, schema);
+        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 
     @Override
@@ -102,5 +112,6 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
         }
         this.tools.remove(name);
         log.info("Tool removed from MCP server. [toolName={}]", name);
+        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 }

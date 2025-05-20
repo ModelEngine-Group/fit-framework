@@ -40,4 +40,21 @@ public interface McpServer {
      * @return The tool result as a {@link Object}.
      */
     Object callTool(String name, Map<String, Object> arguments);
+
+    /**
+     * Registers MCP Server Tools Changed Observer.
+     *
+     * @param observer The MCP Server Tools Changed Observer as a {@link ToolsChangedObserver}.
+     */
+    void registerToolsChangedObserver(ToolsChangedObserver observer);
+
+    /**
+     * Represents the MCP Server Tools Changed Observer.
+     */
+    interface ToolsChangedObserver {
+        /**
+         * Called when MCP Server Tools changed.
+         */
+        void onToolsChanged();
+    }
 }
