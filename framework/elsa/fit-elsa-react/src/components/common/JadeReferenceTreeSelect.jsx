@@ -52,10 +52,6 @@ export const JadeReferenceTreeSelect = (props) => {
       return;
     }
 
-    // 重复选择相同的选项，不进行处理.
-    if (selected === reference.referenceId) {
-      return;
-    }
     const treeMap = new Map(treeData.map(d => [d.id, d]));
     const treeNode = treeMap.get(selected);
     const value = buildValue(treeMap, treeNode);
