@@ -28,7 +28,7 @@ public class ToolListHandler extends AbstractMessageHandler<ToolListHandler.Tool
      * Constructs a new instance of the ToolListHandler class.
      *
      * @param mcpServer The MCP server instance used to retrieve the list of tools during request handling.
-     * @throws IllegalStateException If {@code mcpServer} is null.
+     * @throws IllegalArgumentException If {@code mcpServer} is null.
      */
     public ToolListHandler(McpServer mcpServer) {
         super(ToolListRequest.class);

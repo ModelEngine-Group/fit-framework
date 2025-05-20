@@ -26,7 +26,7 @@ public class InitializeHandler extends AbstractMessageHandler<InitializeHandler.
      * Constructs a new instance of the InitializeHandler class.
      *
      * @param mcpServer The MCP server instance used to retrieve server information during request handling.
-     * @throws IllegalStateException If {@code mcpServer} is null.
+     * @throws IllegalArgumentException If {@code mcpServer} is null.
      */
     public InitializeHandler(McpServer mcpServer) {
         super(InitializeRequest.class);

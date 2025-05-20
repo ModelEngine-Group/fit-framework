@@ -38,7 +38,7 @@ public class ToolCallHandler extends AbstractMessageHandler<ToolCallHandler.Tool
      *
      * @param mcpServer The MCP server instance used to invoke tools during request handling.
      * @param jsonSerializer The serializer used to convert non-string results into JSON strings.
-     * @throws IllegalStateException If {@code mcpServer} or {@code jsonSerializer} is null.
+     * @throws IllegalArgumentException If {@code mcpServer} or {@code jsonSerializer} is null.
      */
     public ToolCallHandler(McpServer mcpServer, ObjectSerializer jsonSerializer) {
         super(ToolCallRequest.class);

@@ -41,7 +41,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
      * Constructs a new instance of the DefaultMcpServer class.
      *
      * @param toolExecuteService The service used to execute tools when handling tool call requests.
-     * @throws IllegalStateException If {@code toolExecuteService} is null.
+     * @throws IllegalArgumentException If {@code toolExecuteService} is null.
      */
     public DefaultMcpServer(ToolExecuteService toolExecuteService) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
