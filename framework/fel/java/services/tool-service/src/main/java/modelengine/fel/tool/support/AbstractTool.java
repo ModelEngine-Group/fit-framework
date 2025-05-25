@@ -86,8 +86,7 @@ public abstract class AbstractTool implements Tool {
     }
 
     private static Object getArg(Object value, Type type) {
-        if (type instanceof OneOfType) {
-            OneOfType oneOfType = (OneOfType) type;
+        if (type instanceof OneOfType oneOfType) {
             List<Type> types = oneOfType.types();
             for (Type actualType : types) {
                 try {

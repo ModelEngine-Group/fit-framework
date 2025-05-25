@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -85,7 +86,8 @@ public class JacksonObjectSerializer implements ObjectSerializer {
                 .build()).build()).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .setAnnotationIntrospector(new FitAnnotationIntrospector())
                 .setVisibility(visibilityChecker)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         SimpleModule module = new SimpleModule();
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormat));
         module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormat));

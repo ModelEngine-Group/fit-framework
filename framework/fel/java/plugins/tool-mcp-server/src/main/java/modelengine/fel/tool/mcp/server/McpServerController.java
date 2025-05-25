@@ -8,9 +8,13 @@ package modelengine.fel.tool.mcp.server;
 
 import static modelengine.fitframework.inspection.Validation.notBlank;
 import static modelengine.fitframework.inspection.Validation.notNull;
+import static modelengine.fitframework.util.ObjectUtils.cast;
 
-import modelengine.fel.tool.mcp.server.entity.JsonRpcEntity;
+import modelengine.fel.tool.mcp.entity.Event;
+import modelengine.fel.tool.mcp.entity.JsonRpc;
+import modelengine.fel.tool.mcp.entity.Method;
 import modelengine.fel.tool.mcp.server.handler.InitializeHandler;
+import modelengine.fel.tool.mcp.server.handler.PingHandler;
 import modelengine.fel.tool.mcp.server.handler.ToolCallHandler;
 import modelengine.fel.tool.mcp.server.handler.ToolListHandler;
 import modelengine.fel.tool.mcp.server.handler.UnsupportedMethodHandler;
@@ -48,15 +52,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2025-05-13
  */
 @Component
-public class McpController implements McpServer.ToolsChangedObserver {
-    private static final Logger log = Logger.get(McpController.class);
+public class McpServerController implements McpServer.ToolsChangedObserver {
+    private static final Logger log = Logger.get(McpServerController.class);
     private static final String MESSAGE_PATH = "/mcp/message";
-    private static final String EVENT_ENDPOINT = "endpoint";
-    private static final String EVENT_MESSAGE = "message";
-    private static final String METHOD_INITIALIZE = "initialize";
-    private static final String METHOD_TOOLS_LIST = "tools/list";
-    private static final String METHOD_TOOLS_CALL = "tools/call";
-    private static final String METHOD_NOTIFICATION_TOOLS_CHANGED = "notifications/tools/list_changed";
     private static final String RESPONSE_OK = StringUtils.EMPTY;
 
     private final Map<String, Emitter<TextEvent>> emitters = new ConcurrentHashMap<>();
@@ -75,16 +73,17 @@ public class McpController implements McpServer.ToolsChangedObserver {
      * @param mcpServer The MCP server instance used to handle tool operations such as initialization,
      * listing tools, and calling tools, as a {@link McpServer}.
      */
-    public McpController(@Value("${base-url}") String baseUrl, @Fit(alias = "json") ObjectSerializer serializer,
+    public McpServerController(@Value("${base-url}") String baseUrl, @Fit(alias = "json") ObjectSerializer serializer,
             McpServer mcpServer) {
         this.baseUrl = notBlank(baseUrl, "The base URL for MCP server cannot be blank.");
         this.serializer = notNull(serializer, "The json serializer cannot be null.");
         notNull(mcpServer, "The MCP server cannot be null.");
         mcpServer.registerToolsChangedObserver(this);
 
-        this.methodHandlers.put(METHOD_INITIALIZE, new InitializeHandler(mcpServer));
-        this.methodHandlers.put(METHOD_TOOLS_LIST, new ToolListHandler(mcpServer));
-        this.methodHandlers.put(METHOD_TOOLS_CALL, new ToolCallHandler(mcpServer, this.serializer));
+        this.methodHandlers.put(Method.INITIALIZE.code(), new InitializeHandler(mcpServer));
+        this.methodHandlers.put(Method.PING.code(), new PingHandler());
+        this.methodHandlers.put(Method.TOOLS_LIST.code(), new ToolListHandler(mcpServer));
+        this.methodHandlers.put(Method.TOOLS_CALL.code(), new ToolCallHandler(mcpServer, this.serializer));
 
         ThreadPoolScheduler channelDetectorScheduler = ThreadPoolScheduler.custom()
                 .corePoolSize(1)
@@ -127,12 +126,10 @@ public class McpController implements McpServer.ToolsChangedObserver {
         log.info("New SSE channel for MCP server created. [sessionId={}]", sessionId);
         return Choir.create(emitter -> {
             emitters.put(sessionId, emitter);
-            TextEvent textEvent = TextEvent.custom()
-                    .id(sessionId)
-                    .event(EVENT_ENDPOINT)
-                    .data(this.baseUrl + MESSAGE_PATH + "?sessionId=" + sessionId)
-                    .build();
+            String data = this.baseUrl + MESSAGE_PATH + "?sessionId=" + sessionId;
+            TextEvent textEvent = TextEvent.custom().id(sessionId).event(Event.ENDPOINT.code()).data(data).build();
             emitter.emit(textEvent);
+            log.info("Send MCP endpoint. [endpoint={}]", data);
         });
     }
 
@@ -148,38 +145,37 @@ public class McpController implements McpServer.ToolsChangedObserver {
      */
     @PostMapping(path = MESSAGE_PATH)
     public Object receiveMcpMessage(@RequestQuery(name = "sessionId") String sessionId,
-            @RequestBody JsonRpcEntity request) {
-        log.info("Receive MCP message. [sessionId={}, request={}]", sessionId, request);
-        Object id = request.getId();
+            @RequestBody Map<String, Object> request) {
+        log.info("Receive MCP message. [sessionId={}, message={}]", sessionId, request);
+        Object id = request.get("id");
         if (id == null) {
             // Request without an ID indicates a notification message, ignore.
             return RESPONSE_OK;
         }
-        MessageHandler handler = this.methodHandlers.getOrDefault(request.getMethod(), this.unsupportedMethodHandler);
-        JsonRpcEntity response = new JsonRpcEntity();
-        response.setId(id);
+        String method = cast(request.getOrDefault("method", StringUtils.EMPTY));
+        MessageHandler handler = this.methodHandlers.getOrDefault(method, this.unsupportedMethodHandler);
+        JsonRpc.Response<Object> response;
         try {
-            Object result = handler.handle(request.getParams());
-            response.setResult(result);
+            Object result = handler.handle(cast(request.get("params")));
+            response = JsonRpc.createResponse(id, result);
         } catch (Exception e) {
             log.error("Failed to handle MCP message.", e);
-            response.setError(e.getMessage());
+            response = JsonRpc.createResponseWithError(id, e.getMessage());
         }
         String serialized = this.serializer.serialize(response);
-        TextEvent textEvent = TextEvent.custom().id(sessionId).event(EVENT_MESSAGE).data(serialized).build();
+        TextEvent textEvent = TextEvent.custom().id(sessionId).event(Event.MESSAGE.code()).data(serialized).build();
         Emitter<TextEvent> emitter = this.emitters.get(sessionId);
         emitter.emit(textEvent);
-        log.info("Send MCP message. [response={}]", serialized);
+        log.info("Send MCP message. [message={}]", serialized);
         return RESPONSE_OK;
     }
 
     @Override
     public void onToolsChanged() {
-        JsonRpcEntity notification = new JsonRpcEntity();
-        notification.setMethod(METHOD_NOTIFICATION_TOOLS_CHANGED);
+        JsonRpc.Notification notification = JsonRpc.createNotification(Method.NOTIFICATION_TOOLS_CHANGED.code());
         String serialized = this.serializer.serialize(notification);
         this.emitters.forEach((sessionId, emitter) -> {
-            TextEvent textEvent = TextEvent.custom().id(sessionId).event(EVENT_MESSAGE).data(serialized).build();
+            TextEvent textEvent = TextEvent.custom().id(sessionId).event(Event.MESSAGE.code()).data(serialized).build();
             emitter.emit(textEvent);
             log.info("Send MCP notification: tools changed. [sessionId={}]", sessionId);
         });

@@ -16,7 +16,9 @@
         <module>tool-discoverer</module>
         <module>tool-executor</module>
         <module>tool-factory-repository</module>
+        <module>tool-mcp-client</module>
         <module>tool-mcp-server</module>
+        <module>tool-mcp-test</module>
         <module>tool-repository-simple</module>
     </modules>
 </project>

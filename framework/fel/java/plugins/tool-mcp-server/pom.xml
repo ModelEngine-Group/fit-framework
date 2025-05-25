@@ -25,10 +25,19 @@
             <groupId>org.fitframework</groupId>
             <artifactId>fit-reactor</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.fitframework.service</groupId>
+            <artifactId>fit-http-classic</artifactId>
+        </dependency>
 
+        <!-- MCP -->
         <dependency>
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>tool-mcp-common</artifactId>
         </dependency>
 
         <!-- Test -->
@@ -57,7 +66,7 @@
                 <version>${fit.version}</version>
                 <configuration>
                     <category>system</category>
-                    <level>4</level>
+                    <level>5</level>
                 </configuration>
                 <executions>
                     <execution>
@@ -84,7 +93,7 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                                      todir="../../../../fit/java/target/plugins"/>
+                                      todir="../../../../../build/plugins"/>
                             </target>
                         </configuration>
                         <goals>

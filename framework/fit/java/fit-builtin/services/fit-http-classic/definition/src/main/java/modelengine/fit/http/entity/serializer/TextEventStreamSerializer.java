@@ -86,7 +86,7 @@ public class TextEventStreamSerializer implements EntitySerializer<TextEventStre
     }
 
     private Object deserializeData(String data) {
-        if (this.type == String.class) {
+        if (this.type == String.class || this.type == TextEvent.class) {
             return data;
         }
         return this.jsonSerializer.deserialize(data, this.type);

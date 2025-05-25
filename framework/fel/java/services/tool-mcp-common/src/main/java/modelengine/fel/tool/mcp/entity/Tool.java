@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server.entity;
+package modelengine.fel.tool.mcp.entity;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ import java.util.Map;
  * @author 季聿阶
  * @since 2025-05-15
  */
-public class ToolEntity {
+public class Tool {
     /**
      * The name of the tool.
      * This serves as a unique identifier for the tool within the system.

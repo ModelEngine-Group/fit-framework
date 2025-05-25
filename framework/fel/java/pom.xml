@@ -143,6 +143,16 @@
                 <artifactId>tool-info</artifactId>
                 <version>${fel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-mcp-common</artifactId>
+                <version>${fel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-mcp-client-service</artifactId>
+                <version>${fel.version}</version>
+            </dependency>
 
             <!-- Third-party -->
             <dependency>

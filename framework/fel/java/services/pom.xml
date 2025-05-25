@@ -14,6 +14,8 @@
 
     <modules>
         <module>tool-info</module>
+        <module>tool-mcp-client-service</module>
+        <module>tool-mcp-common</module>
         <module>tool-service</module>
     </modules>
 

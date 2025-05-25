@@ -18,13 +18,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit test for {@link McpController}.
+ * Unit test for {@link McpServerController}.
  *
  * @author 季聿阶
  * @since 2025-05-20
  */
 @DisplayName("Unit tests for McpController")
-public class McpControllerTest {
+public class McpServerControllerTest {
     private ObjectSerializer objectSerializer;
     private McpServer mcpServer;
     private String baseUrl;
@@ -44,12 +44,12 @@ public class McpControllerTest {
         void shouldThrowExceptionWhenBaseUrlIsNullOrEmpty() {
             // Null
             var exception1 = catchThrowableOfType(IllegalArgumentException.class,
-                    () -> new McpController(null, objectSerializer, mcpServer));
+                    () -> new McpServerController(null, objectSerializer, mcpServer));
             assertThat(exception1).hasMessage("The base URL for MCP server cannot be blank.");
 
             // Blank
             var exception2 = catchThrowableOfType(IllegalArgumentException.class,
-                    () -> new McpController("", objectSerializer, mcpServer));
+                    () -> new McpServerController("", objectSerializer, mcpServer));
             assertThat(exception2).hasMessage("The base URL for MCP server cannot be blank.");
         }
 
@@ -57,7 +57,7 @@ public class McpControllerTest {
         @DisplayName("Should throw exception when serializer is null")
         void shouldThrowExceptionWhenSerializerIsNull() {
             var exception = catchThrowableOfType(IllegalArgumentException.class,
-                    () -> new McpController(baseUrl, null, mcpServer));
+                    () -> new McpServerController(baseUrl, null, mcpServer));
             assertThat(exception).hasMessage("The json serializer cannot be null.");
         }
 
@@ -65,7 +65,7 @@ public class McpControllerTest {
         @DisplayName("Should throw exception when mcpServer is null")
         void shouldThrowExceptionWhenMcpServerIsNull() {
             var exception = catchThrowableOfType(IllegalArgumentException.class,
-                    () -> new McpController(baseUrl, objectSerializer, null));
+                    () -> new McpServerController(baseUrl, objectSerializer, null));
             assertThat(exception).hasMessage("The MCP server cannot be null.");
         }
     }

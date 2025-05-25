@@ -9,10 +9,10 @@
         <version>3.5.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>fel-tool-discoverer</artifactId>
+    <artifactId>fel-tool-mcp-client</artifactId>
 
     <dependencies>
-        <!-- FIT -->
+        <!-- FIT core -->
         <dependency>
             <groupId>org.fitframework</groupId>
             <artifactId>fit-api</artifactId>
@@ -21,33 +21,36 @@
             <groupId>org.fitframework</groupId>
             <artifactId>fit-util</artifactId>
         </dependency>
-
-        <!-- FEL -->
         <dependency>
-            <groupId>org.fitframework.fel</groupId>
-            <artifactId>tool-service</artifactId>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-reactor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.service</groupId>
+            <artifactId>fit-http-classic</artifactId>
         </dependency>
 
-        <!-- Test Plugins -->
+        <!-- MCP -->
         <dependency>
-            <groupId>org.fitframework.plugin</groupId>
-            <artifactId>fit-message-serializer-json-jackson</artifactId>
-            <version>${fit.version}</version>
-            <scope>test</scope>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>tool-mcp-client-service</artifactId>
         </dependency>
 
         <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

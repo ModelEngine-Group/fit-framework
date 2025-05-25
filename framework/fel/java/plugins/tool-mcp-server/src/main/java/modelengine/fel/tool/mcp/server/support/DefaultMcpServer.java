@@ -8,13 +8,13 @@ package modelengine.fel.tool.mcp.server.support;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
 
+import modelengine.fel.tool.mcp.entity.Server;
+import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
-import modelengine.fel.tool.mcp.server.entity.ToolEntity;
 import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.log.Logger;
-import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
 
@@ -34,7 +34,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     private static final Logger log = Logger.get(DefaultMcpServer.class);
 
     private final ToolExecuteService toolExecuteService;
-    private final Map<String, ToolEntity> tools = new ConcurrentHashMap<>();
+    private final Map<String, Tool> tools = new ConcurrentHashMap<>();
     private final List<ToolsChangedObserver> toolsChangedObservers = new ArrayList<>();
 
     /**
@@ -48,21 +48,24 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     }
 
     @Override
-    public Map<String, Object> getInfo() {
-        return MapBuilder.<String, Object>get()
-                .put("protocolVersion", "2025-03-26")
-                .put("capabilities",
-                        MapBuilder.get()
-                                .put("logging", MapBuilder.get().build())
-                                .put("tools", MapBuilder.get().put("listChanged", true).build())
-                                .build())
-                .put("serverInfo",
-                        MapBuilder.get().put("name", "FIT Store MCP Server").put("version", "3.5.0-SNAPSHOT").build())
-                .build();
+    public Server getInfo() {
+        Server server = new Server();
+        server.setProtocolVersion("2025-03-26");
+        Server.Capabilities capabilities = new Server.Capabilities();
+        server.setCapabilities(capabilities);
+        Server.Capabilities.Tools tools1 = new Server.Capabilities.Tools();
+        capabilities.setTools(tools1);
+        tools1.setListChanged(true);
+        capabilities.setLogging(new Server.Capabilities.Logging());
+        Server.Info fitStoreMcpServer = new Server.Info();
+        server.setServerInfo(fitStoreMcpServer);
+        fitStoreMcpServer.setName("FIT Store MCP Server");
+        fitStoreMcpServer.setVersion("3.5.0-SNAPSHOT");
+        return server;
     }
 
     @Override
-    public List<ToolEntity> getTools() {
+    public List<Tool> getTools() {
         return List.copyOf(this.tools.values());
     }
 
@@ -95,7 +98,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             log.warn("Tool addition is ignored: tool schema is null or empty. [toolName={}]", name);
             return;
         }
-        ToolEntity tool = new ToolEntity();
+        Tool tool = new Tool();
         tool.setName(name);
         tool.setDescription(description);
         tool.setInputSchema(schema);

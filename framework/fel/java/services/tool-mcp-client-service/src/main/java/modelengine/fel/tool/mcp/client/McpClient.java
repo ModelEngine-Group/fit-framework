@@ -4,27 +4,27 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server;
+package modelengine.fel.tool.mcp.client;
 
-import modelengine.fel.tool.mcp.entity.Server;
 import modelengine.fel.tool.mcp.entity.Tool;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Represents the MCP Server.
+ * The {@code McpClient} interface defines the contract for interacting with the MCP server.
+ * It provides methods to retrieve available tools and execute specific tools with provided arguments.
+ * This interface is designed to facilitate communication between the client application and the MCP server,
+ * enabling seamless integration and tool invocation.
  *
  * @author 季聿阶
- * @since 2025-05-15
+ * @since 2025-05-21
  */
-public interface McpServer {
+public interface McpClient {
     /**
-     * Gets MCP Server Info.
-     *
-     * @return The MCP Server Info as a {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
+     * Initializes the MCP Client.
      */
-    Server getInfo();
+    void initialize();
 
     /**
      * Gets MCP Server Tools.
@@ -41,21 +41,4 @@ public interface McpServer {
      * @return The tool result as a {@link Object}.
      */
     Object callTool(String name, Map<String, Object> arguments);
-
-    /**
-     * Registers MCP Server Tools Changed Observer.
-     *
-     * @param observer The MCP Server Tools Changed Observer as a {@link ToolsChangedObserver}.
-     */
-    void registerToolsChangedObserver(ToolsChangedObserver observer);
-
-    /**
-     * Represents the MCP Server Tools Changed Observer.
-     */
-    interface ToolsChangedObserver {
-        /**
-         * Called when MCP Server Tools changed.
-         */
-        void onToolsChanged();
-    }
 }

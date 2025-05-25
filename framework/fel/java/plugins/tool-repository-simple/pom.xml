@@ -41,8 +41,8 @@
                 <artifactId>fit-build-maven-plugin</artifactId>
                 <version>${fit.version}</version>
                 <configuration>
-                    <category>user</category>
-                    <level>1</level>
+                    <category>system</category>
+                    <level>5</level>
                 </configuration>
                 <executions>
                     <execution>
@@ -69,7 +69,7 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                                      todir="../../../../fit/java/target/plugins"/>
+                                      todir="../../../../../build/plugins"/>
                             </target>
                         </configuration>
                         <goals>

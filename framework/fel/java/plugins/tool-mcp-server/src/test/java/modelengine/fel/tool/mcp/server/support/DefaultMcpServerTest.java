@@ -6,7 +6,6 @@
 
 package modelengine.fel.tool.mcp.server.support;
 
-import static modelengine.fitframework.util.ObjectUtils.cast;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.Mockito.anyMap;
@@ -17,8 +16,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import modelengine.fel.tool.mcp.entity.Server;
+import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
-import modelengine.fel.tool.mcp.server.entity.ToolEntity;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
 
@@ -64,19 +64,19 @@ public class DefaultMcpServerTest {
         @DisplayName("Should return expected server information")
         void returnExpectedServerInfo() {
             McpServer server = new DefaultMcpServer(toolExecuteService);
-            Map<String, Object> info = server.getInfo();
+            Server info = server.getInfo();
 
-            assertThat(info).containsKey("protocolVersion").containsValue("2025-03-26");
+            assertThat(info).returns("2025-03-26", Server::getProtocolVersion);
 
-            Map<String, Object> capabilities = cast(info.get("capabilities"));
-            assertThat(capabilities).containsKey("logging").containsKey("tools");
+            Server.Capabilities capabilities = info.getCapabilities();
+            assertThat(capabilities).isNotNull();
 
-            Map<String, Object> toolsCapability = cast(capabilities.get("tools"));
-            assertThat(toolsCapability).containsEntry("listChanged", true);
+            Server.Capabilities.Tools toolsCapability = capabilities.getTools();
+            assertThat(toolsCapability).returns(true, Server.Capabilities.Tools::isListChanged);
 
-            Map<String, Object> serverInfo = cast(info.get("serverInfo"));
-            assertThat(serverInfo).containsEntry("name", "FIT Store MCP Server")
-                    .containsEntry("version", "3.5.0-SNAPSHOT");
+            Server.Info serverInfo = info.getServerInfo();
+            assertThat(serverInfo).returns("FIT Store MCP Server", Server.Info::getName)
+                    .returns("3.5.0-SNAPSHOT", Server.Info::getVersion);
         }
     }
 
@@ -113,10 +113,10 @@ public class DefaultMcpServerTest {
 
             server.onToolAdded(name, description, schema);
 
-            List<ToolEntity> tools = server.getTools();
+            List<Tool> tools = server.getTools();
             assertThat(tools).hasSize(1);
 
-            ToolEntity tool = tools.get(0);
+            Tool tool = tools.get(0);
             assertThat(tool.getName()).isEqualTo(name);
             assertThat(tool.getDescription()).isEqualTo(description);
             assertThat(tool.getInputSchema()).isEqualTo(schema);
