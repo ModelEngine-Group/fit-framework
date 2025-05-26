@@ -12,6 +12,7 @@ import {JadeInput} from '@/components/common/JadeInput.jsx';
 import PropTypes from 'prop-types';
 import {useTranslation} from 'react-i18next';
 import {JadeStopPropagationSelect} from '@/components/common/JadeStopPropagationSelect.jsx';
+import {DATA_TYPES} from '@/common/Consts.js';
 
 /**
  * 输出变量的每个条目
@@ -119,6 +120,7 @@ const _OutputVariableRow = ({item, handleItemChange, shapeStatus}) => {
                                 if (value === 'Input') {
                                     changes = [
                                         {key: 'from', value: value},
+                                        {key: 'type', value: DATA_TYPES.STRING},
                                         {key: 'value', value: ''},
                                         {key: 'referenceNode', value: ''},
                                         {key: 'referenceId', value: ''},
