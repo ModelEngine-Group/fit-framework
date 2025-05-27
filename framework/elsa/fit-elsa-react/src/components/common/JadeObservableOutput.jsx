@@ -369,7 +369,7 @@ export const TreeNode = ({
           />
         </Form.Item>
       </Col>
-      <Col flex={'0 0 100 px'} style={{alignSelf: 'normal'}}>
+      {showDescription && <Col flex={'0 0 100 px'} style={{alignSelf: 'normal'}}>
         <Form.Item
           name={`description-${shape.id}-${key}`}
           id={`description-${node.id}-${key}`}
@@ -378,7 +378,7 @@ export const TreeNode = ({
         >
           {getDescription(level)}
         </Form.Item>
-      </Col>
+      </Col>}
       <Col flex='0 0 30px' style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
         <Button disabled={disabled || !(isObjectType(type))}
                 type='text'
