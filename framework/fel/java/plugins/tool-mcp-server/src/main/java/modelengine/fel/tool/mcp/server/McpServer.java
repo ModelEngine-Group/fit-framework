@@ -6,7 +6,7 @@
 
 package modelengine.fel.tool.mcp.server;
 
-import modelengine.fel.tool.mcp.entity.Server;
+import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 
 import java.util.List;
@@ -20,21 +20,21 @@ import java.util.Map;
  */
 public interface McpServer {
     /**
-     * Gets MCP Server Info.
+     * Gets MCP server schema.
      *
-     * @return The MCP Server Info as a {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
+     * @return The MCP server schema as a {@link ServerSchema}.
      */
-    Server getInfo();
+    ServerSchema getSchema();
 
     /**
-     * Gets MCP Server Tools.
+     * Gets MCP server tools.
      *
-     * @return The MCP Server Tools as a {@link List}{@code <}{@link Tool}{@code >}.
+     * @return The MCP server tools as a {@link List}{@code <}{@link Tool}{@code >}.
      */
     List<Tool> getTools();
 
     /**
-     * Calls MCP Server Tool.
+     * Calls MCP server tool.
      *
      * @param name The tool name as a {@link String}.
      * @param arguments The tool arguments as a {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
@@ -43,18 +43,18 @@ public interface McpServer {
     Object callTool(String name, Map<String, Object> arguments);
 
     /**
-     * Registers MCP Server Tools Changed Observer.
+     * Registers MCP server tools changed observer.
      *
-     * @param observer The MCP Server Tools Changed Observer as a {@link ToolsChangedObserver}.
+     * @param observer The MCP server tools changed observer as a {@link ToolsChangedObserver}.
      */
     void registerToolsChangedObserver(ToolsChangedObserver observer);
 
     /**
-     * Represents the MCP Server Tools Changed Observer.
+     * Represents the MCP server tools changed observer.
      */
     interface ToolsChangedObserver {
         /**
-         * Called when MCP Server Tools changed.
+         * Called when MCP server tools changed.
          */
         void onToolsChanged();
     }

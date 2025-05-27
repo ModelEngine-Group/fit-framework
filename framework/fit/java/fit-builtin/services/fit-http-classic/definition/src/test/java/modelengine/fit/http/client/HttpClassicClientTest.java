@@ -19,6 +19,7 @@ import modelengine.fit.http.protocol.ClientResponse;
 import modelengine.fit.http.protocol.ConfigurableMessageHeaders;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.HttpVersion;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.support.DefaultClientResponse;
 import modelengine.fit.http.protocol.support.DefaultMessageHeaders;
@@ -64,8 +65,10 @@ public class HttpClassicClientTest {
             this.headers.add("Content-Length", "23");
             ConfigurableMessageHeaders defaultMessageHeaders = new DefaultMessageHeaders();
             when(this.clientRequest.headers()).thenReturn(defaultMessageHeaders);
-            RequestLine startLine =
-                    new DefaultRequestLine(HttpVersion.HTTP_1_0, HttpRequestMethod.CONNECT, "requestUri");
+            RequestLine startLine = new DefaultRequestLine(HttpVersion.HTTP_1_0,
+                    HttpRequestMethod.CONNECT,
+                    "requestUri",
+                    QueryCollection.create());
             when(this.clientRequest.startLine()).thenReturn(startLine);
         }
 

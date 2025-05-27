@@ -4,10 +4,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fit.http.support;
+package modelengine.fit.http.protocol.support;
 
-import modelengine.fit.http.QueryCollection;
-import modelengine.fit.http.util.HttpUtils;
+import modelengine.fit.http.protocol.QueryCollection;
+import modelengine.fit.http.protocol.util.QueryUtils;
 import modelengine.fitframework.model.MultiValueMap;
 import modelengine.fitframework.util.StringUtils;
 
@@ -39,7 +39,7 @@ public class DefaultQueryCollection implements QueryCollection {
      * @param queryString 表示整个查询参数的 {@link String}。
      */
     public DefaultQueryCollection(String queryString) {
-        this.queries = HttpUtils.parseQuery(queryString);
+        this.queries = QueryUtils.parseQuery(queryString);
     }
 
     @Override

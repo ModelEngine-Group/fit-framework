@@ -20,10 +20,10 @@ public interface ToolChangedObserver {
      *
      * @param name The name of the added tool, as a {@link String}.
      * @param description A description of the added tool, as a {@link String}.
-     * @param schema The schema associated with the added tool, as a
+     * @param parameters The parameters associated with the added tool, as a
      * {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
      */
-    void onToolAdded(String name, String description, Map<String, Object> schema);
+    void onToolAdded(String name, String description, Map<String, Object> parameters);
 
     /**
      * Method called when a tool has been removed.

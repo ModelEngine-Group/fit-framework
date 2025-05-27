@@ -6,7 +6,6 @@
 
 package modelengine.fel.tool.mcp.server;
 
-import static modelengine.fitframework.inspection.Validation.notBlank;
 import static modelengine.fitframework.inspection.Validation.notNull;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
@@ -26,7 +25,6 @@ import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.server.HttpClassicServerResponse;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Fit;
-import modelengine.fitframework.annotation.Value;
 import modelengine.fitframework.flowable.Choir;
 import modelengine.fitframework.flowable.Emitter;
 import modelengine.fitframework.log.Logger;
@@ -61,21 +59,17 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
     private final Map<String, HttpClassicServerResponse> responses = new ConcurrentHashMap<>();
     private final Map<String, MessageHandler> methodHandlers = new HashMap<>();
     private final MessageHandler unsupportedMethodHandler = new UnsupportedMethodHandler();
-    private final String baseUrl;
     private final ObjectSerializer serializer;
 
     /**
      * Constructs a new instance of the McpController class.
      *
-     * @param baseUrl The base URL for the MCP server as a {@link String}, used to construct message endpoints.
      * @param serializer The JSON serializer used to serialize and deserialize RPC messages, as an
      * {@link ObjectSerializer}.
      * @param mcpServer The MCP server instance used to handle tool operations such as initialization,
      * listing tools, and calling tools, as a {@link McpServer}.
      */
-    public McpServerController(@Value("${base-url}") String baseUrl, @Fit(alias = "json") ObjectSerializer serializer,
-            McpServer mcpServer) {
-        this.baseUrl = notBlank(baseUrl, "The base URL for MCP server cannot be blank.");
+    public McpServerController(@Fit(alias = "json") ObjectSerializer serializer, McpServer mcpServer) {
         this.serializer = notNull(serializer, "The json serializer cannot be null.");
         notNull(mcpServer, "The MCP server cannot be null.");
         mcpServer.registerToolsChangedObserver(this);
@@ -126,7 +120,7 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
         log.info("New SSE channel for MCP server created. [sessionId={}]", sessionId);
         return Choir.create(emitter -> {
             emitters.put(sessionId, emitter);
-            String data = this.baseUrl + MESSAGE_PATH + "?sessionId=" + sessionId;
+            String data = MESSAGE_PATH + "?session_id=" + sessionId;
             TextEvent textEvent = TextEvent.custom().id(sessionId).event(Event.ENDPOINT.code()).data(data).build();
             emitter.emit(textEvent);
             log.info("Send MCP endpoint. [endpoint={}]", data);
@@ -144,7 +138,7 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
      * @return Always returns an empty string ({@value #RESPONSE_OK}) to indicate success.
      */
     @PostMapping(path = MESSAGE_PATH)
-    public Object receiveMcpMessage(@RequestQuery(name = "sessionId") String sessionId,
+    public Object receiveMcpMessage(@RequestQuery(name = "session_id") String sessionId,
             @RequestBody Map<String, Object> request) {
         log.info("Receive MCP message. [sessionId={}, message={}]", sessionId, request);
         Object id = request.get("id");

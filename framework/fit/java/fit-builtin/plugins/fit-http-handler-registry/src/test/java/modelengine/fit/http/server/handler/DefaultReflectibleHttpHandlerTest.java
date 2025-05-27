@@ -23,6 +23,7 @@ import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.HttpResponseStatus;
 import modelengine.fit.http.protocol.HttpVersion;
 import modelengine.fit.http.protocol.MessageHeaders;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.ServerRequest;
 import modelengine.fit.http.protocol.ServerResponse;
@@ -98,7 +99,10 @@ public class DefaultReflectibleHttpHandlerTest {
     private void initializeRequest() {
         HttpResource httpResource = mock(HttpResource.class);
         this.serverRequest = mock(ServerRequest.class);
-        RequestLine startLine = new DefaultRequestLine(HttpVersion.HTTP_1_0, HttpRequestMethod.CONNECT, "testUri");
+        RequestLine startLine = new DefaultRequestLine(HttpVersion.HTTP_1_0,
+                HttpRequestMethod.CONNECT,
+                "testUri",
+                QueryCollection.create());
         MessageHeaders headers = new DefaultMessageHeaders();
         when(this.serverRequest.startLine()).thenReturn(startLine);
         when(this.serverRequest.headers()).thenReturn(headers);

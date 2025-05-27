@@ -35,7 +35,7 @@ public class InitializeHandler extends AbstractMessageHandler<InitializeHandler.
 
     @Override
     protected Object handle(InitializeRequest request) {
-        return this.mcpServer.getInfo();
+        return this.mcpServer.getSchema();
     }
 
     /**

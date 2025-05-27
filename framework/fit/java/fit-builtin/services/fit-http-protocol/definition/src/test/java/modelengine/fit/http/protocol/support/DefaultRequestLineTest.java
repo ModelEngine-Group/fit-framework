@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.HttpVersion;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.RequestLine;
 
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +27,8 @@ public class DefaultRequestLineTest {
     private final HttpVersion httpVersion = HttpVersion.HTTP_1_0;
     private final HttpRequestMethod method = HttpRequestMethod.CONNECT;
     private final String requestUri = "testRequestUri";
-    private final RequestLine defaultRequestLine = RequestLine.create(httpVersion, method, requestUri);
+    private final QueryCollection queries = QueryCollection.create();
+    private final RequestLine defaultRequestLine = RequestLine.create(httpVersion, method, requestUri, queries);
 
     @Test
     @DisplayName("获取的方法与给定的方法值相等")
@@ -47,5 +49,12 @@ public class DefaultRequestLineTest {
     void theHttpVersionShouldBeEqualsToTheGivenVersion() {
         HttpVersion actualHttpVersion = this.defaultRequestLine.httpVersion();
         assertThat(actualHttpVersion).isEqualTo(this.httpVersion);
+    }
+
+    @Test
+    @DisplayName("获取的查询集合与给定的查询集合相等")
+    void theQueriesShouldBeEqualsToTheGivenQueries() {
+        QueryCollection actualQueries = this.defaultRequestLine.queries();
+        assertThat(actualQueries).isEqualTo(this.queries);
     }
 }

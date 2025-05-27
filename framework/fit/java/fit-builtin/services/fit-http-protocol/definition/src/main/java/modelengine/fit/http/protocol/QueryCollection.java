@@ -4,9 +4,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fit.http;
+package modelengine.fit.http.protocol;
 
-import modelengine.fit.http.support.DefaultQueryCollection;
+import modelengine.fit.http.protocol.support.DefaultQueryCollection;
 
 import java.util.List;
 import java.util.Optional;

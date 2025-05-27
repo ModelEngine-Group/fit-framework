@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import modelengine.fit.http.HttpMessage;
 import modelengine.fit.http.HttpResource;
-import modelengine.fit.http.QueryCollection;
 import modelengine.fit.http.client.HttpClassicClientResponse;
 import modelengine.fit.http.entity.Entity;
 import modelengine.fit.http.entity.FileEntity;
@@ -22,6 +21,7 @@ import modelengine.fit.http.protocol.ClientResponse;
 import modelengine.fit.http.protocol.ConfigurableMessageHeaders;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.HttpVersion;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.support.DefaultClientResponse;
 import modelengine.fit.http.protocol.support.DefaultMessageHeaders;
@@ -61,13 +61,16 @@ public class DefaultHttpClassicClientRequestTest {
         this.headers.add("Content-Length", "30");
         ConfigurableMessageHeaders defaultMessageHeaders = new DefaultMessageHeaders();
         when(this.clientRequest.headers()).thenReturn(defaultMessageHeaders);
-        RequestLine startLine = new DefaultRequestLine(HttpVersion.HTTP_1_0, HttpRequestMethod.CONNECT, "requestUri");
+        RequestLine startLine = new DefaultRequestLine(HttpVersion.HTTP_1_0,
+                HttpRequestMethod.CONNECT,
+                "requestUri",
+                QueryCollection.create());
         when(this.clientRequest.startLine()).thenReturn(startLine);
         String reasonPhrase = "testHttpClientErrorException";
         ClientResponse clientResponse = new DefaultClientResponse(200, reasonPhrase, this.headers, this.responseStream);
         when(this.clientRequest.readResponse()).thenReturn(clientResponse);
-        this.defaultHttpClassicClientRequest = new DefaultHttpClassicClientRequest(this.httpResource,
-                this.clientRequest);
+        this.defaultHttpClassicClientRequest =
+                new DefaultHttpClassicClientRequest(this.httpResource, this.clientRequest);
     }
 
     @AfterEach
@@ -220,24 +223,6 @@ public class DefaultHttpClassicClientRequestTest {
     void theQueriesIsEmpty() {
         QueryCollection queries = this.defaultHttpClassicClientRequest.queries();
         assertThat(queries.queryString()).isEmpty();
-    }
-
-    @Nested
-    @DisplayName("Uri 值中包含查询分隔符")
-    class UriContainsTheQuerySeparator {
-        @Test
-        @DisplayName("获取的路径值与给定值相等")
-        void thePathIsEqualsToTheGivenValue() {
-            RequestLine startLine = new DefaultRequestLine(HttpVersion.HTTP_1_0,
-                    HttpRequestMethod.CONNECT,
-                    "testRequestUri?elseRequestUri");
-            when(DefaultHttpClassicClientRequestTest.this.clientRequest.startLine()).thenReturn(startLine);
-            DefaultHttpClassicClientRequestTest.this.defaultHttpClassicClientRequest =
-                    new DefaultHttpClassicClientRequest(DefaultHttpClassicClientRequestTest.this.httpResource,
-                            DefaultHttpClassicClientRequestTest.this.clientRequest);
-            String path = DefaultHttpClassicClientRequestTest.this.defaultHttpClassicClientRequest.path();
-            assertThat(path).isEqualTo("testRequestUri");
-        }
     }
 
     @Test

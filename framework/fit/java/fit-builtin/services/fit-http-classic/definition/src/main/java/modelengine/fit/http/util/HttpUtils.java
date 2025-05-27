@@ -12,6 +12,7 @@ import modelengine.fit.http.header.HeaderValue;
 import modelengine.fit.http.header.ParameterCollection;
 import modelengine.fit.http.header.support.DefaultHeaderValue;
 import modelengine.fit.http.header.support.DefaultParameterCollection;
+import modelengine.fit.http.protocol.util.QueryUtils;
 import modelengine.fitframework.model.MultiValueMap;
 import modelengine.fitframework.resource.UrlUtils;
 import modelengine.fitframework.util.StringUtils;
@@ -23,7 +24,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Http 协议相关的工具类。
@@ -33,8 +33,7 @@ import java.util.function.Function;
  * @since 2022-07-22
  */
 public class HttpUtils {
-    private static final char KEY_VALUE_PAIR_SEPARATOR = '&';
-    private static final char KEY_VALUE_SEPARATOR = '=';
+
     private static final char STRING_VALUE_SURROUNDED = '\"';
 
     /**
@@ -80,18 +79,6 @@ public class HttpUtils {
     }
 
     /**
-     * 将 Http 查询参数的内容解析成为一个键和多值的映射。
-     * <p>该映射的实现默认为 {@link LinkedHashMap}，即键是有序的。查询参数的样式为 {@code k1=v1&k2=v2}。</p>
-     *
-     * @param keyValues 表示待解析的查询参数或表单参数的 {@link String}。
-     * @return 表示解析后的键与多值的映射的 {@link MultiValueMap}{@code <}{@link String}{@code ,
-     * }{@link String}{@code >}。
-     */
-    public static MultiValueMap<String, String> parseQuery(String keyValues) {
-        return HttpUtils.parseQueryOrForm(keyValues, UrlUtils::decodePath);
-    }
-
-    /**
      * 将 Http 表单参数的内容解析成为一个键和多值的映射。
      * <p>该映射的实现默认为 {@link LinkedHashMap}，即键是有序的。表单参数的样式为 {@code k1=v1&k2=v2}。</p>
      *
@@ -100,27 +87,7 @@ public class HttpUtils {
      * }{@link String}{@code >}。
      */
     public static MultiValueMap<String, String> parseForm(String keyValues) {
-        return HttpUtils.parseQueryOrForm(keyValues, UrlUtils::decodeForm);
-    }
-
-    private static MultiValueMap<String, String> parseQueryOrForm(String keyValues,
-            Function<String, String> decodeMethod) {
-        MultiValueMap<String, String> map = MultiValueMap.create(LinkedHashMap::new);
-        if (StringUtils.isBlank(keyValues)) {
-            return map;
-        }
-        List<String> keyValuePairs =
-                StringUtils.split(keyValues, KEY_VALUE_PAIR_SEPARATOR, ArrayList::new, StringUtils::isNotBlank);
-        for (String keyValuePair : keyValuePairs) {
-            int index = keyValuePair.indexOf(KEY_VALUE_SEPARATOR);
-            if (index <= 0) {
-                continue;
-            }
-            String key = decodeMethod.apply(keyValuePair.substring(0, index));
-            String value = decodeMethod.apply(keyValuePair.substring(index + 1));
-            map.add(key, value);
-        }
-        return map;
+        return QueryUtils.parseQuery(keyValues, UrlUtils::decodeForm);
     }
 
     /**

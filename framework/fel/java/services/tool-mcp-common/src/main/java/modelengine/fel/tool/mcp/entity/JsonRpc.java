@@ -37,7 +37,7 @@ public class JsonRpc {
      * @param <T> The type of the request ID.
      * @return A JSON RPC request object.
      */
-    public static <T> Request<T> createRequest(T id, String method, Map<String, Object> params) {
+    public static <T> Request<T> createRequest(T id, String method, Object params) {
         return new Request<>("2.0", id, method, params);
     }
 
@@ -91,7 +91,7 @@ public class JsonRpc {
      *
      * @param <T> The type of the request ID.
      */
-    public record Request<T>(String jsonrpc, T id, String method, Map<String, Object> params) {}
+    public record Request<T>(String jsonrpc, T id, String method, Object params) {}
 
     /**
      * Represents a JSON RPC response.

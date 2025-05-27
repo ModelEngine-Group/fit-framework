@@ -9,7 +9,7 @@ package modelengine.fit.http.protocol;
 import modelengine.fit.http.protocol.support.DefaultRequestLine;
 
 /**
- * 表示 Http 请求的起始行。
+ * Represents the start line of an HTTP request.
  *
  * @author 季聿阶
  * @see <a href="https://datatracker.ietf.org/doc/html/rfc2616#section-5.1">RFC 2616</a>
@@ -17,33 +17,43 @@ import modelengine.fit.http.protocol.support.DefaultRequestLine;
  */
 public interface RequestLine extends StartLine {
     /**
-     * 获取 Http 请求的方法。
+     * Retrieves the HTTP request method.
      *
-     * @return 表示 Http 请求方法的 {@link HttpRequestMethod}。
+     * @return The HTTP request method as a {@link HttpRequestMethod}.
      * @see <a href="https://datatracker.ietf.org/doc/html/rfc2616#section-5.1.1">RFC 2616</a>
      */
     HttpRequestMethod method();
 
     /**
-     * 获取 Http 请求的 URI。
+     * Retrieves the URI of the HTTP request.
      *
-     * @return 表示 Http 请求 URI 的 {@link String}。
+     * @return The URI of the HTTP request as a {@link String}.
      * @see <a href="https://datatracker.ietf.org/doc/html/rfc2616#section-5.1.2">RFC 2616</a>
      */
     String requestUri();
 
     /**
-     * 根据 Http 版本、请求方法和请求地址，创建一个新的请求起始行。
+     * Retrieves the query parameters of the HTTP request.
      *
-     * @param httpVersion 表示 Http 版本的 {@link HttpVersion}。
-     * @param method 表示请求方法的 {@link HttpRequestMethod}。
-     * @param requestUri 表示请求地址的 {@link String}。
-     * @return 表示创建出来的新的请求起始行的 {@link RequestLine}。
-     * @throws IllegalArgumentException 当 {@code httpVersion} 为 {@code null} 时。
-     * @throws IllegalArgumentException 当 {@code method} 为 {@code null} 时。
-     * @throws IllegalArgumentException 当 {@code requestUri} 为 {@code null} 或空白字符串时。
+     * @return The query parameters of the HTTP request as a {@link QueryCollection}.
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc2616#section-5.1.2">RFC 2616</a>
      */
-    static RequestLine create(HttpVersion httpVersion, HttpRequestMethod method, String requestUri) {
-        return new DefaultRequestLine(httpVersion, method, requestUri);
+    QueryCollection queries();
+
+    /**
+     * Creates a new request line with the specified HTTP version, method, request URI, and query parameters.
+     *
+     * @param httpVersion The HTTP version as a {@link HttpVersion}.
+     * @param method The request method as a {@link HttpRequestMethod}.
+     * @param requestUri The request URI as a {@link String}.
+     * @param queries The query parameters as a {@link QueryCollection}.
+     * @return A new instance of {@link RequestLine}.
+     * @throws IllegalArgumentException If {@code httpVersion} is {@code null}.
+     * @throws IllegalArgumentException If {@code method} is {@code null}.
+     * @throws IllegalArgumentException If {@code requestUri} is {@code null} or a blank string.
+     */
+    static RequestLine create(HttpVersion httpVersion, HttpRequestMethod method, String requestUri,
+            QueryCollection queries) {
+        return new DefaultRequestLine(httpVersion, method, requestUri, queries);
     }
 }

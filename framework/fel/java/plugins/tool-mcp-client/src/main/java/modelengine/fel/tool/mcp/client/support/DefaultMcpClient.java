@@ -9,9 +9,10 @@ package modelengine.fel.tool.mcp.client.support;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fel.tool.mcp.client.McpClient;
+import modelengine.fel.tool.mcp.entity.ClientSchema;
 import modelengine.fel.tool.mcp.entity.JsonRpc;
 import modelengine.fel.tool.mcp.entity.Method;
-import modelengine.fel.tool.mcp.entity.Server;
+import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fit.http.client.HttpClassicClient;
 import modelengine.fit.http.client.HttpClassicClientRequest;
@@ -26,8 +27,11 @@ import modelengine.fitframework.schedule.Task;
 import modelengine.fitframework.schedule.ThreadPoolExecutor;
 import modelengine.fitframework.schedule.ThreadPoolScheduler;
 import modelengine.fitframework.serialization.ObjectSerializer;
+import modelengine.fitframework.util.CollectionUtils;
 import modelengine.fitframework.util.LockUtils;
+import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.ObjectUtils;
+import modelengine.fitframework.util.StringUtils;
 import modelengine.fitframework.util.ThreadUtils;
 import modelengine.fitframework.util.UuidUtils;
 
@@ -54,37 +58,43 @@ public class DefaultMcpClient implements McpClient {
 
     private final ObjectSerializer jsonSerializer;
     private final HttpClassicClient client;
-    private final String connectionString;
+    private final String baseUri;
+    private final String sseEndpoint;
     private final String name;
     private final AtomicLong id = new AtomicLong(0);
 
-    private volatile String messageUrl;
+    private volatile String messageEndpoint;
     private volatile String sessionId;
-    private volatile Server server;
+    private volatile ServerSchema serverSchema;
     private volatile boolean initialized = false;
     private final List<Tool> tools = new ArrayList<>();
     private final Object initializedLock = LockUtils.newSynchronizedLock();
     private final Object toolsLock = LockUtils.newSynchronizedLock();
     private final Map<Long, Consumer<JsonRpc.Response<Long>>> responseConsumers = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> pendingRequests = new ConcurrentHashMap<>();
+    private final Map<Long, Object> pendingResults = new ConcurrentHashMap<>();
 
     /**
      * Constructs a new instance of the DefaultMcpClient.
      *
      * @param jsonSerializer The serializer used for JSON serialization and deserialization.
      * @param client The HTTP client used for communication with the MCP server.
-     * @param connectionString The connection string used to establish the initial connection.
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The endpoint for the Server-Sent Events (SSE) connection.
      */
-    public DefaultMcpClient(ObjectSerializer jsonSerializer, HttpClassicClient client, String connectionString) {
+    public DefaultMcpClient(ObjectSerializer jsonSerializer, HttpClassicClient client, String baseUri,
+            String sseEndpoint) {
         this.jsonSerializer = jsonSerializer;
         this.client = client;
-        this.connectionString = connectionString;
+        this.baseUri = baseUri;
+        this.sseEndpoint = sseEndpoint;
         this.name = UuidUtils.randomUuidString();
     }
 
     @Override
     public void initialize() {
-        HttpClassicClientRequest request = this.client.createRequest(HttpRequestMethod.GET, connectionString);
+        HttpClassicClientRequest request =
+                this.client.createRequest(HttpRequestMethod.GET, this.baseUri + this.sseEndpoint);
         Choir<TextEvent> messages = this.client.exchangeStream(request, TextEvent.class);
         ThreadPoolExecutor threadPool = ThreadPoolExecutor.custom()
                 .threadPoolName("mcp-client-" + this.name)
@@ -125,7 +135,13 @@ public class DefaultMcpClient implements McpClient {
     }
 
     private void consumeTextEvent(TextEvent textEvent) {
-        log.info("Receive message from MCP server. [message={}]", textEvent.data());
+        log.info("Receive message from MCP server. [id={}, event={}, message={}]",
+                textEvent.id(),
+                textEvent.event(),
+                textEvent.data());
+        if (StringUtils.isBlank(textEvent.event()) || StringUtils.isBlank((String) textEvent.data())) {
+            return;
+        }
         if (Objects.equals(textEvent.event(), "endpoint")) {
             this.initializeMcpServer(textEvent);
             return;
@@ -157,7 +173,8 @@ public class DefaultMcpClient implements McpClient {
             log.info("MCP client is not initialized and {} method will be delayed.", Method.PING.code());
             return;
         }
-        HttpClassicClientRequest request = this.client.createRequest(HttpRequestMethod.POST, this.messageUrl);
+        HttpClassicClientRequest request =
+                this.client.createRequest(HttpRequestMethod.POST, this.baseUri + this.messageEndpoint);
         long currentId = this.getNextId();
         JsonRpc.Request<Long> rpcRequest = JsonRpc.createRequest(currentId, Method.PING.code());
         request.entity(Entity.createObject(request, rpcRequest));
@@ -183,12 +200,17 @@ public class DefaultMcpClient implements McpClient {
     }
 
     private void initializeMcpServer(TextEvent textEvent) {
-        this.messageUrl = textEvent.data().toString();
-        this.sessionId = textEvent.id();
-        HttpClassicClientRequest request = this.client.createRequest(HttpRequestMethod.POST, this.messageUrl);
+        this.messageEndpoint = textEvent.data().toString();
+        HttpClassicClientRequest request =
+                this.client.createRequest(HttpRequestMethod.POST, this.baseUri + this.messageEndpoint);
+        this.sessionId =
+                request.queries().first("session_id").orElseThrow(() -> new IllegalStateException("no session_id"));
         long currentId = this.getNextId();
         this.responseConsumers.put(currentId, this::initializedMcpServer);
-        JsonRpc.Request<Long> rpcRequest = JsonRpc.createRequest(currentId, Method.INITIALIZE.code());
+        ClientSchema schema = new ClientSchema("2024-11-05",
+                new ClientSchema.Capabilities(),
+                new ClientSchema.Info("FIT MCP Client", "3.5.0-SNAPSHOT"));
+        JsonRpc.Request<Long> rpcRequest = JsonRpc.createRequest(currentId, Method.INITIALIZE.code(), schema);
         request.entity(Entity.createObject(request, rpcRequest));
         log.info("Send {} method to MCP server. [sessionId={}, request={}]",
                 Method.INITIALIZE.code(),
@@ -223,9 +245,9 @@ public class DefaultMcpClient implements McpClient {
             this.initialized = true;
             this.initializedLock.notifyAll();
         }
-        this.server = ObjectUtils.toCustomObject(response.result(), Server.class);
-        log.info("MCP server has initialized. [server={}]", this.server);
-        HttpClassicClientRequest request = this.client.createRequest(HttpRequestMethod.POST, this.messageUrl);
+        this.recordServerSchema(response);
+        HttpClassicClientRequest request =
+                this.client.createRequest(HttpRequestMethod.POST, this.baseUri + this.messageEndpoint);
         JsonRpc.Notification notification = JsonRpc.createNotification(Method.NOTIFICATION_INITIALIZED.code());
         request.entity(Entity.createObject(request, notification));
         log.info("Send {} method to MCP server. [sessionId={}, notification={}]",
@@ -249,12 +271,19 @@ public class DefaultMcpClient implements McpClient {
         }
     }
 
+    private void recordServerSchema(JsonRpc.Response<Long> response) {
+        Map<String, Object> mapResult = cast(response.result());
+        this.serverSchema = ServerSchema.create(mapResult);
+        log.info("MCP server has initialized. [server={}]", this.serverSchema);
+    }
+
     @Override
     public List<Tool> getTools() {
         if (this.isNotInitialized()) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
-        HttpClassicClientRequest request = this.client.createRequest(HttpRequestMethod.POST, this.messageUrl);
+        HttpClassicClientRequest request =
+                this.client.createRequest(HttpRequestMethod.POST, this.baseUri + this.messageEndpoint);
         long currentId = this.getNextId();
         this.responseConsumers.put(currentId, this::getTools0);
         this.pendingRequests.put(currentId, true);
@@ -292,6 +321,7 @@ public class DefaultMcpClient implements McpClient {
             log.error("Failed to get tools list from MCP server. [sessionId={}, response={}]",
                     this.sessionId,
                     response);
+            this.pendingRequests.put(response.id(), false);
             return;
         }
         Map<String, Object> result = cast(response.result());
@@ -301,8 +331,8 @@ public class DefaultMcpClient implements McpClient {
             this.tools.addAll(rawTools.stream()
                     .map(rawTool -> ObjectUtils.<Tool>toCustomObject(rawTool, Tool.class))
                     .toList());
-            this.pendingRequests.put(response.id(), false);
         }
+        this.pendingRequests.put(response.id(), false);
     }
 
     @Override
@@ -310,7 +340,64 @@ public class DefaultMcpClient implements McpClient {
         if (this.isNotInitialized()) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
-        return null;
+        HttpClassicClientRequest request =
+                this.client.createRequest(HttpRequestMethod.POST, this.baseUri + this.messageEndpoint);
+        long currentId = this.getNextId();
+        this.responseConsumers.put(currentId, this::callTools0);
+        this.pendingRequests.put(currentId, true);
+        JsonRpc.Request<Long> rpcRequest = JsonRpc.createRequest(currentId,
+                Method.TOOLS_CALL.code(),
+                MapBuilder.<String, Object>get().put("name", name).put("arguments", arguments).build());
+        request.entity(Entity.createObject(request, rpcRequest));
+        log.info("Send {} method to MCP server. [sessionId={}, request={}]",
+                Method.TOOLS_CALL.code(),
+                this.sessionId,
+                rpcRequest);
+        try (HttpClassicClientResponse<Object> exchange = request.exchange(Object.class)) {
+            if (exchange.statusCode() >= 200 && exchange.statusCode() < 300) {
+                log.info("Send {} method to MCP server successfully. [sessionId={}, statusCode={}]",
+                        Method.TOOLS_CALL.code(),
+                        this.sessionId,
+                        exchange.statusCode());
+            } else {
+                log.error("Failed to {} MCP server. [sessionId={}, statusCode={}]",
+                        Method.TOOLS_CALL.code(),
+                        this.sessionId,
+                        exchange.statusCode());
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        while (this.pendingRequests.get(currentId)) {
+            ThreadUtils.sleep(100);
+        }
+        return this.pendingResults.get(currentId);
+    }
+
+    private void callTools0(JsonRpc.Response<Long> response) {
+        if (response.error() != null) {
+            log.error("Failed to call tool from MCP server. [sessionId={}, response={}]", this.sessionId, response);
+            this.pendingRequests.put(response.id(), false);
+            return;
+        }
+        Map<String, Object> result = cast(response.result());
+        boolean isError = cast(result.get("isError"));
+        if (isError) {
+            log.error("Failed to call tool from MCP server. [sessionId={}, result={}]", this.sessionId, result);
+            this.pendingRequests.put(response.id(), false);
+            return;
+        }
+        List<Map<String, Object>> rawContents = cast(result.get("content"));
+        if (CollectionUtils.isEmpty(rawContents)) {
+            log.error("Failed to call tool from MCP server: no result returned. [sessionId={}, result={}]",
+                    this.sessionId,
+                    result);
+            this.pendingRequests.put(response.id(), false);
+            return;
+        }
+        Map<String, Object> rawContent = rawContents.get(0);
+        this.pendingResults.put(response.id(), rawContent.get("text"));
+        this.pendingRequests.put(response.id(), false);
     }
 
     private long getNextId() {

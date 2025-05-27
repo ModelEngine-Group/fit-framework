@@ -13,6 +13,7 @@ import modelengine.fit.http.protocol.ClientResponse;
 import modelengine.fit.http.protocol.ConfigurableMessageHeaders;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.HttpVersion;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.WritableMessageBody;
 import modelengine.fit.http.protocol.support.ClientRequestBody;
@@ -115,7 +116,10 @@ public class OkHttpClientRequest implements ClientRequest {
 
     @Override
     public RequestLine startLine() {
-        return RequestLine.create(HttpVersion.HTTP_1_1, this.method, this.url.getPath());
+        return RequestLine.create(HttpVersion.HTTP_1_1,
+                this.method,
+                this.url.getPath(),
+                QueryCollection.create(this.url.getQuery()));
     }
 
     @Override

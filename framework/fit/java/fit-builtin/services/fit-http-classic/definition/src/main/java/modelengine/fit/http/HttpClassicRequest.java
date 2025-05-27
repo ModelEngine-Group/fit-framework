@@ -7,6 +7,7 @@
 package modelengine.fit.http;
 
 import modelengine.fit.http.protocol.HttpRequestMethod;
+import modelengine.fit.http.protocol.QueryCollection;
 
 /**
  * 表示经典的 Http 请求。

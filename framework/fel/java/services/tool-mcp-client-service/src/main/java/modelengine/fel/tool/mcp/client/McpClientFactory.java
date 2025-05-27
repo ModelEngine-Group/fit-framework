@@ -18,8 +18,9 @@ public interface McpClientFactory {
     /**
      * Creates a {@link McpClient} instance.
      *
-     * @param connectionString The connection {@link String}.
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
      * @return The connected {@link McpClient} instance.
      */
-    McpClient create(String connectionString);
+    McpClient create(String baseUri, String sseEndpoint);
 }

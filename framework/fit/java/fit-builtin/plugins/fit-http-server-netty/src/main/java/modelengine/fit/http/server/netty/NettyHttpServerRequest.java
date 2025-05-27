@@ -18,6 +18,7 @@ import modelengine.fit.http.protocol.ConfigurableMessageHeaders;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.HttpVersion;
 import modelengine.fit.http.protocol.MessageHeaders;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.ReadableMessageBody;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.ServerRequest;
@@ -38,6 +39,8 @@ import java.util.Optional;
  * @since 2022-07-08
  */
 public class NettyHttpServerRequest implements ServerRequest, OnHttpContentReceived {
+    private static final char QUERY_SEPARATOR = '?';
+
     private final HttpRequest request;
     private final ChannelHandlerContext ctx;
     private final boolean isSecure;
@@ -73,7 +76,15 @@ public class NettyHttpServerRequest implements ServerRequest, OnHttpContentRecei
         HttpVersion httpVersion = notNull(HttpVersion.from(this.request.protocolVersion().toString()),
                 "The http version is unsupported. [version={0}]",
                 this.request.protocolVersion());
-        return RequestLine.create(httpVersion, method, this.request.uri());
+        int index = this.request.uri().indexOf(QUERY_SEPARATOR);
+        if (index < 0) {
+            return RequestLine.create(httpVersion, method, this.request.uri(), QueryCollection.create());
+        } else {
+            return RequestLine.create(httpVersion,
+                    method,
+                    this.request.uri().substring(0, index),
+                    QueryCollection.create(this.request.uri().substring(index + 1)));
+        }
     }
 
     private MessageHeaders initHeaders() {

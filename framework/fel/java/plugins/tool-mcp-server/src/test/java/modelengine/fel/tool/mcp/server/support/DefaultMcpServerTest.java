@@ -16,7 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import modelengine.fel.tool.mcp.entity.Server;
+import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolExecuteService;
@@ -64,19 +64,19 @@ public class DefaultMcpServerTest {
         @DisplayName("Should return expected server information")
         void returnExpectedServerInfo() {
             McpServer server = new DefaultMcpServer(toolExecuteService);
-            Server info = server.getInfo();
+            ServerSchema info = server.getSchema();
 
-            assertThat(info).returns("2025-03-26", Server::getProtocolVersion);
+            assertThat(info).returns("2024-11-05", ServerSchema::protocolVersion);
 
-            Server.Capabilities capabilities = info.getCapabilities();
+            ServerSchema.Capabilities capabilities = info.capabilities();
             assertThat(capabilities).isNotNull();
 
-            Server.Capabilities.Tools toolsCapability = capabilities.getTools();
-            assertThat(toolsCapability).returns(true, Server.Capabilities.Tools::isListChanged);
+            ServerSchema.Capabilities.Tools toolsCapability = capabilities.tools();
+            assertThat(toolsCapability).returns(true, ServerSchema.Capabilities.Tools::listChanged);
 
-            Server.Info serverInfo = info.getServerInfo();
-            assertThat(serverInfo).returns("FIT Store MCP Server", Server.Info::getName)
-                    .returns("3.5.0-SNAPSHOT", Server.Info::getVersion);
+            ServerSchema.Info serverInfo = info.serverInfo();
+            assertThat(serverInfo).returns("FIT Store MCP Server", ServerSchema.Info::name)
+                    .returns("3.5.0-SNAPSHOT", ServerSchema.Info::version);
         }
     }
 

@@ -44,7 +44,7 @@ public class DefaultMcpClientFactory implements McpClientFactory {
     }
 
     @Override
-    public McpClient create(String connectionString) {
-        return new DefaultMcpClient(this.jsonSerializer, this.client, connectionString);
+    public McpClient create(String baseUri, String sseEndpoint) {
+        return new DefaultMcpClient(this.jsonSerializer, this.client, baseUri, sseEndpoint);
     }
 }

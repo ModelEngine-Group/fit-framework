@@ -17,6 +17,7 @@ import modelengine.fit.http.entity.Entity;
 import modelengine.fit.http.entity.EntitySerializer;
 import modelengine.fit.http.entity.support.DefaultNamedEntity;
 import modelengine.fit.http.protocol.MessageHeaderNames;
+import modelengine.fit.http.protocol.QueryCollection;
 import modelengine.fit.http.protocol.ReadableMessageBody;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.ServerRequest;
@@ -72,7 +73,8 @@ public class MockHttpClassicServerRequest {
         when(serverRequest.headers()).thenReturn(headers);
         ReadableMessageBody body = mock(ReadableMessageBody.class);
         when(serverRequest.body()).thenReturn(body);
-        when(startLine.requestUri()).thenReturn("?" + URI_KEY + "=" + URI_VALUE);
+        when(startLine.requestUri()).thenReturn("");
+        when(startLine.queries()).thenReturn(QueryCollection.create(URI_KEY + "=" + URI_VALUE));
         HttpResource httpResource = mock(HttpResource.class);
         final Serializers serializers = mock(Serializers.class);
         final EntitySerializer<?> entitySerializer = mock(EntitySerializer.class);

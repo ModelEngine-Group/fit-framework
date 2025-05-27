@@ -8,7 +8,7 @@ package modelengine.fel.tool.mcp.server.support;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
 
-import modelengine.fel.tool.mcp.entity.Server;
+import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolChangedObserver;
@@ -48,20 +48,12 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     }
 
     @Override
-    public Server getInfo() {
-        Server server = new Server();
-        server.setProtocolVersion("2025-03-26");
-        Server.Capabilities capabilities = new Server.Capabilities();
-        server.setCapabilities(capabilities);
-        Server.Capabilities.Tools tools1 = new Server.Capabilities.Tools();
-        capabilities.setTools(tools1);
-        tools1.setListChanged(true);
-        capabilities.setLogging(new Server.Capabilities.Logging());
-        Server.Info fitStoreMcpServer = new Server.Info();
-        server.setServerInfo(fitStoreMcpServer);
-        fitStoreMcpServer.setName("FIT Store MCP Server");
-        fitStoreMcpServer.setVersion("3.5.0-SNAPSHOT");
-        return server;
+    public ServerSchema getSchema() {
+        ServerSchema.Info info = new ServerSchema.Info("FIT Store MCP Server", "3.5.0-SNAPSHOT");
+        ServerSchema.Capabilities.Logging logging = new ServerSchema.Capabilities.Logging();
+        ServerSchema.Capabilities.Tools tools = new ServerSchema.Capabilities.Tools(true);
+        ServerSchema.Capabilities capabilities = new ServerSchema.Capabilities(logging, tools);
+        return new ServerSchema("2024-11-05", capabilities, info);
     }
 
     @Override
@@ -85,7 +77,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     }
 
     @Override
-    public void onToolAdded(String name, String description, Map<String, Object> schema) {
+    public void onToolAdded(String name, String description, Map<String, Object> parameters) {
         if (StringUtils.isBlank(name)) {
             log.warn("Tool addition is ignored: tool name is blank.");
             return;
@@ -94,16 +86,16 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             log.warn("Tool addition is ignored: tool description is blank. [toolName={}]", name);
             return;
         }
-        if (MapUtils.isEmpty(schema)) {
+        if (MapUtils.isEmpty(parameters)) {
             log.warn("Tool addition is ignored: tool schema is null or empty. [toolName={}]", name);
             return;
         }
         Tool tool = new Tool();
         tool.setName(name);
         tool.setDescription(description);
-        tool.setInputSchema(schema);
+        tool.setInputSchema(parameters);
         this.tools.put(name, tool);
-        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, schema);
+        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
         this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 

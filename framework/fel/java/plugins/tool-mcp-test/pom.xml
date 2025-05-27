@@ -35,6 +35,10 @@
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-mcp-client-service</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>tool-service</artifactId>
+        </dependency>
 
         <!-- Test -->
         <dependency>
@@ -57,13 +61,22 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-maven-plugin</artifactId>
+                <version>${fit.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-tool</id>
+                        <goals>
+                            <goal>build-tool</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.fitframework</groupId>
                 <artifactId>fit-build-maven-plugin</artifactId>
                 <version>${fit.version}</version>
-                <configuration>
-                    <category>system</category>
-                    <level>5</level>
-                </configuration>
                 <executions>
                     <execution>
                         <id>build-plugin</id>

@@ -8,6 +8,7 @@ package modelengine.fel.tool.support;
 
 import static modelengine.fitframework.inspection.Validation.notBlank;
 import static modelengine.fitframework.inspection.Validation.notNull;
+import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fel.tool.ToolInfoEntity;
@@ -55,7 +56,8 @@ public class SimpleToolRepository implements ToolRepository {
         String uniqueName = ToolInfo.identify(tool);
         this.toolCache.put(uniqueName, tool);
         log.info("Register tool[uniqueName={}] success.", uniqueName);
-        this.toolChangedObserver.onToolAdded(uniqueName, tool.description(), tool.schema());
+        Map<String, Object> parameters = cast(tool.schema().get("parameters"));
+        this.toolChangedObserver.onToolAdded(uniqueName, tool.description(), parameters);
     }
 
     @Override

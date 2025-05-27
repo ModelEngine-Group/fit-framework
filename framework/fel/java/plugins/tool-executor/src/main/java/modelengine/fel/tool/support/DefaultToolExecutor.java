@@ -8,10 +8,11 @@ package modelengine.fel.tool.support;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
 
-import modelengine.fel.tool.ToolInfoEntity;
+import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fel.tool.Tool;
 import modelengine.fel.tool.ToolFactory;
 import modelengine.fel.tool.ToolFactoryRepository;
+import modelengine.fel.tool.ToolInfoEntity;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
@@ -70,13 +71,15 @@ public class DefaultToolExecutor implements ToolExecuteService {
     @Override
     @Fitable(id = "standard")
     public String execute(String uniqueName, String jsonArgs) {
-        return this.execute("Common", uniqueName, jsonArgs);
+        String[] strings = ToolInfo.parseIdentifier(uniqueName);
+        return this.execute(strings[0], strings[1], jsonArgs);
     }
 
     @Override
     @Fitable(id = "standard")
     public String execute(String uniqueName, Map<String, Object> jsonObject) {
-        return this.execute("Common", uniqueName, jsonObject);
+        String[] strings = ToolInfo.parseIdentifier(uniqueName);
+        return this.execute(strings[0], strings[1], jsonObject);
     }
 
     private Tool getTool(String group, String toolName) {

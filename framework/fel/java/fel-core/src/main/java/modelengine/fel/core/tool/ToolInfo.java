@@ -141,4 +141,21 @@ public interface ToolInfo {
     static String identify(String namespace, String toolName) {
         return StringUtils.format("{0}:{1}", namespace, toolName);
     }
+
+    /**
+     * Parses the tool identifier.
+     *
+     * @param identifier The identifier to be parsed.
+     * @return An array containing the namespace and tool name.
+     */
+    static String[] parseIdentifier(String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
+            throw new IllegalArgumentException("Identifier cannot be null or empty.");
+        }
+        String[] parts = identifier.split(":", 2);
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Invalid identifier format. Expected 'namespace:name'.");
+        }
+        return parts;
+    }
 }
