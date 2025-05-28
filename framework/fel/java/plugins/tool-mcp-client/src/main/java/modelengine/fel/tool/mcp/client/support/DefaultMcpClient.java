@@ -70,6 +70,7 @@ public class DefaultMcpClient implements McpClient {
     private volatile String sessionId;
     private volatile ServerSchema serverSchema;
     private volatile boolean initialized = false;
+    private volatile boolean closed = false;
     private final List<Tool> tools = new ArrayList<>();
     private final Object initializedLock = LockUtils.newSynchronizedLock();
     private final Object toolsLock = LockUtils.newSynchronizedLock();
@@ -99,6 +100,9 @@ public class DefaultMcpClient implements McpClient {
 
     @Override
     public void initialize() {
+        if (this.closed) {
+            throw new IllegalStateException("The MCP client is closed.");
+        }
         HttpClassicClientRequest request =
                 this.client.createRequest(HttpRequestMethod.GET, this.baseUri + this.sseEndpoint);
         Choir<TextEvent> messages = this.client.exchangeStream(request, TextEvent.class);
@@ -116,8 +120,8 @@ public class DefaultMcpClient implements McpClient {
                 .build();
         messages.subscribeOn(threadPool).subscribe(subscription -> {
                     log.info("Prepare to create SSE channel.");
-                    subscription.request(Long.MAX_VALUE);
                     this.subscription = subscription;
+                    subscription.request(Long.MAX_VALUE);
                 },
                 (subscription, textEvent) -> this.consumeTextEvent(textEvent),
                 subscription -> log.info("SSE channel is completed."),
@@ -242,6 +246,9 @@ public class DefaultMcpClient implements McpClient {
 
     @Override
     public List<Tool> getTools() {
+        if (this.closed) {
+            throw new IllegalStateException("The MCP client is closed.");
+        }
         if (this.isNotInitialized()) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
@@ -278,6 +285,9 @@ public class DefaultMcpClient implements McpClient {
 
     @Override
     public Object callTool(String name, Map<String, Object> arguments) {
+        if (this.closed) {
+            throw new IllegalStateException("The MCP client is closed.");
+        }
         if (this.isNotInitialized()) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
@@ -383,9 +393,14 @@ public class DefaultMcpClient implements McpClient {
 
     @Override
     public void close() throws IOException {
-        this.subscription.cancel();
+        this.closed = true;
+        if (this.subscription != null) {
+            this.subscription.cancel();
+        }
         try {
-            this.pingScheduler.shutdown();
+            if (this.pingScheduler != null) {
+                this.pingScheduler.shutdown();
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException(e);
