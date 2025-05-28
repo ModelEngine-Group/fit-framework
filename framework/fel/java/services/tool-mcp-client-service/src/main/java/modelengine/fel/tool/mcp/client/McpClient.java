@@ -8,6 +8,7 @@ package modelengine.fel.tool.mcp.client;
 
 import modelengine.fel.tool.mcp.entity.Tool;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
  * @author 季聿阶
  * @since 2025-05-21
  */
-public interface McpClient {
+public interface McpClient extends Closeable {
     /**
      * Initializes the MCP Client.
      */

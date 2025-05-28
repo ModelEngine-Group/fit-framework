@@ -22,6 +22,7 @@ import modelengine.fit.http.entity.Entity;
 import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fitframework.flowable.Choir;
+import modelengine.fitframework.flowable.Subscription;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.schedule.ExecutePolicy;
 import modelengine.fitframework.schedule.Task;
@@ -76,6 +77,9 @@ public class DefaultMcpClient implements McpClient {
     private final Map<Long, Boolean> pendingRequests = new ConcurrentHashMap<>();
     private final Map<Long, Object> pendingResults = new ConcurrentHashMap<>();
 
+    private volatile Subscription subscription;
+    private volatile ThreadPoolScheduler pingScheduler;
+
     /**
      * Constructs a new instance of the DefaultMcpClient.
      *
@@ -113,11 +117,12 @@ public class DefaultMcpClient implements McpClient {
         messages.subscribeOn(threadPool).subscribe(subscription -> {
                     log.info("Prepare to create SSE channel.");
                     subscription.request(Long.MAX_VALUE);
+                    this.subscription = subscription;
                 },
                 (subscription, textEvent) -> this.consumeTextEvent(textEvent),
                 subscription -> log.info("SSE channel is completed."),
                 (subscription, cause) -> log.error("SSE channel is failed.", cause));
-        ThreadPoolScheduler pingScheduler = ThreadPoolScheduler.custom()
+        this.pingScheduler = ThreadPoolScheduler.custom()
                 .threadPoolName("mcp-client-ping-" + this.name)
                 .awaitTermination(3, TimeUnit.SECONDS)
                 .isImmediateShutdown(true)
@@ -127,7 +132,7 @@ public class DefaultMcpClient implements McpClient {
                 .workQueueCapacity(Integer.MAX_VALUE)
                 .isDaemonThread(true)
                 .build();
-        pingScheduler.schedule(Task.builder()
+        this.pingScheduler.schedule(Task.builder()
                 .runnable(this::pingServer)
                 .policy(ExecutePolicy.fixedDelay(DELAY_MILLIS))
                 .build(), DELAY_MILLIS);
@@ -374,5 +379,17 @@ public class DefaultMcpClient implements McpClient {
             }
         }
         return this.initialized;
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.subscription.cancel();
+        try {
+            this.pingScheduler.shutdown();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        }
+        log.info("Close MCP client. [name={}, sessionId={}]", this.name, this.sessionId);
     }
 }

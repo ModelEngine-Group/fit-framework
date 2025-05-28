@@ -16,6 +16,7 @@ import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestQuery;
 import modelengine.fitframework.annotation.Component;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,22 @@ public class TestController {
         this.client = this.mcpClientFactory.create(baseUri, sseEndpoint);
         this.client.initialize();
         return "Initialized";
+    }
+
+    /**
+     * Closes the MCP client and releases any resources associated with it.
+     * This method ensures that the MCP client is properly closed and resources are released.
+     *
+     * @return A string indicating that the close operation was successful.
+     */
+    @PostMapping(path = "/close")
+    public String close() {
+        try {
+            this.client.close();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to close.", e);
+        }
+        return "Closed";
     }
 
     /**
