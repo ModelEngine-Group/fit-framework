@@ -6,6 +6,8 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
+import static modelengine.fitframework.inspection.Validation.notBlank;
+import static modelengine.fitframework.inspection.Validation.notNull;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fel.tool.mcp.client.McpClient;
@@ -57,7 +59,6 @@ import java.util.function.Consumer;
  */
 public class DefaultMcpClient implements McpClient {
     private static final Logger log = Logger.get(DefaultMcpClient.class);
-    private static final long DELAY_MILLIS = 30_000L;
 
     private final ObjectSerializer jsonSerializer;
     private final HttpClassicClient client;
@@ -65,6 +66,7 @@ public class DefaultMcpClient implements McpClient {
     private final String sseEndpoint;
     private final String name;
     private final AtomicLong id = new AtomicLong(0);
+    private final long pingInterval;
 
     private volatile String messageEndpoint;
     private volatile String sessionId;
@@ -88,14 +90,16 @@ public class DefaultMcpClient implements McpClient {
      * @param client The HTTP client used for communication with the MCP server.
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The endpoint for the Server-Sent Events (SSE) connection.
+     * @param pingInterval The interval for sending ping messages to the MCP server. Unit: milliseconds.
      */
     public DefaultMcpClient(ObjectSerializer jsonSerializer, HttpClassicClient client, String baseUri,
-            String sseEndpoint) {
-        this.jsonSerializer = jsonSerializer;
-        this.client = client;
-        this.baseUri = baseUri;
-        this.sseEndpoint = sseEndpoint;
+            String sseEndpoint, long pingInterval) {
+        this.jsonSerializer = notNull(jsonSerializer, "The json serializer cannot be null.");
+        this.client = notNull(client, "The http client cannot be null.");
+        this.baseUri = notBlank(baseUri, "The MCP server base URI cannot be blank.");
+        this.sseEndpoint = notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
         this.name = UuidUtils.randomUuidString();
+        this.pingInterval = pingInterval > 0 ? pingInterval : 15_000;
     }
 
     @Override
@@ -126,20 +130,6 @@ public class DefaultMcpClient implements McpClient {
                 (subscription, textEvent) -> this.consumeTextEvent(textEvent),
                 subscription -> log.info("SSE channel is completed."),
                 (subscription, cause) -> log.error("SSE channel is failed.", cause));
-        this.pingScheduler = ThreadPoolScheduler.custom()
-                .threadPoolName("mcp-client-ping-" + this.name)
-                .awaitTermination(3, TimeUnit.SECONDS)
-                .isImmediateShutdown(true)
-                .corePoolSize(1)
-                .maximumPoolSize(1)
-                .keepAliveTime(60, TimeUnit.SECONDS)
-                .workQueueCapacity(Integer.MAX_VALUE)
-                .isDaemonThread(true)
-                .build();
-        this.pingScheduler.schedule(Task.builder()
-                .runnable(this::pingServer)
-                .policy(ExecutePolicy.fixedDelay(DELAY_MILLIS))
-                .build(), DELAY_MILLIS);
         if (!this.waitInitialized()) {
             throw new IllegalStateException("Failed to initialize.");
         }
@@ -236,6 +226,20 @@ public class DefaultMcpClient implements McpClient {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+        this.pingScheduler = ThreadPoolScheduler.custom()
+                .threadPoolName("mcp-client-ping-" + this.name)
+                .awaitTermination(3, TimeUnit.SECONDS)
+                .isImmediateShutdown(true)
+                .corePoolSize(1)
+                .maximumPoolSize(1)
+                .keepAliveTime(60, TimeUnit.SECONDS)
+                .workQueueCapacity(Integer.MAX_VALUE)
+                .isDaemonThread(true)
+                .build();
+        this.pingScheduler.schedule(Task.builder()
+                .runnable(this::pingServer)
+                .policy(ExecutePolicy.fixedDelay(this.pingInterval))
+                .build(), this.pingInterval);
     }
 
     private void recordServerSchema(JsonRpc.Response<Long> response) {

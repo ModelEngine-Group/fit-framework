@@ -2,3 +2,7 @@ fit:
   beans:
     packages:
     - 'modelengine.fel.tool.mcp.client.support'
+
+mcp:
+  client:
+    ping-interval: 15000
