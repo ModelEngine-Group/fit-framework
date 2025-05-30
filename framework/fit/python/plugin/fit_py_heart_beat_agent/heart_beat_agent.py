@@ -94,6 +94,7 @@ def _try_heart_beat_once():
                                       f"heart_beat_gap={'{:.3f}'.format(heart_beat_gap)}s, "
                                       f"heart_beat_interval={'{:.3f}'.format(_interval() / 1000)}s]")
         if _FAIL_COUNT != 0:
+            _registry_fitable_addresses()
             sys_plugin_logger.info(f"heart beat reconnect success. [fail_count={_FAIL_COUNT}]")
             _FAIL_COUNT = 0
         sys_plugin_logger.debug(f'heart beating success.')
@@ -155,3 +156,24 @@ def offline():
 @fitable(const.HEART_BEAT_EXIT_UNEXPECTEDLY_GEN_ID, const.HEART_BEAT_EXIT_UNEXPECTEDLY_FIT_ID)
 def heart_beat_exit_unexpectedly() -> bool:
     return _HEART_BEAT_EXIT_UNEXPECTEDLY
+
+
+@fit(const.SERVICE_DB_REGISTER_ALL_FIT_SERVICE_GEN_ID)
+def register_all_fit_services() -> None:
+    pass
+
+
+def _registry_fitable_addresses():
+    """
+    Register with the registration center after the heartbeat is reconnected.
+    """
+    try:
+        register_all_fit_services()
+        sys_plugin_logger.info("In heart beat agent registry all fitable address success.")
+    except:
+        sys_plugin_logger.warning(f"In heart beat agent registry all fitable address failed.")
+        except_type, except_value, except_traceback = sys.exc_info()
+        sys_plugin_logger.warning(f"In heart beat agent registry all fitable address error type: {except_type}")
+        sys_plugin_logger.warning(f"In heart beat agent registry all fitable address error value: {except_value}")
+        sys_plugin_logger.warning(f"In heart beat agent registry all fitable address error trace back:\n"
+                                  f"{''.join(traceback.format_tb(except_traceback))}")
