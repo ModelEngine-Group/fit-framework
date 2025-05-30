@@ -29,6 +29,10 @@
             <groupId>org.fitframework</groupId>
             <artifactId>fit-util</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.fitframework.service</groupId>
+            <artifactId>fit-security</artifactId>
+        </dependency>
 
         <!-- FEL -->
         <dependency>
@@ -52,6 +56,15 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-test-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -90,7 +103,7 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                                      todir="../../../../fit/java/target/plugins"/>
+                                      todir="../../../../../build/plugins"/>
                             </target>
                         </configuration>
                         <goals>

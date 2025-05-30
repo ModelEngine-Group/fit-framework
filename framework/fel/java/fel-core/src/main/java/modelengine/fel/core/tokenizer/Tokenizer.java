@@ -30,4 +30,12 @@ public interface Tokenizer {
      * @return 表示解码后的字符串的 {@link String}。
      */
     String decode(List<Integer> tokens);
+
+    /**
+     * 计算分词数。
+     *
+     * @param text 表示需要进行分词字符串的 {@link String}。
+     * @return 表示分词数的 {@code int}。
+     */
+    int countToken(String text);
 }

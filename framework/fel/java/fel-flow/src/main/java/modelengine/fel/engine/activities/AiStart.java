@@ -12,6 +12,7 @@ import modelengine.fel.core.chat.support.ChatMessages;
 import modelengine.fel.core.document.Content;
 import modelengine.fel.core.document.Document;
 import modelengine.fel.core.document.Measurable;
+import modelengine.fel.core.model.BlockModel;
 import modelengine.fel.core.pattern.Parser;
 import modelengine.fel.core.pattern.Pattern;
 import modelengine.fel.core.pattern.PostProcessor;
@@ -28,7 +29,9 @@ import modelengine.fel.engine.flows.AiProcessFlow;
 import modelengine.fel.engine.flows.Conversation;
 import modelengine.fel.engine.operators.models.FlowModel;
 import modelengine.fel.engine.operators.patterns.AbstractFlowPattern;
+import modelengine.fel.engine.operators.patterns.FlowNodeSupportable;
 import modelengine.fel.engine.operators.patterns.FlowPattern;
+import modelengine.fel.engine.operators.patterns.FlowSupportable;
 import modelengine.fel.engine.operators.patterns.SimpleFlowPattern;
 import modelengine.fel.engine.operators.prompts.PromptTemplate;
 import modelengine.fel.engine.util.AiFlowSession;
@@ -46,7 +49,6 @@ import modelengine.fitframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -419,17 +421,30 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
      */
     public <R> AiState<R, D, O, RF, F> delegate(Pattern<O, R> pattern) {
         Validation.notNull(pattern, "Pattern operator cannot be null.");
-        FlowPattern<O, R> flowPattern = this.castFlowPattern(pattern);
+        return this.delegate(new SimpleFlowPattern<>(pattern));
+    }
+
+    /**
+     * 将数据委托给 {@link FlowPattern}{@code <}{@link O}{@code , }{@link R}{@code >}
+     * 处理，然后自身放弃处理数据。处理后的数据会发送回该节点，作为该节点的处理结果。
+     *
+     * @param pattern 表示异步委托单元的 {@link FlowPattern}{@code <}{@link O}{@code , }{@link R}{@code >}。
+     * @param <R> 表示委托节点的输出数据类型。
+     * @return 表示委托节点的 {@link AiState}{@code <}{@link R}{@code , }{@link D}{@code , }{@link O}{@code ,
+     * }{@link RF}{@code , }{@link F}{@code >}。
+     * @throws IllegalArgumentException 当 {@code pattern} 为 {@code null} 时。
+     */
+    public <R> AiState<R, D, O, RF, F> delegate(FlowPattern<O, R> pattern) {
+        Validation.notNull(pattern, "Pattern operator cannot be null.");
         Processor<O, R> orProcessor = this.publisher().flatMap(input -> {
-            FlowEmitter<R> cachedEmitter = FlowEmitter.from(flowPattern);
-            AiFlowSession.applyPattern(flowPattern, input.getData(), input.getSession());
-            return Flows.source(cachedEmitter);
+            FlowEmitter<R> emitter = AiFlowSession.applyPattern(pattern, input.getData(), input.getSession());
+            return Flows.source(emitter);
         }, null);
         this.displayPatternProcessor(pattern, orProcessor);
         return new AiState<>(new State<>(orProcessor, this.flow().origin()), this.flow());
     }
 
-    private <R> void displayPatternProcessor(Pattern<O, R> pattern, Processor<O, R> processor) {
+    private <R> void displayPatternProcessor(FlowPattern<O, R> pattern, Processor<O, R> processor) {
         if (pattern instanceof AbstractFlowPattern) {
             Flow<O> originFlow = ObjectUtils.<AbstractFlowPattern<O, R>>cast(pattern).origin();
             processor.displayAs("delegate to flow", originFlow, originFlow.start().getId());
@@ -477,13 +492,7 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
      */
     public <R> AiState<R, D, O, RF, F> delegate(AiProcessFlow<O, R> aiFlow) {
         Validation.notNull(aiFlow, "Flow cannot be null.");
-        Processor<O, R> processor = this.publisher().map(input -> {
-            aiFlow.converse(input.getSession()).offer(input.getData());
-            return (R) null;
-        }, null).displayAs("delegate to flow", aiFlow.origin(), aiFlow.origin().start().getId());
-        AiState<R, D, O, RF, F> state = new AiState<>(new State<>(processor, this.flow().origin()), this.flow());
-        state.offer(aiFlow);
-        return state;
+        return this.delegate(new FlowSupportable<>(aiFlow));
     }
 
     /**
@@ -503,14 +512,7 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
     public <R> AiState<R, D, O, RF, F> delegate(AiProcessFlow<O, R> aiFlow, String nodeId) {
         Validation.notNull(aiFlow, "Flow cannot be null.");
         Validation.notBlank(nodeId, "Node id cannot be blank.");
-        Processor<O, R> processor = this.publisher().map(input -> {
-            aiFlow.converse(input.getSession()).offer(nodeId, Collections.singletonList(input.getData()));
-            return (R) null;
-        }, null).displayAs("delegate to node", aiFlow.origin(), nodeId);
-
-        AiState<R, D, O, RF, F> state = new AiState<>(new State<>(processor, this.flow().origin()), this.flow());
-        state.offer(aiFlow);
-        return state;
+        return this.delegate(new FlowNodeSupportable<>(aiFlow, nodeId));
     }
 
     /**
@@ -529,6 +531,22 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
             prompts.forEach(prompt -> messages.addAll(prompt.messages()));
             return ObjectUtils.<Prompt>cast(messages);
         }, null).displayAs("prompt"), this.flow().origin()), this.flow());
+    }
+
+    /**
+     * 生成大模型阻塞调用节点。
+     *
+     * @param model 表示模型算子实现的 {@link BlockModel}{@code <}{@link M}{@code >}。
+     * @param <M> 表示模型节点的输入数据类型。
+     * @return 表示大模型阻塞调用节点的 {@link AiState}{@code <}{@link ChatMessage}{@code , }{@link D}{@code ,
+     * }{@link O}{@code , }{@link RF}{@code , }{@link F}{@code >}。
+     * @throws IllegalArgumentException 当 {@code model} 为 {@code null} 时。
+     */
+    public <M extends ChatMessage> AiState<M, D, O, RF, F> generate(BlockModel<O, M> model) {
+        Validation.notNull(model, "Model operator cannot be null.");
+        return new AiState<>(new State<>(this.publisher()
+                .map(input -> AiFlowSession.applyPattern(model, input.getData(), input.getSession()), null)
+                .displayAs("generate"), this.flow().origin()), this.flow());
     }
 
     /**

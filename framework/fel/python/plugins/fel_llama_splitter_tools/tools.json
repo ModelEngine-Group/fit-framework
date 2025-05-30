@@ -1,0 +1,368 @@
+{
+    "tools": [
+        {
+            "tags": [
+                "LlamaIndex"
+            ],
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "sentence_splitter"
+                }
+            },
+            "schema": {
+                "name": "sentence_splitter",
+                "description": "Parse text with a preference for complete sentences.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "description": "text"
+                        },
+                        "separator": {
+                            "type": "string",
+                            "description": "separator"
+                        },
+                        "chunk_size": {
+                            "type": "string",
+                            "description": "chunk_size"
+                        },
+                        "chunk_overlap": {
+                            "type": "string",
+                            "description": "chunk_overlap"
+                        }
+                    },
+                    "required": [
+                        "text",
+                        "separator",
+                        "chunk_size",
+                        "chunk_overlap"
+                    ]
+                },
+                "return": {
+                    "title": "Split Sentences By Sentence.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "text",
+                        "separator",
+                        "chunk_size",
+                        "chunk_overlap"
+                    ]
+                }
+            }
+        },
+        {
+            "tags": [
+                "LlamaIndex"
+            ],
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "token_text_splitter"
+                }
+            },
+            "schema": {
+                "name": "token_text_splitter",
+                "description": "Splitting text that looks at word tokens.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "description": "text"
+                        },
+                        "separator": {
+                            "type": "string",
+                            "description": "separator"
+                        },
+                        "chunk_size": {
+                            "type": "string",
+                            "description": "chunk_size"
+                        },
+                        "chunk_overlap": {
+                            "type": "string",
+                            "description": "chunk_overlap"
+                        }
+                    },
+                    "required": [
+                        "text",
+                        "separator",
+                        "chunk_size",
+                        "chunk_overlap"
+                    ]
+                },
+                "return": {
+                    "title": "Split Sentences By Token.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "text",
+                        "separator",
+                        "chunk_size",
+                        "chunk_overlap"
+                    ]
+                }
+            }
+        },
+        {
+            "tags": [
+                "LlamaIndex"
+            ],
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "semantic_splitter"
+                }
+            },
+            "schema": {
+                "name": "semantic_splitter",
+                "description": "Splitting text that looks at word tokens.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "buffer_size": {
+                            "type": "string",
+                            "description": "buffer_size"
+                        },
+                        "breakpoint_percentile_threshold": {
+                            "type": "string",
+                            "description": "breakpoint_percentile_threshold"
+                        },
+                        "docs": {
+                            "type": "string",
+                            "description": "docs"
+                        },
+                        "chunk_overlap": {
+                            "type": "string",
+                            "description": "chunk_overlap"
+                        },
+                        "model_name": {
+                            "type": "string",
+                            "description": "model_name"
+                        },
+                        "api_key": {
+                            "type": "string",
+                            "description": "api_key"
+                        },
+                        "api_base": {
+                            "type": "string",
+                            "description": "api_base"
+                        }
+                    },
+                    "required": [
+                        "buffer_size",
+                        "breakpoint_percentile_threshold",
+                        "docs"
+                    ]
+                },
+                "return": {
+                    "title": "Split Sentences By Semantic.",
+                    "type": "array",
+                    "items": {
+                        "title": "BaseNode",
+                        "description": "Base node Object.\n\nGeneric abstract interface for retrievable nodes",
+                        "type": "object",
+                        "properties": {
+                            "id_": {
+                                "title": "Id ",
+                                "description": "Unique ID of the node.",
+                                "type": "string"
+                            },
+                            "embedding": {
+                                "title": "Embedding",
+                                "description": "Embedding of the node.",
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                }
+                            },
+                            "extra_info": {
+                                "title": "Extra Info",
+                                "description": "A flat dictionary of metadata fields",
+                                "type": "object"
+                            },
+                            "excluded_embed_metadata_keys": {
+                                "title": "Excluded Embed Metadata Keys",
+                                "description": "Metadata keys that are excluded from text for the embed model.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "excluded_llm_metadata_keys": {
+                                "title": "Excluded Llm Metadata Keys",
+                                "description": "Metadata keys that are excluded from text for the LLM.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "relationships": {
+                                "title": "Relationships",
+                                "description": "A mapping of relationships to other node information.",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/definitions/RelatedNodeInfo"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/RelatedNodeInfo"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "class_name": {
+                                "title": "Class Name",
+                                "type": "string",
+                                "default": "base_component"
+                            }
+                        }
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "docs",
+                        "buffer_size",
+                        "breakpoint_percentile_threshold",
+                        "chunk_overlap",
+                        "model_name",
+                        "api_key",
+                        "api_base"
+                    ]
+                }
+            }
+        },
+        {
+            "tags": [
+                "LlamaIndex"
+            ],
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "sentence_window_node_parser"
+                }
+            },
+            "schema": {
+                "name": "sentence_window_node_parser",
+                "description": "Splitting text that looks at word tokens.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "window_size": {
+                            "type": "string",
+                            "description": "window_size"
+                        },
+                        "window_metadata_key": {
+                            "type": "string",
+                            "description": "window_metadata_key"
+                        },
+                        "original_text_metadata_key": {
+                            "type": "string",
+                            "description": "original_text_metadata_key"
+                        },
+                        "docs": {
+                            "type": "string",
+                            "description": "docs"
+                        }
+                    },
+                    "required": [
+                        "window_size",
+                        "window_metadata_key",
+                        "original_text_metadata_key",
+                        "docs"
+                    ]
+                },
+                "return": {
+                    "title": "Splits All Documents Into Individual Sentences",
+                    "type": "array",
+                    "items": {
+                        "title": "BaseNode",
+                        "description": "Base node Object.\n\nGeneric abstract interface for retrievable nodes",
+                        "type": "object",
+                        "properties": {
+                            "id_": {
+                                "title": "Id ",
+                                "description": "Unique ID of the node.",
+                                "type": "string"
+                            },
+                            "embedding": {
+                                "title": "Embedding",
+                                "description": "Embedding of the node.",
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                }
+                            },
+                            "extra_info": {
+                                "title": "Extra Info",
+                                "description": "A flat dictionary of metadata fields",
+                                "type": "object"
+                            },
+                            "excluded_embed_metadata_keys": {
+                                "title": "Excluded Embed Metadata Keys",
+                                "description": "Metadata keys that are excluded from text for the embed model.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "excluded_llm_metadata_keys": {
+                                "title": "Excluded Llm Metadata Keys",
+                                "description": "Metadata keys that are excluded from text for the LLM.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "relationships": {
+                                "title": "Relationships",
+                                "description": "A mapping of relationships to other node information.",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/definitions/RelatedNodeInfo"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/RelatedNodeInfo"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "class_name": {
+                                "title": "Class Name",
+                                "type": "string",
+                                "default": "base_component"
+                            }
+                        }
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "docs",
+                        "window_size",
+                        "window_metadata_key",
+                        "original_text_metadata_key"
+                    ]
+                }
+            }
+        }
+    ]
+}

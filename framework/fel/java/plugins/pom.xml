@@ -20,5 +20,6 @@
         <module>tool-mcp-server</module>
         <module>tool-mcp-test</module>
         <module>tool-repository-simple</module>
+        <module>fel-langchain-runnable</module>
     </modules>
 </project>

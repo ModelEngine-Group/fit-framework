@@ -1,0 +1,353 @@
+{
+	"tools": [
+		{
+			"tags": [
+                "Langchain"
+            ],
+            "runnables": {
+				"langchain": {
+					"genericableId": "langchain.tool",
+					"fitableId": "Python_REPL"
+				}
+			},
+			"schema": {
+				"name": "Python_REPL",
+				"description": "A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)`.",
+				"parameters": {
+					"properties": {
+						"__arg1": {
+							"title": "__arg1",
+							"type": "string"
+						}
+					},
+					"required": [
+						"__arg1"
+					],
+					"type": "object"
+				},
+				"return": {
+					"type": "string"
+				}
+			}
+		},
+		{
+			"tags": [
+                "Langchain",
+                "Config"
+            ],
+            "runnables": {
+				"langchain": {
+					"genericableId": "langchain.tool",
+					"fitableId": "google_search"
+				}
+			},
+			"schema": {
+				"name": "google_search",
+				"description": "A wrapper around Google Search. Useful for when you need to answer questions about current events. Input should be a search query.",
+				"parameters": {
+					"properties": {
+						"__arg1": {
+							"title": "__arg1",
+							"type": "string"
+						},
+						"google_api_key": {
+							"description": "google search api key",
+							"type": "string"
+						},
+						"google_cse_id": {
+							"description": "google search cse id",
+							"type": "string"
+						},
+                        "k": {
+							"description": "number of search results",
+                            "default": 10,
+							"type": "integer"
+						},
+                        "siterestrict": {
+							"description": "restricts search results",
+                            "default": false,
+							"type": "boolean"
+						}
+					},
+					"required": [
+						"__arg1",
+						"google_api_key",
+						"google_cse_id"
+					],
+					"type": "object"
+				},
+				"return": {
+					"type": "string"
+				},
+				"parameterExtensions": {
+					"config": [
+						"google_api_key",
+						"google_cse_id",
+                        "k",
+                        "siterestrict"
+					]
+				}
+			}
+		},
+		{
+            "tags": [
+                "Langchain",
+                "Config"
+            ],
+            "runnables": {
+                "langchain": {
+                    "genericableId": "langchain.tool",
+                    "fitableId": "sql_db_query"
+                }
+            },
+            "schema": {
+                "name": "sql_db_query",
+                "description": "Input to this tool is a detailed and correct SQL query, output is a result from the database. If the query is not correct, an error message will be returned. If an error is returned, rewrite the query, check the query, and try again. If you encounter an issue with Unknown column 'xxxx' in 'field list', use sql_db_schema to query the correct table fields.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "description": "A detailed and correct SQL query.",
+                            "type": "string"
+                        },
+                        "sql_url": {
+                            "type": "string",
+                            "description": "sql_url"
+                        },
+                        "sql_table": {
+                            "type": "string",
+                            "description": "sql_table"
+                        },
+                        "sql_name": {
+                            "type": "string",
+                            "description": "sql_name"
+                        },
+                        "sql_pwd": {
+                            "type": "string",
+                            "description": "sql_pwd"
+                        }
+                    },
+                    "required": [
+                        "query",
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd"
+                    ]
+                },
+                "return": {
+                    "type": "string"
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd"
+                    ]
+                }
+            }
+        },
+		{
+            "tags": [
+                "Langchain",
+                "Config"
+            ],
+            "runnables": {
+                "langchain": {
+                    "genericableId": "langchain.tool",
+                    "fitableId": "sql_db_schema"
+                }
+            },
+            "schema": {
+                "name": "sql_db_schema",
+                "description": "Input to this tool is a comma-separated list of tables, output is the schema and sample rows for those tables. Be sure that the tables actually exist by calling sql_db_list_tables first! Example Input: table1, table2, table3",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "table_names": {
+                            "description": "A comma-separated list of the table names for which to return the schema. Example input: 'table1, table2, table3'",
+                            "type": "string"
+                        },
+                        "sql_url": {
+							"type": "string",
+							"description": "sql_url"
+						},
+                        "sql_table": {
+							"type": "string",
+							"description": "sql_table"
+						},
+                        "sql_name": {
+							"type": "string",
+							"description": "sql_name"
+						},
+                        "sql_pwd": {
+							"type": "string",
+							"description": "sql_pwd"
+						}
+                    },
+                    "required": [
+                        "table_names",
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd"
+                    ]
+                },
+                "return": {
+                    "type": "string"
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd"
+                    ]
+                }
+            }
+        },
+		{
+            "tags": [
+                "Langchain",
+                "Config"
+            ],
+            "runnables": {
+                "langchain": {
+                    "genericableId": "langchain.tool",
+                    "fitableId": "sql_db_list_tables"
+                }
+            },
+            "schema": {
+                "name": "sql_db_list_tables",
+                "description": "Input is an empty string, output is a comma-separated list of tables in the database.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "tool_input": {
+                            "description": "An empty string",
+                            "default": "",
+                            "type": "string"
+                        },
+                        "sql_url": {
+							"type": "string",
+							"description": "sql_url"
+						},
+                        "sql_table": {
+							"type": "string",
+							"description": "sql_table"
+						},
+                        "sql_name": {
+							"type": "string",
+							"description": "sql_name"
+						},
+                        "sql_pwd": {
+							"type": "string",
+							"description": "sql_pwd"
+						}
+                    },
+                    "required": [
+                        "sql_table",
+                        "sql_url",
+                        "sql_name",
+                        "sql_pwd"
+                    ]
+                },
+                "return": {
+                    "type": "string"
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd"
+                    ]
+                }
+            }
+        },
+		{
+            "tags": [
+                "Langchain",
+                "Config"
+            ],
+            "runnables": {
+                "langchain": {
+                    "genericableId": "langchain.tool",
+                    "fitableId": "sql_db_query_checker"
+                }
+            },
+            "schema": {
+                "name": "sql_db_query_checker",
+                "description": "Use this tool to double check if your query is correct before executing it. Always use this tool before executing a query with sql_db_query!",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "description": "A detailed and SQL query to be checked.",
+                            "type": "string"
+                        },
+                        "model_name": {
+                            "type": "string",
+                            "description": "model_name"
+                        },
+                        "api_key": {
+                            "type": "string",
+                            "description": "api_key"
+                        },
+                        "api_base": {
+                            "type": "string",
+                            "description": "api_base"
+                        },
+                        "sql_url": {
+                            "type": "string",
+                            "description": "sql_url"
+                        },
+                        "sql_table": {
+                            "type": "string",
+                            "description": "sql_table"
+                        },
+                        "sql_name": {
+                            "type": "string",
+                            "description": "sql_name"
+                        },
+                        "sql_pwd": {
+                            "type": "string",
+                            "description": "sql_pwd"
+                        },
+                        "temperature": {
+                            "type": "string",
+                            "description": "temperature"
+                        }
+                    },
+                    "required": [
+                        "query",
+                        "model_name",
+                        "api_key",
+                        "api_base",
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd",
+                        "temperature"
+                    ]
+                },
+                "return": {
+                    "type": "string"
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "model_name",
+                        "api_key",
+                        "api_base",
+                        "sql_url",
+                        "sql_table",
+                        "sql_name",
+                        "sql_pwd",
+                        "temperature"
+                    ]
+                }
+            }
+        }
+	]
+}

@@ -6,8 +6,8 @@
 
 package modelengine.fit.waterflow.domain.context.repo.flowcontext;
 
-import modelengine.fit.waterflow.common.ErrorCodes;
-import modelengine.fit.waterflow.common.exceptions.WaterflowException;
+import modelengine.fit.waterflow.ErrorCodes;
+import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowTrace;
 import modelengine.fit.waterflow.domain.enums.FlowNodeStatus;

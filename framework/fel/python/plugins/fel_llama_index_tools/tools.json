@@ -1,0 +1,685 @@
+{
+    "tools": [
+        {
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "similarity_filter"
+                }
+            },
+            "schema": {
+                "name": "similarity_filter",
+                "description": "Remove documents that are below a similarity score threshold.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "nodes": {
+                            "title": "Nodes",
+                            "type": "array",
+                            "items": {
+                                "title": "Document",
+                                "description": "Document.",
+                                "type": "object",
+                                "properties": {
+                                    "content": {
+                                        "title": "Content",
+                                        "type": "string"
+                                    },
+                                    "media": {
+                                        "title": "Media",
+                                        "description": "Media.",
+                                        "type": "object",
+                                        "properties": {
+                                            "mime": {
+                                                "title": "Mime",
+                                                "type": "string"
+                                            },
+                                            "data": {
+                                                "title": "Data",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "mime",
+                                            "data"
+                                        ]
+                                    },
+                                    "metadata": {
+                                        "title": "Metadata",
+                                        "type": "object"
+                                    }
+                                },
+                                "required": [
+                                    "content",
+                                    "metadata"
+                                ]
+                            }
+                        },
+                        "query_str": {
+                            "title": "Query Str",
+                            "type": "string"
+                        },
+                        "similarity_cutoff": {
+                            "type": "string",
+                            "description": "similarity_cutoff"
+                        }
+                    },
+                    "required": [
+                        "nodes",
+                        "query_str"
+                    ]
+                },
+                "return": {
+                    "title": "The Filtered Documents.",
+                    "type": "array",
+                    "items": {
+                        "title": "Document",
+                        "description": "Document.",
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "title": "Content",
+                                "type": "string"
+                            },
+                            "media": {
+                                "title": "Media",
+                                "description": "Media.",
+                                "type": "object",
+                                "properties": {
+                                    "mime": {
+                                        "title": "Mime",
+                                        "type": "string"
+                                    },
+                                    "data": {
+                                        "title": "Data",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "mime",
+                                    "data"
+                                ]
+                            },
+                            "metadata": {
+                                "title": "Metadata",
+                                "type": "object"
+                            }
+                        },
+                        "required": [
+                            "content",
+                            "metadata"
+                        ]
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "similarity_cutoff"
+                    ]
+                }
+            }
+        },
+        {
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "sentence_embedding_optimizer"
+                }
+            },
+            "schema": {
+                "name": "sentence_embedding_optimizer",
+                "description": "Optimization of a text chunk given the query by shortening the input text.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "nodes": {
+                            "title": "Nodes",
+                            "type": "array",
+                            "items": {
+                                "title": "Document",
+                                "description": "Document.",
+                                "type": "object",
+                                "properties": {
+                                    "content": {
+                                        "title": "Content",
+                                        "type": "string"
+                                    },
+                                    "media": {
+                                        "title": "Media",
+                                        "description": "Media.",
+                                        "type": "object",
+                                        "properties": {
+                                            "mime": {
+                                                "title": "Mime",
+                                                "type": "string"
+                                            },
+                                            "data": {
+                                                "title": "Data",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "mime",
+                                            "data"
+                                        ]
+                                    },
+                                    "metadata": {
+                                        "title": "Metadata",
+                                        "type": "object"
+                                    }
+                                },
+                                "required": [
+                                    "content",
+                                    "metadata"
+                                ]
+                            }
+                        },
+                        "query_str": {
+                            "title": "Query Str",
+                            "type": "string"
+                        },
+                        "model_name": {
+                            "type": "string",
+                            "description": "model_name"
+                        },
+                        "api_key": {
+                            "type": "string",
+                            "description": "api_key"
+                        },
+                        "api_base": {
+                            "type": "string",
+                            "description": "api_base"
+                        },
+                        "percentile_cutoff": {
+                            "type": "string",
+                            "description": "percentile_cutoff"
+                        },
+                        "threshold_cutoff": {
+                            "type": "string",
+                            "description": "threshold_cutoff"
+                        }
+                    },
+                    "required": [
+                        "nodes",
+                        "query_str"
+                    ]
+                },
+                "return": {
+                    "title": "The Optimized Documents.",
+                    "type": "array",
+                    "items": {
+                        "title": "Document",
+                        "description": "Document.",
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "title": "Content",
+                                "type": "string"
+                            },
+                            "media": {
+                                "title": "Media",
+                                "description": "Media.",
+                                "type": "object",
+                                "properties": {
+                                    "mime": {
+                                        "title": "Mime",
+                                        "type": "string"
+                                    },
+                                    "data": {
+                                        "title": "Data",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "mime",
+                                    "data"
+                                ]
+                            },
+                            "metadata": {
+                                "title": "Metadata",
+                                "type": "object"
+                            }
+                        },
+                        "required": [
+                            "content",
+                            "metadata"
+                        ]
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "model_name",
+                        "api_key",
+                        "api_base",
+                        "percentile_cutoff",
+                        "threshold_cutoff"
+                    ]
+                }
+            }
+        },
+        {
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "llm_rerank"
+                }
+            },
+            "schema": {
+                "name": "llm_rerank",
+                "description": "\n    Re-order nodes by asking the LLM to return the relevant documents and a score of how relevant they are.\n    Returns the top N ranked nodes.\n    ",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "nodes": {
+                            "title": "Nodes",
+                            "type": "array",
+                            "items": {
+                                "title": "Document",
+                                "description": "Document.",
+                                "type": "object",
+                                "properties": {
+                                    "content": {
+                                        "title": "Content",
+                                        "type": "string"
+                                    },
+                                    "media": {
+                                        "title": "Media",
+                                        "description": "Media.",
+                                        "type": "object",
+                                        "properties": {
+                                            "mime": {
+                                                "title": "Mime",
+                                                "type": "string"
+                                            },
+                                            "data": {
+                                                "title": "Data",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "mime",
+                                            "data"
+                                        ]
+                                    },
+                                    "metadata": {
+                                        "title": "Metadata",
+                                        "type": "object"
+                                    }
+                                },
+                                "required": [
+                                    "content",
+                                    "metadata"
+                                ]
+                            }
+                        },
+                        "query_str": {
+                            "title": "Query Str",
+                            "type": "string"
+                        },
+                        "model_name": {
+                            "type": "string",
+                            "description": "model_name"
+                        },
+                        "api_key": {
+                            "type": "string",
+                            "description": "api_key"
+                        },
+                        "api_base": {
+                            "type": "string",
+                            "description": "api_base"
+                        },
+                        "prompt": {
+                            "type": "string",
+                            "description": "prompt"
+                        },
+                        "choice_batch_size": {
+                            "type": "string",
+                            "description": "choice_batch_size"
+                        },
+                        "top_n": {
+                            "type": "string",
+                            "description": "top_n"
+                        }
+                    },
+                    "required": [
+                        "nodes",
+                        "query_str"
+                    ]
+                },
+                "return": {
+                    "title": "The Re-Ordered Documents.",
+                    "type": "array",
+                    "items": {
+                        "title": "Document",
+                        "description": "Document.",
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "title": "Content",
+                                "type": "string"
+                            },
+                            "media": {
+                                "title": "Media",
+                                "description": "Media.",
+                                "type": "object",
+                                "properties": {
+                                    "mime": {
+                                        "title": "Mime",
+                                        "type": "string"
+                                    },
+                                    "data": {
+                                        "title": "Data",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "mime",
+                                    "data"
+                                ]
+                            },
+                            "metadata": {
+                                "title": "Metadata",
+                                "type": "object"
+                            }
+                        },
+                        "required": [
+                            "content",
+                            "metadata"
+                        ]
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "model_name",
+                        "api_key",
+                        "api_base",
+                        "prompt",
+                        "choice_batch_size",
+                        "top_n"
+                    ]
+                }
+            }
+        },
+        {
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "long_context_rerank"
+                }
+            },
+            "schema": {
+                "name": "long_context_rerank",
+                "description": "Re-order the retrieved nodes, which can be helpful in cases where a large top-k is needed.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "nodes": {
+                            "title": "Nodes",
+                            "type": "array",
+                            "items": {
+                                "title": "Document",
+                                "description": "Document.",
+                                "type": "object",
+                                "properties": {
+                                    "content": {
+                                        "title": "Content",
+                                        "type": "string"
+                                    },
+                                    "media": {
+                                        "title": "Media",
+                                        "description": "Media.",
+                                        "type": "object",
+                                        "properties": {
+                                            "mime": {
+                                                "title": "Mime",
+                                                "type": "string"
+                                            },
+                                            "data": {
+                                                "title": "Data",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "mime",
+                                            "data"
+                                        ]
+                                    },
+                                    "metadata": {
+                                        "title": "Metadata",
+                                        "type": "object"
+                                    }
+                                },
+                                "required": [
+                                    "content",
+                                    "metadata"
+                                ]
+                            }
+                        },
+                        "query_str": {
+                            "title": "Query Str",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "nodes",
+                        "query_str"
+                    ]
+                },
+                "return": {
+                    "title": "The Re-Ordered Documents.",
+                    "type": "array",
+                    "items": {
+                        "title": "Document",
+                        "description": "Document.",
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "title": "Content",
+                                "type": "string"
+                            },
+                            "media": {
+                                "title": "Media",
+                                "description": "Media.",
+                                "type": "object",
+                                "properties": {
+                                    "mime": {
+                                        "title": "Mime",
+                                        "type": "string"
+                                    },
+                                    "data": {
+                                        "title": "Data",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "mime",
+                                    "data"
+                                ]
+                            },
+                            "metadata": {
+                                "title": "Metadata",
+                                "type": "object"
+                            }
+                        },
+                        "required": [
+                            "content",
+                            "metadata"
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "llm_choice_selector"
+                }
+            },
+            "schema": {
+                "name": "llm_choice_selector",
+                "description": "LLM-based selector that chooses one or multiple out of many options.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "choice": {
+                            "title": "Choice",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "query_str": {
+                            "title": "Query Str",
+                            "type": "string"
+                        },
+                        "model_name": {
+                            "type": "string",
+                            "description": "model_name"
+                        },
+                        "api_key": {
+                            "type": "string",
+                            "description": "api_key"
+                        },
+                        "api_base": {
+                            "type": "string",
+                            "description": "api_base"
+                        },
+                        "prompt": {
+                            "type": "string",
+                            "description": "prompt"
+                        },
+                        "mode": {
+                            "type": "string",
+                            "description": "mode"
+                        }
+                    },
+                    "required": [
+                        "choice",
+                        "query_str"
+                    ]
+                },
+                "return": {
+                    "title": "The Selected Choice.",
+                    "type": "array",
+                    "items": {
+                        "title": "SingleSelection",
+                        "description": "A single selection of a choice.",
+                        "type": "object",
+                        "properties": {
+                            "index": {
+                                "title": "Index",
+                                "type": "integer"
+                            },
+                            "reason": {
+                                "title": "Reason",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "index",
+                            "reason"
+                        ]
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "model_name",
+                        "api_key",
+                        "api_base",
+                        "prompt",
+                        "mode"
+                    ]
+                }
+            }
+        },
+        {
+            "runnables": {
+                "LlamaIndex": {
+                    "genericableId": "llama_index.rag.toolkit",
+                    "fitableId": "fixed_recency"
+                }
+            },
+            "schema": {
+                "name": "fixed_recency",
+                "description": "This postprocessor returns the top K nodes sorted by date",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "nodes": {
+                            "type": "string",
+                            "description": "nodes"
+                        },
+                        "tok_k": {
+                            "type": "string",
+                            "description": "tok_k"
+                        },
+                        "date_key": {
+                            "type": "string",
+                            "description": "date_key"
+                        },
+                        "query_str": {
+                            "type": "string",
+                            "description": "query_str"
+                        }
+                    },
+                    "required": [
+                        "nodes",
+                        "tok_k",
+                        "date_key",
+                        "query_str"
+                    ]
+                },
+                "return": {
+                    "title": "The Fixed Recency Postprocessor",
+                    "type": "array",
+                    "items": {
+                        "title": "Document",
+                        "description": "Document.",
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "title": "Content",
+                                "type": "string"
+                            },
+                            "media": {
+                                "title": "Media",
+                                "description": "Media.",
+                                "type": "object",
+                                "properties": {
+                                    "mime": {
+                                        "title": "Mime",
+                                        "type": "string"
+                                    },
+                                    "data": {
+                                        "title": "Data",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "mime",
+                                    "data"
+                                ]
+                            },
+                            "metadata": {
+                                "title": "Metadata",
+                                "type": "object"
+                            }
+                        },
+                        "required": [
+                            "content",
+                            "metadata"
+                        ]
+                    }
+                },
+                "parameterExtensions": {
+                    "config": [
+                        "nodes",
+                        "tok_k",
+                        "date_key",
+                        "query_str"
+                    ]
+                }
+            }
+        }
+    ]
+}

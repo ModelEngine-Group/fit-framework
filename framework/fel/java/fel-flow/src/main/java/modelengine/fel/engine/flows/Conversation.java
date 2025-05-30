@@ -6,10 +6,13 @@
 
 package modelengine.fel.engine.flows;
 
+import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.ChatOption;
 import modelengine.fel.core.memory.Memory;
 import modelengine.fel.engine.activities.AiStart;
 import modelengine.fel.engine.activities.FlowCallBack;
+import modelengine.fel.engine.operators.models.StreamingConsumer;
+import modelengine.fel.engine.operators.sources.Source;
 import modelengine.fel.engine.util.StateKey;
 import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
@@ -45,7 +48,7 @@ public class Conversation<D, R> {
     public Conversation(AiProcessFlow<D, R> flow, FlowSession session) {
         this.flow = Validation.notNull(flow, "Flow cannot be null.");
         this.session =
-                (session == null) ? this.setConverseListener(new FlowSession()) : this.setSubConverseListener(session);
+                (session == null) ? this.setConverseListener(new FlowSession(true)) : this.setSubConverseListener(session);
         this.session.begin();
         this.callBackBuilder = FlowCallBack.builder();
     }
@@ -60,7 +63,8 @@ public class Conversation<D, R> {
     @SafeVarargs
     public final ConverseLatch<R> offer(D... data) {
         ConverseLatch<R> latch = setListener(this.flow);
-        FlowSession newSession = new FlowSession(this.session);
+        FlowSession newSession = FlowSession.newRootSession(this.session, this.session.preserved());
+        newSession.getWindow().setFrom(null);
         this.flow.start().offer(data, newSession);
         newSession.getWindow().complete();
         return latch;
@@ -79,6 +83,7 @@ public class Conversation<D, R> {
         Validation.notBlank(nodeId, "invalid nodeId.");
         ConverseLatch<R> latch = setListener(this.flow);
         FlowSession newSession = new FlowSession(this.session);
+        newSession.getWindow().setFrom(null);
         this.flow.origin().offer(nodeId, data.toArray(new Object[0]), newSession);
         newSession.getWindow().complete();
         return latch;
@@ -107,6 +112,20 @@ public class Conversation<D, R> {
     public Conversation<D, R> bind(Memory memory) {
         Validation.notNull(memory, "Memory cannot be null.");
         this.session.setInnerState(StateKey.HISTORY, memory);
+        return this;
+    }
+
+    /**
+     * 绑定流式响应信息消费者到对话上下文，用于消费流程流转过程中的流式信息。
+     *
+     * @param consumer 表示流式响应信息消费者的 {@link StreamingConsumer}{@code <}{@link ChatMessage}{@code ,
+     * }{@link ChatMessage}{@code >}。
+     * @return 表示绑定了流式响应信息消费者的对话对象的 {@link Conversation}{@code <}{@link D}{@code , }{@link R}{@code >}。
+     * @throws IllegalArgumentException 当 {@code consumer} 为 {@code null} 时。
+     */
+    public Conversation<D, R> bind(StreamingConsumer<ChatMessage, ChatMessage> consumer) {
+        Validation.notNull(consumer, "Streaming consumer cannot be null.");
+        this.session.setInnerState(StateKey.STREAMING_CONSUMER, consumer);
         return this;
     }
 

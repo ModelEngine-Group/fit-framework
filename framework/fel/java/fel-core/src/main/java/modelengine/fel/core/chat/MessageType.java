@@ -6,6 +6,11 @@
 
 package modelengine.fel.core.chat;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * 表示消息类型的枚举。
  *
@@ -35,6 +40,9 @@ public enum MessageType {
 
     private final String role;
 
+    private static final Map<String, MessageType> RELATIONSHIP =
+            Arrays.stream(MessageType.values()).collect(Collectors.toMap(MessageType::getRole, Function.identity()));
+
     MessageType(String role) {
         this.role = role;
     }
@@ -46,5 +54,15 @@ public enum MessageType {
      */
     public String getRole() {
         return role;
+    }
+
+    /**
+     * 根据字符串获取 {@link MessageType} 的实例。
+     *
+     * @param role 表示消息角色的 {@link String}。
+     * @return 表示消息类型的 {@link MessageType}。
+     */
+    public static MessageType parse(String role) {
+        return RELATIONSHIP.getOrDefault(role, MessageType.HUMAN);
     }
 }

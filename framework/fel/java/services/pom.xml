@@ -17,6 +17,8 @@
         <module>tool-mcp-client-service</module>
         <module>tool-mcp-common</module>
         <module>tool-service</module>
+        <module>fel-langchain-service</module>
+        <module>fel-pipeline-service</module>
     </modules>
 
     <build>

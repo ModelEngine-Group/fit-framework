@@ -6,6 +6,8 @@
 
 package modelengine.fel.core.document;
 
+import modelengine.fitframework.inspection.Nonnull;
+
 /**
  * 表示具有量化能力的对象。
  *
@@ -19,4 +21,12 @@ public interface Measurable {
      * @return 表示当前对象的量化分数的 {@code double}。
      */
     double score();
+
+    /**
+     * 获取文档的分组标识。
+     *
+     * @return 表示文档分组标识的 {@link String}。
+     */
+    @Nonnull
+    String group();
 }

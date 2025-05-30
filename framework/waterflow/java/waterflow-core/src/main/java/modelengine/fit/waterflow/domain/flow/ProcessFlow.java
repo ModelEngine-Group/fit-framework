@@ -34,13 +34,19 @@ public class ProcessFlow<D> extends Flow<D> implements EmitterListener<D, FlowSe
     }
 
     @Override
-    public void handle(D data, FlowSession token) {
-        this.offer(data, token == null ? new FlowSession() : token);
+    public void handle(D data, FlowSession session) {
+        this.offer(data, session == null ? new FlowSession() : session);
     }
 
     @Override
     public void register(EmitterListener<Object, FlowSession> handler) {
         this.end.register(handler);
+    }
+
+    public void unregister(EmitterListener<Object, FlowSession> handler) {
+        if (handler != null) {
+            this.end.unregister(handler);
+        }
     }
 
     @Override

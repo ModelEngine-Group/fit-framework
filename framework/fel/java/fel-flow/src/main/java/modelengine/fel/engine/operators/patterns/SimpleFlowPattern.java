@@ -10,6 +10,7 @@ import modelengine.fel.core.pattern.Pattern;
 import modelengine.fel.engine.util.AiFlowSession;
 import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fit.waterflow.domain.emitters.EmitterListener;
+import modelengine.fit.waterflow.domain.emitters.FlowEmitter;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.util.ObjectUtils;
@@ -25,7 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @since 2024-04-22
  */
 public class SimpleFlowPattern<I, O> implements FlowPattern<I, O> {
-    private EmitterListener<O, FlowSession> handler;
+    private final FlowEmitter<O> emitter = new FlowEmitter<>();
     private final Operators.ProcessMap<I, O> processor;
 
     /**
@@ -35,38 +36,39 @@ public class SimpleFlowPattern<I, O> implements FlowPattern<I, O> {
      * @throws IllegalArgumentException 当 {@code processor} 为 {@code null} 时。
      */
     public SimpleFlowPattern(Operators.ProcessMap<I, O> processor) {
-        this(processor, null);
-    }
-
-    public SimpleFlowPattern(Pattern<I, O> pattern) {
-        this((data, ctx) -> AiFlowSession.applyPattern(pattern, data, ObjectUtils.cast(ctx)), null);
-    }
-
-    private SimpleFlowPattern(Operators.ProcessMap<I, O> processor, EmitterListener<O, FlowSession> handler) {
         this.processor = Validation.notNull(processor, "The processor cannot be null.");
-        this.handler = handler;
+    }
+
+    /**
+     * 使用委托单元初始化 {@link SimpleFlowPattern}{@code <}{@link I}{@code , }{@link O}{@code >}。
+     *
+     * @param pattern 表示委托单元的 {@link Pattern}{@code <}{@link I}{@code , }{@link O}{@code >}。
+     * @throws IllegalArgumentException 当 {@code processor} 为 {@code null} 时。
+     */
+    public SimpleFlowPattern(Pattern<I, O> pattern) {
+        this((data, ctx) -> AiFlowSession.applyPattern(pattern, data, ObjectUtils.cast(ctx)));
     }
 
     @Override
-    public O invoke(I data) {
+    public FlowEmitter<O> invoke(I data) {
         FlowSession session = AiFlowSession.require();
-        this.emit(this.processor.process(data, session), session);
-        session.getWindow().complete();
-        return null;
+        this.emitter.emit(this.processor.process(data, session));
+        this.emitter.complete();
+        return this.emitter;
     }
 
     @Override
     public void register(EmitterListener<O, FlowSession> handler) {
-        if (handler != null) {
-            this.handler = handler;
-        }
+        this.emitter.register(handler);
+    }
+
+    @Override
+    public void unregister(EmitterListener<O, FlowSession> handler) {
+        this.emitter.unregister(handler);
     }
 
     @Override
     public void emit(O data, FlowSession session) {
-        if (this.handler == null) {
-            return;
-        }
-        this.handler.handle(data, session);
+        this.emitter.emit(data, session);
     }
 }

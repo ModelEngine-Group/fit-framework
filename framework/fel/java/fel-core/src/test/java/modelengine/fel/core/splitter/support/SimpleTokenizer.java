@@ -6,6 +6,8 @@
 
 package modelengine.fel.core.splitter.support;
 
+import static modelengine.fitframework.inspection.Validation.notNull;
+
 import modelengine.fel.core.tokenizer.Tokenizer;
 
 import java.util.ArrayList;
@@ -35,5 +37,11 @@ public class SimpleTokenizer implements Tokenizer {
             charArray[i] = (char) tokens.get(i).intValue();
         }
         return new String(charArray);
+    }
+
+    @Override
+    public int countToken(String text) {
+        notNull(text, "Text cannot be null.");
+        return text.length();
     }
 }

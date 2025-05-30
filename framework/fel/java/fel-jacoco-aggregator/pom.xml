@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.fitframework.fel</groupId>
+        <artifactId>fel-parent</artifactId>
+        <version>3.5.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>fel-jacoco-aggregator</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!-- Framework version -->
+        <fel.version>1.0.0-SNAPSHOT</fel.version>
+    </properties>
+
+    <dependencies>
+        <!-- FIT Core -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-core</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-flow</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-pipeline-core</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL Service -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-langchain-service</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-pipeline-service</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FIT Plugin -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-langchain-runnable</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <excludes>**/*.jar</excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- jacoco 的 id 是自定义，不固定 -->
+                        <id>report-aggregate</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

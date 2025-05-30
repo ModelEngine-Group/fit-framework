@@ -751,6 +751,11 @@ class WaterFlowsTest {
                 }
 
                 @Override
+                public void unregister(EmitterListener<Integer, FlowSession> listener) {
+                    this.handler = null;
+                }
+
+                @Override
                 public void emit(Integer data, FlowSession trance) {
                     this.handler.handle(data, trance);
                 }

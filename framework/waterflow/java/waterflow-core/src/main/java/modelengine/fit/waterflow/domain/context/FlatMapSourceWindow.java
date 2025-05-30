@@ -65,13 +65,14 @@ public class FlatMapSourceWindow extends Window {
     /**
      * 根据输入的原始窗口和上下文仓库创建或获取一个 FlatMapSourceWindow 实例。
      *
-     * @param window 原始窗口
-     * @param repo   上下文仓库
-     * @param <I>    输入类型
+     * @param <I> 输入类型。
+     * @param flowId 流标识。
+     * @param window 原始窗口。
+     * @param repo 上下文仓库。
      * @return FlatMapSourceWindow 实例
      */
-    public static <I> FlatMapSourceWindow from(Window window, FlowContextRepo repo) {
-        return FlowSessionRepo.getFlatMapSource(window, repo);
+    public static <I> FlatMapSourceWindow from(String flowId, Window window, FlowContextRepo repo) {
+        return FlowSessionRepo.getFlatMapSource(flowId, window, repo);
     }
 
     /**

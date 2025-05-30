@@ -80,6 +80,10 @@ public class State<O, D, I, F extends Flow<D>> extends Start<O, D, I, F>
         this.processor.register(handler);
     }
 
+    public void unregister(EmitterListener<O, FlowSession> listener) {
+        this.processor.unregister(listener);
+    }
+
     @Override
     public void emit(O data, FlowSession token) {
         this.processor.emit(data, token);
@@ -204,11 +208,11 @@ public class State<O, D, I, F extends Flow<D>> extends Start<O, D, I, F>
         nodes.stream().filter(node -> !node.subscribed()).forEach(node -> node.subscribe(getFlow().end()));
         getFlow().end().onComplete((Operators.Just<Callback<FlowContext<O>>>) input -> {
             FlowDebug.log(input.get().getSession(),
-                    "[close] " + this.getFlow().end().getId() + ":" + "end. data:" + input.get().getData());
+                    "[close] " + this.getFlow().end().getStreamId() + ":" + "end. data:" + input.get().getData());
             callback.process(input);
             input.get().getWindow().peekAndConsume().finishConsume();
             if (input.get().getWindow().isDone()) {
-                FlowSessionRepo.release(input.get().getSession());
+                FlowSessionRepo.release(this.processor.getStreamId(), input.get().getSession());
                 this.getFlow().completeSession(input.get().getSession().getId());
             }
         });
@@ -247,7 +251,9 @@ public class State<O, D, I, F extends Flow<D>> extends Start<O, D, I, F>
     private Operators.ErrorHandler<Object> buildGlobalHandler(Operators.ErrorHandler<Object> errHandler,
             FlowContextRepo repo) {
         return (exception, retryable, contexts) -> {
-            contexts.stream().findFirst().ifPresent(context -> FlowSessionRepo.release(context.getSession()));
+            contexts.stream()
+                    .findFirst()
+                    .ifPresent(context -> FlowSessionRepo.release(this.processor.getStreamId(), context.getSession()));
             contexts.forEach(context -> context.setStatus(FlowNodeStatus.ERROR));
             repo.save(contexts);
             if (errHandler != null) {

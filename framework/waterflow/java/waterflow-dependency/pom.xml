@@ -109,6 +109,11 @@
                 <artifactId>fit-util</artifactId>
                 <version>${fit.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.fitframework.service</groupId>
+                <artifactId>fit-security</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
 
             <!-- WaterFlow -->
             <dependency>
@@ -123,7 +128,7 @@
             </dependency>
             <dependency>
                 <groupId>org.fitframework.waterflow</groupId>
-                <artifactId>waterflow-genericable</artifactId>
+                <artifactId>waterflow-common</artifactId>
                 <version>${waterflow.version}</version>
             </dependency>
 
@@ -144,6 +149,11 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
 
             <dependency>

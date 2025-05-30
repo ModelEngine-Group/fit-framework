@@ -1,0 +1,114 @@
+[
+  {
+    "task": "automatic-speech-recognition",
+    "model": "openai/whisper-large-v3",
+    "input": {
+      "inputs": "test.wav"
+    },
+    "output": {
+      "text": "hello"
+    }
+  },
+  {
+    "task": "automatic-speech-recognition",
+    "model": "openai/whisper-large-v3",
+    "input": {
+      "inputs": "test.wav",
+      "return_timestamps": true
+    },
+    "output": {
+      "text": "hello",
+      "chunks": [
+        {
+          "text": "hello",
+          "timestamp": [
+            0.0,
+            1.5
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "task": "image-to-image",
+    "model": "stabilityai/stable-diffusion-2-base",
+    "input": {
+      "prompt": "a girl",
+      "image": "test.png"
+    },
+    "output": [
+      {
+        "mime": "image/png",
+        "data": "1.png"
+      }
+    ]
+  },
+  {
+    "task": "image-to-image",
+    "model": "stabilityai/stable-diffusion-2-base",
+    "input": {
+      "prompt": "a girl",
+      "image": "test.png",
+      "negative_prompt": "ugly",
+      "num_images_per_prompt": 2
+    },
+    "output": [
+      {
+        "mime": "image/png",
+        "data": "1.png"
+      },
+      {
+        "mime": "image/png",
+        "data": "2.png"
+      }
+    ]
+  },
+  {
+    "task": "text-to-image",
+    "model": "stabilityai/stable-diffusion-2-base",
+    "input": {
+      "prompt": "a girl"
+    },
+    "output": [
+      {
+        "mime": "image/png",
+        "data": "1.png"
+      }
+    ]
+  },
+  {
+    "task": "text-to-image",
+    "model": "stabilityai/stable-diffusion-2-base",
+    "input": {
+      "prompt": "a girl",
+      "negative_prompt": "ugly",
+      "height": 500,
+      "width": 500,
+      "num_images_per_prompt": 2
+    },
+    "output": [
+      {
+        "mime": "image/png",
+        "data": "1.png"
+      },
+      {
+        "mime": "image/png",
+        "data": "2.png"
+      }
+    ]
+  },
+  {
+    "task": "text-to-speech",
+    "model": "2Noise/ChatTTS",
+    "input": {
+      "text_inputs": "hello"
+    },
+    "output": {
+      "audio": {
+        "mime": "audio/x-wav",
+        "data": "1.wav"
+      },
+      "sampling_rate": 16000
+    }
+  }
+]

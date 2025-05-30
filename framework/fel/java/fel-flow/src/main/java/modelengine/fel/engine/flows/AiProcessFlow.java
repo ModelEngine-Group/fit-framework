@@ -16,6 +16,9 @@ import modelengine.fit.waterflow.domain.flow.ProcessFlow;
 import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
 import modelengine.fitframework.util.ObjectUtils;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * AI 数据处理流程，在 {@link AiFlow} 的基础上增加流程间的数据流转能力，并对外提供对话语义。
  *
@@ -26,6 +29,9 @@ import modelengine.fitframework.util.ObjectUtils;
  */
 public class AiProcessFlow<D, R> extends AiFlow<D, ProcessFlow<D>>
         implements EmitterListener<D, FlowSession>, Emitter<R, FlowSession> {
+    private final Map<EmitterListener<R, FlowSession>, EmitterListener<Object, FlowSession>> listeners =
+            new ConcurrentHashMap<>();
+
     public AiProcessFlow(ProcessFlow<D> flow) {
         super(flow);
     }
@@ -38,7 +44,17 @@ public class AiProcessFlow<D, R> extends AiFlow<D, ProcessFlow<D>>
     @Override
     public void register(EmitterListener<R, FlowSession> listener) {
         if (listener != null) {
-            this.origin().register((data, token) -> listener.handle(ObjectUtils.cast(data), new FlowSession(token)));
+            EmitterListener<Object, FlowSession> wrapperHandler =
+                    (data, session) -> listener.handle(ObjectUtils.cast(data), session);
+            this.listeners.put(listener, wrapperHandler);
+            this.origin().register(wrapperHandler);
+        }
+    }
+
+    public void unregister(EmitterListener<R, FlowSession> listener) {
+        EmitterListener<Object, FlowSession> target = this.listeners.remove(listener);
+        if (target != null) {
+            this.origin().unregister(target);
         }
     }
 

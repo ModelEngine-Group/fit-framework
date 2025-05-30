@@ -25,6 +25,11 @@ public interface OpenAiApi {
     String EMBEDDING_ENDPOINT = "/embeddings";
 
     /**
+     * 图像生成请求的端点。
+     */
+    String IMAGE_ENDPOINT = "/images/generations";
+
+    /**
      * 请求头模型密钥字段。
      */
     String AUTHORIZATION = "Authorization";

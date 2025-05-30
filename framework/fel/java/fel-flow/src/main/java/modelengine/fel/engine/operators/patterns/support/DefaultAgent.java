@@ -17,6 +17,7 @@ import modelengine.fel.core.tool.ToolCall;
 import modelengine.fel.engine.operators.models.ChatFlowModel;
 import modelengine.fel.engine.operators.patterns.AbstractAgent;
 import modelengine.fel.tool.service.ToolExecuteService;
+import modelengine.fit.waterflow.domain.context.StateContext;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class DefaultAgent extends AbstractAgent {
     }
 
     @Override
-    protected Prompt doToolCall(List<ToolCall> toolCalls) {
+    protected Prompt doToolCall(List<ToolCall> toolCalls, StateContext ctx) {
         return toolCalls.stream().map(toolCall -> {
             String text = this.toolExecuteService.execute(this.namespace, toolCall.name(), toolCall.arguments());
             return (ChatMessage) new ToolMessage(toolCall.id(), text);

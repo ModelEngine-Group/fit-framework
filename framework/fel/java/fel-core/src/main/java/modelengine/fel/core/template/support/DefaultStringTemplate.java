@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultStringTemplate implements StringTemplate {
     private static final ParameterizedStringResolver FORMATTER =
-            ParameterizedStringResolver.create("{{", "}}", '/', false);
+            ParameterizedStringResolver.create("{{", "}}", '\\', false);
 
     private final ParameterizedString parameterizedString;
 

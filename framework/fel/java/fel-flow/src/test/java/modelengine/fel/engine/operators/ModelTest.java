@@ -12,13 +12,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.ChatOption;
+import modelengine.fel.core.chat.Prompt;
 import modelengine.fel.core.chat.support.AiMessage;
+import modelengine.fel.core.chat.support.ChatMessages;
+import modelengine.fel.core.tool.ToolCall;
 import modelengine.fel.core.util.Tip;
 import modelengine.fel.engine.flows.AiFlows;
 import modelengine.fel.engine.flows.AiProcessFlow;
 import modelengine.fel.engine.flows.Conversation;
 import modelengine.fel.engine.operators.models.ChatFlowModel;
+import modelengine.fel.engine.operators.patterns.AbstractAgent;
 import modelengine.fel.engine.operators.prompts.Prompts;
+import modelengine.fit.waterflow.domain.context.StateContext;
 import modelengine.fit.waterflow.domain.utils.SleepUtil;
 import modelengine.fitframework.flowable.Choir;
 

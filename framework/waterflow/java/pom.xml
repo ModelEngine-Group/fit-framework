@@ -36,10 +36,10 @@
     </scm>
 
     <modules>
-        <module>waterflow-bridge-fit-reactor</module>
+        <module>waterflow-common</module>
         <module>waterflow-core</module>
         <module>waterflow-dependency</module>
-        <module>waterflow-genericable</module>
+        <module>waterflow-eco</module>
     </modules>
 
     <properties>
@@ -108,6 +108,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.version}</version>
+                <configuration>
+                    <!-- 打印每个测试结果，包括方法名 -->
+                    <printSummary>true</printSummary>
+                    <!-- 将输出打印到控制台 -->
+                    <useFile>false</useFile>
+                    <!-- 设置详细报告格式 -->
+                    <reportFormat>plain</reportFormat>
+                    <!-- 启用详细测试输出，显示每个测试方法 -->
+                    <forkCount>1</forkCount> <!-- 单线程显示测试名称 -->
+                    <forkedProcessTimeoutInSeconds>300000</forkedProcessTimeoutInSeconds>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

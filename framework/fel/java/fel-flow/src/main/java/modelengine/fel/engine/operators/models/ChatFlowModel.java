@@ -33,7 +33,7 @@ public class ChatFlowModel implements FlowModel<Prompt, ChatMessage> {
 
     public ChatFlowModel(ChatModel chatModel, ChatOption option) {
         this.chatModel = notNull(chatModel, "The model provider can not be null.");
-        this.option = notNull(option, "The chat options can not be null.");
+        this.option = option;
     }
 
     /**
@@ -54,7 +54,8 @@ public class ChatFlowModel implements FlowModel<Prompt, ChatMessage> {
         FlowSession session =
                 AiFlowSession.get().orElseThrow(() -> new IllegalStateException("The ai session cannot be empty."));
         ChatOption dynamicOption = nullIf(session.getInnerState(StateKey.CHAT_OPTION), this.option);
+        notNull(dynamicOption, "The chat options can not be null.");
         Choir<ChatMessage> choir = ObjectUtils.cast(this.chatModel.generate(input, dynamicOption));
-        return new LlmEmitter<>(choir);
+        return new LlmEmitter<>(choir, input, session);
     }
 }

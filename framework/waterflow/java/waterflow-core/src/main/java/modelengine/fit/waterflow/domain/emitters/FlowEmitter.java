@@ -11,7 +11,9 @@ import modelengine.fit.waterflow.domain.context.FlowSession;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 流程数据发布器
@@ -23,7 +25,7 @@ public class FlowEmitter<D> implements Emitter<D, FlowSession> {
     /**
      * Emitter的监听器
      */
-    protected List<EmitterListener<D, FlowSession>> listeners = new ArrayList<>();
+    protected Set<EmitterListener<D, FlowSession>> listeners = new LinkedHashSet<>();
 
     /**
      * 关联的 session 信息
@@ -41,6 +43,11 @@ public class FlowEmitter<D> implements Emitter<D, FlowSession> {
     private boolean isComplete = false;
 
     private final List<D> data = new ArrayList<>();
+
+    /**
+     * 构造空数据的发射器，具体数据由用户自己投递。
+     */
+    public FlowEmitter() {}
 
     /**
      * 构造单个数据的Emitter
@@ -90,20 +97,26 @@ public class FlowEmitter<D> implements Emitter<D, FlowSession> {
      * @return 新的发射器
      */
     public static <I> FlowEmitter<I> from(Emitter<I, FlowSession> emitter) {
-        FlowEmitter<I> cachedEmitter = new FlowEmitter<>();
-        EmitterListener<I, FlowSession> emitterListener = (data, token) -> {
-            cachedEmitter.emit(data, token);
-        };
-        emitter.register(emitterListener);
+        FlowEmitter<I> cachedEmitter = new AutoCompleteEmitter<>();
+        emitter.register(cachedEmitter::emit);
         return cachedEmitter;
     }
 
     @Override
     public synchronized void register(EmitterListener<D, FlowSession> listener) {
+        if (listener == null) {
+            return;
+        }
         this.listeners.add(listener);
-
         if (this.isStart) {
             this.fire();
+        }
+    }
+
+    @Override
+    public synchronized void unregister(EmitterListener<D, FlowSession> listener) {
+        if (listener != null) {
+            this.listeners.remove(listener);
         }
     }
 
@@ -118,6 +131,9 @@ public class FlowEmitter<D> implements Emitter<D, FlowSession> {
 
     @Override
     public synchronized void start(FlowSession session) {
+        if (this.isStart) {
+            return;
+        }
         if (session != null) {
             session.begin();
         }
@@ -181,6 +197,35 @@ public class FlowEmitter<D> implements Emitter<D, FlowSession> {
         }
         if (this.isStart && this.isComplete) {
             this.flowSession.getWindow().complete();
+        }
+    }
+
+    /**
+     * An emitter implementation that automatically completes based on emission conditions.
+     * This emitter subclass handles automatic completion logic when certain emission
+     * criteria are met, reducing the need for manual completion management.
+     *
+     * @param <D> the type of data processed by this emitter.
+     */
+    public static class AutoCompleteEmitter<D> extends FlowEmitter<D> {
+        @Override
+        public synchronized void start(FlowSession session) {
+            if (session != null) {
+                session.begin();
+            }
+            this.setFlowSession(session);
+            this.setStarted();
+            this.fire();
+        }
+
+        @Override
+        public synchronized void emit(D data, FlowSession session) {
+            session.getWindow().onDone(getOnDoneHandlerId(session), this::complete);
+            this.listeners.forEach(listener -> listener.handle(data, this.flowSession));
+        }
+
+        private static String getOnDoneHandlerId(FlowSession session) {
+            return "AutoCompleteEmitter" + session.getWindow().id();
         }
     }
 }

@@ -18,11 +18,13 @@ import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -38,12 +40,6 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 public class Window implements Completable {
-    private final UUID id;
-
-    private final List<WindowToken> tokens = new ArrayList<>(16);
-
-    private final Set<Window> tos = new HashSet<>();
-
     /**
      * window最后更新时间
      */
@@ -60,6 +56,13 @@ public class Window implements Completable {
     @Getter
     protected Window from = null;
 
+    private final UUID id;
+    private final List<WindowToken> tokens = new ArrayList<>(16);
+    @Getter
+    private final Set<Window> tos = new CopyOnWriteArraySet<>();
+    private final Map<String, Runnable> onDoneHandlers = new ConcurrentHashMap<>();
+
+    private Boolean isFinished = false;
     /**
      * accumulator for reduce
      */
@@ -147,6 +150,43 @@ public class Window implements Completable {
     }
 
     /**
+     * 监听窗口完成事件。
+     *
+     * @param handlerId 表示监听者的唯一标识的 {@link String}。
+     * @param handler 表示监听者接收处理的 {@link Runnable}。
+     */
+    public synchronized void onDone(String handlerId, Runnable handler) {
+        synchronized (this) {
+            if (!this.isDone()) {
+                this.onDoneHandlers.put(handlerId, handler);
+                return;
+            }
+        }
+        handler.run();
+    }
+
+    /**
+     * 获取顶层窗口。
+     *
+     * @return 表示顶层窗口的 {@link Window}。
+     */
+    public Window getRootWindow() {
+        if (this.from == null) {
+            return this;
+        }
+        return this.from.getRootWindow();
+    }
+
+    /**
+     * 获取该窗口以及后续所有窗口是否全部结束。
+     *
+     * @return 表示该窗口以及后续所有窗口是否全部结束的 {@code boolean}。
+     */
+    public boolean isAllDone() {
+        return this.isDone() && this.tos.stream().allMatch(Window::isAllDone);
+    }
+
+    /**
      * 创建window token
      *
      * @return window token
@@ -183,17 +223,19 @@ public class Window implements Completable {
 
     @Override
     public void complete() {
-        if (this.isComplete()) {
-            return;
+        synchronized (this) {
+            if (this.isComplete()) {
+                return;
+            }
+            this.isComplete.set(true);
         }
-        this.isComplete.set(true);
         this.fire();
         this.tryFinish();
     }
 
     private void fire() {
         // only when all elements are consumed(done), fire the possible reduce
-        if (completeContext != null && session.isAccumulator() && this.isDone()) {
+        if (completeContext != null && (session.isAccumulator() || this.acc != null) && this.isDone()) {
             List<FlowContext<Object>> cs = new ArrayList<>();
             cs.add(completeContext);
             List contexts = node.getProcessMode().process(node, cs);
@@ -275,9 +317,17 @@ public class Window implements Completable {
      * if this session window is closed and all elements have been consumed, then notify listener stream that i'm totally consumed
      **/
     public void tryFinish() {
-        if (this.isDone()) {
-            this.completed();
+        synchronized (this) {
+            if (this.isFinished) {
+                return;
+            }
+            if (!this.isDone()) {
+                return;
+            }
+            this.isFinished = true;
         }
+        this.completed();
+        this.onDoneHandlers.values().forEach(Runnable::run);
     }
 
     /**

@@ -48,4 +48,9 @@ public final class DefaultContent implements Content {
     public List<Media> medias() {
         return this.medias;
     }
+
+    @Override
+    public String toString() {
+        return this.text;
+    }
 }

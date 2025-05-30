@@ -1,0 +1,37 @@
+{
+	"tools": [
+		{
+			"tags": [
+                "Builtin"
+            ],
+            "runnables": {
+				"langchain": {
+					"genericableId": "CodeNode.tool",
+					"fitableId": "Python_REPL"
+				}
+			},
+			"schema": {
+				"name": "Python_REPL",
+				"description": "A Python shell. Use this to execute python commands. Input should be a valid python command.",
+				"parameters": {
+					"properties": {
+						"args": {
+							"type": "object"
+						},
+						"code": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"args",
+						"code"
+					],
+					"type": "object"
+				},
+				"return": {
+					"type": "string"
+				}
+			}
+		}
+	]
+}

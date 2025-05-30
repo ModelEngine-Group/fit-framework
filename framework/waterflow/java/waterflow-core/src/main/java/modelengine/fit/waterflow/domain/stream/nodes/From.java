@@ -6,9 +6,10 @@
 
 package modelengine.fit.waterflow.domain.stream.nodes;
 
-import static modelengine.fit.waterflow.common.ErrorCodes.FLOW_ENGINE_INVALID_MANUAL_TASK;
+import static modelengine.fit.waterflow.ErrorCodes.FLOW_ENGINE_INVALID_MANUAL_TASK;
 
-import modelengine.fit.waterflow.common.exceptions.WaterflowException;
+import modelengine.fit.waterflow.domain.context.repo.flowsession.FlowSessionRepo;
+import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fit.waterflow.domain.context.FlatMapSourceWindow;
 import modelengine.fit.waterflow.domain.context.FlatMapWindow;
 import modelengine.fit.waterflow.domain.context.FlowContext;
@@ -178,16 +179,15 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         Validation.notNull(processor, "Flat map processor can not be null.");
         AtomicReference<Node<I, O>> processRef = new AtomicReference<>();
         Operators.Map<FlowContext<I>, O> wrapper = input -> {
-            FlatMapSourceWindow fWindow = FlatMapSourceWindow.from(input.getWindow(), this.repo);
+            FlatMapSourceWindow fWindow = FlatMapSourceWindow.from(this.streamId, input.getWindow(), this.repo);
 
-            final FlowSession session = new FlowSession(input.getSession());
             FlatMapWindow flatMapWindow = new FlatMapWindow(fWindow);
-            session.setWindow(flatMapWindow);
+            final FlowSession session = FlowSession.from(input.getSession(), flatMapWindow);
             session.begin();
 
             DataStart<O, O, ?> start = processor.process(input);
 
-            FlowSession startSession = new FlowSession();
+            FlowSession startSession = new FlowSession(input.getSession().preserved());
             flatMapWindow.setSource(startSession.begin());
             startSession.onError(exception -> {
                 processRef.get().fail(exception, Collections.singletonList(input));
@@ -207,7 +207,11 @@ public class From<I> extends IdGenerator implements Publisher<I> {
     public <O> Processor<I, O> process(Operators.Process<FlowContext<I>, O> processor, Operators.Whether<I> whether) {
         AtomicReference<Node<I, O>> processRef = new AtomicReference<>();
         Operators.Map<FlowContext<I>, O> wrapper = input -> {
-            processor.process(input, input, data -> processRef.get().offer(data, input.getSession()));
+            FlowSession nextSession = FlowSessionRepo.getNextToSession(this.streamId, input.getSession());
+            processor.process(input, input, data -> processRef.get().offer(data, nextSession));
+            if (input.getSession().getWindow().isOngoing()) {
+                nextSession.getWindow().complete();
+            }
             return null;
         };
         Node<I, O> node = new Node<>(this.getStreamId(), wrapper, repo, messenger, locks);
