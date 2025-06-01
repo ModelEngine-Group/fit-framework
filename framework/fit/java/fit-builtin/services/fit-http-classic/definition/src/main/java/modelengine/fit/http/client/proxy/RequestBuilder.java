@@ -13,142 +13,158 @@ import modelengine.fit.http.entity.Entity;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 
 /**
- * 表示 Http 请求提供建造者。
+ * Represents a builder for HTTP requests.
  *
  * @author 王攀博
  * @since 2024-06-08
  */
 public interface RequestBuilder {
     /**
-     * 设置 Http 客户端。
+     * Sets the HTTP client.
      *
-     * @param httpClassicClient 表示测试需要的客户端。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param httpClassicClient The HTTP client to be used.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder client(HttpClassicClient httpClassicClient);
 
     /**
-     * 设置客户端请协议。
+     * Sets the HTTP request method.
      *
-     * @param method 表示客户端请求的协议 {@link HttpRequestMethod}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param method The HTTP request method {@link HttpRequestMethod}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder method(HttpRequestMethod method);
 
     /**
-     * 设置客户端请协议。
+     * Sets the protocol for the HTTP request.
      *
-     * @param protocol 表示客户端请求的协议 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param protocol The protocol for the HTTP request {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder protocol(String protocol);
 
     /**
-     * 设置客户端请求域名。
+     * Sets the domain for the HTTP request.
      *
-     * @param domain 表示客户端请求的域名 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param domain The domain for the HTTP request {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder domain(String domain);
 
     /**
-     * 设置客户端请求模板。
+     * Sets the host for the HTTP request.
      *
-     * @param pathPattern 表示客户端请求的路径模板的 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param host The host for the HTTP request {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
+     */
+    RequestBuilder host(String host);
+
+    /**
+     * Sets the port for the HTTP request.
+     *
+     * @param port The port for the HTTP request {@link int}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
+     */
+    RequestBuilder port(int port);
+
+    /**
+     * Sets the path pattern for the HTTP request.
+     *
+     * @param pathPattern The path pattern for the HTTP request {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder pathPattern(String pathPattern);
 
     /**
-     * 设置客户端请求路径段。
+     * Sets the path variable for the HTTP request.
      *
-     * @param key 表示客户端请求的路径变量的 {@link String}。
-     * @param pathVariable 表示客户端请求的路径变量的值的 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param key The key for the path variable {@link String}.
+     * @param pathVariable The value for the path variable {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder pathVariable(String key, String pathVariable);
 
     /**
-     * 为请求插件结构体添加键值对参数。
+     * Adds a key-value pair to the query parameters of the HTTP request.
      *
-     * @param key 表示请求体内请求参数的键的 {@link String}。
-     * @param value 表示请求体内请求参数的值的 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param key The key for the query parameter {@link String}.
+     * @param value The value for the query parameter {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder query(String key, String value);
 
     /**
-     * 设置请求结构体的消息头。
+     * Sets the header for the HTTP request.
      *
-     * @param name 表示待设置的消息头的名字的 {@link String}。
-     * @param header 表示待设置的消息头内容的 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param name The name of the header {@link String}.
+     * @param header The content of the header {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder header(String name, String header);
 
     /**
-     * 设置请求结构体的 Cookie。
+     * Sets the cookie for the HTTP request.
      *
-     * @param key 表示待设置的 Cookie 的键的 {@link String}。
-     * @param value 表示待设置的 Cookie 的值的 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param key The key for the cookie {@link String}.
+     * @param value The value for the cookie {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder cookie(String key, String value);
 
     /**
-     * 设置请求结构体的消息体内容。
+     * Sets the entity (body content) for the HTTP request.
      *
-     * @param entity 表示 Http 请求的消息体内容的 {@link Entity}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param entity The entity (body content) for the HTTP request {@link Entity}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder entity(Entity entity);
 
     /**
-     * 设置 Http 请求的 Form 格式的消息体内容。
+     * Sets the form entity (body content) for the HTTP request.
      *
-     * @param key 表示 Http 请求的 Form 格式的消息体内容键值对键的 {@link String}。
-     * @param value 表示 Http 请求的 Form 格式的消息体内容键值对值的 {@link String}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param key The key for the form entity {@link String}.
+     * @param value The value for the form entity {@link String}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder formEntity(String key, String value);
 
     /**
-     * 设置 Http 请求的 Json 格式的消息体内容。
+     * Sets the JSON entity (body content) for the HTTP request.
      *
-     * @param propertyValuePath 表示 Http 请求的 json 格式的消息体内容属性路径的 {@link String}。
-     * @param value 表示 Http 请求的消息体内容属性值的 {@link Object}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param propertyValuePath The property path for the JSON entity {@link String}.
+     * @param value The value for the JSON entity {@link Object}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder jsonEntity(String propertyValuePath, Object value);
 
     /**
-     * 设置 Http 请求的鉴权类型。
+     * Sets the authorization type for the HTTP request.
      *
-     * @param authorization 表示 Http 请求的鉴权信息结构的 {@link Authorization}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param authorization The authorization information for the HTTP request {@link Authorization}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder authorization(Authorization authorization);
 
     /**
-     * 设置 Http 请求的鉴权信息。
+     * Sets the authorization information for the HTTP request.
      *
-     * @param key 表示 Http 鉴权信息的参数键值的 {@link String}。
-     * @param value 表示鉴权信息的值的 {@link Object}。
-     * @return 表示客户端请求参数的建造者 {@link RequestBuilder}。
+     * @param key The key for the authorization information {@link String}.
+     * @param value The value for the authorization information {@link Object}.
+     * @return The builder for HTTP request parameters {@link RequestBuilder}.
      */
     RequestBuilder authorizationInfo(String key, Object value);
 
     /**
-     * 构建客户端的请求参数。
+     * Builds the HTTP request parameters.
      *
-     * @return 表示返回构建完成的客户端的请求参数 {@link HttpClassicClientRequest}。
+     * @return The built HTTP request parameters {@link HttpClassicClientRequest}.
      */
     HttpClassicClientRequest build();
 
     /**
-     * 创建请求构建器。
+     * Creates a new instance of the request builder.
      *
-     * @return 表示创建出的请求构建器的 {@link RequestBuilder}。
+     * @return A new instance of the request builder {@link RequestBuilder}.
      */
     static RequestBuilder create() {
         return new DefaultRequestBuilder();

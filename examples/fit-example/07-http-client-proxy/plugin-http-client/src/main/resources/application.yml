@@ -1,0 +1,10 @@
+fit:
+  beans:
+    packages:
+    - 'modelengine.fit.example'
+
+http:
+  client:
+    interface:
+      package:
+      - 'modelengine.fit.example.client'

@@ -15,5 +15,6 @@
         <module>04-complicated-apps</module>
         <module>05-aop-log-plugin</module>
         <module>06-spring-boot-starter</module>
+        <module>07-http-client-proxy</module>
     </modules>
 </project>

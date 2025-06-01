@@ -12,12 +12,12 @@ import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
 
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 为 {@link StringResource} 提供基于 {@link ResourceBundle} 的实现。
@@ -35,7 +35,7 @@ final class ResourceBundleStringResource implements StringResource {
     ResourceBundleStringResource(ClassLoader loader, String baseName, String encoding) {
         this.loader = loader;
         this.baseName = baseName;
-        this.bundles = new HashMap<>();
+        this.bundles = new ConcurrentHashMap<>();
         this.control = new MessageBundleControl(encoding);
     }
 

@@ -42,6 +42,8 @@ public class DefaultRequestBuilder implements RequestBuilder {
     private HttpRequestMethod method;
     private String protocol;
     private String domain;
+    private String host;
+    private int port;
     private String pathPattern;
     private Entity entity;
     private Authorization authorization;
@@ -67,6 +69,18 @@ public class DefaultRequestBuilder implements RequestBuilder {
     @Override
     public RequestBuilder domain(String domain) {
         this.domain = domain;
+        return this;
+    }
+
+    @Override
+    public RequestBuilder host(String host) {
+        this.host = host;
+        return this;
+    }
+
+    @Override
+    public RequestBuilder port(int port) {
+        this.port = port;
         return this;
     }
 
@@ -163,16 +177,23 @@ public class DefaultRequestBuilder implements RequestBuilder {
 
     @Override
     public HttpClassicClientRequest build() {
-        StringBuilder url = new StringBuilder(this.protocol);
-        url.append("://").append(this.domain);
+        if (this.authorization != null) {
+            this.authorization.assemble(this);
+        }
+        StringBuilder url = new StringBuilder();
+        if (StringUtils.isNotEmpty(this.protocol)) {
+            url.append(this.protocol).append("://");
+        }
+        if (StringUtils.isNotEmpty(this.domain)) {
+            url.append(this.domain);
+        } else if (StringUtils.isNotEmpty(this.host)) {
+            url.append(this.host).append(":").append(this.port);
+        }
         if (!this.pathVariables.isEmpty()) {
             this.pathVariables.forEach((key, value) -> this.pathPattern =
                     this.pathPattern.replace("{" + key + "}", value));
         }
         url.append(this.pathPattern);
-        if (this.authorization != null) {
-            this.authorization.assemble(this);
-        }
         if (!this.queries.isEmpty()) {
             url.append("?");
             this.queries.forEach((key, values) -> values.forEach(value -> url.append(key)
