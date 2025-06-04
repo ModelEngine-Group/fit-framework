@@ -113,7 +113,7 @@ public class HttpToolTest {
     }
 
     private static Tool createTool(Tool.Info info) {
-        ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null, true);
         Map<String, ObjectSerializer> serializers =
                 MapBuilder.<String, ObjectSerializer>get().put("json", jsonSerializer).build();
         ValueFetcher valueFetcher = new FastJsonValueHandler();

@@ -47,7 +47,7 @@ public class MemoryVectorStoreTest {
     @Test
     @DisplayName("插入文档后，持久化后重新加载成功")
     void shouldOkWhenPersistThenLoad() throws IOException {
-        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
 
         MemoryVectorStore vectorStore = new MemoryVectorStore(new DefaultDocumentEmbedModel(new EmbedModelStub(),
                 EmbedOption.custom().build()));

@@ -34,14 +34,14 @@ import java.util.stream.Stream;
  */
 @DisplayName("测试 MessageSerializer 的基本测试用例")
 public class MessageSerializerGenericableTest {
-    private Properties properties = new Properties();
-    private Config config = new PropertiesConfig("test", properties);
+    private final Properties properties = new Properties();
+    private final Config config = new PropertiesConfig("test", properties);
 
     private final MessageSerializerTest test =
             new MessageSerializerTest(() -> new JacksonMessageSerializer(new JacksonObjectSerializer(null,
                     null,
-                    null),
-                    this.config));
+                    null,
+                    true), this.config));
 
     @BeforeEach
     void setup() {

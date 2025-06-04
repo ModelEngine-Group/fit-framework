@@ -25,7 +25,7 @@ import java.util.Collections;
  */
 @DisplayName("测试 openai 嵌入请求相关数据结构序列化与反序列化")
 public class OpenAiEmbedEntityTest {
-    private static final ObjectSerializer SERIALIZER = new JacksonObjectSerializer(null, null, null);
+    private static final ObjectSerializer SERIALIZER = new JacksonObjectSerializer(null, null, null, true);
 
     @Test
     @DisplayName("测试序列化嵌入请求成功")

@@ -50,7 +50,7 @@ public class JacksonMessageSerializer implements MessageSerializer {
     public JacksonMessageSerializer(@Fit(alias = "jackson") ObjectSerializer serializer, Config config) {
         this.serializer = notNull(serializer, "The Jackson serializer cannot be null.");
         JacksonObjectSerializer jacksonObjectSerializer = cast(this.serializer);
-        this.mapper = jacksonObjectSerializer.getMapper();
+        this.mapper = jacksonObjectSerializer.mapper();
         this.config = notNull(config, "The message serializer config cannot be null.");
     }
 

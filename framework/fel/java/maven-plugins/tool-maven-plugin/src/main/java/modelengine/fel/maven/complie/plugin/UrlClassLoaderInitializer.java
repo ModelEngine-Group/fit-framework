@@ -74,12 +74,9 @@ public class UrlClassLoaderInitializer {
             return;
         }
         File jsonFile = Paths.get(outputDirectory, ToolSchema.TOOL_MANIFEST).toFile();
-        JacksonObjectSerializer serializer = new JacksonObjectSerializer(
-                DEFAULT_DATE_TIME_FORMAT,
-                DEFAULT_DATE_FORMAT,
-                "Asia/Shanghai"
-        );
-        ObjectMapper objectMapper = serializer.getMapper().copy();
+        JacksonObjectSerializer serializer =
+                new JacksonObjectSerializer(DEFAULT_DATE_TIME_FORMAT, DEFAULT_DATE_FORMAT, "Asia/Shanghai", false);
+        ObjectMapper objectMapper = serializer.mapper().copy();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, toolJsonEntity);
         log.info("Write tool json successfully. [file={}]", jsonFile.getName());

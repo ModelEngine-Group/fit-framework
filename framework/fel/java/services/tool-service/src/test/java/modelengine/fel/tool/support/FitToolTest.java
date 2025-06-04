@@ -56,7 +56,7 @@ public class FitToolTest {
                     }
                     throw new IllegalStateException("Error");
                 });
-        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
         List<ToolEntity> toolEntities =
                 serializer.<Map<String, List<ToolEntity>>>deserialize(IoUtils.content(this.getClass().getClassLoader(),
                         ToolSchema.TOOL_MANIFEST), TypeUtils.parameterized(Map.class, new Type[] {

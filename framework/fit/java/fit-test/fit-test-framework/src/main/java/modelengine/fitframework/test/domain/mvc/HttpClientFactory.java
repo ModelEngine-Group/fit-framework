@@ -33,7 +33,7 @@ public class HttpClientFactory {
      * @return 表示用于模拟测试的 {@link HttpClassicClient}。
      */
     public static HttpClassicClient create() {
-        ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null, true);
         Map<String, ObjectSerializer> serializers =
                 MapBuilder.<String, ObjectSerializer>get().put("json", jsonSerializer).build();
         ValueFetcher valueFetcher = new FastJsonValueHandler();

@@ -53,7 +53,7 @@ public class DefaultToolExecutorTest {
     private ToolRepository toolRepository;
     private ToolFactoryRepository toolFactoryRepository;
     private ToolFactory toolFactory;
-    private final ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+    private final ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
 
     @BeforeEach
     void setUp() {

@@ -33,7 +33,7 @@ public class JsonFileSourceTest {
     @Test
     @DisplayName("测试读取 json 文件成功，结果符合预期")
     void giveExistFileThenReturnOk() {
-        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
         Source<File> fileSource = new JsonFileSource(serializer, StringTemplate.create("{{instruction}}\n{{output}}"));
         URL url = this.getClass().getClassLoader().getResource("test.json");
         File file = FileUtils.file(url);

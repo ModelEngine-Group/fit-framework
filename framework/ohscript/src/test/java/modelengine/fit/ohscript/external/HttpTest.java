@@ -18,12 +18,7 @@ import modelengine.fit.ohscript.script.parser.AST;
 import modelengine.fit.ohscript.script.parser.GrammarBuilder;
 import modelengine.fit.ohscript.script.parser.ParserBuilder;
 import modelengine.fit.ohscript.util.OhScriptReader;
-import modelengine.fit.serialization.json.jackson.JacksonObjectSerializer;
-import modelengine.fit.value.fastjson.FastJsonValueHandler;
-import modelengine.fitframework.serialization.ObjectSerializer;
-import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.ObjectUtils;
-import modelengine.fitframework.value.ValueFetcher;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
@@ -59,11 +54,6 @@ public class HttpTest {
         GrammarBuilder grammarBuilder = new GrammarBuilder();
         Lexer lexer = new Lexer();
         this.parserBuilder = new ParserBuilder(grammarBuilder, lexer);
-
-        ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null);
-        Map<String, ObjectSerializer> serializers =
-                MapBuilder.<String, ObjectSerializer>get().put("json", jsonSerializer).build();
-        ValueFetcher valueFetcher = new FastJsonValueHandler();
     }
 
     @AfterEach

@@ -38,7 +38,7 @@ import java.util.Optional;
  */
 @DisplayName("测试 openai 聊天请求相关数据结构序列化与反序列化")
 public class OpenAiChatEntityTest {
-    private static final ObjectSerializer SERIALIZER = new JacksonObjectSerializer(null, null, null);
+    private static final ObjectSerializer SERIALIZER = new JacksonObjectSerializer(null, null, null, true);
 
     @Nested
     class ChatMessageTest {

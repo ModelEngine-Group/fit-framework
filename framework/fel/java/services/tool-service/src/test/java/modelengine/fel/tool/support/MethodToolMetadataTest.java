@@ -58,7 +58,7 @@ public class MethodToolMetadataTest {
 
     MethodToolMetadataTest() throws NoSuchMethodException {
         this.testMethod = TestInterface.class.getDeclaredMethod("testMethod", String.class);
-        this.serializer = new JacksonObjectSerializer(null, null, null);
+        this.serializer = new JacksonObjectSerializer(null, null, null, true);
     }
 
     @BeforeEach

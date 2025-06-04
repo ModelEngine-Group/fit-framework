@@ -59,7 +59,7 @@ public class SchemaToolMetadataTest {
     private Tool tool;
     private Tool.Metadata toolMetadata;
 
-    private final ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null);
+    private final ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null, true);
 
     @BeforeEach
     void setup() {
@@ -82,7 +82,7 @@ public class SchemaToolMetadataTest {
         this.toolSchema = this.buildSchema();
         this.definitionSchema = this.buildDefinitionSchema();
         this.toolMetadata = Tool.Metadata.fromSchema(DEFINITION_GROUP_NAME, this.definitionSchema);
-        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
         FitToolFactory fitToolFactory = new FitToolFactory(client, serializer);
         this.tool = fitToolFactory.create(this.buildInfo(), this.toolMetadata);
     }

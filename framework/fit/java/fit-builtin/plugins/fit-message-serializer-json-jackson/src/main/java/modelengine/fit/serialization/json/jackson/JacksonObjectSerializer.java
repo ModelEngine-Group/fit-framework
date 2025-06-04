@@ -66,6 +66,7 @@ public class JacksonObjectSerializer implements ObjectSerializer {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
     private final ObjectMapper mapper;
+    private final boolean isDebug;
 
     /**
      * 序列化对象为 Json 格式的字符串。
@@ -75,7 +76,8 @@ public class JacksonObjectSerializer implements ObjectSerializer {
      * @param zoneId 表示时区唯一标识的 {@link String}。
      */
     public JacksonObjectSerializer(@Value("${date-time-format}") String dateTimeFormat,
-            @Value("${date-format}") String dateFormat, @Value("${time-zone}") String zoneId) {
+            @Value("${date-format}") String dateFormat, @Value("${time-zone}") String zoneId,
+            @Value("${fit.debug:false}") boolean isDebug) {
         VisibilityChecker<VisibilityChecker.Std> visibilityChecker = VisibilityChecker.Std.defaultInstance()
                 .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
                 .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
@@ -96,6 +98,7 @@ public class JacksonObjectSerializer implements ObjectSerializer {
         module.addSerializer(LocalDate.class, new LocalDateSerializer(dateFormat));
         module.addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormat));
         this.mapper.registerModule(module);
+        this.isDebug = isDebug;
     }
 
     @Override
@@ -124,8 +127,8 @@ public class JacksonObjectSerializer implements ObjectSerializer {
         notNull(in, "The input stream cannot be null.");
         Type actualType = ObjectUtils.nullIf(objectType, Object.class);
         Map<String, Object> actualContext = ObjectUtils.getIfNull(context, Collections::emptyMap);
+        String read = null;
         try {
-            String read;
             if (actualContext.containsKey("length")) {
                 read = IoUtils.content(in, ObjectUtils.<Integer>cast(actualContext.get("length")));
             } else {
@@ -133,7 +136,11 @@ public class JacksonObjectSerializer implements ObjectSerializer {
             }
             return this.mapper.readValue(read, this.mapper.constructType(actualType));
         } catch (IOException e) {
-            throw new SerializationException("Failed to deserialize by Jackson.", e);
+            String message = "Failed to deserialize by Jackson.";
+            if (this.isDebug) {
+                message += " [content=" + read + "]";
+            }
+            throw new SerializationException(message, e);
         }
     }
 
@@ -143,7 +150,7 @@ public class JacksonObjectSerializer implements ObjectSerializer {
      *
      * @return 表示 Jackson 的核心序列化器的 {@link ObjectMapper}。
      */
-    public ObjectMapper getMapper() {
+    public ObjectMapper mapper() {
         return this.mapper;
     }
 }

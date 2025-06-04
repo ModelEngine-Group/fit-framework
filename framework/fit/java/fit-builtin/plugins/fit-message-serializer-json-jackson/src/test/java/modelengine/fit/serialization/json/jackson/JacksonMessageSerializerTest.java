@@ -37,15 +37,14 @@ import java.util.Properties;
  */
 @DisplayName("测试 JacksonMessageSerializer")
 public class JacksonMessageSerializerTest {
+    private final Properties properties = new Properties();
+    private final Config config = new PropertiesConfig("test", properties);
     private JacksonMessageSerializer messageSerializer;
-    private Properties properties = new Properties();
-    private Config config = new PropertiesConfig("test", properties);
 
     @BeforeEach
     void setup() {
-        this.messageSerializer = new JacksonMessageSerializer(
-                new JacksonObjectSerializer(null, null, null),
-                this.config);
+        this.messageSerializer =
+                new JacksonMessageSerializer(new JacksonObjectSerializer(null, null, null, true), this.config);
     }
 
     @Test

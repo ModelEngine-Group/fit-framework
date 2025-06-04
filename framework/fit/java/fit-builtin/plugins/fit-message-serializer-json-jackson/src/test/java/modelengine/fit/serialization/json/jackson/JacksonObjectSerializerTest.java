@@ -7,6 +7,7 @@
 package modelengine.fit.serialization.json.jackson;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import modelengine.fit.serialization.test.enums.Gender;
 import modelengine.fit.serialization.test.person.Person;
@@ -16,6 +17,7 @@ import modelengine.fit.serialization.test.person.PersonGender;
 import modelengine.fit.serialization.test.person.PersonName;
 import modelengine.fit.serialization.test.person.PersonTransient;
 import modelengine.fitframework.serialization.ObjectSerializer;
+import modelengine.fitframework.serialization.SerializationException;
 import modelengine.fitframework.util.MapBuilder;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -52,7 +54,7 @@ public class JacksonObjectSerializerTest {
 
     @BeforeEach
     void setup() {
-        this.jsonSerializer = new JacksonObjectSerializer(null, null, "America/New_York");
+        this.jsonSerializer = new JacksonObjectSerializer(null, null, "America/New_York", true);
     }
 
     @AfterEach
@@ -183,6 +185,17 @@ public class JacksonObjectSerializerTest {
                     JacksonObjectSerializerTest.this.charset,
                     ZonedDateTime.class);
             assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("当输入错误的 Json 数据时，返回合适的错误信息")
+        void givenWrongJsonThenReturnErrorMessage() {
+            InputStream in = new ByteArrayInputStream("{\"Hello\"}".getBytes());
+            SerializationException cause = catchThrowableOfType(SerializationException.class,
+                    () -> JacksonObjectSerializerTest.this.jsonSerializer.deserialize(in,
+                            JacksonObjectSerializerTest.this.charset,
+                            String.class));
+            assertThat(cause).hasMessage("Failed to deserialize by Jackson. [content={\"Hello\"}]");
         }
 
         private InputStream constructInputStream(Object obj) {

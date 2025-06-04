@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  */
 @DisplayName(("测试 JsonOutputParser"))
 public class JsonOutputParserTest {
-    private static final ObjectSerializer TEST_SERIALIZER = new JacksonObjectSerializer(null, null, null);
+    private static final ObjectSerializer TEST_SERIALIZER = new JacksonObjectSerializer(null, null, null, true);
 
     static class Joke {
         @Property(description = "question to set up a joke")

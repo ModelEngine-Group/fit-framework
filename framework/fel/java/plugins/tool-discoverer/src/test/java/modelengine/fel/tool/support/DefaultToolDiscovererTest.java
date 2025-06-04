@@ -66,7 +66,7 @@ public class DefaultToolDiscovererTest {
     @DisplayName("测试自动装载工具")
     void shouldOkWhenInstallTools() {
         doNothing().when(this.toolRepository).addTool(any());
-        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
         DefaultToolDiscoverer toolDiscoverer = new DefaultToolDiscoverer(this.toolRepository, serializer, 64);
         toolDiscoverer.onPluginStarted(this.plugin);
         verify(this.toolRepository, times(1)).addTool(argThat(tool -> tool.name().equals("get_delivery_date")));
@@ -76,7 +76,7 @@ public class DefaultToolDiscovererTest {
     @DisplayName("测试自动卸载工具")
     void shouldOkWhenUninstallTools() {
         doNothing().when(this.toolRepository).deleteTool(any(), any());
-        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+        ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
         DefaultToolDiscoverer toolDiscoverer = new DefaultToolDiscoverer(this.toolRepository, serializer, 64);
         toolDiscoverer.onPluginStopping(this.plugin);
         verify(this.toolRepository, times(1)).deleteTool(argThat(group -> true),
