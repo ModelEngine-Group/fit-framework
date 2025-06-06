@@ -8,6 +8,7 @@ package modelengine.fel.community.model.openai.entity.chat;
 
 import modelengine.fel.core.tool.ToolCall;
 import modelengine.fitframework.inspection.Nonnull;
+import modelengine.fitframework.serialization.annotation.SerializeStrategy;
 
 /**
  * 表示 {@link ToolCall} 的 openai 实现。
@@ -15,10 +16,12 @@ import modelengine.fitframework.inspection.Nonnull;
  * @author 易文渊
  * @since 2024-08-17
  */
+@SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)
 public class OpenAiToolCall implements ToolCall {
     private String id;
     private final String type = "function";
     private FunctionCall function;
+    private Integer index;
 
     /**
      * 使用 {@link ToolCall} 构造一个新的 {@link OpenAiToolCall}。
@@ -33,6 +36,7 @@ public class OpenAiToolCall implements ToolCall {
         OpenAiToolCall openAiToolCall = new OpenAiToolCall();
         openAiToolCall.id = toolCall.id();
         openAiToolCall.function = functionCall;
+        openAiToolCall.index = toolCall.index();
         return openAiToolCall;
     }
 
@@ -40,6 +44,12 @@ public class OpenAiToolCall implements ToolCall {
     @Override
     public String id() {
         return this.id;
+    }
+
+    @Nonnull
+    @Override
+    public Integer index() {
+        return this.index;
     }
 
     @Nonnull
@@ -64,7 +74,7 @@ public class OpenAiToolCall implements ToolCall {
 
     @Override
     public String toString() {
-        return "ToolCall{" + "id='" + id + '\'' + ", name='" + this.function.name + '\'' + ", arguments='"
-                + this.function.arguments + '\'' + '}';
+        return "ToolCall{" + "id='" + id + '\'' + "index='" + index + '\'' + ", name='" + this.function.name + '\''
+                + ", arguments='" + this.function.arguments + '\'' + '}';
     }
 }

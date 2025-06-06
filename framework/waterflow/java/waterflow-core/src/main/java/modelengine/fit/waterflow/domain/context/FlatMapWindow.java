@@ -7,7 +7,7 @@
 package modelengine.fit.waterflow.domain.context;
 
 import lombok.Getter;
-import lombok.Setter;
+import modelengine.fit.waterflow.domain.stream.nodes.To;
 import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
 
 import java.util.UUID;
@@ -28,7 +28,6 @@ public class FlatMapWindow extends Window {
      * from是对应的flatmap节点的整个window
      * 注意三个window的关系：source，from，this
      */
-    @Setter
     @Getter
     private Window source;
 
@@ -70,6 +69,11 @@ public class FlatMapWindow extends Window {
     }
 
     @Override
+    public boolean isComplete() {
+        return this.from.isComplete();
+    }
+
+    @Override
     public Integer tokenCount() {
         return this.from.tokenCount();
     }
@@ -89,9 +93,6 @@ public class FlatMapWindow extends Window {
      */
     @Override
     public void complete() {
-        if (this.isComplete()) {
-            return;
-        }
         super.complete();
         this.from.complete();
     }
@@ -114,5 +115,20 @@ public class FlatMapWindow extends Window {
     @Override
     public void setAcc(Object acc) {
         this.from.setAcc(acc);
+    }
+
+    @Override
+    public <T, R> void setCompleteHook(To<T, R> to, FlowContext context) {
+        this.from.setCompleteHook(to, context);
+    }
+
+    /**
+     * set source window.
+     *
+     * @param source the source window of {@link Window}.
+     */
+    public void setSource(Window source) {
+        this.source = source;
+        source.onDone(this.id(), this::complete);
     }
 }

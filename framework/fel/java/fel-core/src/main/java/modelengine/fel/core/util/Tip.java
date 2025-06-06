@@ -25,6 +25,11 @@ public class Tip {
     private final Map<String, Content> values = new HashMap<>();
     private int index = 0;
 
+    @Override
+    public String toString() {
+        return this.values.toString();
+    }
+
     /**
      * 从键值对创建 {@link Tip} 的实例。
      *

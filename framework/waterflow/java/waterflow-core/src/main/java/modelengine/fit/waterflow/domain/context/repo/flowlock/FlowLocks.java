@@ -9,11 +9,7 @@ package modelengine.fit.waterflow.domain.context.repo.flowlock;
 import modelengine.fit.waterflow.domain.common.Constants;
 import modelengine.fitframework.util.StringUtils;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 流程实例的锁接口
@@ -22,10 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 1.0
  */
 public interface FlowLocks {
-    /**
-     * 本地锁全局静态对象
-     */
-    Map<String, Lock> locks = new ConcurrentHashMap<>();
 
     /**
      * 节点分布式锁key前缀
@@ -38,9 +30,7 @@ public interface FlowLocks {
      * @param key 获取本地锁的key值，一般是流程版本的streamID
      * @return {@link Lock} 锁对象
      */
-    default Lock getLocalLock(String key) {
-        return Optional.ofNullable(locks.putIfAbsent(key, new ReentrantLock())).orElseGet(() -> locks.get(key));
-    }
+    Lock getLocalLock(String key);
 
     /**
      * 获取分布式锁
@@ -49,16 +39,6 @@ public interface FlowLocks {
      * @return {@link Lock} 锁对象
      */
     Lock getDistributeLock(String key);
-
-    /**
-     * 删除本地锁
-     * TODO xiangyu 删除流程定义的时候需要删除该定义的本地锁资源
-     *
-     * @param key 删除本地锁的key值，一般是流程版本的streamID
-     */
-    default void removeLocalLock(String key) {
-        locks.remove(key);
-    }
 
     /**
      * 获取节点分布式锁key值

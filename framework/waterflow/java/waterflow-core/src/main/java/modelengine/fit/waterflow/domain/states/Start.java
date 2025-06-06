@@ -10,6 +10,7 @@ import modelengine.fit.waterflow.domain.context.CompleteContext;
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fit.waterflow.domain.context.Window;
+import modelengine.fit.waterflow.domain.context.repo.flowsession.FlowSessionRepo;
 import modelengine.fit.waterflow.domain.emitters.EmitterListener;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
 import modelengine.fit.waterflow.domain.flow.Flow;
@@ -173,7 +174,12 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
     public <R> State<R, D, O, F> process(Operators.Process<O, R> processor) {
         AtomicReference<State<R, D, O, F>> wrapper = new AtomicReference<>();
         State<R, D, O, F> state = new State<>(this.publisher().map(input -> {
-            processor.process(input.getData(), input, data -> wrapper.get().from.offer(data, input.getSession()));
+            FlowSession nextSession =
+                    FlowSessionRepo.getNextToSession(this.publisher().getStreamId(), input.getSession());
+            processor.process(input.getData(), nextSession, data -> wrapper.get().from.offer(data, nextSession));
+            if (input.getSession().getWindow().isOngoing()) {
+                nextSession.getWindow().complete();
+            }
             return null;
         }, null), this.getFlow());
         wrapper.set(state);

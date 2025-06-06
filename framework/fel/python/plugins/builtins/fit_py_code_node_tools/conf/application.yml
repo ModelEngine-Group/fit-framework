@@ -8,14 +8,20 @@ code:
       - 'asyncio'
       - 'json'
       - 'typing'
-    blacklist:
+      - 'pymysql'
+      - 'mysql'
+      - 'elasticsearch'
+      - 'requests'
+      - 'pandas'
+      - 'numpy'
       - 'os'
       - 'sys'
       - 'cmd'
       - 'subprocess'
-      - 'multiprocessing'
       - 'timeit'
       - 'platform'
+    blacklist:
+      - 'multiprocessing'
   timeout: 10
   max_pool: 4
   mem_limit: 189792256 # 181*1024*1024

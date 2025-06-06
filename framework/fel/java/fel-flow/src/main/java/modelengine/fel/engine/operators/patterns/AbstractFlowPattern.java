@@ -13,9 +13,11 @@ import modelengine.fel.engine.util.AiFlowSession;
 import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fit.waterflow.domain.context.Window;
 import modelengine.fit.waterflow.domain.emitters.EmitterListener;
+import modelengine.fit.waterflow.domain.emitters.FlowEmitter;
 import modelengine.fit.waterflow.domain.flow.Flow;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.util.LazyLoader;
+import modelengine.fitframework.util.ObjectUtils;
 
 /**
  * 流程委托单元。
@@ -24,10 +26,25 @@ import modelengine.fitframework.util.LazyLoader;
  * @since 2024-06-04
  */
 public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
+    private static final String RESULT_ACTION_KEY = "resultAction";
+    private static final String PARENT_SESSION_ID_KEY = "parentSessionId";
+
     private final LazyLoader<AiProcessFlow<I, O>> flowSupplier;
+    private final EmitterListener<O, FlowSession> dataDispatcher = (data, session) -> {
+        Object rawResultAction = session.getInnerState(RESULT_ACTION_KEY);
+        if (rawResultAction == null) {
+            return;
+        }
+        ResultAction<O> resultAction = ObjectUtils.cast(rawResultAction);
+        resultAction.process(data, session);
+    };
 
     protected AbstractFlowPattern() {
-        this.flowSupplier = LazyLoader.of(this::buildFlow);
+        this.flowSupplier = LazyLoader.of(() -> {
+            AiProcessFlow<I, O> flow = buildFlow();
+            flow.register(this.dataDispatcher);
+            return flow;
+        });
     }
 
     /**
@@ -39,21 +56,25 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
 
     @Override
     public void register(EmitterListener<O, FlowSession> handler) {
-        if (handler != null) {
-            this.getFlow().register(handler);
-        }
+        this.getFlow().register(handler);
+    }
+
+    @Override
+    public void unregister(EmitterListener<O, FlowSession> listener) {
+        this.getFlow().unregister(listener);
     }
 
     @Override
     public void emit(O data, FlowSession session) {
-        FlowSession flowSession = new FlowSession(session);
-        this.getFlow().emit(data, flowSession);
+        this.getFlow().emit(data, session);
     }
 
     @Override
-    public O invoke(I data) {
-        this.getFlow().converse(AiFlowSession.require()).offer(data);
-        return null;
+    public FlowEmitter<O> invoke(I data) {
+        FlowEmitter<O> emitter = new FlowEmitter.AutoCompleteEmitter<>();
+        FlowSession flowSession = buildFlowSession(emitter);
+        this.getFlow().converse(flowSession).offer(data);
+        return emitter;
     }
 
     /**
@@ -65,7 +86,7 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
     public Pattern<I, O> sync() {
         return new SimplePattern<>(data -> {
             FlowSession require = AiFlowSession.require();
-            FlowSession session = new FlowSession();
+            FlowSession session = new FlowSession(true);
             Window window = session.begin();
             session.copySessionState(require);
             ConverseLatch<O> conversation = this.getFlow().converse(session).offer(data);
@@ -83,7 +104,33 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
         return this.getFlow().origin();
     }
 
+    /**
+     * built the flow session for starting the conversation.
+     *
+     * @param emitter the {@link FlowEmitter}{@code <}{@link O}{@code >} representing output emitter.
+     * @return {@link FlowSession}.
+     * @param <O> the output data type.
+     */
+    protected static <O> FlowSession buildFlowSession(FlowEmitter<O> emitter) {
+        FlowSession mainSession = AiFlowSession.require();
+        FlowSession flowSession = FlowSession.newRootSession(mainSession, true);
+        flowSession.setInnerState(PARENT_SESSION_ID_KEY, mainSession.getId());
+        ResultAction<O> resultAction = emitter::emit;
+        flowSession.setInnerState(RESULT_ACTION_KEY, resultAction);
+        return flowSession;
+    }
+
     private AiProcessFlow<I, O> getFlow() {
         return Validation.notNull(this.flowSupplier.get(), "The flow cannot be null.");
+    }
+
+    protected interface ResultAction<O> {
+        /**
+         * process the result.
+         *
+         * @param data the result of {@link O}.
+         * @param flowSession the result flow session of {@link FlowSession}.
+         */
+        void process(O data, FlowSession flowSession);
     }
 }

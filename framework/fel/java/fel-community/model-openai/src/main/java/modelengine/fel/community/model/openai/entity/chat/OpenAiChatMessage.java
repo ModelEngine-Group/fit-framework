@@ -40,6 +40,8 @@ public class OpenAiChatMessage {
     private String toolCallId;
     @Property(name = "tool_calls")
     private List<OpenAiToolCall> toolCalls;
+    @Property(name = "reasoning_content")
+    private String reasoningContent;
 
     /**
      * 将 {@link ChatMessage} 对象转换为 {@link OpenAiChatMessage} 对象。
@@ -77,6 +79,15 @@ public class OpenAiChatMessage {
      */
     public Object content() {
         return this.content;
+    }
+
+    /**
+     * 获取模型推理内容。
+     *
+     * @return 表示推理内容的 {@link String}。
+     */
+    public String reasoningContent() {
+        return this.reasoningContent;
     }
 
     /**

@@ -22,6 +22,13 @@ public interface Emitter<D, T> extends Completable {
     void register(EmitterListener<D, T> listener);
 
     /**
+     * 取消监听
+     *
+     * @param listener 监听器
+     */
+    void unregister(EmitterListener<D, T> listener);
+
+    /**
      * 发布一个数据，并制定session
      *
      * @param data 待发布的数据

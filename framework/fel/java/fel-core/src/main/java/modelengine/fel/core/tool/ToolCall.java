@@ -19,17 +19,22 @@ public interface ToolCall {
     /**
      * 获取工具调用的唯一标识。
      *
-     * @return 表示工具调用唯一编号的 {@link Integer}。
+     * @return 表示工具调用唯一编号的 {@link String}。
      */
-    @Nonnull
     String id();
+
+    /**
+     * 获取工具调用的索引标号。
+     *
+     * @return 表示索引标号的 {@link Integer}。
+     */
+    Integer index();
 
     /**
      * 获取调用的工具名称。
      *
      * @return 表示工具名称的 {@link String}。
      */
-    @Nonnull
     String name();
 
     /**
@@ -37,7 +42,6 @@ public interface ToolCall {
      *
      * @return 表示工具调用参数的 {@link String}。
      */
-    @Nonnull
     String arguments();
 
     /**
@@ -51,6 +55,14 @@ public interface ToolCall {
          * @return 表示当前构建器的 {@link Builder}。
          */
         Builder id(String id);
+
+        /**
+         * 设置工具调用的索引标号。
+         *
+         * @param index 表示索引标号的 {@code Integer}。
+         * @return 表示当前构建器的 {@link Builder}。
+         */
+        Builder index(Integer index);
 
         /**
          * 设置调用的工具名称。

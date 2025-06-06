@@ -8,6 +8,8 @@ package modelengine.fel.engine.flows;
 
 import modelengine.fel.engine.activities.AiDataStart;
 import modelengine.fel.engine.activities.AiStart;
+import modelengine.fit.waterflow.domain.context.FlowSession;
+import modelengine.fit.waterflow.domain.emitters.Emitter;
 import modelengine.fit.waterflow.domain.flow.Flows;
 import modelengine.fit.waterflow.domain.flow.ProcessFlow;
 import modelengine.fit.waterflow.domain.states.Start;
@@ -55,5 +57,17 @@ public class AiFlows {
     public static <D> AiDataStart<D, D, D> flux(D... data) {
         AiStart<D, D, D, ProcessFlow<D>, AiProcessFlow<D, ?>> start = AiFlows.create();
         return new AiDataStart<>(start, data);
+    }
+
+    /**
+     * 通过指定的发射源来构造一个数据前置流。
+     *
+     * @param emitter 表示数据源的 {@link Emitter}{@code <}{@link D}{@code , }{@link FlowSession}{@code >}。
+     * @param <D> 表示数据类型。
+     * @return 表示数据前置流的 {@link AiDataStart}{@code <}{@link D}{@code , }{@link D}{@code , }{@link D}{@code >}。
+     */
+    public static <D> AiDataStart<D, D, D> source(Emitter<D, FlowSession> emitter) {
+        AiStart<D, D, D, ProcessFlow<D>, AiProcessFlow<D, ?>> start = AiFlows.create();
+        return new AiDataStart<>(start, emitter);
     }
 }

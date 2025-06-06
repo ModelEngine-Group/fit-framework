@@ -6,7 +6,6 @@
 
 package modelengine.fel.core.tool;
 
-import modelengine.fitframework.inspection.Nonnull;
 import modelengine.fitframework.pattern.builder.BuilderFactory;
 import modelengine.fitframework.util.StringUtils;
 
@@ -25,7 +24,6 @@ public interface ToolInfo {
      *
      * @return 表示工具分组的 {@link String}。
      */
-    @Nonnull
     String namespace();
 
     /**
@@ -33,7 +31,6 @@ public interface ToolInfo {
      *
      * @return 表示工具名称的 {@link String}。
      */
-    @Nonnull
     String name();
 
     /**
@@ -41,7 +38,6 @@ public interface ToolInfo {
      *
      * @return 表示工具描述的 {@link String}。
      */
-    @Nonnull
     String description();
 
     /**
@@ -49,7 +45,6 @@ public interface ToolInfo {
      *
      * @return 表示工具参数描述的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
      */
-    @Nonnull
     Map<String, Object> parameters();
 
     /**
@@ -57,7 +52,6 @@ public interface ToolInfo {
      *
      * @return 表示工具元数据的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
      */
-    @Nonnull
     Map<String, Object> extensions();
 
     /**

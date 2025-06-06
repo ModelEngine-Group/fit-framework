@@ -1,0 +1,4 @@
+fit:
+  beans:
+    packages:
+      - 'modelengine.fel.plugin.langchain'

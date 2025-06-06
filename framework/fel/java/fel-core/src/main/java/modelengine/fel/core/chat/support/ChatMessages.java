@@ -36,6 +36,18 @@ public class ChatMessages implements Prompt {
     }
 
     /**
+     * 使用聊天消息数组创建 {@link ChatMessages} 的实例。
+     *
+     * @param messages 表示聊天消息的 {@link List}{@code <? extends }{@link ChatMessage}{@code >}。
+     * @return 表示创建成功的 {@link ChatMessages}。
+     */
+    public static ChatMessages fromList(List<? extends ChatMessage> messages) {
+        ChatMessages chatMessages = new ChatMessages();
+        chatMessages.messages().addAll(messages);
+        return chatMessages;
+    }
+
+    /**
      * 从给定的提示中创建 {@link ChatMessages} 的实例。
      *
      * @param prompt 表示提示的 {@link Prompt}。

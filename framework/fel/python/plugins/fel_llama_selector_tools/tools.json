@@ -1,0 +1,91 @@
+{
+  "tools": [
+    {
+      "tags": [
+          "LlamaIndex"
+      ],
+      "runnables": {
+        "LlamaIndex": {
+          "genericableId": "llama_index.rag.toolkit",
+          "fitableId": "embedding_choice_selector"
+        }
+      },
+      "schema": {
+        "name": "embedding_choice_selector",
+        "description": " Embedding selector that chooses one out of many options.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "choice": {
+              "title": "Choice",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "query_str": {
+              "title": "Query Str",
+              "type": "string"
+            },
+            "model_name": {
+              "type": "string",
+              "description": "model_name"
+            },
+            "api_key": {
+              "type": "string",
+              "description": "api_key"
+            },
+            "api_base": {
+              "type": "string",
+              "description": "api_base"
+            },
+            "prompt": {
+              "type": "string",
+              "description": "prompt"
+            },
+            "mode": {
+              "type": "string",
+              "description": "mode"
+            }
+          },
+          "required": [
+            "choice",
+            "query_str"
+          ]
+        },
+        "return": {
+          "title": "The Selected Choice.",
+          "type": "array",
+          "items": {
+            "title": "SingleSelection",
+            "description": "A single selection of a choice.",
+            "type": "object",
+            "properties": {
+              "index": {
+                "title": "Index",
+                "type": "integer"
+              },
+              "reason": {
+                "title": "Reason",
+                "type": "string"
+              }
+            },
+            "required": [
+              "index",
+              "reason"
+            ]
+          }
+        },
+        "parameterExtensions": {
+          "config": [
+            "model_name",
+            "api_key",
+            "api_base",
+            "prompt",
+            "mode"
+          ]
+        }
+      }
+    }
+  ]
+}

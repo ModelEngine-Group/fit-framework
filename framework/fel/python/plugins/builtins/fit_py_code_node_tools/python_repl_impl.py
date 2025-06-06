@@ -72,7 +72,7 @@ class Result(BaseModel):
 def _create_restricted_exec_env(config: Dict[str, object]):
     def safer_import(name, my_globals=None, my_locals=None, fromlist=(), level=0):
         if name not in config['whitelist'] or name in config['blacklist']:
-            raise NameError(f'model {name} is not valid')
+            raise NameError(f'model {name} is not valid, WhiteList: {config["whitelist"]}')
         return importlib.import_module(name)
 
     safe_globals = {

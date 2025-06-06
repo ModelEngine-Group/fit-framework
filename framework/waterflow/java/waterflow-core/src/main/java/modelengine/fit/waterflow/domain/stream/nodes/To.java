@@ -6,11 +6,11 @@
 
 package modelengine.fit.waterflow.domain.stream.nodes;
 
-import static modelengine.fit.waterflow.common.ErrorCodes.FLOW_NODE_CREATE_ERROR;
-import static modelengine.fit.waterflow.common.ErrorCodes.FLOW_NODE_MAX_TASK;
+import static modelengine.fit.waterflow.ErrorCodes.FLOW_NODE_CREATE_ERROR;
+import static modelengine.fit.waterflow.ErrorCodes.FLOW_NODE_MAX_TASK;
 
 import lombok.Getter;
-import modelengine.fit.waterflow.common.exceptions.WaterflowException;
+import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fit.waterflow.domain.common.Constants;
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowSession;
@@ -30,12 +30,12 @@ import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.domain.stream.reactive.Callback;
 import modelengine.fit.waterflow.domain.stream.reactive.Subscriber;
 import modelengine.fit.waterflow.domain.stream.reactive.Subscription;
-import modelengine.fit.waterflow.domain.utils.FlowDebug;
 import modelengine.fit.waterflow.domain.utils.FlowExecutors;
 import modelengine.fit.waterflow.domain.utils.IdGenerator;
 import modelengine.fit.waterflow.domain.utils.Identity;
 import modelengine.fit.waterflow.domain.utils.SleepUtil;
 import modelengine.fit.waterflow.domain.utils.UUIDUtil;
+import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.schedule.Task;
 import modelengine.fitframework.util.CollectionUtils;
@@ -138,7 +138,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Getter
     private ProcessMode processMode;
 
-    private Map<String, Integer> processingSessions = new ConcurrentHashMap<>();//todo:夏斐，确定合适清除，否则有内存泄露风险
+    private Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
 
     private Operators.Validator<I> validator = (repo, to) -> repo.requestMappingContext(to.streamId,
             to.froms.stream().map(Identity::getId).collect(Collectors.toList()), to.processingSessions);
@@ -192,7 +192,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
 
     private Thread preProcessT = null;
 
-    private final Set<EmitterListener> listeners = new HashSet<>();
+    private final Map<Object, EmitterListener<O, FlowSession>> listeners = new ConcurrentHashMap<>();
 
     private final Map<Object, FlowSession> nextSessions = new ConcurrentHashMap<>();
 
@@ -487,6 +487,11 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 return;
             }
             List<FlowContext<O>> afterList = this.getProcessMode().process(this, preList);
+            preList.forEach(context -> {
+                context.getWindow()
+                        .onDone(getCleanProcessingSessionHandlerId(context),
+                                () -> this.processingSessions.remove(context.getSession().getId()));
+            });
             this.afterProcess(preList, afterList);
             if (CollectionUtils.isNotEmpty(afterList)) {
                 // 查找一个transaction里的所有数据的都完成了，运行callback给stream外反馈数据
@@ -495,6 +500,12 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             }
             // 处理好数据后对外送数据，驱动其他flow响应
             afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
+            // keep order
+            preList.forEach(context -> {
+                if (context.getIndex() > Constants.NOT_PRESERVED_INDEX && !context.getWindow().isDone()) {
+                    this.processingSessions.put(context.getSession().getId(), context.getIndex() + 1);
+                }
+            });
         } catch (Exception ex) {
             LOG.error("Node process exception stream-id: {}, node-id: {}, position-id: {}, traceId: {}. caused by: {}",
                     this.streamId, this.id, preList.get(0).getPosition(), preList.get(0).getTraceId(),
@@ -521,8 +532,12 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         Optional.ofNullable(this.errorHandler).ifPresent(handler -> handler.handle(exception, retryable, preList));
         Optional.ofNullable(this.globalErrorHandler)
                 .ifPresent(handler -> handler.handle(exception, retryable, preList));
+        preList.forEach(context -> this.processingSessions.remove(context.getSession().getId()));
     }
 
+    private static <I> String getCleanProcessingSessionHandlerId(FlowContext<I> ctx) {
+        return "ProcessingSession" + ctx.getSession().getId();
+    }
 
     private List<FlowContext<I>> filterTerminate(List<FlowContext<I>> contexts) {
         if (CollectionUtils.isEmpty(contexts)) {
@@ -554,20 +569,11 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
 
     private void feedback(List<FlowContext<O>> contexts) {
         this.callback.process(new ToCallback<>(contexts));
-
         if (this.sessionCompleteCallback != null) {
             contexts.forEach(context -> {
-                FlowDebug.log(String.format("[feedback] nodeId=%s isComplete=%s, sessionId=%s, windowId=%s, data=%s"
-                                + ", tokens=%s",
-                        this.getId() + this.getNodeType(),
-                        context.getSession().getWindow().isComplete(),
-                        context.getSession().getId(), context.getSession().getWindow().id(),
-                        context.getData().toString(),
-                        context.getSession().getWindow().debugTokens()
-                ));
-                if (context.getSession().getWindow().isComplete()) {
+                context.getSession().getWindow().onDone(context.getSession().getWindow().id(), () -> {
                     this.sessionCompleteCallback.process(context.getSession());
-                }
+                });
             });
         }
     }
@@ -694,17 +700,27 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     }
 
     @Override
-    public void register(EmitterListener<O, FlowSession> handler) {
-        this.listeners.add(handler);
+    public void register(EmitterListener<O, FlowSession> listener) {
+        Validation.notNull(listener, "The emitter listener should not be null.");
+        this.listeners.put(listener, listener);
+    }
+
+    public void unregister(EmitterListener<O, FlowSession> listener) {
+        Validation.notNull(listener, "The emitter listener should not be null.");
+        this.listeners.remove(listener);
     }
 
     @Override
-    public void emit(O data, FlowSession trans) {
-        this.listeners.forEach(listener -> listener.handle(data, trans));
+    public void emit(O data, FlowSession session) {
+        this.listeners.values().forEach(listener -> listener.handle(data, session));
     }
 
     private FlowSession getNextSession(FlowSession session) {
-        return FlowSessionRepo.getNextSession(session);
+        return FlowSessionRepo.getNextToSession(this.streamId, session);
+    }
+
+    private int getNextAccOrder(FlowSession session) {
+        return FlowSessionRepo.getNextAccOrder(this.streamId, this.id, session);
     }
 
     /**
@@ -741,36 +757,29 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                     R1 data = to.map.process(context);
                     // context.getSession() could be changed by processor
                     FlowSession session = context.getSession();
-                    // create new session and window token for processed data
-                    FlowSession nextSession = to.getNextSession(session);
                     // ignore reduce null, reduce null means reduce not finished
                     if (data != null) {
+                        // create new session and window token for processed data
+                        FlowSession nextSession = to.getNextSession(session);
                         FlowContext<R1> clonedContext = context.generate(data, to.getId());
                         clonedContext.setSession(nextSession);
                         if (context.getSession().isAccumulator()) {
-                            Integer index = to.counter.get(context.getSession().getId());
-                            if (index == null) {
-                                index = 0;
-                            } else {
-                                index++;
+                            if (clonedContext.getIndex() > Constants.NOT_PRESERVED_INDEX) {
+                                clonedContext.setIndex(0);
                             }
-                            to.counter.put(context.getSession().getId(), index);
-                            clonedContext.setIndex(index);
                         }
                         //accept the consumed token, and create a new token for the handled data, meanwhile,consume the peeked
                         nextSession.getWindow().acceptToken(peekedToken);
                         cs.add(clonedContext);
+                        //if previous stream complete, complete this stream
+                        if (context.getSession().getWindow().isDone()) {
+                            nextSession.getWindow().complete();
+                        }
                     } else {
-                        peekedToken.finishConsume();//consume the peeked
-                    }
-                    //keep order
-                    if (context.getIndex() > Constants.NOT_PRESERVED_INDEX) {
-                        to.processingSessions.put(context.getSession().getId(), context.getIndex() + 1);
-                    }
-
-                    //if previous stream complete, complete this stream
-                    if (context.getSession().getWindow().isDone()) {
-                        nextSession.getWindow().complete();
+                        peekedToken.finishConsume();
+                        if (window.isDone()) {
+                            window.tryFinish();
+                        }
                     }
                 }
                 return cs;

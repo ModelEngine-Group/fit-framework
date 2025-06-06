@@ -1,0 +1,418 @@
+{
+  "tools": [
+    {
+      "tags": [
+        "langchain"
+      ],
+      "runnables": {
+        "langchain": {
+          "genericableId": "langchain.tool",
+          "fitableId": "py_pdf_loader"
+        }
+      },
+      "schema": {
+        "name": "py_pdf_loader",
+        "description": "Load PDF using pypdf into list of documents.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "title": "File Path",
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_path"
+          ]
+        },
+        "return": {
+          "title": "A Piece Of Text And Associated Metadata.",
+          "type": "array",
+          "items": {
+            "title": "Document",
+            "description": "Document.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "title": "Content",
+                "type": "string"
+              },
+              "media": {
+                "title": "Media",
+                "description": "Media.",
+                "type": "object",
+                "properties": {
+                  "mime": {
+                    "title": "Mime",
+                    "type": "string"
+                  },
+                  "data": {
+                    "title": "Data",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mime",
+                  "data"
+                ]
+              },
+              "metadata": {
+                "title": "Metadata",
+                "type": "object"
+              }
+            },
+            "required": [
+              "content",
+              "metadata"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "tags": [
+        "langchain"
+      ],
+      "runnables": {
+        "langchain": {
+          "genericableId": "langchain.tool",
+          "fitableId": "pdfplumber_loader"
+        }
+      },
+      "schema": {
+        "name": "pdfplumber_loader",
+        "description": "Load PDF using pdfplumber into list of documents",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "title": "File Path",
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_path"
+          ]
+        },
+        "return": {
+          "title": "A Piece Of Text And Associated Metadata.",
+          "type": "array",
+          "items": {
+            "title": "Document",
+            "description": "Document.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "title": "Content",
+                "type": "string"
+              },
+              "media": {
+                "title": "Media",
+                "description": "Media.",
+                "type": "object",
+                "properties": {
+                  "mime": {
+                    "title": "Mime",
+                    "type": "string"
+                  },
+                  "data": {
+                    "title": "Data",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mime",
+                  "data"
+                ]
+              },
+              "metadata": {
+                "title": "Metadata",
+                "type": "object"
+              }
+            },
+            "required": [
+              "content",
+              "metadata"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "tags": [
+        "langchain"
+      ],
+      "runnables": {
+        "langchain": {
+          "genericableId": "langchain.tool",
+          "fitableId": "py_mupdf_loader"
+        }
+      },
+      "schema": {
+        "name": "py_mupdf_loader",
+        "description": "Load PDF using PyMuPDF into list of documents",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "title": "File Path",
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_path"
+          ]
+        },
+        "return": {
+          "title": "A Piece Of Text And Associated Metadata.",
+          "type": "array",
+          "items": {
+            "title": "Document",
+            "description": "Document.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "title": "Content",
+                "type": "string"
+              },
+              "media": {
+                "title": "Media",
+                "description": "Media.",
+                "type": "object",
+                "properties": {
+                  "mime": {
+                    "title": "Mime",
+                    "type": "string"
+                  },
+                  "data": {
+                    "title": "Data",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mime",
+                  "data"
+                ]
+              },
+              "metadata": {
+                "title": "Metadata",
+                "type": "object"
+              }
+            },
+            "required": [
+              "content",
+              "metadata"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "tags": [
+        "langchain"
+      ],
+      "runnables": {
+        "langchain": {
+          "genericableId": "langchain.tool",
+          "fitableId": "py_pdfium2_loader"
+        }
+      },
+      "schema": {
+        "name": "py_pdfium2_loader",
+        "description": "Load PDF using pypdfium2 into list of documents",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "title": "File Path",
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_path"
+          ]
+        },
+        "return": {
+          "title": "A Piece Of Text And Associated Metadata.",
+          "type": "array",
+          "items": {
+            "title": "Document",
+            "description": "Document.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "title": "Content",
+                "type": "string"
+              },
+              "media": {
+                "title": "Media",
+                "description": "Media.",
+                "type": "object",
+                "properties": {
+                  "mime": {
+                    "title": "Mime",
+                    "type": "string"
+                  },
+                  "data": {
+                    "title": "Data",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mime",
+                  "data"
+                ]
+              },
+              "metadata": {
+                "title": "Metadata",
+                "type": "object"
+              }
+            },
+            "required": [
+              "content",
+              "metadata"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "tags": [
+        "langchain"
+      ],
+      "runnables": {
+        "langchain": {
+          "genericableId": "langchain.tool",
+          "fitableId": "py_miner_loader"
+        }
+      },
+      "schema": {
+        "name": "py_miner_loader",
+        "description": "Load PDF using PDFMiner into list of documents",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "title": "File Path",
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_path"
+          ]
+        },
+        "return": {
+          "title": "A Piece Of Text And Associated Metadata.",
+          "type": "array",
+          "items": {
+            "title": "Document",
+            "description": "Document.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "title": "Content",
+                "type": "string"
+              },
+              "media": {
+                "title": "Media",
+                "description": "Media.",
+                "type": "object",
+                "properties": {
+                  "mime": {
+                    "title": "Mime",
+                    "type": "string"
+                  },
+                  "data": {
+                    "title": "Data",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mime",
+                  "data"
+                ]
+              },
+              "metadata": {
+                "title": "Metadata",
+                "type": "object"
+              }
+            },
+            "required": [
+              "content",
+              "metadata"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "tags": [
+        "langchain"
+      ],
+      "runnables": {
+        "langchain": {
+          "genericableId": "langchain.tool",
+          "fitableId": "py_pdf_directory_loader"
+        }
+      },
+      "schema": {
+        "name": "py_pdf_directory_loader",
+        "description": "Load a directory with `PDF` files using `pypdf` and chunks at character level",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "directory": {
+              "title": "Directory",
+              "type": "string"
+            }
+          },
+          "required": [
+            "directory"
+          ]
+        },
+        "return": {
+          "title": "A Piece Of Text And Associated Metadata.",
+          "type": "array",
+          "items": {
+            "title": "Document",
+            "description": "Document.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "title": "Content",
+                "type": "string"
+              },
+              "media": {
+                "title": "Media",
+                "description": "Media.",
+                "type": "object",
+                "properties": {
+                  "mime": {
+                    "title": "Mime",
+                    "type": "string"
+                  },
+                  "data": {
+                    "title": "Data",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mime",
+                  "data"
+                ]
+              },
+              "metadata": {
+                "title": "Metadata",
+                "type": "object"
+              }
+            },
+            "required": [
+              "content",
+              "metadata"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

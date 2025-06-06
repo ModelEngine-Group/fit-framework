@@ -55,8 +55,11 @@
         <waterflow.version>3.5.0-SNAPSHOT</waterflow.version>
 
         <!-- Third-party versions -->
+        <lombok.version>1.18.36</lombok.version>
         <bytebuddy.version>1.17.5</bytebuddy.version>
         <jackson.version>2.18.2</jackson.version>
+        <hanlp.version>portable-1.8.4</hanlp.version>
+        <h2.version>2.3.232</h2.version>
 
         <!-- Test framework versions -->
         <assertj.version>3.27.3</assertj.version>
@@ -114,6 +117,11 @@
                 <artifactId>fit-message-serializer-json-jackson</artifactId>
                 <version>${fit.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.fitframework.service</groupId>
+                <artifactId>fit-security</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
 
             <!-- WaterFlow -->
             <dependency>
@@ -165,12 +173,28 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hankcs</groupId>
+                <artifactId>hanlp</artifactId>
+                <version>${hanlp.version}</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
                 <groupId>org.fitframework</groupId>
                 <artifactId>fit-test-framework</artifactId>
                 <version>${fit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

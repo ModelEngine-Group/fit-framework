@@ -268,7 +268,7 @@ public class ToolData {
                 .runnables(toolData.getRunnables())
                 .extensions(toolData.getExtensions())
                 .version(toolData.getVersion())
-                .isLatest(toolData.getLatest())
+                .isLatest(ObjectUtils.nullIf(toolData.getLatest(), true))
                 .returnConverter(ObjectUtils.cast(toolData.getSchema().get(ToolSchema.RETURN_CONVERTER)))
                 .defaultParameterValues(ToolData.defaultParamValues(toolData.getSchema()))
                 .parameters(toolData.getParameters())
