@@ -1,2 +1,4 @@
 pydantic==2.6.3
 psutil==6.1.1
+httpx
+pandas
