@@ -364,11 +364,24 @@ export const llmCompatibilityProcessor = (shapeData, graph, pageHandler) => {
       }
     };
 
+    const addEnableLog = (inputParams) => {
+      if (!inputParams.some(item => item.name === 'enableLog')) {
+        inputParams.push({
+          id: uuidv4(),
+          from: FROM_TYPE.INPUT,
+          name: 'enableLog',
+          type: DATA_TYPES.BOOLEAN,
+          value: true,
+        });
+      }
+    }
+
     const inputParams = self.shapeData.flowMeta.jober.converter.entity.inputParams;
     const outputObject = self.shapeData.flowMeta.jober.converter.entity.outputParams.find(i => i.name === 'output');
     ensureParam(inputParams, DEFAULT_MAX_MEMORY_ROUNDS);
     ensureParam(inputParams, DEFAULT_LLM_KNOWLEDGE_BASES);
     ensureParam(outputObject.value, DEFAULT_LLM_REFERENCE_OUTPUT);
+    addEnableLog(inputParams);
     if (!self.shapeData.flowMeta.jober.converter.entity.tempReference) {
       self.shapeData.flowMeta.jober.converter.entity.tempReference = {};
     }
