@@ -28,6 +28,13 @@
                 <role>Maintainer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Song Yongtan</name>
+            <email>271667068@qq.com</email>
+            <roles>
+                <role>Committer</role>
+            </roles>
+        </developer>
     </developers>
 
     <scm>
@@ -43,6 +50,16 @@
 
         <!-- FIT version -->
         <fit.version>3.5.0-SNAPSHOT</fit.version>
+
+        <!-- Third-party versions -->
+        <byte-buddy.version>1.17.5</byte-buddy.version>
+        <druid.version>1.2.20</druid.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <guava.version>32.0.1-jre</guava.version>
+        <h2.version>2.3.232</h2.version>
+        <lombok.version>1.18.36</lombok.version>
+        <jackson.version>2.18.2</jackson.version>
+        <mybatis.version>3.5.13</mybatis.version>
 
         <!-- Test framework versions -->
         <assertj.version>3.27.3</assertj.version>
@@ -379,6 +396,78 @@
                 <groupId>org.fitframework.integration</groupId>
                 <artifactId>fit-mybatis-common</artifactId>
                 <version>${fit.version}</version>
+            </dependency>
+
+            <!-- WaterFlow -->
+            <dependency>
+                <groupId>org.fitframework.waterflow</groupId>
+                <artifactId>waterflow-bridge-fit-reactor</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.waterflow</groupId>
+                <artifactId>waterflow-core</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.waterflow</groupId>
+                <artifactId>waterflow-common</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+
+            <!-- Ohscript -->
+            <dependency>
+                <groupId>org.fitframework.ohscript</groupId>
+                <artifactId>ohscript</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+
+            <!-- Third-party -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

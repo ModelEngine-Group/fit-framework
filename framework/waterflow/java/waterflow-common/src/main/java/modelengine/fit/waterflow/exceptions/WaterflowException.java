@@ -18,6 +18,10 @@ import java.text.MessageFormat;
  * @since 1.0
  */
 public class WaterflowException extends FitException {
+    /**
+     * Represents additional arguments associated with this exception.
+     * These arguments can be used for logging, debugging, or custom error handling.
+     */
     private Object[] args;
 
     /**
@@ -52,6 +56,11 @@ public class WaterflowException extends FitException {
         this.args = args;
     }
 
+    /**
+     * Returns the additional arguments associated with this exception.
+     *
+     * @return An array of objects representing the arguments.
+     */
     public Object[] getArgs() {
         return args;
     }

@@ -39,7 +39,7 @@ public class PipelineTest {
     static class TestCaseProvider implements ArgumentsProvider {
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws IOException {
-            ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null);
+            ObjectSerializer serializer = new JacksonObjectSerializer(null, null, null, true);
 
             String resourceName = "/test_case.json";
             String jsonContent = content(TestCaseProvider.class, resourceName);

@@ -12,11 +12,6 @@
     <artifactId>fel-jacoco-aggregator</artifactId>
     <packaging>pom</packaging>
 
-    <properties>
-        <!-- Framework version -->
-        <fel.version>1.0.0-SNAPSHOT</fel.version>
-    </properties>
-
     <dependencies>
         <!-- FIT Core -->
         <dependency>
@@ -60,7 +55,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+                <version>${jacoco.maven-plugin.version}</version>
                 <configuration>
                     <excludes>**/*.jar</excludes>
                 </configuration>

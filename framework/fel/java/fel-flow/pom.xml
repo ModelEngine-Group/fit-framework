@@ -47,6 +47,12 @@
             <artifactId>waterflow-bridge-fit-reactor</artifactId>
         </dependency>
 
+        <!-- Third-party -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Test Plugins -->
         <dependency>
             <groupId>org.fitframework.plugin</groupId>

@@ -22,7 +22,7 @@
     <developers>
         <developer>
             <name>Song Yongtan</name>
-            <email>271667068.qq.com</email>
+            <email>271667068@qq.com</email>
             <roles>
                 <role>Committer</role>
             </roles>
@@ -39,6 +39,8 @@
         <module>fel-community</module>
         <module>fel-core</module>
         <module>fel-flow</module>
+        <module>fel-jacoco-aggregator</module>
+        <module>fel-pipeline-core</module>
         <module>maven-plugins</module>
         <module>plugins</module>
         <module>services</module>

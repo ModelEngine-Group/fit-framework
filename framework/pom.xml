@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>dependency</module>
         <module>fel/java</module>
         <module>fit/java</module>
         <module>ohscript</module>

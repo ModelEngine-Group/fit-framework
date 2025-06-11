@@ -45,7 +45,6 @@
         <module>fit-broker</module>
         <module>fit-builtin</module>
         <module>fit-conf</module>
-        <module>fit-dependency</module>
         <module>fit-extension</module>
         <module>fit-reactor</module>
         <module>fit-ioc</module>

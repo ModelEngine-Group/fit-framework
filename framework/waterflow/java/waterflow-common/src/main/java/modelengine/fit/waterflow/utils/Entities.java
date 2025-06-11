@@ -193,7 +193,7 @@ public final class Entities {
      * @param map1 The first map to compare (may be null).
      * @param map2 The second map to compare (may be null).
      * @return {@code true} If the maps are equal according to the specified criteria,
-     *         {@code false} otherwise.
+     * {@code false} otherwise.
      */
     public static <K, V> boolean equals(Map<K, V> map1, Map<K, V> map2) {
         if (map1 == null) {
@@ -222,13 +222,10 @@ public final class Entities {
      * <p>Note: This implementation considers [1,2,2] and [1,1,2] as equal due to set conversion.</p>
      *
      * @param <T> The type of elements in the lists.
-     * @param list1 The first list to compare (may be null).
-     * @param list2 The second list to compare (may be null).
+     * @param list1 The first list to compare (maybe null).
+     * @param list2 The second list to compare (maybe null).
      * @return {@code true} If the lists contain the same elements regardless of order,
-     *         {@code false} otherwise.
-     * @apiNote This method performs a set-based comparison, which means it doesn't preserve
-     *          element ordering or duplicate counts. For strict list equality that considers
-     *          order and duplicates, use {@link List#equals}.
+     * {@code false} otherwise.
      */
     public static <T> boolean equals(List<T> list1, List<T> list2) {
         if (list1 == null) {

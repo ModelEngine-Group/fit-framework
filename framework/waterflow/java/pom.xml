@@ -22,7 +22,7 @@
     <developers>
         <developer>
             <name>Song Yongtan</name>
-            <email>271667068.qq.com</email>
+            <email>271667068@qq.com</email>
             <roles>
                 <role>Committer</role>
             </roles>
@@ -38,7 +38,6 @@
     <modules>
         <module>waterflow-common</module>
         <module>waterflow-core</module>
-        <module>waterflow-dependency</module>
         <module>waterflow-eco</module>
     </modules>
 
@@ -49,13 +48,14 @@
 
         <!-- Framework version -->
         <fit.version>3.5.0-SNAPSHOT</fit.version>
-        <waterflow.version>3.5.0-SNAPSHOT</waterflow.version>
 
         <!-- Maven plugin versions -->
         <maven.antrun.version>3.1.0</maven.antrun.version>
         <maven.compiler.version>3.14.0</maven.compiler.version>
         <maven.dependency.version>3.8.1</maven.dependency.version>
+        <maven.gpg.version>3.2.7</maven.gpg.version>
         <maven.jar.version>3.4.2</maven.jar.version>
+        <maven.javadoc.version>3.11.2</maven.javadoc.version>
         <maven.surefire.version>3.5.3</maven.surefire.version>
         <maven.source.version>3.3.1</maven.source.version>
         <central-publishing.maven-plugin.version>0.7.0</central-publishing.maven-plugin.version>
@@ -65,9 +65,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.fitframework.waterflow</groupId>
-                <artifactId>waterflow-dependency</artifactId>
-                <version>${waterflow.version}</version>
+                <groupId>org.fitframework</groupId>
+                <artifactId>fit-dependency</artifactId>
+                <version>${fit.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -90,6 +90,33 @@
                         <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven.gpg.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
