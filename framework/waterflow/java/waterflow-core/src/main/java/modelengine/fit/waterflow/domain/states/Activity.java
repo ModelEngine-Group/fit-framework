@@ -20,6 +20,11 @@ public abstract class Activity<D, F extends Flow<D>> {
     @Getter
     private final F flow;
 
+    /**
+     * 构造函数
+     *
+     * @param flow 流对象
+     */
     protected Activity(F flow) {
         this.flow = flow;
     }

@@ -78,15 +78,29 @@ public class Window implements Completable {
 
     private To node = null;
 
+    /**
+     * 创建窗口
+     *
+     * @param condition 窗口条件
+     * @param id 窗口ID
+     */
     public Window(Operators.WindowCondition condition, UUID id) {
         this.condition = condition;
         this.id = id;
     }
 
+    /**
+     * 创建窗口
+     *
+     * @param condition 窗口条件
+     */
     public Window(Operators.WindowCondition condition) {
         this(condition, UUID.randomUUID());
     }
 
+    /**
+     * 创建窗口
+     */
     public Window() {
         this(arg -> false);
     }
@@ -94,7 +108,7 @@ public class Window implements Completable {
     /**
      * 待删除
      *
-     * @return
+     * @return 待删除的token数量
      */
     public int getTosSize() {
         return tos.size();
@@ -133,7 +147,8 @@ public class Window implements Completable {
      * @return 是否到达
      */
     public boolean fulfilled() {
-        WindowArg arg = new WindowArg(this.isComplete(), this.tokens.size(),
+        WindowArg arg = new WindowArg(this.isComplete(),
+                this.tokens.size(),
                 this.tokens.stream().filter(t -> !t.initialized() && !t.isReduced()).count(),
                 Duration.between(this.now.get(), LocalDateTime.now()));
         // consuming and consumed are all counted
@@ -314,7 +329,8 @@ public class Window implements Completable {
     }
 
     /**
-     * if this session window is closed and all elements have been consumed, then notify listener stream that i'm totally consumed
+     * if this session window is closed and all elements have been consumed, then notify listener stream that i'm
+     * totally consumed
      **/
     public void tryFinish() {
         synchronized (this) {
@@ -342,7 +358,7 @@ public class Window implements Completable {
     /**
      * 待删除
      *
-     * @return
+     * @return token数量
      */
     public synchronized String debugTokens() {
         return this.tokens.hashCode() + "-" + this.tokens.stream()

@@ -35,6 +35,7 @@ public class Parallel<D, I, F extends Flow<D>> extends Activity<D, F> {
     /**
      * parallel节点就是用来fork出其他子节点的
      *
+     * @param <O> fork节点的输出类型
      * @param processor just处理器
      * @return 新的fork节点
      */

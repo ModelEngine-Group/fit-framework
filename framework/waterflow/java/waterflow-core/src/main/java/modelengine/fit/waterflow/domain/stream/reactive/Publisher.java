@@ -47,43 +47,45 @@ public interface Publisher<I> extends StreamIdentity, EmitterListener<I, FlowSes
      * conditions
      *
      * @param whether 判定条件
-     * @return Processor<O, O>
+     * @return Processor
      */
     Processor<I, I> conditions(Operators.Whether<I> whether);
 
     /**
      * parallel
      *
-     * @param mode mode
-     * @param whether whether
-     * @return Processor<O, O>
+     * @param mode 并行模式
+     * @param whether 判定条件
+     * @return Processor
      */
     Processor<I, I> parallel(ParallelMode mode, Operators.Whether<I> whether);
 
     /**
      * join
      *
-     * @param processor processor
-     * @param whether whether
-     * @return Processor<M, O>
+     * @param processor 数据处理器
+     * @param whether 判定条件
+     * @param <O> 返回值类型
+     * @return Processor
      */
     <O> Processor<I, O> join(Operators.Map<FlowContext<I>, O> processor, Operators.Whether<I> whether);
 
     /**
      * just
      *
-     * @param processor processor
-     * @param whether whether
-     * @return Processor<O, O>
+     * @param processor 数据处理器
+     * @param whether 判定条件
+     * @return Processor
      */
     Processor<I, I> just(Operators.Just<FlowContext<I>> processor, Operators.Whether<I> whether);
 
     /**
      * map
      *
-     * @param processor processor
-     * @param whether whether
-     * @return Processor<M, O>
+     * @param processor 数据处理器
+     * @param whether 判定条件
+     * @param <O> 返回值类型
+     * @return Processor
      */
     <O> Processor<I, O> map(Operators.Map<FlowContext<I>, O> processor, Operators.Whether<I> whether);
 
@@ -102,40 +104,45 @@ public interface Publisher<I> extends StreamIdentity, EmitterListener<I, FlowSes
      * process处理，并往下发射新的数据，支持操作 session KV状态数据
      *
      * @param processor 携带数据、KV下文和发射器的处理器
-     * @param whether whether
-     * @return Processor<M, O>
+     * @param whether 判定条件
+     * @param <O> 返回值类型
+     * @return Processor
      */
     <O> Processor<I, O> process(Operators.Process<FlowContext<I>, O> processor, Operators.Whether<I> whether);
 
     /**
      * subscribe
      *
-     * @param subscriber subscriber
+     * @param subscriber 订阅者
+     * @param <O> 订阅者处理的数据类型
      */
     <O> void subscribe(Subscriber<I, O> subscriber);
 
     /**
      * subscribe
      *
-     * @param subscriber subscriber
-     * @param whether whether
+     * @param subscriber 订阅者
+     * @param whether 判定条件
+     * @param <O> 订阅者处理的数据类型
      */
     <O> void subscribe(Subscriber<I, O> subscriber, Operators.Whether<I> whether);
 
     /**
      * subscribe
      *
-     * @param eventId eventId
-     * @param subscriber subscriber
+     * @param eventId 事件ID
+     * @param subscriber 订阅者
+     * @param <O> 订阅者处理的数据类型
      */
     <O> void subscribe(String eventId, Subscriber<I, O> subscriber);
 
     /**
      * subscribe
      *
-     * @param eventId eventId
-     * @param subscriber subscriber
-     * @param whether whether
+     * @param eventId 事件ID
+     * @param subscriber 订阅者
+     * @param whether 判定条件
+     * @param <O> 订阅者处理的数据类型
      */
     <O> void subscribe(String eventId, Subscriber<I, O> subscriber, Operators.Whether<I> whether);
 
@@ -190,7 +197,7 @@ public interface Publisher<I> extends StreamIdentity, EmitterListener<I, FlowSes
     /**
      * getSubscriptions
      *
-     * @return List<Subscription < I>>
+     * @return 订阅者列表
      */
     List<Subscription<I>> getSubscriptions();
 

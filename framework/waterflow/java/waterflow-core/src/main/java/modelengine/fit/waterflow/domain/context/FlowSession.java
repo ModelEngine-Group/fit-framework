@@ -12,7 +12,6 @@ import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.ObjectUtils;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -99,7 +98,7 @@ public class FlowSession extends IdGenerator implements StateContext {
     /**
      * 构造方法，使用指定的 ID 和保序标识。
      *
-     * @param id        session 的唯一标识
+     * @param id session 的唯一标识
      * @param preserved 是否保序
      */
     public FlowSession(String id, boolean preserved) {
@@ -131,7 +130,7 @@ public class FlowSession extends IdGenerator implements StateContext {
      * @param session the original {@link FlowSession} to copy properties from.
      * @param window the {@link Window} configuration to apply to the new session.
      * @return a new {@link FlowSession} instance with properties copied from the original session.
-     *         and the specified window configuration applied
+     * and the specified window configuration applied
      */
     public static FlowSession from(FlowSession session, Window window) {
         FlowSession newSession = new FlowSession(session.getId(), session.preserved);
@@ -149,7 +148,7 @@ public class FlowSession extends IdGenerator implements StateContext {
      * @param session the original {@link FlowSession} to copy state from.
      * @param preserved {@code boolean} indicates whether the new session should be created as a preserved session.
      * @return a new root-level {@link FlowSession} initialized with the specified preservation state.
-     *         and containing copied state from the original session
+     * and containing copied state from the original session
      */
     public static FlowSession newRootSession(FlowSession session, boolean preserved) {
         FlowSession newSession = new FlowSession(preserved);
@@ -187,6 +186,7 @@ public class FlowSession extends IdGenerator implements StateContext {
     /**
      * 设置当前 session 的window对象，并确保window关联到当前 session。
      *
+     * @param <I> 泛型类型，表示上下文的数据类型
      * @param window 要设置的 Window 实例
      */
     public <I> void setWindow(Window window) {
@@ -258,6 +258,7 @@ public class FlowSession extends IdGenerator implements StateContext {
     /**
      * 获取指定键的内置上下文数据。
      *
+     * @param <R> 泛型类型，表示上下文的数据类型
      * @param key 表示键的 {@link String}。
      * @return 上下文数据 {@link R}。
      */
@@ -319,6 +320,7 @@ public class FlowSession extends IdGenerator implements StateContext {
     /**
      * 开始当前 session 的窗口，如果窗口尚未初始化，则创建一个新的 Window 实例并关联到当前 session。
      *
+     * @param <I> 泛型类型，表示上下文的数据类型
      * @return 当前的 Window 实例
      */
     public <I> Window begin() {

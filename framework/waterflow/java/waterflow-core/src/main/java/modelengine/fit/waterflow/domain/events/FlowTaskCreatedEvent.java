@@ -25,6 +25,14 @@ public class FlowTaskCreatedEvent implements Event {
 
     private final Object publisher;
 
+    /**
+     * flow任务创建事件的构造方法
+     *
+     * @param flowContextId 流上下文ID列表
+     * @param streamId 流ID
+     * @param nodeId 节点ID
+     * @param publisher 发布者对象
+     */
     public FlowTaskCreatedEvent(List<String> flowContextId, String streamId, String nodeId, Object publisher) {
         this.flowContextId = flowContextId;
         this.streamId = streamId;
@@ -37,14 +45,29 @@ public class FlowTaskCreatedEvent implements Event {
         return this.publisher;
     }
 
+    /**
+     * 获取流上下文ID列表
+     *
+     * @return 流上下文ID列表
+     */
     public List<String> getFlowContextId() {
         return flowContextId;
     }
 
+    /**
+     * 获取流ID
+     *
+     * @return 流ID
+     */
     public String getStreamId() {
         return streamId;
     }
 
+    /**
+     * 获取节点ID
+     *
+     * @return 节点ID
+     */
     public String getNodeId() {
         return nodeId;
     }

@@ -16,6 +16,7 @@ public interface StateContext {
      * 获取指定key的上下文数据
      *
      * @param key 指定key
+     * @param <R> 返回值的类型
      * @return 上下文数据
      */
     <R> R getState(String key);

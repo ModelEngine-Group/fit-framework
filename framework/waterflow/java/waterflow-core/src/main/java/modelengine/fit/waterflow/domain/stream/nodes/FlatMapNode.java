@@ -21,6 +21,15 @@ import modelengine.fit.waterflow.domain.stream.operators.Operators;
  * @since 1.0
  */
 public class FlatMapNode<T, R> extends Node<T, R> {
+    /**
+     * 构造函数
+     *
+     * @param streamId 流ID
+     * @param wrapper 包装器
+     * @param repo 上下文仓库
+     * @param messenger 上下文消息
+     * @param locks 上下文锁
+     */
     public FlatMapNode(String streamId, Operators.Map<FlowContext<T>, R> wrapper, FlowContextRepo repo,
             FlowContextMessenger messenger, FlowLocks locks) {
         super(streamId, wrapper, repo, messenger, locks);

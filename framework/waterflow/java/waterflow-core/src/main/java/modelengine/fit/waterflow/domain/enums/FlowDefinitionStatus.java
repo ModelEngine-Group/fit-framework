@@ -21,7 +21,14 @@ import java.util.Arrays;
  */
 @Getter
 public enum FlowDefinitionStatus {
+    /**
+     * 流程定义处于激活状态
+     */
     ACTIVE("active"),
+
+    /**
+     * 流程定义处于非激活状态
+     */
     INACTIVE("inactive");
 
     private final String code;

@@ -51,6 +51,7 @@ public class When<I> extends IdGenerator implements Subscription<I> {
     /**
      * When
      *
+     * @param <R> R
      * @param streamId streamId
      * @param to to
      * @param whether whether
@@ -70,6 +71,7 @@ public class When<I> extends IdGenerator implements Subscription<I> {
     /**
      * When
      *
+     * @param <R> R
      * @param streamId streamId
      * @param eventId eventId
      * @param to to

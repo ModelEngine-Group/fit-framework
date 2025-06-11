@@ -53,7 +53,7 @@ public class Blocks {
      * 有能力validate某个item是否满足条件
      * 辉子 2019-11-21
      *
-     * @param <I>
+     * @param <I> 输入数据类型
      */
     public static class ValidatorBlock<I> extends Block<I> {
         /**
@@ -94,15 +94,24 @@ public class Blocks {
     /**
      * FilterBlock
      *
+     * @param <I> 输入数据类型
      * @since 1.0
      */
     public static class FilterBlock<I> extends Block<I> {
         private final Operators.Filter<I> filter;
 
+        /**
+         * 空filter构造器，其实就是默认全部通过验证
+         */
         public FilterBlock() {
             this(null);
         }
 
+        /**
+         * 用户在设置时将filter传入block，但不会传入相应的节点，只会在调用process的时候传入节点
+         *
+         * @param filter 过滤器
+         */
         public FilterBlock(Operators.Filter<I> filter) {
             this.filter = filter;
         }

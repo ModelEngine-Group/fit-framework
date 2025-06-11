@@ -16,7 +16,16 @@ import lombok.Getter;
  */
 @Getter
 public enum FlowNodeTriggerMode {
+    /**
+     * 定义自动模式常量
+     * 该常量表示某种特性或模式是自动启用的
+     */
     AUTO(true),
+
+    /**
+     * 默认手动模式
+     * 该常量表示某种特性或模式是手动启用的
+     */
     MANUAL(false);
 
     private final boolean auto;

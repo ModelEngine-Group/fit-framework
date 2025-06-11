@@ -30,14 +30,15 @@ public interface Subscription<I> extends StreamIdentity {
     /**
      * getWhether
      *
-     * @return Whether<I>
+     * @return Whether
      */
     Operators.Whether<I> getWhether();
 
     /**
      * getTo
      *
-     * @return Subscriber<O, R>
+     * @param <R> R
+     * @return Subscriber
      */
     <R> Subscriber<I, R> getTo();
 }

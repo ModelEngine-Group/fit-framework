@@ -40,12 +40,11 @@ public interface Processor<T, R> extends Publisher<R>, Subscriber<T, R> {
      * @param nodeId 表示 {@code displayFlow} 流程节点名称的 {@link String}。
      * @return 表示数据处理器自身的 {@link Processor}{@code <}{@link T}{@code , }{@link R}{@code >}。
      * @throws IllegalArgumentException
-     * <lu>
+     * <ol>
      *     <li>当 {@code displayFlow} 为 {@code null} 时。</li>
      *     <li>当 {@code name} 为 {@code null} 、空字符串或只有空白字符的字符串时。</li>
      *     <li>当 {@code nodeId} 为 {@code null} 、空字符串或只有空白字符的字符串时。</li>
-     * </lu>
-     *
+     * </ol>
      */
     Processor<T, R> displayAs(String name, Flow<T> displayFlow, String nodeId);
 

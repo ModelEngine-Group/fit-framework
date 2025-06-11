@@ -146,7 +146,7 @@ public final class Operators {
          * process
          *
          * @param input input
-         * @return List<R>
+         * @return R
          */
         List<R> process(List<T> input);
     }
@@ -218,15 +218,15 @@ public final class Operators {
     /**
      * 用于when的条件判定
      *
-     * @param <T>
+     * @param <T> 输入类型
      */
     @FunctionalInterface
     public interface Whether<T> {
         /**
-         * is
+         * 判断输入是否满足条件
          *
-         * @param input input
-         * @return boolean
+         * @param input 输入值
+         * @return 如果满足条件返回true，否则返回false
          */
         boolean is(T input);
     }
@@ -271,7 +271,7 @@ public final class Operators {
          * process
          *
          * @param input input
-         * @return List<FlowContext < T>>
+         * @return 筛选结果
          */
         List<FlowContext<T>> process(List<FlowContext<T>> input);
     }
@@ -279,7 +279,7 @@ public final class Operators {
     /**
      * 用于单条验证原材料是否符合生产标准
      *
-     * @param <T>
+     * @param <T> 原材料类型
      */
     @FunctionalInterface
     public interface Validator<T> {

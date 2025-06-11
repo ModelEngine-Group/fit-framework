@@ -14,11 +14,38 @@ package modelengine.fit.waterflow.domain.enums;
  * @since 1.0
  */
 public enum FlowNodeStatus {
+    /**
+     * 新创建的节点状态
+     */
     NEW,
+
+    /**
+     * 节点处于等待状态，停留在事件边上
+     */
     PENDING,
+
+    /**
+     * 节点已准备好，但尚未更新数据库
+     */
     READY, // 未更新数据库
+
+    /**
+     * 节点正在处理中，但尚未更新数据库
+     */
     PROCESSING, // 未更新数据库
+
+    /**
+     * 节点已完成处理
+     */
     ARCHIVED,
+
+    /**
+     * 节点已终止
+     */
     TERMINATE,
+
+    /**
+     * 节点处理过程中发生错误
+     */
     ERROR
 }

@@ -37,20 +37,43 @@ public class DataStart<O, D, I> {
 
     private final Emitter<D, FlowSession> emitter;
 
+    /**
+     * 使用单个数据初始化 DataStart。
+     *
+     * @param state 开始节点
+     * @param data 单个数据
+     */
     public DataStart(Start<O, D, I, ProcessFlow<D>> state, D data) {
         this(state, FlowEmitter.mono(data));
     }
 
+    /**
+     * 使用数据数组初始化 DataStart。
+     *
+     * @param state 开始节点
+     * @param data 数据数组
+     */
     public DataStart(Start<O, D, I, ProcessFlow<D>> state, D[] data) {
         this(state, FlowEmitter.flux(data));
     }
 
+    /**
+     * 使用数据发射器初始化 DataStart。
+     *
+     * @param state 开始节点
+     * @param emitter 数据发射器
+     */
     public DataStart(Start<O, D, I, ProcessFlow<D>> state, Emitter<D, FlowSession> emitter) {
         this.state = state;
         this.emitter = emitter;
         this.start = this;
     }
 
+    /**
+     * 使用开始节点初始化 DataStart，不指定发射器。
+     *
+     * @param state 开始节点
+     */
     protected DataStart(Start<O, D, I, ProcessFlow<D>> state) {
         this(state, (Emitter<D, FlowSession>) null);
     }
@@ -202,6 +225,8 @@ public class DataStart<O, D, I> {
 
     /**
      * 触发数据的发射。
+     *
+     * @param session 流会话
      */
     protected void offer(FlowSession session) {
         if (this.emitter == null) {

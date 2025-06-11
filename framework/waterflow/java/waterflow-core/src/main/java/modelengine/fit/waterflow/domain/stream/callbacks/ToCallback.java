@@ -19,6 +19,11 @@ import java.util.List;
 public class ToCallback<O> implements Callback<O> {
     private final List<O> products;
 
+    /**
+     * 构造方法
+     *
+     * @param products 待回调发送的数据
+     */
     public ToCallback(List<O> products) {
         this.products = products;
     }

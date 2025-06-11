@@ -130,7 +130,7 @@ public interface Subscriber<I, O> extends StreamIdentity, Emitter<O, FlowSession
      * nextContexts
      *
      * @param batchId 批次id
-     * @return List<FlowContext < O>>
+     * @return {@link List}{@code <}{@link FlowContext}{@code <}{@link O}{@code >>}
      */
     List<FlowContext<O>> nextContexts(String batchId);
 

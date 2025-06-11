@@ -25,12 +25,27 @@ public class MatchWindow extends Window {
 
     private final Set<MatchWindow> arms = new HashSet<>();
 
+    /**
+     * 创建一个MatchWindow
+     *
+     * @param source 源窗口
+     * @param id 窗口ID
+     * @param data 窗口数据
+     */
     public MatchWindow(Window source, UUID id, Object data) {
         super(inputs -> false, id);
         this.from = source;
         source.addTo(this);
     }
 
+    /**
+     * 创建一个MatchWindow
+     *
+     * @param source 源窗口
+     * @param id 窗口ID
+     * @param data 窗口数据
+     * @return 返回创建的MatchWindow对象
+     */
     public static synchronized MatchWindow from(Window source, UUID id, Object data) {
         MatchWindow window = all.get(id.toString());
         if (window == null) {

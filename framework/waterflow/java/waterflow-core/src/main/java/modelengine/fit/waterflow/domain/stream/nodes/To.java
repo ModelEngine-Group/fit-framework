@@ -10,7 +10,6 @@ import static modelengine.fit.waterflow.ErrorCodes.FLOW_NODE_CREATE_ERROR;
 import static modelengine.fit.waterflow.ErrorCodes.FLOW_NODE_MAX_TASK;
 
 import lombok.Getter;
-import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fit.waterflow.domain.common.Constants;
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowSession;
@@ -35,6 +34,7 @@ import modelengine.fit.waterflow.domain.utils.IdGenerator;
 import modelengine.fit.waterflow.domain.utils.Identity;
 import modelengine.fit.waterflow.domain.utils.SleepUtil;
 import modelengine.fit.waterflow.domain.utils.UUIDUtil;
+import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.schedule.Task;
@@ -59,8 +59,8 @@ import java.util.stream.Stream;
  * FitStream的数据处理节点，上一个节点是下一个节点的publisher
  * 辉子 2019-10-31
  *
- * @param <I>该节点处理函数入参类型
- * @param <O>该节点处理函数返回值类型
+ * @param <I> 该节点处理函数入参类型
+ * @param <O> 该节点处理函数返回值类型
  * @author 高诗意
  * @since 1.0
  */
@@ -141,7 +141,8 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     private Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
 
     private Operators.Validator<I> validator = (repo, to) -> repo.requestMappingContext(to.streamId,
-            to.froms.stream().map(Identity::getId).collect(Collectors.toList()), to.processingSessions);
+            to.froms.stream().map(Identity::getId).collect(Collectors.toList()),
+            to.processingSessions);
 
     private Blocks.Block<I> block = null;
 
@@ -293,20 +294,24 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             preProcessRunning = true;
             String threadName = getThreadName(PRE_PROCESS_T_NAME_PREFIX);
             preProcessT = new Thread(() -> preProcess(type), threadName);
-            preProcessT.setUncaughtExceptionHandler((thread, error) ->
-                    LOG.error("run preProcessT error, message:{}", error.getMessage()));
+            preProcessT.setUncaughtExceptionHandler((thread, error) -> LOG.error("run preProcessT error, message:{}",
+                    error.getMessage()));
             preProcessT.start();
-            LOG.debug("[{}] preprocess main loop starts for stream-id: {}, node-id: {}", threadName, this.streamId,
+            LOG.debug("[{}] preprocess main loop starts for stream-id: {}, node-id: {}",
+                    threadName,
+                    this.streamId,
                     this.id);
         }
         if (type == ProcessType.PROCESS && (processT == null || !processRunning)) {
             processRunning = true;
             String threadName = getThreadName(PROCESS_T_NAME_PREFIX);
             processT = new Thread(() -> process(type), threadName);
-            processT.setUncaughtExceptionHandler((thread, error) ->
-                    LOG.error("run processT error, message:{}", error.getMessage()));
+            processT.setUncaughtExceptionHandler((thread, error) -> LOG.error("run processT error, message:{}",
+                    error.getMessage()));
             processT.start();
-            LOG.debug("[{}] process main loop starts for stream-id: {}, node-id: {}", threadName, this.streamId,
+            LOG.debug("[{}] process main loop starts for stream-id: {}, node-id: {}",
+                    threadName,
+                    this.streamId,
                     this.id);
         }
     }
@@ -336,16 +341,19 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 if (CollectionUtils.isEmpty(ready)) {
                     preProcessRunning = false;
                     LOG.debug("[{}] preprocess main loop exit for stream-id: {}, node-id: {}",
-                            this.getThreadName(PRE_PROCESS_T_NAME_PREFIX), this.streamId, this.id);
+                            this.getThreadName(PRE_PROCESS_T_NAME_PREFIX),
+                            this.streamId,
+                            this.id);
                     this.handlePreProcessConcurrentConflict();
                     return;
                 }
                 messenger.send(this.getId(), ready);
             } catch (Exception ex) {
                 ready.forEach( // 如果是数据库或者redis挂了，会死循环，线程不退出等待数据库或者redis恢复
-                        r -> LOG.error(
-                                "Preprocess main loop exception stream-id: {}, node-id: {}, context-id: {}.",
-                                this.streamId, this.id, r.getId()));
+                        r -> LOG.error("Preprocess main loop exception stream-id: {}, node-id: {}, context-id: {}.",
+                                this.streamId,
+                                this.id,
+                                r.getId()));
                 LOG.debug("Preprocess main loop exception details: ", ex);
             } finally {
                 SleepUtil.sleep(SLEEP_MILLS);
@@ -366,7 +374,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             return;
         }
         LOG.info("[{}] preprocess thread conflict happens for stream-id: {}, node-id: {}",
-                this.getThreadName(PRE_PROCESS_T_NAME_PREFIX), this.streamId, this.id);
+                this.getThreadName(PRE_PROCESS_T_NAME_PREFIX),
+                this.streamId,
+                this.id);
         this.accept(ProcessType.PRE_PROCESS, concurrentConflictContexts);
     }
 
@@ -463,6 +473,11 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         }
     }
 
+    /**
+     * 设置验证器，用于验证上下文数据。
+     *
+     * @param validator 验证器对象
+     */
     public void setValidator(Operators.Validator<I> validator) {
         if (validator == null) {
             this.validator = (i, all) -> new ArrayList<>();
@@ -508,7 +523,10 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             });
         } catch (Exception ex) {
             LOG.error("Node process exception stream-id: {}, node-id: {}, position-id: {}, traceId: {}. caused by: {}",
-                    this.streamId, this.id, preList.get(0).getPosition(), preList.get(0).getTraceId(),
+                    this.streamId,
+                    this.id,
+                    preList.get(0).getPosition(),
+                    preList.get(0).getTraceId(),
                     ex.getClass().getName());
             LOG.debug("Error, message: {}.", ex.getMessage());
             LOG.debug("Node process exception details: ", ex);
@@ -656,7 +674,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
 
     @Override
     public List<FlowContext<O>> nextContexts(String batchId) {
-        return ObjectUtils.cast(this.flowContextRepo.getContextsByPosition(this.streamId, this.getId(), batchId,
+        return ObjectUtils.cast(this.flowContextRepo.getContextsByPosition(this.streamId,
+                this.getId(),
+                batchId,
                 FlowNodeStatus.NEW.toString()));
     }
 
@@ -689,8 +709,8 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     }
 
     private <T1> boolean isParallelJoined(FlowContext<T1> context) {
-        List<FlowContext<T1>> contextsByParallel = this.getFlowContextRepo()
-                .getContextsByParallel(context.getParallel());
+        List<FlowContext<T1>> contextsByParallel =
+                this.getFlowContextRepo().getContextsByParallel(context.getParallel());
         return contextsByParallel.stream().anyMatch(FlowContext::isJoined);
     }
 
@@ -725,11 +745,14 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     }
 
     /**
-     * ProcessMode
+     * ProcessMode 枚举，定义了节点的处理模式。
      *
      * @since 1.0
      */
     public enum ProcessMode {
+        /**
+         * Producing 模式
+         */
         PRODUCING {
             @Override
             public <T1, R1> List<FlowContext<R1>> process(To<T1, R1> to, List<FlowContext<T1>> contexts) {
@@ -742,9 +765,14 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             @Override
             protected <T1, R1> List<FlowContext<T1>> requestAll(To<T1, R1> to) {
                 return to.flowContextRepo.requestProducingContext(to.streamId,
-                        to.froms.stream().map(Identity::getId).collect(Collectors.toList()), to.postFilter());
+                        to.froms.stream().map(Identity::getId).collect(Collectors.toList()),
+                        to.postFilter());
             }
         },
+
+        /**
+         * Mapping 模式
+         */
         MAPPING {
             @Override
             public <T1, R1> List<FlowContext<R1>> process(To<T1, R1> to, List<FlowContext<T1>> contexts) {
@@ -769,7 +797,8 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                                 clonedContext.setIndex(0);
                             }
                         }
-                        //accept the consumed token, and create a new token for the handled data, meanwhile,consume the peeked
+                        //accept the consumed token, and create a new token for the handled data, meanwhile,consume
+                        // the peeked
                         nextSession.getWindow().acceptToken(peekedToken);
                         cs.add(clonedContext);
                         //if previous stream complete, complete this stream
@@ -795,23 +824,20 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         /**
          * 节点处理器
          *
-         * @param to to
-         * @param contexts contexts
-         * @return List<FlowContext < R1>>
+         * @param <T1> 流程实例执行时的入参数据类型
+         * @param <R1> 流程实例执行时的出参数据类型
+         * @param to 当前节点
+         * @param contexts 上下文列表
+         * @return 处理后的上下文列表
          */
         public abstract <T1, R1> List<FlowContext<R1>> process(To<T1, R1> to, List<FlowContext<T1>> contexts);
 
         /**
-         * 节点request边上pending的数据
-         * 首先通过分布式锁，保证每次只有一个节点线程可以请求到一批次contexts（以batchID为维度）
-         * 其次过滤出ready的contexts，并且将其状态更新为ready，然后释放分布式锁
-         * 最后将ready的contexts提交给节点线程池处理
-         * 保证一批次contexts一次只有一个线程在处理
-         * 非常重要！退出机制增加保护策略，避免A线程退出过程中，B线程放数据到边上数据得不到处理的场景：
-         * 这时A线程未标记退出，B线程已经完成触发动作，B线程以为A线程还在处理，而A线程直接就会退出，因此由A线程判断是否再触发一次
+         * 节点 request 边上 pending 的数据
          *
-         * @param <T1> 流程实例执行时的入参数据类型，用于泛型推倒
-         * @param <R1> 流程实例执行时的出参数据类型，用于泛型推倒
+         * @param <T1> 流程实例执行时的入参数据类型
+         * @param <R1> 流程实例执行时的出参数据类型
+         * @param type 处理类型
          * @param to 当前节点
          */
         public <T1, R1> void request(ProcessType type, To<T1, R1> to) {
@@ -832,7 +858,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                     if (CollectionUtils.isEmpty(ready)) {
                         to.processRunning = false;
                         LOG.debug("[{}] process main loop exit for stream-id: {}, node-id: {}",
-                                to.getThreadName(To.PROCESS_T_NAME_PREFIX), to.streamId, to.id);
+                                to.getThreadName(To.PROCESS_T_NAME_PREFIX),
+                                to.streamId,
+                                to.id);
                         handleProcessConcurrentConflict(to);
                         return;
                     }
@@ -846,7 +874,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                     // 如果是数据库或者redis挂了，会死循环，线程不退出等待数据库或者redis恢复
                     ready.forEach(r -> LOG.error(
                             "Process main loop exception, " + "stream-id: {}, node-id: {}, context-id: {}.",
-                            to.streamId, to.id, r.getId()));
+                            to.streamId,
+                            to.id,
+                            r.getId()));
                     LOG.debug("Process main loop exception details: ", ex);
                 } finally {
                     if (!isSubmitted) {
@@ -858,11 +888,11 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         }
 
         /**
-         * 查找节点连接的边上所有的contexts，由子类负责实现
+         * 查找节点连接的边上所有的 contexts
          *
+         * @param <T1> 流程实例执行时的入参数据类型
+         * @param <R1> 流程实例执行时的出参数据类型
          * @param to 本节点节点类
-         * @param <T1> 流程实例执行时的入参数据类型，用于泛型推倒
-         * @param <R1> 流程实例执行时的出参数据类型，用于泛型推倒
          * @return 获取所有该节点待处理的数据
          */
         protected abstract <T1, R1> List<FlowContext<T1>> requestAll(To<T1, R1> to);
@@ -892,8 +922,8 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
          *
          * @param to 本节点节点类
          * @param pre 本节点获取到边上所有的contexts集合
-         * @param <T1> 流程实例执行时的入参数据类型，用于泛型推倒
-         * @param <R1> 流程实例执行时的出参数据类型，用于泛型推倒
+         * @param <T1> 流程实例执行时的入参数据类型
+         * @param <R1> 流程实例执行时的出参数据类型
          * @return ready的context列表
          */
         private <T1, R1> List<FlowContext<T1>> filterReady(To<T1, R1> to, List<FlowContext<T1>> pre) {
@@ -920,7 +950,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 return;
             }
             LOG.info("[{}] process thread conflict happens for stream-id: {}, node-id: {}",
-                    to.getThreadName(To.PROCESS_T_NAME_PREFIX), to.streamId, to.id);
+                    to.getThreadName(To.PROCESS_T_NAME_PREFIX),
+                    to.streamId,
+                    to.id);
             to.accept(ProcessType.PROCESS, pending);
         }
     }

@@ -22,13 +22,44 @@ import java.util.Arrays;
  */
 @Getter
 public enum FlowNodeType {
+    /**
+     * 开始节点
+     */
     START("START", false),
+
+    /**
+     * 状态节点
+     */
     STATE("STATE", false),
+
+    /**
+     * 条件节点
+     */
     CONDITION("CONDITION", false),
+
+    /**
+     * 并行节点
+     */
     PARALLEL("PARALLEL", false),
+
+    /**
+     * 分支节点
+     */
     FORK("FORK", true),
+
+    /**
+     * 合并节点
+     */
     JOIN("JOIN", true),
+
+    /**
+     * 事件节点
+     */
     EVENT("EVENT", true),
+
+    /**
+     * 结束节点
+     */
     END("END", false);
 
     private final String code;

@@ -16,6 +16,15 @@ import modelengine.fit.waterflow.domain.common.Constants;
  * @since 1.0
  */
 public class CompleteContext extends FlowContext {
+    /**
+     * 构造一个 {@link CompleteContext} 实例。
+     * <p>
+     * 该构造函数用于在 session window complete 时创建一个结束上下文，通知 reduce 节点结束累积操作。
+     * </p>
+     *
+     * @param context 表示当前上下文的 {@link FlowContext}。
+     * @param position 表示上下文当前所处位置的 {@link String}。
+     */
     public CompleteContext(FlowContext context, String position) {
         super(context.getStreamId(), context.getRootId(), null, context.getTraceId(), position,
                 context.getParallel(), context.getParallelMode(), context.getSession());

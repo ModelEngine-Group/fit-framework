@@ -24,6 +24,12 @@ public class Retryable<I> {
 
     private final Subscriber<I, ?> to;
 
+    /**
+     * 构造方法
+     *
+     * @param repo 仓库
+     * @param to 订阅者
+     */
     public Retryable(FlowContextRepo repo, Subscriber<I, ?> to) {
         this.repo = repo;
         this.to = to;

@@ -21,9 +21,15 @@ import java.util.Arrays;
  */
 @Getter
 public enum ParallelMode {
+    /**
+     * 所有满足条件节点都执行
+     */
     ALL("all"),
-    EITHER("either"),
-    ;
+
+    /**
+     * 满足条件节点执行
+     */
+    EITHER("either");
 
     private final String code;
 

@@ -74,6 +74,9 @@ public class FlowTrace extends IdGenerator {
      */
     private FlowTraceStatus status = FlowTraceStatus.READY;
 
+    /**
+     * 默认构造函数
+     */
     public FlowTrace() {
         contextPool = new HashSet<>();
     }

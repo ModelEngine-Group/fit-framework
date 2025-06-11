@@ -8,8 +8,6 @@ package modelengine.fit.waterflow.domain.stream.nodes;
 
 import static modelengine.fit.waterflow.ErrorCodes.FLOW_ENGINE_INVALID_MANUAL_TASK;
 
-import modelengine.fit.waterflow.domain.context.repo.flowsession.FlowSessionRepo;
-import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fit.waterflow.domain.context.FlatMapSourceWindow;
 import modelengine.fit.waterflow.domain.context.FlatMapWindow;
 import modelengine.fit.waterflow.domain.context.FlowContext;
@@ -19,6 +17,7 @@ import modelengine.fit.waterflow.domain.context.Window;
 import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextMessenger;
 import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo;
 import modelengine.fit.waterflow.domain.context.repo.flowlock.FlowLocks;
+import modelengine.fit.waterflow.domain.context.repo.flowsession.FlowSessionRepo;
 import modelengine.fit.waterflow.domain.enums.FlowNodeStatus;
 import modelengine.fit.waterflow.domain.enums.FlowTraceStatus;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
@@ -32,6 +31,7 @@ import modelengine.fit.waterflow.domain.stream.reactive.Subscription;
 import modelengine.fit.waterflow.domain.stream.reactive.When;
 import modelengine.fit.waterflow.domain.utils.IdGenerator;
 import modelengine.fit.waterflow.domain.utils.UUIDUtil;
+import modelengine.fit.waterflow.exceptions.WaterflowException;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.util.CollectionUtils;
 import modelengine.fitframework.util.ObjectUtils;
@@ -75,11 +75,26 @@ public class From<I> extends IdGenerator implements Publisher<I> {
 
     private final String streamId;
 
+    /**
+     * 构造函数
+     *
+     * @param repo contextRepo
+     * @param messenger messenger
+     * @param locks 锁
+     */
     public From(FlowContextRepo repo, FlowContextMessenger messenger, FlowLocks locks) {
         this(null, repo, messenger, locks);
         // 单纯的from的id就是stream id，因为单纯的from是数据的起点，其他都是subscriber
     }
 
+    /**
+     * 构造函数
+     *
+     * @param streamId 流ID
+     * @param repo 上下文仓库
+     * @param messenger 消息传递者
+     * @param locks 流程锁
+     */
     public From(String streamId, FlowContextRepo repo, FlowContextMessenger messenger, FlowLocks locks) {
         this.streamId = streamId != null && !"".equals(streamId.trim()) ? streamId : this.id;
         this.repo = repo;
@@ -245,14 +260,12 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         Set<String> traceId = new HashSet<>();
         traceId.add(trace.getId());
         Window window = session.begin();
-        List<FlowContext<I>> contexts = Arrays.stream(data)
-                .map(d -> {
-                    FlowContext<I> context = new FlowContext<>(this.getStreamId(), this.getId(), d, traceId,
-                            this.getId(), session);
-                    window.createToken();
-                    return context;
-                })
-                .collect(Collectors.toList());
+        List<FlowContext<I>> contexts = Arrays.stream(data).map(d -> {
+            FlowContext<I> context =
+                    new FlowContext<>(this.getStreamId(), this.getId(), d, traceId, this.getId(), session);
+            window.createToken();
+            return context;
+        }).collect(Collectors.toList());
         List<FlowContext<I>> after = this.startNodeMarkAsHandled(contexts, trace);
         after.forEach(this::generateIndex);
         this.offer(after);

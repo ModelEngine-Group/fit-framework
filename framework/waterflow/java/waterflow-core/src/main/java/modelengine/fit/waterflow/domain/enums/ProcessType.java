@@ -14,6 +14,13 @@ package modelengine.fit.waterflow.domain.enums;
  * @since 1.0
  */
 public enum ProcessType {
+    /**
+     * 前置处理
+     */
     PRE_PROCESS,
+
+    /**
+     * 后置处理
+     */
     PROCESS
 }

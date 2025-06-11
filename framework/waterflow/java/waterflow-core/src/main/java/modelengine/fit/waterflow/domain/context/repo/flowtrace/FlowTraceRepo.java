@@ -37,7 +37,7 @@ public interface FlowTraceRepo {
      * 根据 ids 查找FlowTrace
      *
      * @param ids traceId列表
-     * @return List<FlowTrace>
+     * @return List
      */
     List<FlowTrace> getByIds(List<String> ids);
 

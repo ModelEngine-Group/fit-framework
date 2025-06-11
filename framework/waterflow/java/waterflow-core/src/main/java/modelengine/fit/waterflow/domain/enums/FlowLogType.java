@@ -13,7 +13,18 @@ package modelengine.fit.waterflow.domain.enums;
  * @since 1.0
  */
 public enum FlowLogType {
+    /**
+     * 信息
+     */
     INFO,
+
+    /**
+     * 警告
+     */
     WARNING,
+
+    /**
+     * 错误
+     */
     ERROR
 }

@@ -150,9 +150,10 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
      * @param data 表示上下文里所带数据的 {@link T}。
      * @param traceId 表示路径唯一标识的 {@link Set}{@code <}的{@link String}{@code >}。
      * @param position 表示上下文当前所处的位置的 {@link String}。
+     * @param session 表示上下文会话信息的 {@link FlowSession}。
      */
     public FlowContext(String streamId, String rootId, T data, Set<String> traceId, String position,
-                       FlowSession session) {
+            FlowSession session) {
         this(streamId, rootId, data, traceId, position, "", "", session);
     }
 
@@ -166,6 +167,7 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
      * @param position 表示上下文当前所处的位置的 {@link String}。
      * @param parallel 表示并行节点唯一标识的 {@link String}。
      * @param parallelMode 表示并行模式的 {@link String}。
+     * @param session 表示上下文会话信息的 {@link FlowSession}。
      */
     public FlowContext(String streamId, String rootId, T data, Set<String> traceId, String position, String parallel,
             String parallelMode, FlowSession session) {
@@ -182,7 +184,7 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
         this.index = this.createIndex(); // 0起始，说明保序
     }
 
-    private Integer createIndex(){
+    private Integer createIndex() {
         return session.preserved() ? session.getWindow().tokenCount() : -1;
     }
 
@@ -261,13 +263,20 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
     /**
      * 在 map，reduce，produce 的过程中把大多数上一个 context 的内容复制给下一个。
      *
+     * @param <R> 表示返回值类型的泛型参数。
      * @param data 表示处理后数据的 {@link R}。
      * @param position 表示处理后所处的节点的 {@link String}。
      * @return 表示新的上下文的 {@link FlowContext}{@code <}{@link R}{@code >}。
      */
     public <R> FlowContext<R> generate(R data, String position) {
-        FlowContext<R> context = new FlowContext<>(this.streamId, this.rootId, data, this.traceId, this.position,
-                this.parallel, this.parallelMode, this.session);
+        FlowContext<R> context = new FlowContext<>(this.streamId,
+                this.rootId,
+                data,
+                this.traceId,
+                this.position,
+                this.parallel,
+                this.parallelMode,
+                this.session);
         context.position = position;
         context.previous = this.id;
         context.batchId = this.batchId;
@@ -278,6 +287,7 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
     /**
      * 在 map，reduce，produce 的过程中把大多数上一个 context 的内容复制给下一个。
      *
+     * @param <R> 表示返回值类型的泛型参数。
      * @param dataList 表示处理后数据的 {@link List}{@code <}{@link R}{@code >}。
      * @param position 表示处理后所处节点的 {@link String}。
      * @return 表示新的上下文的 {@link List}{@code <}{@link FlowContext}{@code <}{@link R}{@code >}{@code >}。
@@ -289,13 +299,20 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
     /**
      * 用于 when.convert 数据时候的转换 context，除了包裹的数据类型不一样，所有其他信息都一样。
      *
+     * @param <R> 表示返回值类型的泛型参数。
      * @param data 表示转换后数据的 {@link R}。
      * @param id 表示 contextId 的 {@link String}。
      * @return 表示转换后的 context 的 {@link FlowContext}{@code <}{@link R}{@code >}。
      */
     public <R> FlowContext<R> convertData(R data, String id) {
-        FlowContext<R> context = new FlowContext<>(this.streamId, this.rootId, data, this.traceId, this.position,
-                this.parallel, this.parallelMode, this.session);
+        FlowContext<R> context = new FlowContext<>(this.streamId,
+                this.rootId,
+                data,
+                this.traceId,
+                this.position,
+                this.parallel,
+                this.parallelMode,
+                this.session);
         context.previous = this.previous;
         context.status = this.status;
         context.id = id;
@@ -336,6 +353,11 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
         return this.session.keyBy();
     }
 
+    /**
+     * 获取window
+     *
+     * @return 窗口
+     */
     public Window getWindow() {
         return this.getSession().getWindow();
     }

@@ -24,6 +24,12 @@ public class FlowCallbackEvent<O> implements Event {
 
     private final Object publisher;
 
+    /**
+     * 构造函数
+     *
+     * @param flowContexts 回调函数参数
+     * @param publisher 发布者
+     */
     public FlowCallbackEvent(List<FlowContext<O>> flowContexts, Object publisher) {
         this.flowContexts = flowContexts;
         this.publisher = publisher;

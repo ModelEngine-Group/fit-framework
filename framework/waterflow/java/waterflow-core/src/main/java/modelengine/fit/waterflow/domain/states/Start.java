@@ -154,6 +154,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
     /**
      * 处理，并转换类型。
      *
+     * @param <R> 表示输出数据类型。
      * @param processor 表示 map 处理器的 {@link Operators.Map}{@code <}{@link O}{@code ,}{@link R}{@code >}。
      * @return 表示新的处理节点的 {@link State}{@code <}{@link R}{@code , }{@link D}{@code , }
      * {@link O}{@code , }{@link F}{@code >}。
@@ -166,6 +167,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
     /**
      * 处理，并往下发射新的数据，支持操作 session KV 状态数据。
      *
+     * @param <R> 表示输出数据类型。
      * @param processor 表示携带数据、KV 下文和发射器的处理器的{@link Operators.Process}{@code <}{@link O}
      * {@code ,}{@link R}{@code >}}。
      * @return 表示新的处理节点的 {@link State}{@code <}{@link R}{@code ,}{@link D}
@@ -189,6 +191,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
     /**
      * 处理，并转换类型。
      *
+     * @param <R> 表示输出数据类型。
      * @param processor 表示携带 KV 下文的 map 处理器的 {@link Operators.ProcessMap}{@code <}{@link O}
      * {@code ,}{@link R}{@code >}。
      * @return 表示新的处理节点的 {@link State}{@code <}{@link R}{@code , }{@link D}{@code , }{@link O}
@@ -202,6 +205,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
     /**
      * 处理，并转换类型。
      *
+     * @param <R> 表示输出数据类型。
      * @param processor 表示 flat map 处理器的 {@link Operators.FlatMap}{@code <}{@link O}{@code ,}{@link R}{@code >}。
      * @return 表示新的处理节点的 {@link State}{@code <}{@link R}{@code , }{@link D}
      * {@code , }{@link O}{@code ,}{@link F}{@code >}。
@@ -250,6 +254,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
      * 处理后的数据类型是根据初始值来确认。
      * </p>
      *
+     * @param <R> 表示输出数据类型。
      * @param init 表示聚合操作初始值提供者的 {@link Supplier}{@code <}{@link R}{@code >}。
      * @param processor 表示数据聚合器的 {@link Operators.ProcessReduce}{@code <}{@link O}{@code , }{@link R}{@code >}。
      * @return 表示数据聚合节点的 {@link State}{@code <}{@link R}{@code , }{@link D}{@code , }
@@ -344,6 +349,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
     /**
      * 对数据流进行分组处理，根据指定的 keyGetter 获取的键进行分组。
      *
+     * @param <R> 表示输出数据类型。
      * @param keyGetter 表示提供聚合键的 {@link Operators.Map}{@code <}{@link O}{@code , }{@link R}{@code >}。
      * @return 表示聚合后的节点的 {@link Tuple}{@code <}{@link R}{@code , }{@link O}{@code >}。
      */
@@ -375,6 +381,7 @@ public class Start<O, D, I, F extends Flow<D>> extends Activity<D, F> implements
      * 生成一个数据处理节点，将每个数据通过指定的方式进行处理后，形成一个新的数据，并继续发送。
      *
      * @param processor 表示处理器的 {@link Operators.Produce}{@code <}{@link O}{@code ,}{@link R}{@code >}。
+     * @param <R> 表示处理后的数据类型。
      * @return 表示新的处理节点的 {@link State}{@code <}{@link List}{@code <}{@link R}{@code >}
      * {@code ,}{@link D}{@code ,?,}{@link F}{@code >}
      */

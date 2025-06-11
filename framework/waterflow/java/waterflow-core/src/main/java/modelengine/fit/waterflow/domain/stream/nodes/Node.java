@@ -30,8 +30,8 @@ import java.util.function.Supplier;
  * 中间节点，既是数据发送者，也是数据接受者
  * 由于没有多重继承，node直接继承自To，并生成一个From，引用所有From的实现
  *
- * @param <T>
- * @param <R>
+ * @param <T> 输入数据类型
+ * @param <R> 输出数据类型
  * @author 高诗意
  * @since 1.0
  */
@@ -114,7 +114,7 @@ public class Node<T, R> extends To<T, R> implements Processor<T, R>, Identity {
      * @param repo contextRepo
      * @param messenger messenger
      * @param locks 流程锁
-     * @return From<R>
+     * @return {@link From}{@code <}{@link R}{@code >}
      */
     protected From<R> initFrom(FlowContextRepo repo, FlowContextMessenger messenger, FlowLocks locks) {
         return new From<>(this.getStreamId(), repo, messenger, locks); // node里的from跟随subscriber的streamId

@@ -37,6 +37,7 @@ public class Conditions<D, I, F extends Flow<D>> extends Activity<D, F> {
     /**
      * 创建一个分支，在满足该分支条件时执行逻辑。
      *
+     * @param <O> 表示返回值类型的泛型参数。
      * @param whether 表示条件判定函数的 {@link Operators.Whether}{@code <} {@link I}{@code >}。
      * @param processor 表示处理器的 {@link Operators.BranchProcessor}{@code <} {@link O}{@code ,} {@link D}{@code ,}
      *                  {@link I}{@code ,} {@link F}{@code >}。

@@ -19,13 +19,29 @@ public class WindowToken {
      * 状态枚举
      */
     enum Status {
+        /**
+         * 初始化
+         */
         INITIALIZED,
+
+        /**
+         * 正在处理
+         */
         CONSUMING,
+
+        /**
+         * 已处理完成
+         */
         CONSUMED
     }
 
     private final Window window;
 
+    /**
+     * 状态
+     *
+     * @return 状态
+     */
     public Status getStatus() {
         return this.status;
     }
@@ -34,6 +50,11 @@ public class WindowToken {
 
     private boolean reduced;
 
+    /**
+     * 构造函数
+     *
+     * @param window 窗口
+     */
     public WindowToken(Window window) {
         this.window = window;
     }

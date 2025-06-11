@@ -59,6 +59,9 @@ public abstract class Flow<D> extends IdGenerator {
 
     private Consumer<String> completeListener;
 
+    /**
+     * 构造函数
+     */
     protected Flow() {
         // default session for unbound stream
         this.defaultSession = new FlowSession();

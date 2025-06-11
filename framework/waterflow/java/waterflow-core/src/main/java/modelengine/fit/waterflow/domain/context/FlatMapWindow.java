@@ -31,6 +31,11 @@ public class FlatMapWindow extends Window {
     @Getter
     private Window source;
 
+    /**
+     * 创建一个flatmap window
+     *
+     * @param from flatmap source window
+     */
     public FlatMapWindow(FlatMapSourceWindow from) {
         super();
         this.from = from;
@@ -112,6 +117,11 @@ public class FlatMapWindow extends Window {
         return this.from.acc();
     }
 
+    /**
+     * 设置acc
+     *
+     * @param acc acc
+     */
     @Override
     public void setAcc(Object acc) {
         this.from.setAcc(acc);

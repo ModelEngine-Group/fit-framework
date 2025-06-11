@@ -23,10 +23,18 @@ public abstract class IdGenerator implements Identity {
     @Setter
     protected String id;
 
+    /**
+     * 构造函数
+     */
     public IdGenerator() {
         this(UUIDUtil.uuid());
     }
 
+    /**
+     * 构造函数
+     *
+     * @param id ID
+     */
     public IdGenerator(String id) {
         this.id = id;
     }

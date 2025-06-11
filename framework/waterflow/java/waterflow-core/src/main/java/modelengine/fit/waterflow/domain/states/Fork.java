@@ -64,6 +64,7 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
     /**
      * 生成join节点，到这里parallel结束，回到一般节点
      *
+     * @param <R> join节点的输出数据类型
      * @param init 初始值
      * @param processor join后的数据再处理一下
      * @return 回到一般节点
@@ -79,11 +80,11 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
             public synchronized R process(FlowContext<O> input) {
                 input.getSession().setAsAccumulator();
                 Object key = input.getParallel();
-                Map<Object, Tuple<R, Integer>> accs = allAccs.computeIfAbsent(input.getSession().getId(),
-                        k -> new HashMap<>());
+                Map<Object, Tuple<R, Integer>> accs =
+                        allAccs.computeIfAbsent(input.getSession().getId(), k -> new HashMap<>());
 
-                Tuple<R, Integer> acc = Optional.ofNullable(accs.get(key))
-                        .orElseGet(() -> Tuple.from(actualInit.get(), 0));
+                Tuple<R, Integer> acc =
+                        Optional.ofNullable(accs.get(key)).orElseGet(() -> Tuple.from(actualInit.get(), 0));
                 if (acc.first() == null) {
                     if (input.getData() instanceof Number) {
                         acc = Tuple.from((R) new Integer(0), 0);

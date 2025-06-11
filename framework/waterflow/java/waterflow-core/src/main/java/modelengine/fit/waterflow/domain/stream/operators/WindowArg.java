@@ -20,6 +20,14 @@ public class WindowArg {
 
     private final Duration timeToNow;
 
+    /**
+     * 构造函数
+     *
+     * @param isSessionComplete 是否会话完成
+     * @param dataLength 数据长度
+     * @param countToNow 计数到当前
+     * @param timeToNow 时间到当前
+     */
     public WindowArg(boolean isSessionComplete, long dataLength, long countToNow, Duration timeToNow) {
         this.isSessionComplete = isSessionComplete;
         this.dataLength = dataLength;
@@ -28,9 +36,9 @@ public class WindowArg {
     }
 
     /**
-     * session是否完成
+     * 确认window是否完成
      *
-     * @return
+     * @return 完成状态
      */
     public boolean isSessionComplete() {
         return this.isSessionComplete;

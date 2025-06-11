@@ -16,16 +16,16 @@ import java.util.List;
  */
 public interface Callback<O> {
     /**
-     * getAll
+     * 获取所有处理的对象
      *
-     * @return List<O>
+     * @return 包含所有处理对象的列表
      */
     List<O> getAll();
 
     /**
-     * get
+     * 获取单个处理的对象
      *
-     * @return O
+     * @return 单个处理对象
      */
     O get();
 }

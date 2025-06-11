@@ -19,15 +19,29 @@ import java.util.Arrays;
  * @since 1.0
  */
 public enum FlowTraceStatus {
-    // 未执行
+    /**
+     * 未执行
+     */
     READY,
-    // 执行中
+
+    /**
+     * 执行中
+     */
     RUNNING,
-    // 执行完成
+
+    /**
+     * 执行完成
+     */
     ARCHIVED,
-    // 执行失败
+
+    /**
+     * 执行失败
+     */
     ERROR,
-    // 已终止
+
+    /**
+     * 已终止
+     */
     TERMINATE;
 
     /**

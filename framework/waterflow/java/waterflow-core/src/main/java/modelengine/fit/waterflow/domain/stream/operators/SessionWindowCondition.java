@@ -26,7 +26,6 @@ public class SessionWindowCondition implements Operators.WindowCondition {
      *
      * @param key 用于构建window的key
      * @param windowCondition 给定的window条件
-     * @param <T> 数据类型
      * @return 构造后的sessionWindow
      */
     public static SessionWindowCondition from(String key, Operators.WindowCondition windowCondition) {
@@ -42,7 +41,6 @@ public class SessionWindowCondition implements Operators.WindowCondition {
     public static SessionWindowCondition from(Operators.WindowCondition windowCondition) {
         return from(null, windowCondition);
     }
-
 
     @Override
     public boolean fulfilled(WindowArg arg) {

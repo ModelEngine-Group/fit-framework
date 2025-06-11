@@ -51,6 +51,7 @@ public class MatchToHappen<D, I, F extends Flow<D>> {
      * 创建一个分支，在满足该分支条件时，执行该分支的逻辑
      * 该分支的处理后的类型必须与conditions的首个分支条件的返回值类型一致
      *
+     * @param <O> 分支处理后的数据类型
      * @param whether 分支条件
      * @param processor 分支的处理逻辑
      * @return 新的处理节点
@@ -63,6 +64,7 @@ public class MatchToHappen<D, I, F extends Flow<D>> {
     /**
      * 提供一个默认的处理逻辑，类似于switch的default语法，并结束conditions节点
      *
+     * @param <O> 输出数据类型
      * @param processor 默认的处理逻辑
      * @return conditions后续的节点
      */
