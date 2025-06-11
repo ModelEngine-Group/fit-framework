@@ -39,6 +39,9 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
         resultAction.process(data, session);
     };
 
+    /**
+     * Constructor.
+     */
     protected AbstractFlowPattern() {
         this.flowSupplier = LazyLoader.of(() -> {
             AiProcessFlow<I, O> flow = buildFlow();
@@ -108,8 +111,8 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
      * Built the flow session for starting the conversation.
      *
      * @param emitter The {@link FlowEmitter}{@code <}{@link O}{@code >} representing output emitter.
-     * @return The new {@link FlowSession}.
      * @param <O> The output data type.
+     * @return The new {@link FlowSession}.
      */
     protected static <O> FlowSession buildFlowSession(FlowEmitter<O> emitter) {
         FlowSession mainSession = AiFlowSession.require();

@@ -31,6 +31,12 @@ public class AiMatchToHappen<D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> 
 
     private final F flow;
 
+    /**
+     * 创建一个 {@link AiMatchToHappen} 对象。
+     *
+     * @param matchToHappen 匹配条件。
+     * @param flow AI 流程。
+     */
     public AiMatchToHappen(MatchToHappen<D, I, RF> matchToHappen, F flow) {
         this.matchToHappen = Validation.notNull(matchToHappen, "matchToHappen cannot be null.");
         this.flow = Validation.notNull(flow, "Flow cannot be null.");
@@ -75,8 +81,8 @@ public class AiMatchToHappen<D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> 
     /**
      * 提供一个默认的处理逻辑，并结束条件节点。
      *
-     * @param processor 表示分支处理器的 {@link AiBranchProcessor}{@code <}{@link O}{@code , }{@link D}{@code ,
-     * }{@link ?}{@code , }{@link RF}{@code , }{@link F}{@code >}。
+     * @param processor 表示分支处理器的 {@link AiBranchProcessor}{@code <}{@link O}{@code , }{@link D}{@code ,?,
+     * }{@link RF}{@code , }{@link F}{@code >}。
      * @param <O> 表示第一个条件分支指定的返回类型。
      * @return 表示条件节点的 {@link AiState}{@code <}{@link O}{@code , }{@link D}{@code , }{@link O}{@code ,
      * }{@link RF}{@code , }{@link F}{@code >}。

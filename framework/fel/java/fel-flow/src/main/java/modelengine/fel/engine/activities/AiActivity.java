@@ -32,6 +32,11 @@ public class AiActivity<D, RF extends Flow<D>, F extends AiFlow<D, RF>> {
         this.flow = Validation.notNull(flow, "Flow cannot be null.");
     }
 
+    /**
+     * 获取 AI 节点所对应的流程对象。
+     *
+     * @return AI 节点所对应的流程对象。
+     */
     public F flow() {
         return this.flow;
     }

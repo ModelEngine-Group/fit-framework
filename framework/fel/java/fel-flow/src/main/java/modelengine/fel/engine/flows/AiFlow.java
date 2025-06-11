@@ -23,6 +23,11 @@ import modelengine.fitframework.inspection.Validation;
 public class AiFlow<D, F extends Flow<D>> extends IdGenerator {
     private final F flow;
 
+    /**
+     * 创建一个 AI 流程。
+     *
+     * @param flow 流程。
+     */
     public AiFlow(F flow) {
         this.flow = Validation.notNull(flow, "Flow cannot be null.");
     }

@@ -32,6 +32,11 @@ public class AiProcessFlow<D, R> extends AiFlow<D, ProcessFlow<D>>
     private final Map<EmitterListener<R, FlowSession>, EmitterListener<Object, FlowSession>> listeners =
             new ConcurrentHashMap<>();
 
+    /**
+     * 创建一个流程。
+     *
+     * @param flow 表示流程。
+     */
     public AiProcessFlow(ProcessFlow<D> flow) {
         super(flow);
     }

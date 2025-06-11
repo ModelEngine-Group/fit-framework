@@ -20,6 +20,11 @@ import java.util.function.Function;
 public class SimplePattern<I, O> implements Pattern<I, O> {
     private final Function<I, O> func;
 
+    /**
+     * 创建一个委托单元。
+     *
+     * @param func 委托函数。
+     */
     public SimplePattern(Function<I, O> func) {
         this.func = Validation.notNull(func, "The action function cannot be null.");
     }

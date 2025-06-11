@@ -31,6 +31,12 @@ public class ChatFlowModel implements FlowModel<Prompt, ChatMessage> {
 
     private final ChatOption option;
 
+    /**
+     * 创建一个流式对话模型。
+     *
+     * @param chatModel 对话模型。
+     * @param option 对话参数。
+     */
     public ChatFlowModel(ChatModel chatModel, ChatOption option) {
         this.chatModel = notNull(chatModel, "The model provider can not be null.");
         this.option = option;

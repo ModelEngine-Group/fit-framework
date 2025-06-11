@@ -7,11 +7,11 @@
 package modelengine.fel.engine.operators.models;
 
 import modelengine.fel.core.chat.ChatMessage;
+import modelengine.fel.core.chat.ChatModel;
 import modelengine.fel.core.chat.ChatOption;
 import modelengine.fel.core.chat.MessageType;
 import modelengine.fel.core.chat.Prompt;
 import modelengine.fel.core.chat.support.AiMessage;
-import modelengine.fel.core.chat.ChatModel;
 import modelengine.fel.core.memory.Memory;
 import modelengine.fel.core.model.BlockModel;
 import modelengine.fel.engine.util.AiFlowSession;
@@ -32,10 +32,21 @@ public class ChatBlockModel implements BlockModel<Prompt, ChatMessage> {
     private final ChatModel provider;
     private final ChatOption option;
 
+    /**
+     * 创建一个阻塞对话模型。
+     *
+     * @param provider 聊天模型提供者。
+     */
     public ChatBlockModel(ChatModel provider) {
         this(provider, ChatOption.custom().build());
     }
 
+    /**
+     * 创建一个阻塞对话模型。
+     *
+     * @param provider 聊天模型提供者。
+     * @param option 聊天模型选项。
+     */
     public ChatBlockModel(ChatModel provider, ChatOption option) {
         this.provider = Validation.notNull(provider, "The model provider cannot be null.");
         this.option = Validation.notNull(option, "The chat options cannot be null.");

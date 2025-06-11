@@ -73,22 +73,47 @@ public class ConverseLatch<T> {
         return this.data;
     }
 
+    /**
+     * Returns the data.
+     *
+     * @return The data.
+     */
     public T data() {
         return this.data;
     }
 
+    /**
+     * Sets the data.
+     *
+     * @param data The data.
+     */
     public void data(T data) {
         this.data = data;
     }
 
+    /**
+     * Returns the throwable.
+     *
+     * @return The throwable.
+     */
     public Throwable throwable() {
         return this.throwable;
     }
 
+    /**
+     * Sets the throwable.
+     *
+     * @param throwable The throwable.
+     */
     public void throwable(Throwable throwable) {
         this.throwable = throwable;
     }
 
+    /**
+     * Returns the count-down latch.
+     *
+     * @return The count-down latch.
+     */
     public CountDownLatch countDownLatch() {
         return this.countDownLatch;
     }

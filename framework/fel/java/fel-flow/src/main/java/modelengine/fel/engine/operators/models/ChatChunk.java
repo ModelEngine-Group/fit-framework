@@ -31,8 +31,11 @@ public class ChatChunk implements ChatMessage {
     private final StringBuilder text = new StringBuilder();
     private final List<ToolCall> toolCalls = new ArrayList<>();
 
-    public ChatChunk() {
-    }
+    /**
+     * 创建一个空的 {@link ChatChunk}。
+     */
+    public ChatChunk() {}
+
     /**
      * 使用文本数据、媒体数据和工具请求初始化 {@link ChatChunk}。
      *

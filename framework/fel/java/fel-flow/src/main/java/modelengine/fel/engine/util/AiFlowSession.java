@@ -46,6 +46,8 @@ public class AiFlowSession {
     /**
      * 在 {@link AiFlowSession} 上下文执行委托单元。
      *
+     * @param <I> 输入数据类型。
+     * @param <O> 输出数据类型。
      * @param pattern 表示委托单元的 {@link Pattern}{@code <}{@link I}{@code , }{@link O}{@code >}。
      * @param input 表示输入数据的 {@link I}。
      * @param session 表示流程实例运行标识信息的 {@link FlowSession}。
@@ -60,6 +62,8 @@ public class AiFlowSession {
     /**
      * 在 {@link AiFlowSession} 上下文批量执行委托单元。
      *
+     * @param <I> 输入数据类型。
+     * @param <O> 输出数据类型。
      * @param patterns 表示委托单元的 {@link List}{@code <}{@link Pattern}{@code <}{@link I}{@code , }{@link O}{@code >>}。
      * @param input 表示输入数据的 {@link I}。
      * @param session 表示流程实例运行标识信息的 {@link FlowSession}。

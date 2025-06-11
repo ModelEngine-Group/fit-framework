@@ -8,6 +8,43 @@
     <version>3.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <name>Framework Parent</name>
+    <description>The framework includes the FIT (a plugin-based framework), Waterflow (a reactive process engine), FEL
+        (FIT Expression for LLM), Ohscript (a scripting language for FIT) and elsa (a graphics Engine).
+    </description>
+    <url>https://github.com/ModelEngine-Group/fit-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Ji Yujie</name>
+            <email>codecaster365@outlook.com</email>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Song Yongtan</name>
+            <email>271667068@qq.com</email>
+            <roles>
+                <role>Committer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/ModelEngine-Group/fit-framework.git</connection>
+        <developerConnection>scm:git:ssh://github.com/ModelEngine-Group/fit-framework.git</developerConnection>
+        <url>https://github.com/ModelEngine-Group/fit-framework</url>
+    </scm>
+
     <modules>
         <module>dependency</module>
         <module>fel/java</module>

@@ -30,6 +30,12 @@ public class AiMatchHappen<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>>
 
     private final F flow;
 
+    /**
+     * 创建一个 AI 流程匹配发生器。
+     *
+     * @param matchHappen 匹配发生器。
+     * @param flow AI 流程。
+     */
     public AiMatchHappen(MatchHappen<O, D, I, RF> matchHappen, F flow) {
         this.matchHappen = Validation.notNull(matchHappen, "MatchHappen cannot be null.");
         this.flow = Validation.notNull(flow, "Flow cannot be null.");

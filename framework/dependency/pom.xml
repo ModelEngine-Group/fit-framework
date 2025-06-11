@@ -56,7 +56,7 @@
         <druid.version>1.2.20</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>32.0.1-jre</guava.version>
-        <h2.version>2.3.232</h2.version>
+        <hanlp.version>portable-1.8.4</hanlp.version>
         <lombok.version>1.18.36</lombok.version>
         <jackson.version>2.18.2</jackson.version>
         <mybatis.version>3.5.13</mybatis.version>
@@ -415,6 +415,33 @@
                 <version>${fit.version}</version>
             </dependency>
 
+            <!-- FEL -->
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>fel-core</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-service</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-info</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-mcp-common</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.fel</groupId>
+                <artifactId>tool-mcp-client-service</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+
             <!-- Ohscript -->
             <dependency>
                 <groupId>org.fitframework.ohscript</groupId>
@@ -452,6 +479,11 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hankcs</groupId>
+                <artifactId>hanlp</artifactId>
+                <version>${hanlp.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>

@@ -9,7 +9,6 @@ package modelengine.fel.engine.operators.patterns;
 import static modelengine.fitframework.inspection.Validation.notBlank;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
-import lombok.Getter;
 import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.Prompt;
 import modelengine.fel.core.chat.support.AiMessage;
@@ -53,10 +52,11 @@ public abstract class AbstractAgent extends AbstractFlowPattern<Prompt, ChatMess
      *
      * @param flowModel 表示模型推理服务的 {@link ChatFlowModel}。
      * @param memoryId agentMsgKey 表示 Agent 响应的所在自定义键的 {@link String}。
-     * @throws IllegalArgumentException <ln>
+     * @throws IllegalArgumentException
+     * <ul>
      * <li>当 {@code toolProvider} 、 {@code chatStreamModel} 和 {@code options} 任一个为 {@code null} 时。</li>
      * <li>当 {@code agentMsgKey} 为 {@code null} 、空字符串或只有空白字符的字符串时。</li>
-     * </ln>
+     * </ul>
      */
     protected AbstractAgent(ChatFlowModel flowModel, String memoryId) {
         this.model = notNull(flowModel, "The flow model cannot be null.");
@@ -69,7 +69,7 @@ public abstract class AbstractAgent extends AbstractFlowPattern<Prompt, ChatMess
      * @return 配置的模型对象。
      */
     public ChatFlowModel getModel() {
-        return model;
+        return this.model;
     }
 
     /**

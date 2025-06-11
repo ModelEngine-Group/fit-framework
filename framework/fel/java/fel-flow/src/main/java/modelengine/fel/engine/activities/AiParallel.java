@@ -40,6 +40,7 @@ public class AiParallel<D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
     /**
      * 生成平行节点的子分支。
      *
+     * @param <O> 表示分支处理器的输入参数的类型。
      * @param processor 表示分支处理器的 {@link AiBranchProcessor}{@code <}{@link O}{@code , }{@link D}{@code ,
      * }{@link I}{@code , }{@link RF}{@code , }{@link F}{@code >}。
      * @return 表示平行节点子分支的 {@link AiFork}{@code <}{@link O}{@code , }{@link D}{@code , }{@link I}{@code ,

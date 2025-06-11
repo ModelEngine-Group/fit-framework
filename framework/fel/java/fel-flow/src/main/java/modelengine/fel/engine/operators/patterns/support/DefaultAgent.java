@@ -32,6 +32,13 @@ public class DefaultAgent extends AbstractAgent {
     private final String namespace;
     private final ToolExecuteService toolExecuteService;
 
+    /**
+     * 创建一个智能体。
+     *
+     * @param flowModel 智能体的流程模型。
+     * @param namespace 智能体的命名空间。
+     * @param toolExecuteService 智能体的工具执行服务。
+     */
     public DefaultAgent(ChatFlowModel flowModel, String namespace, ToolExecuteService toolExecuteService) {
         super(flowModel);
         this.namespace = notBlank(namespace, "The namespace cannot be blank.");

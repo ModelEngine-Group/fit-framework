@@ -88,6 +88,7 @@ public interface SyncTipper<I> extends Pattern<I, Tip> {
     /**
      * 简单键值对分支。
      *
+     * @param <I> 输入数据类型。
      * @param key 表示自定义键的 {@link String}。
      * @param value 表示自定义键对应的值的 {@link String}。
      * @return 表示一个平行分支的 {@link SyncTipper}{@code <}{@link I}{@code >}。
@@ -148,6 +149,7 @@ public interface SyncTipper<I> extends Pattern<I, Tip> {
     /**
      * 自定义键的格式化提示词键值对分支。
      *
+     * @param <I> 输入数据类型。
      * @param key 表示格式化提示词的键的 {@link String}。
      * @param formatter 表示格式化提示词的 {@link FormatProvider}。
      * @return 表示一个平行分支的 {@link SyncTipper}{@code <}{@link I}{@code >}。
@@ -163,6 +165,7 @@ public interface SyncTipper<I> extends Pattern<I, Tip> {
     /**
      * 默认键的格式化提示词键值对分支。
      *
+     * @param <I> 输入参数类型。
      * @param formatter 表示格式化提示词的 {@link FormatProvider}。
      * @return 表示一个平行分支的 {@link SyncTipper}{@code <}{@link I}{@code >}。
      * @throws IllegalArgumentException 当 {@code formatter} 为 {@code null} 时。
@@ -183,6 +186,7 @@ public interface SyncTipper<I> extends Pattern<I, Tip> {
     /**
      * 自定义键的历史记录键值对分支。
      *
+     * @param <I> 表示输入参数的类型。
      * @param historyKey 表示历史记录所在键的 {@link String}。
      * @return 表示一个平行分支的 {@link SyncTipper}{@code <}{@link I}{@code >}。
      * @throws IllegalArgumentException 当 {@code historyKey} 为 {@code null} 、空字符串或只有空白字符的字符串时。
@@ -201,6 +205,7 @@ public interface SyncTipper<I> extends Pattern<I, Tip> {
     /**
      * 默认键的历史记录键值对分支。
      *
+     * @param <I> 输入数据类型。
      * @return 表示一个平行分支的 {@link SyncTipper}{@code <}{@link I}{@code >}。
      */
     static <I> SyncTipper<I> history() {

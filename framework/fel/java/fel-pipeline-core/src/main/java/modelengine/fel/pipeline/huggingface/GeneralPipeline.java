@@ -14,12 +14,11 @@ import java.util.Map;
 
 /**
  * 表示 huggingface pipeline 的泛化实现。
- * <p>返回结果取决于任务类型，可能是以下值中的一个：
+ * <p>返回结果取决于任务类型，可能是以下值中的一个：</p>
  * <ul>
  *     <li>{@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。</li>
  *     <li>{@link java.util.List}{@code <}{@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >>}。</li>
  * </ul>
- * </p>
  *
  * @author 易文渊
  * @since 2024-06-04

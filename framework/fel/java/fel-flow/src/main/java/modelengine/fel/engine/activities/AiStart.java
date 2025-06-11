@@ -397,6 +397,7 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
     /**
      * 将模型处理返回值的格式化解析。
      *
+     * @param <R> 表示解析器的返回值类型。
      * @param parser 表示格式化解析器的 {@link Parser}{@code <}{@link R}{@code >}。
      * @return 表示格式化解析节点的 {@link AiState}{@code <}{@link O}{@code , }{@link D}{@code , }{@link O}{@code ,
      * }{@link RF}{@code , }{@link F}{@code >}。
@@ -505,8 +506,8 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
      * @return 表示委托节点的 {@link AiState}{@code <}{@link R}{@code , }{@link D}{@code , }{@link O}{@code ,
      * }{@link RF}{@code , }{@link F}{@code >}。
      * @throws IllegalArgumentException <ul>
-     * <li>当 {@code aiFlow} 为 {@code null}时。</il>
-     * <li>当 {@code nodeId} 为 {@code null} 、空字符串或只有空白字符的字符串时。</il>
+     * <li>当 {@code aiFlow} 为 {@code null}时。</li>
+     * <li>当 {@code nodeId} 为 {@code null} 、空字符串或只有空白字符的字符串时。</li>
      * </ul>
      */
     public <R> AiState<R, D, O, RF, F> delegate(AiProcessFlow<O, R> aiFlow, String nodeId) {
