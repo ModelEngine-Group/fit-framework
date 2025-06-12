@@ -105,6 +105,18 @@ public class State<O, D, I, F extends Flow<D>> extends Start<O, D, I, F>
     }
 
     /**
+     * Sets the maximum concurrency level for this state's processing pipeline.
+     *
+     * @param concurrency The maximum number of concurrent operations allowed (must be positive).
+     * @return The current state instance for method chaining.
+     * @throws IllegalArgumentException If the concurrency value is zero or negative.
+     */
+    public State<O, D, I, F> concurrency(int concurrency) {
+        ObjectUtils.<Node<I, O>>cast(this.processor).setMaxConcurrency(concurrency);
+        return this;
+    }
+
+    /**
      * 跳转到指定节点，使用节点的唯一标识来标识一个节点。
      * <p>
      * 类似于 goto，通常在 conditions 的分支中使用，用于形成循环。

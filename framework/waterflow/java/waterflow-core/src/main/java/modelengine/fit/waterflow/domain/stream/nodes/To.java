@@ -100,6 +100,8 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Getter
     private final FlowLocks locks;
 
+    private int maxConcurrency = MAX_CONCURRENCY;
+
     // 默认自动流转过滤器是按batchID批次过滤contexts
     private final Operators.Filter<I> defaultAutoFilter = (contexts) -> {
         if (CollectionUtils.isEmpty(contexts)) {
@@ -606,7 +608,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
      * @return true-已经满负载， false-未满负载
      */
     public boolean isOverLimit() {
-        return this.curConcurrency >= MAX_CONCURRENCY;
+        return this.curConcurrency >= this.maxConcurrency;
     }
 
     /**
@@ -734,6 +736,16 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Override
     public void emit(O data, FlowSession session) {
         this.listeners.values().forEach(listener -> listener.handle(data, session));
+    }
+
+    /**
+     * Sets the maximum concurrency level for this state's processing pipeline.
+     *
+     * @param concurrency The maximum number of concurrent operations allowed (must be positive).
+     * @throws IllegalArgumentException If the concurrency value is zero or negative.
+     */
+    public void setMaxConcurrency(int concurrency) {
+        this.maxConcurrency = Validation.greaterThan(concurrency, 0, "The concurrency should greater than 0.");
     }
 
     private FlowSession getNextSession(FlowSession session) {
