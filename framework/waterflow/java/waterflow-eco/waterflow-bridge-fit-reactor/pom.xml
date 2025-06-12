@@ -11,6 +11,8 @@
 
     <artifactId>waterflow-bridge-fit-reactor</artifactId>
 
+    <name>Waterflow Bridge FIT Reactor</name>
+
     <dependencies>
         <dependency>
             <groupId>org.fitframework.waterflow</groupId>

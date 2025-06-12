@@ -11,6 +11,8 @@
 
     <artifactId>fel-tool-mcp-test</artifactId>
 
+    <name>Tool MCP Test</name>
+
     <dependencies>
         <!-- FIT core -->
         <dependency>

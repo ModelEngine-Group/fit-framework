@@ -11,6 +11,8 @@
 
     <artifactId>tool-mcp-client-service</artifactId>
 
+    <name>Tool MCP Client Service</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

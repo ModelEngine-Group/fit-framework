@@ -11,6 +11,8 @@
 
     <artifactId>fel-tool-discoverer</artifactId>
 
+    <name>Tool Discoverer</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

@@ -11,6 +11,8 @@
 
     <artifactId>fel-tokenizer-hanlp-plugin</artifactId>
 
+    <name>FEL Tokenizer HanLP</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

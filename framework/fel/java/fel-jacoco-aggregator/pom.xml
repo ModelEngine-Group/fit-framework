@@ -12,6 +12,8 @@
     <artifactId>fel-jacoco-aggregator</artifactId>
     <packaging>pom</packaging>
 
+    <name>FEL Jacoco Aggregator</name>
+
     <dependencies>
         <!-- FIT Core -->
         <dependency>

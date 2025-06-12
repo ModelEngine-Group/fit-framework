@@ -11,6 +11,8 @@
 
     <artifactId>fel-langchain-service</artifactId>
 
+    <name>FEL Language Chain Service</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

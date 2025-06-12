@@ -11,6 +11,8 @@
 
     <artifactId>fel-tool-executor</artifactId>
 
+    <name>Tool Executor</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

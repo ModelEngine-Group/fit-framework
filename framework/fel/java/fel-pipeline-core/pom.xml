@@ -11,6 +11,8 @@
 
     <artifactId>fel-pipeline-core</artifactId>
 
+    <name>FEL Pipeline Core</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

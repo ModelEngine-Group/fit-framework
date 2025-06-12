@@ -12,6 +12,8 @@
     <artifactId>fel-maven-plugin-parent</artifactId>
     <packaging>pom</packaging>
 
+    <name>FEL Maven Plugin Parent</name>
+
     <modules>
         <module>tool-maven-plugin</module>
     </modules>

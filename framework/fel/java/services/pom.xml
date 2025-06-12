@@ -12,6 +12,8 @@
     <artifactId>fel-services-parent</artifactId>
     <packaging>pom</packaging>
 
+    <name>FEL Service Parent</name>
+
     <modules>
         <module>tool-info</module>
         <module>tool-mcp-client-service</module>

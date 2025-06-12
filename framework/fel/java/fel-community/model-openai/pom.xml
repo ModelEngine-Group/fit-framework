@@ -11,6 +11,8 @@
 
     <artifactId>fel-model-openai-plugin</artifactId>
 
+    <name>FEL Model OpenAI</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

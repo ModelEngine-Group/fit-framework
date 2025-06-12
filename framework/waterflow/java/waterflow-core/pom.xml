@@ -9,8 +9,9 @@
         <version>3.5.0-SNAPSHOT</version>
     </parent>
 
-    <name>waterflow-core</name>
     <artifactId>waterflow-core</artifactId>
+
+    <name>waterflow-core</name>
 
     <dependencies>
         <dependency>

@@ -11,6 +11,8 @@
 
     <artifactId>fel-tool-repository-simple</artifactId>
 
+    <name>Tool Repository Simple</name>
+
     <dependencies>
         <!-- FIT core -->
         <dependency>

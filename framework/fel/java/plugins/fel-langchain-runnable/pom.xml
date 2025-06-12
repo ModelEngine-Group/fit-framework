@@ -11,6 +11,8 @@
 
     <artifactId>fel-langchain-runnable</artifactId>
 
+    <name>FEL Langchain Runnable</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

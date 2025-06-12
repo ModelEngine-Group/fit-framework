@@ -11,6 +11,8 @@
 
     <artifactId>tool-mcp-common</artifactId>
 
+    <name>Tool MCP Common</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

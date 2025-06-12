@@ -11,6 +11,8 @@
 
     <artifactId>fel-flow</artifactId>
 
+    <name>FEL Flow</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

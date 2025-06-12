@@ -11,6 +11,8 @@
 
     <artifactId>fel-core</artifactId>
 
+    <name>FEL Core</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

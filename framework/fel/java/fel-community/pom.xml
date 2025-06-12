@@ -12,6 +12,8 @@
     <artifactId>fel-community-parent</artifactId>
     <packaging>pom</packaging>
 
+    <name>FEL Community Parent</name>
+
     <modules>
         <module>model-openai</module>
         <module>tokenizer-hanlp</module>

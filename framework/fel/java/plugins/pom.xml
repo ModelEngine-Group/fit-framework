@@ -12,7 +12,10 @@
     <artifactId>fel-plugin-parent</artifactId>
     <packaging>pom</packaging>
 
+    <name>FEL Plugin Parent</name>
+
     <modules>
+        <module>fel-langchain-runnable</module>
         <module>tool-discoverer</module>
         <module>tool-executor</module>
         <module>tool-factory-repository</module>
@@ -20,6 +23,5 @@
         <module>tool-mcp-server</module>
         <module>tool-mcp-test</module>
         <module>tool-repository-simple</module>
-        <module>fel-langchain-runnable</module>
     </modules>
 </project>

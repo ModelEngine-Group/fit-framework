@@ -11,6 +11,8 @@
 
     <artifactId>fel-tool-mcp-client</artifactId>
 
+    <name>Tool MCP Client</name>
+
     <dependencies>
         <!-- FIT core -->
         <dependency>

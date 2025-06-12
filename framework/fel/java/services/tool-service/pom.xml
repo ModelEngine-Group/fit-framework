@@ -11,6 +11,8 @@
 
     <artifactId>tool-service</artifactId>
 
+    <name>Tool Service</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

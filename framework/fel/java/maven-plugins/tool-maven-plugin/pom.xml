@@ -12,6 +12,8 @@
     <artifactId>tool-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
+    <name>Tool Maven Plugin</name>
+
     <dependencies>
         <!-- FIT -->
         <dependency>

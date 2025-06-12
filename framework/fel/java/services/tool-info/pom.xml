@@ -11,6 +11,8 @@
 
     <artifactId>tool-info</artifactId>
 
+    <name>Tool Info</name>
+
     <dependencies>
         <dependency>
             <groupId>org.fitframework</groupId>
