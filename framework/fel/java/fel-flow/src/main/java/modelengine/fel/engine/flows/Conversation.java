@@ -47,6 +47,9 @@ public class Conversation<D, R> {
      */
     public Conversation(AiProcessFlow<D, R> flow, FlowSession session) {
         this.flow = Validation.notNull(flow, "Flow cannot be null.");
+        if (session != null) {
+            session.begin();
+        }
         this.session =
                 (session == null) ? this.setConverseListener(new FlowSession(true)) : this.setSubConverseListener(session);
         this.session.begin();
