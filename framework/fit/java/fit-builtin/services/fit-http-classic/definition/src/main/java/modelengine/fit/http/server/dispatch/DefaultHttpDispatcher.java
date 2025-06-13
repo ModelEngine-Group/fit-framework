@@ -85,7 +85,8 @@ public class DefaultHttpDispatcher implements HttpDispatcher {
     @Override
     public HttpHandler dispatch(HttpClassicServerRequest request, HttpClassicResponse response) {
         log.debug("Remote address accessed. [path={}, remote={}]",
-                request.path(), request.remoteAddress().hostAddress());
+                request.path(),
+                request.remoteAddress().hostAddress());
         return OptionalUtils.get(() -> this.selectFromNoPathVariableHandlers(request))
                 .orElse(() -> this.selectFromPathVariableHandlers(request))
                 .orElse(() -> this.selectFromWildcardHandlers(request))
@@ -197,6 +198,10 @@ public class DefaultHttpDispatcher implements HttpDispatcher {
     @Override
     public void registerGroup(HttpHandlerGroup group) {
         if (group != null) {
+            if (this.groups.containsKey(group.getName())) {
+                throw new IllegalStateException(StringUtils.format("Http handler group already exists. [group={0}]",
+                        group.getName()));
+            }
             this.groups.put(group.getName(), group);
         }
     }
