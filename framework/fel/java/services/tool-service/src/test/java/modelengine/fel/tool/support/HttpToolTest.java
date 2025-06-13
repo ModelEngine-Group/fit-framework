@@ -31,6 +31,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +51,8 @@ import java.util.stream.Stream;
  * @since 2024-06-12
  */
 public class HttpToolTest {
+    private static final Logger log = LoggerFactory.getLogger(HttpToolTest.class);
+
     private static final String TOOL_PATH = "tool/";
     private static Integer port = null;
     private static final String DEFINITION_GROUP_NAME = "test_definition_group_name";
@@ -66,11 +70,13 @@ public class HttpToolTest {
         if (port == null) {
             port = getLocalAvailablePort();
         }
+        log.warn("!!!test in github action!!! setup all: port: {}", port);
         TestFitRuntime.INSTANCE.start(port);
     }
 
     @AfterAll
     static void teardownAll() {
+        log.warn("!!!test in github action!!! teardown all");
         TestFitRuntime.INSTANCE.stop();
     }
 
@@ -132,11 +138,13 @@ public class HttpToolTest {
 
         Address address = Address.create("jiangsu", "suzhou", 3205);
         Education education = Education.create("QUST", "UCAS");
+        log.warn("!!!test in github action!!! test shouldReturnMap, before execute tool");
         Map<String, Object> result = cast(tool.execute("Alice",
                 26,
                 address,
                 education,
                 Stream.of("0123-4567-8888", "0123-4567-9999").collect(Collectors.toList())));
+        log.warn("!!!test in github action!!! test shouldReturnMap, after execute tool");
         Map<String, Object> addressResult = cast(result.get("address"));
         Map<String, Object> educationResult = cast(result.get("education"));
         List<String> phoneNumbers = cast(result.get("phoneNumbers"));
@@ -156,7 +164,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("string.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test shouldReturnString, before execute tool");
         String result = cast(tool.execute(Stream.of("abc", "def", "ghi").collect(Collectors.toList())));
+        log.warn("!!!test in github action!!! test shouldReturnString, after execute tool");
         assertThat(result).isEqualTo("abc,def,ghi");
     }
 
@@ -166,7 +176,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("integer.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test shouldReturnInteger, before execute tool");
         Integer result = cast(tool.execute(Stream.of(1, 2, 3).collect(Collectors.toList())));
+        log.warn("!!!test in github action!!! test shouldReturnInteger, after execute tool");
         assertThat(result).isEqualTo(6);
     }
 
@@ -176,7 +188,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("void.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test shouldReturnNull, before execute tool");
         Object result = tool.execute();
+        log.warn("!!!test in github action!!! test shouldReturnNull, after execute tool");
         assertThat(result).isEqualTo(null);
     }
 
@@ -186,7 +200,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("basic-auth.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test BasicShouldReturnOk, before execute tool");
         boolean result = cast(tool.execute("{\"name\":\"testuser\", \"pwd\":\"testpass\"}"));
+        log.warn("!!!test in github action!!! test BasicShouldReturnOk, after execute tool");
         assertThat(result).isEqualTo(true);
     }
 
@@ -196,7 +212,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("api-key-auth.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test ApiKeyShouldReturnOk, before execute tool");
         boolean result = cast(tool.execute("{\"name\":\"ApiKey\", \"pwd\":\"ApiKeyValue\"}"));
+        log.warn("!!!test in github action!!! test ApiKeyShouldReturnOk, after execute tool");
         assertThat(result).isEqualTo(true);
     }
 
@@ -206,7 +224,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("api-key-query-auth.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test ApiKeyQueryShouldReturnOk, before execute tool");
         boolean result = cast(tool.execute("{\"name\":\"ApiKey\", \"pwd\":\"ApiKeyValue\"}"));
+        log.warn("!!!test in github action!!! test ApiKeyQueryShouldReturnOk, after execute tool");
         assertThat(result).isEqualTo(true);
     }
 
@@ -216,7 +236,9 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("bearer-auth.json");
         Tool tool = createTool(info);
 
+        log.warn("!!!test in github action!!! test BearerShouldReturnOk, before execute tool");
         boolean result = cast(tool.execute("{\"name\":\"test666666666\", \"pwd\":\"invalid\"}"));
+        log.warn("!!!test in github action!!! test BearerShouldReturnOk, after execute tool");
         assertThat(result).isEqualTo(true);
     }
 }
