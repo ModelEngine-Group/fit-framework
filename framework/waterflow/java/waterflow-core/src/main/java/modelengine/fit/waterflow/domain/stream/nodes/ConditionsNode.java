@@ -12,6 +12,7 @@ import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo
 import modelengine.fit.waterflow.domain.context.repo.flowlock.FlowLocks;
 import modelengine.fit.waterflow.domain.enums.FlowNodeType;
 import modelengine.fit.waterflow.domain.utils.UUIDUtil;
+import modelengine.fitframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +83,12 @@ public class ConditionsNode<I> extends Node<I, I> {
                         .filter(context -> subscription.getWhether().is(context.getData()))
                         .collect(Collectors.toList());
                 matched.forEach(contexts::remove);
-                subscription.cache(matched);
+                // For order-sensitive data, directly synchronously executes the next conditional branch node.
+                if (CollectionUtils.isNotEmpty(matched) && matched.get(0).getSession().preserved()) {
+                    subscription.process(matched);
+                } else {
+                    subscription.cache(matched);
+                }
             });
         }
 

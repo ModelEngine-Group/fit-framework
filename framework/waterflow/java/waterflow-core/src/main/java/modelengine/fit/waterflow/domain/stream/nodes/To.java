@@ -140,7 +140,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Getter
     private ProcessMode processMode;
 
-    private Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
+    private final Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
 
     private Operators.Validator<I> validator = (repo, to) -> repo.requestMappingContext(to.streamId,
             to.froms.stream().map(Identity::getId).collect(Collectors.toList()),
@@ -289,6 +289,38 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             return;
         }
         this.triggerNodeProcessor(type);
+    }
+
+    @Override
+    public void process(ProcessType type, List<FlowContext<I>> contexts) {
+        Validation.isTrue(ProcessType.PROCESS.equals(type),
+                "Direct processing requires PROCESS type, but received: " + type);
+        this.directProcess(contexts);
+    }
+
+    private void directProcess(List<FlowContext<I>> preList) {
+        try {
+            if (CollectionUtils.isEmpty(preList)) {
+                return;
+            }
+            if (preList.size() == 1 && preList.get(0).getData() == null) {
+                this.afterProcess(preList, new ArrayList<>());
+                return;
+            }
+            List<FlowContext<O>> afterList = this.getProcessMode().process(this, preList);
+            this.afterProcess(preList, afterList);
+            if (CollectionUtils.isNotEmpty(afterList)) {
+                feedback(afterList);
+                this.onNext(afterList.get(0).getBatchId());
+            }
+            afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
+        } catch (Exception ex) {
+            LOG.error("Node direct process exception. [streamId={}, nodeId={}, positionId={}, traceId={}, causedBy={}]",
+                    this.streamId, this.id, preList.get(0).getPosition(), preList.get(0).getTraceId(),
+                    ex.getClass().getName());
+            LOG.debug("Node process exception details: ", ex);
+            this.fail(ex, preList);
+        }
     }
 
     private synchronized void triggerNodeProcessor(ProcessType type) {

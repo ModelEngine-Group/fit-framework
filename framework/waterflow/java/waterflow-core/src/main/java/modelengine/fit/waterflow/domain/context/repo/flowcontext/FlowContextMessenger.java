@@ -54,4 +54,18 @@ public interface FlowContextMessenger {
      * @param <I> 流程实例执行时的入参数据类型，用于泛型推倒
      */
     <I> void sendCallback(List<FlowContext<I>> contexts);
+
+    /**
+     * Directly processes a list of flow contexts through the specified subscriber.
+     * This method serves as a default implementation for immediate processing without
+     * any intermediate transformations or routing.
+     *
+     * @param <I> The type of input data contained in the flow contexts.
+     * @param type The type of processing to be performed.
+     * @param subscriber The subscriber that will handle the processing.
+     * @param context List of flow contexts to be processed.
+     */
+    default <I> void directProcess(ProcessType type, Subscriber<I, ?> subscriber, List<FlowContext<I>> context) {
+        subscriber.process(type, context);
+    }
 }

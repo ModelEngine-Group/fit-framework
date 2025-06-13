@@ -105,4 +105,18 @@ public class When<I> extends IdGenerator implements Subscription<I> {
     public String getStreamId() {
         return this.streamId;
     }
+
+    @Override
+    public void process(List<FlowContext<I>> contexts) {
+        if (CollectionUtils.isEmpty(contexts)) {
+            return;
+        }
+        List<FlowContext<I>> converted = contexts.stream()
+                .map(context -> context.convertData(context.getData(), context.getId())
+                        .setPosition(this.to.getId())
+                        .setStatus(FlowNodeStatus.READY))
+                .collect(Collectors.toList());
+        repo.updateStatus(converted, FlowNodeStatus.READY.toString(), this.to.getId());
+        messenger.directProcess(this.to.isAuto() ? PROCESS : PRE_PROCESS, this.to, converted);
+    }
 }

@@ -50,6 +50,21 @@ public class Conditions<D, I, F extends Flow<D>> extends Activity<D, F> {
     }
 
     /**
+     * Creates a conditional branch that executes when the specified condition is met.
+     * This establishes a processing path that will only be followed if the predicate
+     * evaluates to true for the input data.
+     *
+     * @param <O> The output type of the branch processor.
+     * @param whether The condition predicate that determines branch activation.
+     * @param processor The transformation to apply when the condition is met.
+     * @return A {@link WhenHappen} instance representing the conditional relationship,
+     *         allowing for further chaining of operations.
+     */
+    public <O> WhenHappen<O, D, I, F> when(Operators.Whether<I> whether, Operators.Then<I, O> processor) {
+        return new WhenHappen<>(whether, processor, this);
+    }
+
+    /**
      * 在满足条件时跳转到指定节点。
      *
      * @param whether 表示条件判定函数的 {@link Operators.Whether}{@code <} {@link I}{@code >}。
