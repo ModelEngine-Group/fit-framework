@@ -27,7 +27,7 @@ import java.util.Map;
  * @since 2024-06-17
  */
 @Component
-@RequestMapping(group = "Test")
+@RequestMapping(group = "http-client-test")
 public class TestController {
     /**
      * 用于测试验证 Http 服务端各个注解是否正常

@@ -34,7 +34,7 @@ import java.util.Map;
  * @since 2024-06-15
  */
 @Component
-@RequestMapping(group = "Test")
+@RequestMapping(group = "http-tool-test")
 public class HttpClientTestController {
     /**
      * 表示返回值为 {@link Map} 的 HTTP 服务端接口。
