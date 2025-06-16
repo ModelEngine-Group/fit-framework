@@ -53,7 +53,7 @@ public class AiWhenHappen<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> 
      *
      * @param processor The handler to process unmatched inputs.
      * @return An {@link AiState} representing the terminal node of the conditional flow.
-     * @throws IllegalArgumentException if processor is null
+     * @throws IllegalArgumentException if processor is null.
      */
     public AiState<O, D, O, RF, F> others(Operators.Then<I, O> processor) {
         Validation.notNull(processor, "Ai branch processor cannot be null.");

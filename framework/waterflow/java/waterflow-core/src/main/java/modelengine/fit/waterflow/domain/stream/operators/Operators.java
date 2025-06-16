@@ -298,8 +298,8 @@ public final class Operators {
      * This functional interface defines the processing operation that converts an
      * input of one type to an output of potentially different type.
      *
-     * @param <T> The type of raw material (input) to be processed
-     * @param <R> The type of product (output) to be produced
+     * @param <T> The type of raw material (input) to be processed.
+     * @param <R> The type of product (output) to be produced.
      */
     @FunctionalInterface
     public interface Then<T, R> {

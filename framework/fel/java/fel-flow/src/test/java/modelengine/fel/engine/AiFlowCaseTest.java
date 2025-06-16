@@ -34,18 +34,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2025-06-11
  */
 public class AiFlowCaseTest {
+    private static final int SPEED = 1;
     @Nested
     class DesensitizeCase {
         private final ChatFlowModel model = new ChatFlowModel((prompt, chatOption) -> Choir.create(emitter -> {
             emitter.emit(new AiMessage("<think>"));
-            for (int i = 0; i < 10; i++) {
+            int takeTime = 10 * SPEED;
+            SleepUtil.sleep(takeTime);
+            for (int i = 0; i < 48; i++) {
                 emitter.emit(new AiMessage(String.valueOf(i)));
-                SleepUtil.sleep(100);
+                SleepUtil.sleep(takeTime);
             }
             emitter.emit(new AiMessage("</think>"));
-            for (int i = 100; i < 110; i++) {
+            SleepUtil.sleep(takeTime);
+            for (int i = 100; i < 150; i++) {
                 emitter.emit(new AiMessage(String.valueOf(i)));
-                SleepUtil.sleep(100);
+                SleepUtil.sleep(takeTime);
             }
             emitter.complete();
         }), ChatOption.custom().model("modelName").stream(true).build());
@@ -60,7 +64,8 @@ public class AiFlowCaseTest {
                     this.log(input);
                     return input;
                 })
-                .map(this::mockDesensitize)
+                .map(this::mockDesensitize1)
+                .map(this::mockDesensitize2)
                 .close();
 
         @Test
@@ -74,7 +79,7 @@ public class AiFlowCaseTest {
             }).offer(Tip.fromArray("hi"));
             result.await();
             System.out.printf("time:%s, cost=%s\n", System.currentTimeMillis(), System.currentTimeMillis() - startTime);
-            Assertions.assertEquals(22, counter.get());
+            Assertions.assertEquals(100, counter.get());
         }
 
         private Chunk classic(ChatMessage message, StateContext ctx) {
@@ -92,8 +97,14 @@ public class AiFlowCaseTest {
             return new Chunk(false, message.text());
         }
 
-        private String mockDesensitize(Chunk chunk) {
+        private String mockDesensitize1(Chunk chunk) {
+            SleepUtil.sleep(10 * SPEED);
             return chunk.content.replace("3", "*");
+        }
+
+        private String mockDesensitize2(String chunk) {
+            SleepUtil.sleep(10 * SPEED);
+            return chunk.replace("4", "*");
         }
 
         private void log(Chunk chunk) {
@@ -113,17 +124,17 @@ public class AiFlowCaseTest {
     /**
      * Simulates a backpressure scenario where:
      * <ol>
-     *     <li>The LLM generates data (50ms per item) faster than the TTS can process it.</li>
+     *     <li>The LLM generates data faster than the TTS can process it.</li>
      *     <li>TTS processing is constrained to a single thread.</li>
-     *     <li>TTS processing speed is artificially slowed (100ms per item).</li>
+     *     <li>TTS processing speed is artificially slowed.</li>
      * </ol>
      */
     @Nested
     class BackPressureCase {
         private final ChatFlowModel model = new ChatFlowModel((prompt, chatOption) -> Choir.create(emitter -> {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 100; i++) {
                 emitter.emit(new AiMessage(String.valueOf(i)));
-                SleepUtil.sleep(50);
+                SleepUtil.sleep(5 * SPEED);
             }
             emitter.complete();
             System.out.printf("time:%s, generate completed.\n", System.currentTimeMillis());
@@ -132,6 +143,7 @@ public class AiFlowCaseTest {
         private final AiProcessFlow<Tip, String> flow = AiFlows.<Tip>create()
                 .prompt(Prompts.human("{{0}}"))
                 .generate(model)
+                .map(this::mockDesensitize).concurrency(1) // Limit processing to 1 concurrent thread
                 .map(this::mockTTS).concurrency(1) // Limit processing to 1 concurrent thread
                 .close();
 
@@ -146,30 +158,36 @@ public class AiFlowCaseTest {
             }).offer(Tip.fromArray("hi"));
             result.await();
             System.out.printf("time:%s, cost=%s\n", System.currentTimeMillis(), System.currentTimeMillis() - startTime);
-            Assertions.assertEquals(10, counter.get());
+            Assertions.assertEquals(100, counter.get());
         }
 
-        private String mockTTS(ChatMessage chunk) {
+        private String mockDesensitize(ChatMessage chunk) {
             // Simulate time-consuming operation with a delay.
-            SleepUtil.sleep(100);
-            return chunk.text();
+            SleepUtil.sleep(10 * SPEED);
+            return chunk.text().replace("3", "*");
+        }
+
+        private String mockTTS(String chunk) {
+            // Simulate time-consuming operation with a delay.
+            SleepUtil.sleep(10 * SPEED);
+            return chunk;
         }
     }
 
     /**
      * Demonstrates concurrent processing with balanced throughput where:
      * <ol>
-     *     <li>LLM generates data at moderate pace (50ms per item)</li>
-     *     <li>Downstream processing runs with 3 concurrent threads</li>
-     *     <li>Processing speed is slightly slower than generation (150ms vs 50ms)</li>
+     *     <li>LLM generates data at moderate pace.</li>
+     *     <li>Downstream processing runs with 3 concurrent threads.</li>
+     *     <li>Processing speed is slightly slower than generation (3 : 1).</li>
      * </ol>
      */
     @Nested
     class ConcurrencyCase {
         private final ChatFlowModel model = new ChatFlowModel((prompt, chatOption) -> Choir.create(emitter -> {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 100; i++) {
                 emitter.emit(new AiMessage(String.valueOf(i)));
-                SleepUtil.sleep(50);
+                SleepUtil.sleep(10 * SPEED);
             }
             emitter.complete();
         }), ChatOption.custom().model("modelName").stream(true).build());
@@ -191,12 +209,12 @@ public class AiFlowCaseTest {
             }).offer(Tip.fromArray("hi"));
             result.await();
             System.out.printf("time:%s, cost=%s\n", System.currentTimeMillis(), System.currentTimeMillis() - startTime);
-            Assertions.assertEquals(10, counter.get());
+            Assertions.assertEquals(100, counter.get());
         }
 
         private String mockDesensitize(ChatMessage chunk) {
             // Simulate slower processing at 1/3 speed of LLM generation.
-            SleepUtil.sleep(150);
+            SleepUtil.sleep(30 * SPEED);
             return chunk.text().replace("3", "*");
         }
     }

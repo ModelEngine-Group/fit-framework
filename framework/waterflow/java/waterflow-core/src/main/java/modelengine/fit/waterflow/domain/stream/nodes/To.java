@@ -100,8 +100,6 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Getter
     private final FlowLocks locks;
 
-    private int maxConcurrency = MAX_CONCURRENCY;
-
     // 默认自动流转过滤器是按batchID批次过滤contexts
     private final Operators.Filter<I> defaultAutoFilter = (contexts) -> {
         if (CollectionUtils.isEmpty(contexts)) {
@@ -140,7 +138,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Getter
     private ProcessMode processMode;
 
-    private final Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
+    private Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
 
     private Operators.Validator<I> validator = (repo, to) -> repo.requestMappingContext(to.streamId,
             to.froms.stream().map(Identity::getId).collect(Collectors.toList()),
@@ -162,6 +160,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
      */
     private Operators.Produce<FlowContext<I>, O> produce;
 
+    private volatile int maxConcurrency = MAX_CONCURRENCY;
     /**
      * 当前并发度，已经提交的批次
      */

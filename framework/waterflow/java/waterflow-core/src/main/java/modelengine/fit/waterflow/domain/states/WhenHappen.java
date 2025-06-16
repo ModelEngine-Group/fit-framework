@@ -52,7 +52,7 @@ public class WhenHappen<O, D, I, F extends Flow<D>> {
      *
      * @param processor The handler to process unmatched inputs.
      * @return An {@link State} representing the join node of the conditional flow.
-     * @throws IllegalArgumentException if processor is null
+     * @throws IllegalArgumentException if processor is null.
      */
     public State<O, D, O, F> others(Operators.Then<I, O> processor) {
         this.when(null, processor);
