@@ -405,7 +405,7 @@ TreeNode.propTypes = {
   form: PropTypes.object,
   shape: PropTypes.object,
   showDescription: PropTypes.bool,
-  treeData: PropTypes.object,
+  treeData: PropTypes.array,
   output: PropTypes.object,
 };
 

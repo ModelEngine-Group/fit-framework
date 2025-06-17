@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {copyPasteHelper, ElsaCopyHandler, page, PAGE_OPERATION_MODE, shapeDataHelper, sleep, uuid} from '@fit-elsa/elsa-core';
-import {SYSTEM_ACTION, VIRTUAL_CONTEXT_NODE} from '@/common/Consts.js';
+import {OBSERVER_STATUS, SYSTEM_ACTION, VIRTUAL_CONTEXT_NODE} from '@/common/Consts.js';
 import {conditionRunner, inactiveNodeRunner, standardRunner} from '@/flow/runners.js';
 import {message} from 'antd';
 
@@ -149,6 +149,17 @@ export const jadeFlowPage = (div, graph, name, id) => {
    */
   self.getObservable = (nodeId, observableId) => {
     return self.observableStore.getObservable(nodeId, observableId);
+  };
+
+  /**
+   * 通知该节点所有树上子节点的observable.
+   *
+   * @param nodeId 所属节点的id.
+   * @param notifyTreeNodeId 通知的树上的id.
+   * @return {*|null}
+   */
+  self.notifySubNodeObserver = (nodeId, notifyTreeNodeId) => {
+    return self.observableStore.notifySubNodeObserver(nodeId, notifyTreeNodeId);
   };
 
   /**
@@ -826,6 +837,47 @@ const ObservableStore = () => {
   self.getObservable = (nodeId, observableId) => {
     const observableMap = self.store.get(nodeId);
     return observableMap ? observableMap.get(observableId) : null;
+  };
+
+  /**
+   * 通知节点上所有对应的子节点.
+   *
+   * @param nodeId 被监听节点的id.
+   * @param notifyTopTreeNodeId 通知的子节点对应的顶层父节点的id.
+   * @return {*|null}
+   */
+  self.notifySubNodeObserver = (nodeId, notifyTopTreeNodeId) => {
+    const observableMap = self.store.get(nodeId);
+    const adjacencyList = buildAdjacencyList(observableMap);
+
+    const queue = adjacencyList.get(notifyTopTreeNodeId) || [];
+
+    while (queue.length > 0) {
+      const currentObservable = queue.shift();
+
+      currentObservable.observers.forEach(o => {
+        if (o.status === OBSERVER_STATUS.ENABLE) {
+          o.notify({
+            value: currentObservable.value,
+            type: currentObservable.type
+          });
+        }
+      });
+
+      const children = adjacencyList.get(currentObservable.observableId) || [];
+      queue.push(...children);
+    }
+  };
+
+  const buildAdjacencyList = (observableMap) => {
+    const adjacencyList = new Map();
+    for (const observable of observableMap.values()) {
+      if (!adjacencyList.has(observable.parentId)) {
+        adjacencyList.set(observable.parentId, []);
+      }
+      adjacencyList.get(observable.parentId).push(observable);
+    }
+    return adjacencyList;
   };
 
   /**

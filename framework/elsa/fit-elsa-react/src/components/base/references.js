@@ -91,6 +91,8 @@ export const referenceDecorate = (node) => {
         if (type !== null && type !== undefined) {
             observable.type = type;
         }
+
+        node.page.notifySubNodeObserver(node.id, observableId);
     };
 
     /**
