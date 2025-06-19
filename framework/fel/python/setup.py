@@ -25,6 +25,6 @@ setuptools.setup(
     ],
     install_requires=["langchain==0.2.6",
                       "llama_index==0.10.47",
-                      "requests==2.31"],
+                      "requests==2.32.4"],
     python_requires='==3.9.11'
 )
