@@ -201,7 +201,7 @@ public class FitException extends RuntimeException {
      * @return 表示包装的 FIT 通用异常的 {@link FitException}。
      */
     public static FitException wrap(@Nonnull Throwable cause, String genericableId) {
-        return wrap(cause, genericableId, StringUtils.EMPTY);
+        return wrap(cause, genericableId, cause.getMessage());
     }
 
     /**
@@ -213,7 +213,7 @@ public class FitException extends RuntimeException {
      * @return 表示包装的 FIT 通用异常的 {@link FitException}。
      */
     public static FitException wrap(@Nonnull Throwable cause, String genericableId, String fitableId) {
-        return wrap(cause, genericableId, fitableId, StringUtils.EMPTY);
+        return wrap(cause, genericableId, fitableId, cause.getMessage());
     }
 
     /**
