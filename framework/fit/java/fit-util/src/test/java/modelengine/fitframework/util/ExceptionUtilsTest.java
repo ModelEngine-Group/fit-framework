@@ -106,4 +106,43 @@ public class ExceptionUtilsTest {
             assertThat(actualCause).isNotNull().hasMessage("error");
         }
     }
+
+    @Nested
+    @DisplayName("test getActualMessage(Throwable throwable)")
+    class WhenGetActualMessage {
+        @Test
+        @DisplayName("when throwable has non-blank message, return the message")
+        void givenThrowableWithMessageThenReturnMessage() {
+            Throwable throwable = new Exception("Error occurred");
+            String message = ExceptionUtils.getActualMessage(throwable);
+            assertThat(message).isEqualTo("Error occurred");
+        }
+
+        @Test
+        @DisplayName("when throwable chain has non-blank message in deep cause, return the first valid message")
+        void givenDeepThrowableChainThenReturnFirstValidMessage() {
+            Throwable cause = new Exception("Root cause");
+            Throwable throwable = new Exception(null, new Exception("   ", cause));
+            String message = ExceptionUtils.getActualMessage(throwable);
+            assertThat(message).isEqualTo("Root cause");
+        }
+
+        @Test
+        @DisplayName("when throwable chain has all blank messages, return null")
+        void givenAllBlankMessagesThenReturnNull() {
+            Throwable throwable = new Exception(null, new Exception("   "));
+            String message = ExceptionUtils.getActualMessage(throwable);
+            assertThat(message).isNull();
+        }
+
+        @Test
+        @DisplayName("when throwable chain has circular reference, return valid message")
+        void givenCircularReferenceThenReturnFirstValidMessage() {
+            Exception e1 = new Exception("e1");
+            Exception e2 = new Exception("e2", e1);
+            e1.initCause(e2);
+            assertThat(ExceptionUtils.getActualMessage(e1)).isEqualTo("e1");
+            assertThat(ExceptionUtils.getActualMessage(e2)).isEqualTo("e2");
+        }
+    }
 }

@@ -55,7 +55,7 @@ public class ExceptionUtils {
     /**
      * 获取异常的原因。
      *
-     * @param throwable 表示指定异常的 {@link Exception}。
+     * @param throwable 表示指定异常的 {@link Throwable}。
      * @return 表示异常原因的 {@link String}。
      */
     public static String getReason(Throwable throwable) {
@@ -63,5 +63,24 @@ public class ExceptionUtils {
             return "No exception";
         }
         return throwable.getClass().getSimpleName() + ": " + throwable.getMessage();
+    }
+
+    /**
+     * 获取从异常链中找出第一个非空的异常消息。
+     *
+     * @param throwable 表示指定异常的 {@link Throwable}。
+     * @return 表示异常原因的 {@link String}。
+     */
+    public static String getActualMessage(Throwable throwable) {
+        Set<Throwable> visited = new HashSet<>();
+        while (throwable != null && !visited.contains(throwable)) {
+            visited.add(throwable);
+            String message = throwable.getMessage();
+            if (StringUtils.isNotBlank(message)) {
+                return message;
+            }
+            throwable = throwable.getCause();
+        }
+        return null;
     }
 }
