@@ -161,6 +161,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     private Operators.Produce<FlowContext<I>, O> produce;
 
     private volatile int maxConcurrency = MAX_CONCURRENCY;
+
     /**
      * 当前并发度，已经提交的批次
      */

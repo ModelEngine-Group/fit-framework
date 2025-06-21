@@ -21,6 +21,7 @@ import modelengine.fit.waterflow.domain.utils.SleepUtil;
 import modelengine.fitframework.flowable.Choir;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class AiFlowCaseTest {
     private static final int SPEED = 1;
+
     @Nested
     class DesensitizeCase {
         private final ChatFlowModel model = new ChatFlowModel((prompt, chatOption) -> Choir.create(emitter -> {
@@ -69,6 +71,7 @@ public class AiFlowCaseTest {
                 .close();
 
         @Test
+        @DisplayName("DesensitizeCase")
         void run() {
             AtomicInteger counter = new AtomicInteger(0);
             long startTime = System.currentTimeMillis();
@@ -148,6 +151,7 @@ public class AiFlowCaseTest {
                 .close();
 
         @Test
+        @DisplayName("BackPressureCase")
         void run() {
             AtomicInteger counter = new AtomicInteger(0);
             long startTime = System.currentTimeMillis();
@@ -199,6 +203,7 @@ public class AiFlowCaseTest {
                 .close();
 
         @Test
+        @DisplayName("ConcurrencyCase")
         void run() {
             AtomicInteger counter = new AtomicInteger(0);
             long startTime = System.currentTimeMillis();
