@@ -78,7 +78,7 @@ public class RegistryServer implements RegistryService {
         this.worker = worker;
     }
 
-    private  Properties getNacosProperties(NacosConfig nacosConfig) {
+    private Properties getNacosProperties(NacosConfig nacosConfig) {
         Properties properties = new Properties();
         properties.put("serverAddr", nacosConfig.getServerAddr());
         properties.put("username", Objects.toString(nacosConfig.getUsername(), ""));
@@ -127,13 +127,13 @@ public class RegistryServer implements RegistryService {
                     // 设置为非临时实例,默认ehphemeral为true
                     instance.setEphemeral(false);
                 }
-                if(heartbeatConfig.getWeight() != null) {
+                if (heartbeatConfig.getWeight() != null) {
                     instance.setWeight(heartbeatConfig.getWeight());
                 }
-                if(heartbeatConfig.getHeartBeatInterval() != null) {
+                if (heartbeatConfig.getHeartBeatInterval() != null) {
                     instance.setMetadata(Collections.singletonMap("preserved.heart.beat.interval", String.valueOf(heartbeatConfig.getHeartBeatInterval())));
                 }
-                if(heartbeatConfig.getHeartBeatTimeout() != null) {
+                if (heartbeatConfig.getHeartBeatTimeout() != null) {
                     instance.setMetadata(Collections.singletonMap("preserved.heart.beat.timeout", String.valueOf(heartbeatConfig.getHeartBeatTimeout())));
                 }
                 try {
@@ -142,7 +142,7 @@ public class RegistryServer implements RegistryService {
                     metadata.put(FITABLE_META_KEY, objectMapper.writeValueAsString(meta));
                 } catch (JsonProcessingException e) {
                     log.error("Failed to serialize metadata for worker: {}, application: {}, fitableMeta: {}, error: {}",
-                              worker, application, meta, e);
+                            worker, application, meta, e);
                 }
                 instance.setMetadata(metadata);
                 instances.add(instance);
@@ -241,7 +241,7 @@ public class RegistryServer implements RegistryService {
 
             } catch (Exception e) {
                 log.error("Failed to query fitables for genericableId: {}, fitableId: {}, error: {}",
-                          fitable.getGenericableId(), fitable.getFitableId(), e);
+                        fitable.getGenericableId(), fitable.getFitableId(), e);
             }
         }
 
@@ -322,13 +322,18 @@ public class RegistryServer implements RegistryService {
             try {
                 String groupName = fitable.getGenericableId() + fitable.getGenericableVersion();
                 String serviceName = fitable.getFitableId() + fitable.getFitableVersion();
-                EventListener listener = event ->{
-                    if (event instanceof NamingEvent || event instanceof NamingChangeEvent) {
-                        onServiceChanged(fitable);
-                    }
-                };
-                namingService.subscribe(serviceName, groupName,listener);
-                serviceSubscriptions.put(buildServiceKey(groupName, serviceName), listener);
+
+
+                EventListener eventListener = serviceSubscriptions.computeIfAbsent(buildServiceKey(groupName, serviceName), k -> {
+                    EventListener listener = event -> {
+                        if (event instanceof NamingEvent || event instanceof NamingChangeEvent) {
+                            onServiceChanged(fitable);
+                        }
+                    };
+                    return listener;
+                });
+                namingService.subscribe(serviceName, groupName, eventListener);
+
             } catch (Exception e) {
                 log.error("Failed to subscribe to Nacos service, fitableId:{},error:{}", fitable.getFitableId(), e);
             }
@@ -392,13 +397,13 @@ public class RegistryServer implements RegistryService {
                                     .add(worker.getEnvironment());
                         } catch (JsonProcessingException e) {
                             log.error("Failed to parse worker metadata for genericableId: {}, fitableId: {}, error: {}",
-                                      genericable.getGenericableId(), meta.getFitable().getFitableId(), e);
+                                    genericable.getGenericableId(), meta.getFitable().getFitableId(), e);
                         }
                     }
                 }
             } catch (Exception e) {
                 log.error("Failed to query fitable metas for genericableId: {}, error: {}",
-                          genericable.getGenericableId(), e);
+                        genericable.getGenericableId(), e);
             }
         }
 
