@@ -35,9 +35,9 @@ public class AiWhenHappen<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> 
      * This constructor initializes a stateful processor for when/then style pattern matching
      * within AI workflows.
      *
-     * @param matchHappen The core matching generator that evaluates conditions
-     * @param flow The parent AI flow
-     * @throws NullPointerException If either parameter is null
+     * @param matchHappen The core matching generator that evaluates conditions.
+     * @param flow The parent AI flow.
+     * @throws NullPointerException If either parameter is null.
      */
     public AiWhenHappen(WhenHappen<O, D, I, RF> matchHappen, F flow) {
         this.matchHappen = Validation.notNull(matchHappen, "WhenHappen cannot be null.");
