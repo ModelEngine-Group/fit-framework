@@ -1,8 +1,5 @@
 nacos:
-  serverAddr: 192.168.123.81:8848
-  heartbeat:
-    isEphemeral: true
-    weight: 1.0F
+  serverAddr: 127.0.0.1:8848
 
 fit:
   beans:
