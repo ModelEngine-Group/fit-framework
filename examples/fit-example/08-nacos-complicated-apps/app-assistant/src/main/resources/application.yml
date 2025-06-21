@@ -1,0 +1,14 @@
+application:
+  name: 'assistant'
+nacos:
+  serverAddr: 192.168.123.81:8848
+worker:
+  id: 'assistant'
+  host: '127.0.0.1'
+  environment: 'local'
+  environment-sequence: 'local'
+
+
+server:
+  http:
+    port: 8080

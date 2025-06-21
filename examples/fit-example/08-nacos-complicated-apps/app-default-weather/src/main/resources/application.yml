@@ -1,0 +1,15 @@
+application:
+  name: 'default-weather'
+
+worker:
+  id: 'default-weather'
+  host: '127.0.0.1'
+  environment: 'local'
+  environment-sequence: 'local'
+
+nacos:
+  serverAddr: 192.168.123.81:8848
+
+server:
+  http:
+    port: 8081
