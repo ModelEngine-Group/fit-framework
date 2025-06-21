@@ -11,6 +11,5 @@
     <modules>
         <module>examples</module>
         <module>framework</module>
-        <module>examples/fit-example/08-nacos-complicated-apps</module>
     </modules>
 </project>
