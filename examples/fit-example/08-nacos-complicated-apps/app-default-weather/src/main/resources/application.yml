@@ -8,7 +8,7 @@ worker:
   environment-sequence: 'local'
 
 nacos:
-  serverAddr: 192.168.123.81:8848
+  serverAddr: 127.0.0.1:8848
 
 server:
   http:
