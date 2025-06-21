@@ -83,6 +83,18 @@ public class AiState<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
     }
 
     /**
+     * Sets the maximum concurrency level for this state's processing pipeline.
+     *
+     * @param concurrency The maximum number of concurrent operations allowed (must be positive).
+     * @return The current state instance for method chaining.
+     * @throws IllegalArgumentException If the concurrency value is zero or negative.
+     */
+    public AiState<O, D, I, RF, F> concurrency(int concurrency) {
+        this.state.concurrency(concurrency);
+        return this;
+    }
+
+    /**
      * 获取当前节点的数据订阅者。
      *
      * @return 表示数据订阅者的 {@link Subscriber}{@code <}{@link I}{@code , }{@link O}{@code >}。

@@ -33,6 +33,16 @@ public interface Subscriber<I, O> extends StreamIdentity, Emitter<O, FlowSession
     void accept(ProcessType type, List<FlowContext<I>> contexts);
 
     /**
+     * Processes a batch of flow contexts according to the specified processing type.
+     * This method handles the core execution logic for the workflow engine, applying
+     * the appropriate operations to each context in the batch.
+     *
+     * @param type The type of processing to perform.
+     * @param contexts The list of flow contexts to process.
+     */
+    void process(ProcessType type, List<FlowContext<I>> contexts);
+
+    /**
      * 设置节点block
      *
      * @param block block

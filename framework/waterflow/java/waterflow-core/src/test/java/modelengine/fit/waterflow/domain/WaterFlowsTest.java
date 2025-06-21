@@ -1137,5 +1137,45 @@ class WaterFlowsTest {
             assertEquals("150unit", result.get(0));
             assertEquals("240unit", result.get(1));
         }
+
+        @Test
+        void shouldExecuteRightBranchWhenUseWhenThenBranchGivenPreserved() {
+            List<Integer> result = new ArrayList<>();
+            ProcessFlow<Integer> flow = Flows.<Integer>create()
+                    .conditions()
+                    .when(i -> i >= 5, i -> i * 10)
+                    .others(i -> i)
+                    .reduce(Integer::sum)
+                    .just(i -> result.add(i))
+                    .close();
+            FlowSession session = new FlowSession(true);
+            Window window = session.begin();
+            flow.offer(new Integer[] {1, 2, 3, 4, 5, 6}, session);
+            window.complete();
+
+            FlowsTestUtil.waitUntil(() -> !result.isEmpty(), 1000);
+            assertEquals(1, result.size());
+            assertEquals(120, result.get(0));
+        }
+
+        @Test
+        void shouldExecuteRightBranchWhenUseWhenThenBranchGivenNotPreserved() {
+            List<Integer> result = new ArrayList<>();
+            ProcessFlow<Integer> flow = Flows.<Integer>create()
+                    .conditions()
+                    .when(i -> i >= 5, i -> i * 10)
+                    .others(i -> i)
+                    .reduce(Integer::sum)
+                    .just(i -> result.add(i))
+                    .close();
+            FlowSession session = new FlowSession(false);
+            Window window = session.begin();
+            flow.offer(new Integer[] {1, 2, 3, 4, 5, 6}, session);
+            window.complete();
+
+            FlowsTestUtil.waitUntil(() -> !result.isEmpty(), 1000);
+            assertEquals(1, result.size());
+            assertEquals(120, result.get(0));
+        }
     }
 }

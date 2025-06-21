@@ -292,5 +292,24 @@ public final class Operators {
          */
         List<FlowContext<T>> validate(FlowContextRepo repo, To<T, ?> to);
     }
+
+    /**
+     * Represents a conditional node's transformation from raw material to product.
+     * This functional interface defines the processing operation that converts an
+     * input of one type to an output of potentially different type.
+     *
+     * @param <T> The type of raw material (input) to be processed.
+     * @param <R> The type of product (output) to be produced.
+     */
+    @FunctionalInterface
+    public interface Then<T, R> {
+        /**
+         * Transforms the input raw material into a processed product.
+         *
+         * @param input The raw material to be processed.
+         * @return The transformed product result.
+         */
+        R process(T input);
+    }
 }
 

@@ -58,6 +58,23 @@ public class AiConditions<D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> ext
     }
 
     /**
+     * 指定条件和处理器创建条件分支。
+     *
+     * @param whether 表示匹配条件的 {@link Operators.Whether}{@code <}{@link I}{@code >}。
+     * @param processor 表示分支处理器的 {@link Operators.Then}{@code <}{@link O}{@code , }{@link D}{@code ,
+     * }{@link I}{@code , }{@link RF}{@code , }{@link F}{@code >}。
+     * @param <O> 表示第一个条件分支指定的返回类型。
+     * @return 表示条件分支的 {@link AiMatchHappen}{@code <}{@link O}{@code , }{@link D}{@code ,
+     * }{@link I}{@code , }{@link RF}{@code , }{@link F}{@code >}。
+     * @throws IllegalArgumentException 当 {@code processor} 为 {@code null} 时。
+     */
+    public <O> AiWhenHappen<O, D, I, RF, F> when(Operators.Whether<I> whether,
+            Operators.Then<I, O> processor) {
+        Validation.notNull(processor, "Ai branch processor cannot be null.");
+        return new AiWhenHappen<>(this.conditions.when(whether, processor), this.flow());
+    }
+
+    /**
      * 指定条件和对应的处理器创建条件跳转分支。
      *
      * @param whether 表示匹配条件的 {@link Operators.Whether}{@code <}{@link I}{@code >}。

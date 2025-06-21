@@ -89,7 +89,7 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
     public Pattern<I, O> sync() {
         return new SimplePattern<>(data -> {
             FlowSession require = AiFlowSession.require();
-            FlowSession session = new FlowSession(true);
+            FlowSession session = new FlowSession(require.preserved());
             Window window = session.begin();
             session.copySessionState(require);
             ConverseLatch<O> conversation = this.getFlow().converse(session).offer(data);
@@ -116,7 +116,7 @@ public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {
      */
     protected static <O> FlowSession buildFlowSession(FlowEmitter<O> emitter) {
         FlowSession mainSession = AiFlowSession.require();
-        FlowSession flowSession = FlowSession.newRootSession(mainSession, true);
+        FlowSession flowSession = FlowSession.newRootSession(mainSession, mainSession.preserved());
         flowSession.setInnerState(PARENT_SESSION_ID_KEY, mainSession.getId());
         ResultAction<O> resultAction = emitter::emit;
         flowSession.setInnerState(RESULT_ACTION_KEY, resultAction);

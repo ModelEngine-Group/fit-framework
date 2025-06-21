@@ -28,6 +28,14 @@ public interface Subscription<I> extends StreamIdentity {
     void cache(List<FlowContext<I>> contexts);
 
     /**
+     * Immediately sends data to subscriber for processing the given flow contexts.
+     * This method executes synchronously and blocks until all contexts have been processed.
+     *
+     * @param contexts The list of flow contexts to process and send to subscribers。
+     */
+    void process(List<FlowContext<I>> contexts);
+
+    /**
      * getWhether
      *
      * @return Whether
