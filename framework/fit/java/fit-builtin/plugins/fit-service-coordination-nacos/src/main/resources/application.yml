@@ -1,0 +1,11 @@
+nacos:
+  serverAddr: 192.168.123.81:8848
+  heartbeat:
+    isEphemeral: true
+    weight: 1.0F
+
+fit:
+  beans:
+    packages:
+      - 'modelengine.fit.service'
+      - 'modelengine.fit.heartbeat'
