@@ -12,10 +12,10 @@ import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.conf.Config;
 
 /**
- * 
- * @author mikeaaaaaa
- * @description
- * @created 2025/6/14
+ * 表示配置项 {@code 'nacos.heartbeat'} 下的配置。
+ *
+ * @author 董智豪
+ * @since 2025-06-21
  */
 @Component
 @AcceptConfigValues("nacos.heartbeat")
