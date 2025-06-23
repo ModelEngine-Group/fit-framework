@@ -10,12 +10,13 @@ import static modelengine.fitframework.inspection.Validation.isTrue;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fel.tool.ToolInfoEntity;
-import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.ToolSchema;
+import modelengine.fel.tool.info.entity.ToolEntity;
 import modelengine.fel.tool.info.entity.ToolGroupEntity;
 import modelengine.fel.tool.info.entity.ToolJsonEntity;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
 import modelengine.fitframework.plugin.Plugin;
 import modelengine.fitframework.plugin.PluginStartedObserver;
@@ -42,7 +43,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStoppingObserver {
-    private static final String TOOLS = "tools";
     private final ToolRepository toolRepository;
     private final ObjectSerializer serializer;
     private final int maxToolNum;
@@ -55,7 +55,7 @@ public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStopp
      * @param maxNum 表示插件最大工具数量的 {@code int}。
      * @throws IllegalArgumentException 当 {@code toolRepository}、{@code objectSerializer} 为 {@code null} 时。
      */
-    public DefaultToolDiscoverer(ToolRepository toolRepository, ObjectSerializer serializer,
+    public DefaultToolDiscoverer(ToolRepository toolRepository, @Fit(alias = "json") ObjectSerializer serializer,
             @Value("${tool.max-num}") int maxNum) {
         this.toolRepository = notNull(toolRepository, "The tool repository cannot be null.");
         this.serializer = notNull(serializer, "The serializer cannot be null.");
@@ -94,7 +94,8 @@ public class DefaultToolDiscoverer implements PluginStartedObserver, PluginStopp
             if (toolJsonEntity == null) {
                 return Collections.emptyList();
             }
-            return toolJsonEntity.getToolGroups().stream()
+            return toolJsonEntity.getToolGroups()
+                    .stream()
                     .filter(Objects::nonNull)
                     .map(ToolGroupEntity::getTools)
                     .filter(Objects::nonNull)

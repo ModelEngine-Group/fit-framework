@@ -20,6 +20,7 @@ import modelengine.fit.http.annotation.GetMapping;
 import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestParam;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Property;
 import modelengine.fitframework.annotation.Value;
 import modelengine.fitframework.flowable.Choir;
@@ -42,7 +43,7 @@ public class OutputParserExampleController {
     @Value("${example.model}")
     private String modelName;
 
-    public OutputParserExampleController(ChatModel chatModel, ObjectSerializer serializer) {
+    public OutputParserExampleController(ChatModel chatModel, @Fit(alias = "json") ObjectSerializer serializer) {
         this.chatModel = chatModel;
         this.outputParser = JsonOutputParser.createPartial(serializer, Demo.class);
         this.template = new HumanMessageTemplate(new DefaultStringTemplate(

@@ -39,6 +39,7 @@ import modelengine.fit.http.annotation.GetMapping;
 import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestParam;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
 import modelengine.fitframework.serialization.ObjectSerializer;
 import modelengine.fitframework.util.FileUtils;
@@ -65,8 +66,8 @@ public class RetrievalExampleController {
     private final AiProcessFlow<String, ChatMessage> ragFlow;
     private final Memory memory = new CacheMemory();
 
-    public RetrievalExampleController(ChatModel chatModel, EmbedModel embedModel, ObjectSerializer serializer,
-            @Value("${example.model.chat}") String chatModelName,
+    public RetrievalExampleController(ChatModel chatModel, EmbedModel embedModel,
+            @Fit(alias = "json") ObjectSerializer serializer, @Value("${example.model.chat}") String chatModelName,
             @Value("${example.model.embed}") String embedModelName) {
         DocumentEmbedModel documentEmbedModel =
                 new DefaultDocumentEmbedModel(embedModel, EmbedOption.custom().model(embedModelName).build());
