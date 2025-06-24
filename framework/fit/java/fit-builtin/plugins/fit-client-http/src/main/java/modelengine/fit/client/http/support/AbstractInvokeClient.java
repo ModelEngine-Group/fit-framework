@@ -16,7 +16,6 @@ import modelengine.fit.http.client.HttpClassicClient;
 import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fit.http.client.HttpClassicClientRequest;
 import modelengine.fit.http.entity.Entity;
-import modelengine.fit.http.entity.support.DefaultReadableBinaryEntity;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.MessageHeaderNames;
 import modelengine.fit.http.protocol.MimeType;
@@ -161,15 +160,15 @@ public abstract class AbstractInvokeClient implements InvokeClient {
         int format = request.metadata().dataFormat();
         if (format == SerializationFormat.JSON.code()) {
             clientRequest.headers().add(MessageHeaderNames.CONTENT_TYPE, APPLICATION_JSON);
-        } else {
-            clientRequest.headers().add(MessageHeaderNames.CONTENT_TYPE, MimeType.APPLICATION_OCTET_STREAM.value());
+            return Entity.createObject(clientRequest, request.data());
         }
+        clientRequest.headers().add(MessageHeaderNames.CONTENT_TYPE, MimeType.APPLICATION_OCTET_STREAM.value());
         MessageSerializer messageSerializer = MessageSerializerUtils.getMessageSerializer(this.container, format)
                 .orElseThrow(() -> new IllegalStateException(StringUtils.format(
                         "MessageSerializer required but not found. [format={0}]",
                         format)));
         byte[] bytes = messageSerializer.serializeRequest(request.dataTypes(), request.data());
         clientRequest.headers().add(MessageHeaderNames.CONTENT_LENGTH, Integer.toString(bytes.length));
-        return new DefaultReadableBinaryEntity(clientRequest, new ByteArrayInputStream(bytes));
+        return Entity.createBinaryEntity(clientRequest, new ByteArrayInputStream(bytes));
     }
 }
