@@ -26,11 +26,11 @@ This experiment evaluates the frameworks' capability to handle complex AI-genera
 
 **Performance Metrics:**
 
-| Metric | AIFlow | LCEL |
-|---|---|---|
-| TTFT | 210ms ± 10ms | 280ms ± 5ms |
-| Total Latency | 10.9s ± 0.1s | 21.8s ± 0.1s |
-| Log Delay | 5.4s ± 0.1s | 10.9s ± 0.1s |
+|  Metric |  AIFlow | LCEL | RX+LLM |
+|---|---|---|---|
+| TTFT | 210ms ± 10ms | 280ms ± 5ms | 300ms ± 10ms |
+| Total Latency | 10.9s ± 0.1s | 21.8s ± 0.1s | 21.8s ± 0.1s |
+| Log Delay | 5.4s ± 0.1s | 10.9s ± 0.1s | 11s ± 0.1s |
 
 **Code Implementation:**
 
@@ -207,6 +207,125 @@ asyncio.run(main())
 print(f"take time: {(time.time() - start) * 1000:.3f}(ms)")
 ```
 
+**RX+LLM:**
+
+```java
+package modelengine.fel.engine;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+
+public class DesensitizeCase {
+    public static void main(String[] args) throws InterruptedException {
+        String userInput = "hi";
+        long startTime = System.currentTimeMillis();
+        System.out.printf("start at: %.3f(ms)%n", (double) startTime);
+
+        Flux<String> result = Mono.just(Map.of("user_input", userInput))
+                .flatMapMany(DesensitizeCase::mockStreamModel)
+                .transform(DesensitizeCase::classic)
+                .map(DesensitizeCase::log)
+                .map(DesensitizeCase::mockDesensitize1)
+                .map(DesensitizeCase::mockDesensitize2);
+
+        CountDownLatch waiter = new CountDownLatch(1);
+        result.subscribe(text -> System.out.printf("%.3f output: %s%n", (double) System.currentTimeMillis(), text),
+                error -> System.err.println("Error: " + error),
+                () -> {
+                    long endTime = System.currentTimeMillis();
+                    System.out.printf("take time: %.3f(ms)%n", (double) (endTime - startTime));
+                    waiter.countDown();
+                });
+
+        waiter.await();
+    }
+
+    private static Flux<String> mockStreamModel(Map<String, String> input) {
+        List<String> dataList = new ArrayList<>();
+        dataList.add("<think>");
+        for (int i = 0; i < 48; i++) {
+            dataList.add(String.valueOf(i));
+        }
+        dataList.add("</think>");
+        for (int i = 0; i < 50; i++) {
+            dataList.add(String.valueOf(i + 100));
+        }
+
+        long startTime = System.currentTimeMillis();
+        return Flux.generate(() -> 0, (state, sink) -> {
+            long diff = System.currentTimeMillis() - startTime;
+            if (diff < state * 100) {
+                sleep(state * 100 - diff);
+            }
+            sink.next(dataList.get(state));
+            if (state == 99) {
+                sink.complete();
+            }
+            return state + 1;
+        });
+    }
+
+    private static Flux<Chunk> classic(Flux<String> stream) {
+        AtomicReference<Boolean> isThinking = new AtomicReference<>(false);
+        return stream.map(message -> {
+            if (message.trim().equals("<think>")) {
+                isThinking.set(true);
+                return new Chunk(true, message);
+            }
+            if (message.trim().equals("</think>")) {
+                isThinking.set(false);
+                return new Chunk(true, message);
+            }
+            if (Boolean.TRUE.equals(isThinking.get())) {
+                return new Chunk(true, message);
+            }
+            return new Chunk(false, message);
+        });
+    }
+
+    private static String mockDesensitize1(Chunk input) {
+        sleep(100);
+        return input.content.replace("3", "*");
+    }
+
+    private static String mockDesensitize2(String input) {
+        sleep(100);
+        return input.replace("4", "*");
+    }
+
+    private static Chunk log(Chunk chunk) {
+        if (!chunk.isThinkContent) {
+            System.out.println("log content:" + chunk.content);
+        }
+        return chunk;
+    }
+
+    private static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private static class Chunk {
+        private final boolean isThinkContent;
+        private final String content;
+
+        private Chunk(boolean isThinkContent, String content) {
+            this.isThinkContent = isThinkContent;
+            this.content = content;
+        }
+    }
+}
+```
+
 ---
 
 ### Experiment 2: Backpressure Handling Under Single-Thread Constraints
@@ -233,10 +352,10 @@ This test examines how each framework manages processing bottlenecks when downst
 
 **Performance Metrics:**
 
-| Metric | AIFlow | LCEL |
-|---|---|---|
-| TTFT | 210ms ± 10ms | 280ms ± 10ms |
-| Total Latency | 12.5s ± 0.1s | 21.9s ± 0.1s |
+| Metric | AIFlow | LCEL | RX+LLM |
+|---|---|---|---|
+| TTFT | 210ms ± 10ms | 280ms ± 10ms | 300ms ± 10ms |
+| Total Latency | 12.5s ± 0.1s | 21.9s ± 0.1s | 21.8s ± 0.1s |
 
 **Code Implementation:**
 
@@ -338,6 +457,75 @@ asyncio.run(main())
 print(f"take time: {(time.time() - start) * 1000:.3f}(ms)")
 ```
 
+**RX+LLM:**
+
+```java
+package modelengine.fel.engine;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
+public class BackPressureCase {
+    public static void main(String[] args) throws InterruptedException {
+        String userInput = "hi";
+        long startTime = System.currentTimeMillis();
+        System.out.printf("start at: %.3f(ms)%n", (double) startTime);
+
+        Flux<String> result = Mono.just(Map.of("user_input", userInput))
+                .flatMapMany(BackPressureCase::mockStreamModel)
+                .map(BackPressureCase::mockDesensitize)
+                .map(BackPressureCase::mockTTS);
+
+        CountDownLatch waiter = new CountDownLatch(1);
+        result.subscribe(text -> System.out.printf("%.3f output: %s%n", (double) System.currentTimeMillis(), text),
+                error -> System.err.println("Error: " + error),
+                () -> {
+                    long endTime = System.currentTimeMillis();
+                    System.out.printf("take time: %.3f(ms)%n", (double) (endTime - startTime));
+                    waiter.countDown();
+                });
+
+        waiter.await();
+    }
+
+    private static Flux<String> mockStreamModel(Map<String, String> input) {
+        long startTime = System.currentTimeMillis();
+        return Flux.generate(() -> 0, (state, sink) -> {
+            long diff = System.currentTimeMillis() - startTime;
+            if (diff < state * 50) {
+                sleep(state * 50 - diff);
+            }
+            sink.next(String.valueOf(state));
+            if (state == 99) {
+                sink.complete();
+            }
+            return state + 1;
+        });
+    }
+
+    private static String mockDesensitize(String input) {
+        sleep(100);
+        return input.replace("3", "*");
+    }
+
+    private static String mockTTS(String input) {
+        sleep(100);
+        return input;
+    }
+
+    private static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+```
+
 ---
 
 ### Experiment 3: Concurrent Processing Performance
@@ -363,10 +551,10 @@ This experiment measures throughput optimization under constrained parallel proc
 
 **Performance Metrics:**
 
-| Metric | AIFlow | LCEL |
-|---|---|---|
-| TTFT | 310ms ± 10ms | 380ms ± 10ms |
-| Total Latency | 11.2s ± 0.1s | 31.6s ± 0.1s |
+| Metric | AIFlow | LCEL | RX+LLM |
+|---|---|---|---|
+| TTFT | 310ms ± 10ms | 380ms ± 10ms | 400ms ± 10ms |
+| Total Latency | 11.2s ± 0.1s | 31.6s ± 0.1s | 12.1s ± 0.1s |
 
 **Code Implementation:**
 
@@ -454,4 +642,64 @@ start = time.time()
 print(f"start at: {start * 1000:.3f}(ms)")
 asyncio.run(main())
 print(f"take time: {(time.time() - start) * 1000:.3f}(ms)")
+```
+
+**RX+LLM:**
+
+```java
+package modelengine.fel.engine;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
+public class ConcurrencyCase {
+    public static void main(String[] args) throws InterruptedException {
+        String userInput = "hi";
+        long startTime = System.currentTimeMillis();
+        System.out.printf("start at: %.3f(ms)%n", (double) startTime);
+
+        Flux<String> result = Mono.just(Map.of("user_input", userInput))
+                .flatMapMany(ConcurrencyCase::mockStreamModel)
+                .parallel(3)
+                .runOn(Schedulers.parallel())
+                .map(ConcurrencyCase::mockDesensitize)
+                .sequential();
+
+        CountDownLatch waiter = new CountDownLatch(1);
+        result.subscribe(text -> System.out.printf("%.3f output: %s%n", (double) System.currentTimeMillis(), text),
+                error -> System.err.println("Error: " + error),
+                () -> {
+                    long endTime = System.currentTimeMillis();
+                    System.out.printf("take time: %.3f(ms)%n", (double) (endTime - startTime));
+                    waiter.countDown();
+                });
+
+        waiter.await();
+    }
+
+    private static Flux<String> mockStreamModel(Map<String, String> input) {
+        Flux<Integer> firstElement = Flux.just(0);
+        Flux<Integer> restElements = Flux.range(1, 99).delayElements(Duration.ofMillis(100));
+
+        return Flux.concat(firstElement, restElements).map(String::valueOf);
+    }
+
+    private static String mockDesensitize(String input) {
+        sleep(300);
+        return input.replace("3", "*");
+    }
+
+    private static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
 ```
