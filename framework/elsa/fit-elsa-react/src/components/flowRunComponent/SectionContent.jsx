@@ -95,7 +95,36 @@ const SectionContent = ({data}) => {
   const treeData = generateTreeData(data);
 
   useEffect(() => {
+    const handleClickOutside = (e) => {
+      // 如果点击的不是树节点内容区域
+      if (!e.target.closest('.ant-tree-node-content-wrapper')) {
+        window.getSelection().removeAllRanges();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
     removeFirstLevelLine();
+
+    // 监听全局 keydown 事件
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === 'c') {
+        const selectedText = window.getSelection().toString();
+        if (selectedText) {
+          e.preventDefault(); // 阻止默认行为（可选）
+          navigator.clipboard.writeText(selectedText)
+            .catch(err => console.error('Copy failed:', err));
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [treeData]);
 
   return (<>
@@ -103,10 +132,18 @@ const SectionContent = ({data}) => {
           switcherIcon={({expanded}) => <TreeSwitcherIcon expanded={expanded}/>}
           defaultExpandAll={false}
           treeData={treeData}
-          titleRender={(nodeData) => {
-            const className = nodeData.isFirstLevel && nodeData.children.length === 0 ? 'first-level' : 'not-first';
-            return <span className={className}>{nodeData.title}</span>;
-          }}
+          titleRender={(nodeData) => (
+            <span
+              style={{
+                userSelect: 'text',       // 允许选择文本
+                WebkitUserSelect: 'text', // Safari 兼容
+                MozUserSelect: 'text',    // Firefox 兼容
+              }}
+              onMouseDown={(e) => e.stopPropagation()} // 阻止拖拽
+            >
+              {nodeData.title}
+            </span>
+          )}
     />
   </>);
 };
