@@ -12,9 +12,14 @@
 import {defaultComponent} from '@/components/defaultComponent.js';
 import {ChangeFlowMetaReducer} from '@/components/common/reducers/commonReducers.js';
 import IntelligentFormWrapper from '@/components/intelligentForm/IntelligentFormWrapper.jsx';
-import {AddParamReducer, DeleteParamReducer, UpdateParamReducer} from '@/components/intelligentForm/reducers.js';
-import {v4 as uuidv4} from 'uuid';
-import {DATA_TYPES, FROM_TYPE} from '@/common/Consts.js';
+import {
+  AddParamReducer,
+  ChangeFormByMetaDataReducer,
+  ChangeFormTypeReducer, DeleteFormReducer,
+  DeleteParamReducer, UpdateInputReducer,
+  UpdateParamReducer,
+} from '@/components/intelligentForm/reducers.js';
+import {FORM_TYPE, ORCHESTRATION_INIT_ENTITY, ORCHESTRATION_TASK_ID} from '@/components/intelligentForm/Consts.js';
 
 export const intelligentFormComponent = (jadeConfig) => {
   const self = defaultComponent(jadeConfig);
@@ -24,6 +29,10 @@ export const intelligentFormComponent = (jadeConfig) => {
   addReducer(builtInReducers, AddParamReducer());
   addReducer(builtInReducers, UpdateParamReducer());
   addReducer(builtInReducers, DeleteParamReducer());
+  addReducer(builtInReducers, ChangeFormTypeReducer());
+  addReducer(builtInReducers, ChangeFormByMetaDataReducer());
+  addReducer(builtInReducers, DeleteFormReducer());
+  addReducer(builtInReducers, UpdateInputReducer());
 
   /**
    * 必须.
@@ -32,31 +41,10 @@ export const intelligentFormComponent = (jadeConfig) => {
     return jadeConfig ? jadeConfig : {
       converter: {
         type: 'mapping_converter',
-        entity: {
-          inputParams: [{
-            id: uuidv4(),
-            name: 'data',
-            type: DATA_TYPES.OBJECT,
-            from: FROM_TYPE.EXPAND,
-            value: [],
-          }, {
-            id: uuidv4(),
-            name: 'schema',
-            type: DATA_TYPES.OBJECT,
-            from: FROM_TYPE.INPUT,
-            value: {
-              parameters: [],
-            },
-          }],
-          outputParams: [{
-            id: uuidv4(),
-            name: 'output',
-            type: DATA_TYPES.OBJECT,
-            value: [],
-          }],
-        },
+        entity: JSON.parse(JSON.stringify(ORCHESTRATION_INIT_ENTITY)),
       },
-      taskId: 'a910a3d38a4549eda1112beee008419d',
+      formType: FORM_TYPE.ORCHESTRATION,
+      taskId: ORCHESTRATION_TASK_ID,
       type: 'AIPP_SMART_FORM',
     };
   };

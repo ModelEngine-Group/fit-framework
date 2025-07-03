@@ -109,7 +109,7 @@ export const llmComponent = (jadeConfig, shape) => {
                         }
                     ],
                 },
-                DEFAULT_MAX_MEMORY_ROUNDS,
+                JSON.parse(JSON.stringify(DEFAULT_MAX_MEMORY_ROUNDS)),
                 {id: uuidv4(), name: 'tools', type: 'Array', from: 'Expand', value: []},
                 {id: uuidv4(), name: 'systemPrompt', type: 'String', from: 'Input', value: ''},
                 {

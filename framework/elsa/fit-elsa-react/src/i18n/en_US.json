@@ -414,5 +414,8 @@
   "formItemFieldTypeCannotBeEmpty": "Field type is required",
   "addParallelTask": "Add Parallel Tasks",
   "parameterDescription": "Parameter Description: ",
-  "parallelNode": "Parallel Node"
+  "parallelNode": "Parallel Node",
+  "type": "Type",
+  "orchestration": "Orchestration",
+  "manual": "Manual"
 }
