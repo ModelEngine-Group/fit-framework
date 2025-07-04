@@ -5,7 +5,7 @@
 # ======================================================================================================================
 from llama_index.core.multi_modal_llms.generic_utils import encode_image
 from llama_index.core.schema import ImageNode, TextNode, NodeWithScore
-from llama_index.core import Document as LDocument
+from llama_index.core.schema import Document as LDocument
 
 from .types.document import Document
 from .types.media import Media

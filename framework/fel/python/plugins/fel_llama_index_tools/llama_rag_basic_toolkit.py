@@ -3,30 +3,27 @@
 # This file is a part of the ModelEngine Project.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # ======================================================================================================================
-import functools
 import os
 import traceback
 from enum import Enum, unique
-from inspect import signature
 from typing import List, Callable, Any, Tuple
 
 from fitframework import fit_logger
 from fitframework.core.repo.fitable_register import register_fitable
-from llama_index.core import PromptTemplate
 from llama_index.core.base.base_selector import SingleSelection
 from llama_index.core.postprocessor import SimilarityPostprocessor, SentenceEmbeddingOptimizer, LLMRerank, \
     LongContextReorder, FixedRecencyPostprocessor
 from llama_index.core.postprocessor.types import BaseNodePostprocessor
-from llama_index.core.prompts import PromptType
+from llama_index.core.prompts import PromptType, PromptTemplate
 from llama_index.core.prompts.default_prompts import DEFAULT_CHOICE_SELECT_PROMPT_TMPL
 from llama_index.core.selectors import LLMSingleSelector, LLMMultiSelector
 from llama_index.core.selectors.prompts import DEFAULT_SINGLE_SELECT_PROMPT_TMPL, DEFAULT_MULTI_SELECT_PROMPT_TMPL
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.legacy.llms import OpenAILike
+from llama_index.llms.openai import OpenAI
 
 from .callable_registers import register_callable_tool
-from .types.document import Document
 from .node_utils import document_to_query_node, query_node_to_document
+from .types.document import Document
 
 os.environ["no_proxy"] = "*"
 
@@ -80,7 +77,7 @@ def llm_rerank(nodes: List[Document], query_str: str, **kwargs) -> List[Document
     choice_batch_size = int(kwargs.get("choice_batch_size") or 10)
     top_n = int(kwargs.get("top_n") or 10)
 
-    llm = OpenAILike(model=model_name, api_base=api_base, api_key=api_key, max_tokens=4096)
+    llm = OpenAI(model=model_name, api_base=api_base, api_key=api_key, max_tokens=4096)
     choice_select_prompt = PromptTemplate(prompt, prompt_type=PromptType.CHOICE_SELECT)
     llm_rerank_obj = LLMRerank(llm=llm, choice_select_prompt=choice_select_prompt, choice_batch_size=choice_batch_size,
                                top_n=top_n)
@@ -110,7 +107,7 @@ def llm_choice_selector(choice: List[str], query_str: str, **kwargs) -> List[Sin
     if mode.lower() not in [m.value for m in SelectorMode]:
         raise ValueError(f"Invalid mode {mode}.")
 
-    llm = OpenAILike(model=model_name, api_base=api_base, api_key=api_key, max_tokens=4096)
+    llm = OpenAI(model=model_name, api_base=api_base, api_key=api_key, max_tokens=4096)
     if mode.lower() == SelectorMode.SINGLE.value:
         selector_prompt = prompt or DEFAULT_SINGLE_SELECT_PROMPT_TMPL
         selector = LLMSingleSelector.from_defaults(llm=llm, prompt_template_str=selector_prompt)
