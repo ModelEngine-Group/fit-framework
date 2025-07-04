@@ -138,7 +138,7 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
             from: FROM_TYPE.INPUT,
             value: DEFAULT_KNOWLEDGE_REPO_GROUP,
           },
-          DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID
+          JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID)),
         ],
       }],
       outputParams: [{

@@ -29,5 +29,5 @@ export const DEFAULT_INPUT_PARAMS = [
     from: FROM_TYPE.INPUT,
     value: {},
   },
-  DEFAULT_ADD_TOOL_NODE_CONTEXT
+  JSON.parse(JSON.stringify(DEFAULT_ADD_TOOL_NODE_CONTEXT)),
 ];

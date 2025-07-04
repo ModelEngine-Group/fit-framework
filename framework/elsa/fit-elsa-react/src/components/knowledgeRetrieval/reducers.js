@@ -148,7 +148,7 @@ export const UpdateGroupIdAndConfigIdReducer = () => {
     const option = newConfig.inputParams.find(ip => ip.name === 'option');
     let groupId = option.value.find(v => v.name === 'groupId');
     if (!groupId) {
-      groupId = {...DEFAULT_KNOWLEDGE_REPO_GROUP_STRUCT};
+      groupId = JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_REPO_GROUP_STRUCT));
       option.value.push(groupId);
     }
 
@@ -160,7 +160,7 @@ export const UpdateGroupIdAndConfigIdReducer = () => {
 
     let knowledgeConfigId = option.value.find(v => v.name === 'knowledgeConfigId');
     if (!knowledgeConfigId) {
-      knowledgeConfigId = {...DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID};
+      knowledgeConfigId = JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID));
       option.value.push(knowledgeConfigId);
     }
     knowledgeConfigId.value = action.knowledgeConfigId;

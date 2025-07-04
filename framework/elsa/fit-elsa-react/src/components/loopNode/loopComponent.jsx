@@ -50,7 +50,7 @@ export const loopComponent = (jadeConfig, shape) => {
           from: FROM_TYPE.INPUT,
           value: {},
         },
-        DEFAULT_ADD_TOOL_NODE_CONTEXT,
+        JSON.parse(JSON.stringify(DEFAULT_ADD_TOOL_NODE_CONTEXT)),
       ],
       outputParams: [],
     };

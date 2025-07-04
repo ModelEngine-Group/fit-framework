@@ -7,8 +7,8 @@
 import {v4 as uuidv4} from 'uuid';
 import {manualCheckNodeState} from '@/components/manualCheck/manualCheckNodeState.jsx';
 import {intelligentFormNodeDrawer} from '@/components/intelligentForm/intelligentFormNodeDrawer.jsx';
-import {RENDER_OPTIONS_TYPE} from '@/components/intelligentForm/Consts.js';
-import {DATA_TYPES, SECTION_TYPE} from '@/common/Consts.js';
+import {FORM_TYPE, RENDER_OPTIONS_TYPE} from '@/components/intelligentForm/Consts.js';
+import {SECTION_TYPE} from '@/common/Consts.js';
 
 /**
  * jadeStream中的智能表单节点.
@@ -18,13 +18,13 @@ import {DATA_TYPES, SECTION_TYPE} from '@/common/Consts.js';
 export const intelligentFormNodeState = (id, x, y, width, height, parent, drawer) => {
   const self = manualCheckNodeState(id, x, y, width, height, parent, drawer ? drawer : intelligentFormNodeDrawer);
   self.type = 'intelligentFormNodeState';
-  self.text = '智能编排表单';
+  self.text = '表单';
   self.componentName = 'intelligentFormComponent';
 
   const transInputFormSchema = (originals) => {
     return originals.flatMap((original) => {
       // 提取原始对象的 options 部分
-      const { options, renderType, ...rest } = original;
+      const {options, renderType, ...rest} = original;
 
       const firstObject = {
         ...rest,
@@ -52,7 +52,7 @@ export const intelligentFormNodeState = (id, x, y, width, height, parent, drawer
       const {id, name, type} = original;
 
       return [{
-        id, name, type, value: ''
+        id, name, type, value: '',
       }];
     });
   };
@@ -63,6 +63,9 @@ export const intelligentFormNodeState = (id, x, y, width, height, parent, drawer
   const serializerJadeConfig = self.serializerJadeConfig;
   self.serializerJadeConfig = (jadeConfig) => {
     serializerJadeConfig.apply(self, [jadeConfig]);
+    if (self.flowMeta.task.formType !== FORM_TYPE.ORCHESTRATION) {
+      return;
+    }
     self.flowMeta.task.converter.entity.inputParams.find(item => item.name === 'data').value = transInputFormSchema(self.flowMeta.task.converter.entity.inputParams.find(item => item.name === 'schema').value.parameters);
     self.flowMeta.task.converter.entity.outputParams.find(item => item.name === 'output').value = transOutputFormSchema(self.flowMeta.task.converter.entity.inputParams.find(item => item.name === 'schema').value.parameters);
   };
@@ -90,15 +93,15 @@ export const intelligentFormNodeState = (id, x, y, width, height, parent, drawer
 
     // 这里的data是每个节点的每个章节需要展示的数据，比如工具节点展示为输入、输出的数据
     return [{
-      no: "1",
-      name: "input",
+      no: '1',
+      name: 'input',
       type: SECTION_TYPE.DEFAULT,
       data: _getInputData(),
     }, {
-      no: "2",
-      name: "output",
+      no: '2',
+      name: 'output',
       type: SECTION_TYPE.DEFAULT,
-      data: self.getOutputData(self.output)
+      data: self.getOutputData(self.output),
     }];
   };
 

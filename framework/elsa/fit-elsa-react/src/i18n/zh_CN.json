@@ -707,5 +707,8 @@
   "formItemFieldTypeCannotBeEmpty": "表单项类型不能为空",
   "addParallelTask": "添加并行任务",
   "parameterDescription": "参数介绍：",
-  "parallelNode": "并行节点"
+  "parallelNode": "并行节点",
+  "type": "类型",
+  "orchestration": "编排",
+  "manual": "人工"
 }
