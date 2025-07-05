@@ -9,10 +9,10 @@ package modelengine.fel.engine.flows;
 import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.ChatOption;
 import modelengine.fel.core.memory.Memory;
+import modelengine.fel.core.memory.support.RecentMemory;
 import modelengine.fel.engine.activities.AiStart;
 import modelengine.fel.engine.activities.FlowCallBack;
 import modelengine.fel.engine.operators.models.StreamingConsumer;
-import modelengine.fel.engine.operators.sources.Source;
 import modelengine.fel.engine.util.StateKey;
 import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
@@ -33,6 +33,8 @@ import java.util.function.Consumer;
  * @since 2024-04-28
  */
 public class Conversation<D, R> {
+    private static final int DEFAULT_HISTORY_COUNT = 20;
+
     private final AiProcessFlow<D, R> flow;
     private final FlowSession session;
     private final AtomicReference<ConverseListener<R>> converseListener = new AtomicReference<>(null);
@@ -66,6 +68,7 @@ public class Conversation<D, R> {
     @SafeVarargs
     public final ConverseLatch<R> offer(D... data) {
         ConverseLatch<R> latch = setListener(this.flow);
+        this.initMemory();
         FlowSession newSession = FlowSession.newRootSession(this.session, this.session.preserved());
         newSession.getWindow().setFrom(null);
         this.flow.start().offer(data, newSession);
@@ -85,6 +88,7 @@ public class Conversation<D, R> {
     public ConverseLatch<R> offer(String nodeId, List<?> data) {
         Validation.notBlank(nodeId, "invalid nodeId.");
         ConverseLatch<R> latch = setListener(this.flow);
+        this.initMemory();
         FlowSession newSession = new FlowSession(this.session);
         newSession.getWindow().setFrom(null);
         this.flow.origin().offer(nodeId, data.toArray(new Object[0]), newSession);
@@ -230,5 +234,11 @@ public class Conversation<D, R> {
     private FlowSession setConverseListener(FlowSession session) {
         session.setInnerState(StateKey.CONVERSE_LISTENER, new AtomicReference<>(new ConcurrentHashMap<>()));
         return session;
+    }
+
+    private void initMemory() {
+        if (this.session.getInnerState(StateKey.HISTORY) == null) {
+            this.session.setInnerState(StateKey.HISTORY, new RecentMemory(DEFAULT_HISTORY_COUNT));
+        }
     }
 }
