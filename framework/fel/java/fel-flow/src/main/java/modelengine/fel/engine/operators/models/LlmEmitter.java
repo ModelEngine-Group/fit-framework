@@ -8,12 +8,15 @@ package modelengine.fel.engine.operators.models;
 
 import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.Prompt;
+import modelengine.fel.core.chat.support.HumanMessage;
+import modelengine.fel.core.memory.Memory;
 import modelengine.fel.engine.util.StateKey;
 import modelengine.fit.waterflow.bridge.fitflow.FitBoundedEmitter;
 import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fitframework.flowable.Publisher;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.util.ObjectUtils;
+import modelengine.fitframework.util.StringUtils;
 
 /**
  * 流式模型发射器。
@@ -26,6 +29,8 @@ public class LlmEmitter<O extends ChatMessage> extends FitBoundedEmitter<O, Chat
 
     private final ChatChunk chunkAcc = new ChatChunk();
     private final StreamingConsumer<ChatMessage, ChatMessage> consumer;
+    private final Memory memory;
+    private final ChatMessage question;
 
     /**
      * 初始化 {@link LlmEmitter}。
@@ -38,6 +43,9 @@ public class LlmEmitter<O extends ChatMessage> extends FitBoundedEmitter<O, Chat
         super(publisher, data -> data);
         Validation.notNull(session, "The session cannot be null.");
         this.consumer = ObjectUtils.nullIf(session.getInnerState(StateKey.STREAMING_CONSUMER), EMPTY_CONSUMER);
+        this.memory = session.getInnerState(StateKey.HISTORY);
+        this.question =
+                ObjectUtils.getIfNull(session.getInnerState(StateKey.HISTORY_INPUT), () -> getDefaultQuestion(prompt));
     }
 
     @Override
@@ -45,5 +53,22 @@ public class LlmEmitter<O extends ChatMessage> extends FitBoundedEmitter<O, Chat
         super.emit(data, this.flowSession);
         this.chunkAcc.merge(data);
         this.consumer.accept(this.chunkAcc, data);
+    }
+
+    @Override
+    public void complete() {
+        if (this.memory != null && this.chunkAcc.toolCalls().isEmpty()) {
+            this.memory.add(this.question);
+            this.memory.add(this.chunkAcc);
+        }
+        super.complete();
+    }
+
+    private static ChatMessage getDefaultQuestion(Prompt prompt) {
+        int size = prompt.messages().size();
+        if (size == 0) {
+            return new HumanMessage(StringUtils.EMPTY);
+        }
+        return prompt.messages().get(size - 1);
     }
 }
