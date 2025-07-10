@@ -15,7 +15,8 @@ import modelengine.fitframework.util.MapBuilder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ import static modelengine.fitframework.inspection.Validation.notNull;
  * @since 2025-07-04
  */
 public class RecentMemory implements Memory {
-    private final LinkedBlockingQueue<ChatMessage> records;
+    private final Queue<ChatMessage> records;
     private final BulkStringTemplate bulkTemplate;
     private final Function<ChatMessage, Map<String, String>> extractor;
 
@@ -59,13 +60,14 @@ public class RecentMemory implements Memory {
     public RecentMemory(int maxCount, BulkStringTemplate bulkTemplate,
             Function<ChatMessage, Map<String, String>> extractor) {
         Validation.greaterThanOrEquals(maxCount, 0, "The max count should >= 0.");
-        this.records = new LinkedBlockingQueue<>(maxCount);
+        this.records = new ArrayBlockingQueue<>(maxCount);
         this.bulkTemplate = notNull(bulkTemplate, "The bulkTemplate cannot be null.");
         this.extractor = notNull(extractor, "The extractor cannot be null.");
     }
 
     @Override
     public void add(ChatMessage message) {
+        notNull(message, "The message cannot be null.");
         if (!this.records.offer(message)) {
             this.records.poll();
             this.records.offer(message);
@@ -74,6 +76,7 @@ public class RecentMemory implements Memory {
 
     @Override
     public void set(List<ChatMessage> messages) {
+        notNull(messages, "The messages cannot be null.");
         messages.forEach(this::add);
     }
 
