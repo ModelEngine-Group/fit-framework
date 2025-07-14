@@ -17,16 +17,14 @@
               "description" : "查询地点",
               "name" : "location",
               "type" : "string",
-              "examples" : "",
-              "required" : true
+              "example" : ""
             },
             "date" : {
               "defaultValue" : "",
               "description" : "查询日期",
               "name" : "date",
               "type" : "string",
-              "examples" : "",
-              "required" : true
+              "example" : ""
             }
           },
           "required" : [ "location", "date" ]
@@ -46,13 +44,11 @@
           "properties" : {
             "location" : {
               "name" : "location",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             },
             "date" : {
               "name" : "date",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             }
           },
           "required" : [ ]
@@ -84,13 +80,11 @@
           "properties" : {
             "location" : {
               "name" : "location",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             },
             "date" : {
               "name" : "date",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             }
           },
           "required" : [ ]
@@ -100,8 +94,7 @@
           "name" : "",
           "description" : "获取今日下雨信息的结果",
           "type" : "string",
-          "convertor" : "",
-          "examples" : ""
+          "convertor" : ""
         }
       },
       "runnables" : {
@@ -124,13 +117,11 @@
           "properties" : {
             "location" : {
               "name" : "location",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             },
             "date" : {
               "name" : "date",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             }
           },
           "required" : [ ]
@@ -140,8 +131,7 @@
           "name" : "",
           "description" : "获取明日下雨信息的结果",
           "type" : "string",
-          "convertor" : "",
-          "examples" : ""
+          "convertor" : ""
         }
       },
       "runnables" : {
@@ -171,13 +161,11 @@
           "properties" : {
             "location" : {
               "name" : "location",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             },
             "date" : {
               "name" : "date",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             }
           },
           "required" : [ ]
@@ -208,13 +196,11 @@
           "properties" : {
             "location" : {
               "name" : "location",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             },
             "date" : {
               "name" : "date",
-              "type" : "string",
-              "required" : false
+              "type" : "string"
             }
           },
           "required" : [ ]

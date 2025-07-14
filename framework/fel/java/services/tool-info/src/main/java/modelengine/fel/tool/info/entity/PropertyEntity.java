@@ -6,6 +6,8 @@
 
 package modelengine.fel.tool.info.entity;
 
+import java.util.List;
+
 /**
  * 表示参数属性的实体类。
  *
@@ -20,8 +22,9 @@ public class PropertyEntity {
     private String type;
     private Object items;
     private Object properties;
-    private String examples;
-    private boolean required;
+    private String example;
+    private List<String> required;
+    private transient boolean need;
 
     /**
      * 获取参数的默认值。
@@ -60,21 +63,39 @@ public class PropertyEntity {
     }
 
     /**
+     * 获取对象类型的必填字段列表。
+     *
+     * @return 表示对象类型必填字段列表的 {@link List}{@code <}{@link String}{@code >}。
+     */
+    public List<String> getRequired() {
+        return this.required;
+    }
+
+    /**
+     * 设置对象类型的必填字段列表。
+     *
+     * @param required 表示对象类型必填字段列表的 {@link List}{@code <}{@link String}{@code >}。
+     */
+    public void setRequired(List<String> required) {
+        this.required = required;
+    }
+
+    /**
      * 获取参数是否是必需的标志。
      *
      * @return 如果参数是必需的，则返回 {@code true}，否则返回 {@code false}。
      */
-    public boolean isRequired() {
-        return this.required;
+    public boolean isNeed() {
+        return need;
     }
 
     /**
      * 设置参数是否是必需的标志。
      *
-     * @param required 表示参数是否是必需的 {@link boolean}。
+     * @param need 表示参数是否是必需的 {@link boolean}。
      */
-    public void setRequired(boolean required) {
-        this.required = required;
+    public void setNeed(boolean need) {
+        this.need = need;
     }
 
     /**
@@ -154,16 +175,16 @@ public class PropertyEntity {
      *
      * @return 表示参数的示例值的 {@link String}。
      */
-    public String getExamples() {
-        return this.examples;
+    public String getExample() {
+        return this.example;
     }
 
     /**
      * 设置参数的示例值。
      *
-     * @param examples 表示参数的示例值的 {@link String}。
+     * @param example 表示参数的示例值的 {@link String}。
      */
-    public void setExamples(String examples) {
-        this.examples = examples;
+    public void setExample(String example) {
+        this.example = example;
     }
 }
