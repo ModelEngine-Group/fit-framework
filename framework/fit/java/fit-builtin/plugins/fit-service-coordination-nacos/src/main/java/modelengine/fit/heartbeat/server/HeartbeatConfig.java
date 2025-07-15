@@ -36,11 +36,11 @@ public class HeartbeatConfig {
      * 心跳间隔时间（单位：毫秒）。
      * 定义服务发送心跳的时间间隔。
      */
-    private Integer heartBeatInterval;
+    private Long heartBeatInterval;
 
     /**
      * 心跳超时时间（单位：毫秒）。
      * 定义服务在未收到心跳后判定为超时的时间。
      */
-    private Integer heartBeatTimeout;
+    private Long heartBeatTimeout;
 }

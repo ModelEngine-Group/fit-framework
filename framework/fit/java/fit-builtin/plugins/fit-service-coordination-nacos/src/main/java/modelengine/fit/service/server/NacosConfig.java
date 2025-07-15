@@ -21,7 +21,7 @@ import modelengine.fitframework.annotation.Component;
 @Data
 public class NacosConfig {
     /**
-     * Nacos服务器地址
+     * Nacos 服务器地址
      */
     private String serverAddr;
 

@@ -12,7 +12,7 @@ import modelengine.fitframework.annotation.Genericable;
 import java.util.List;
 
 /**
- * 表示通知服务，用于更新Fitables实例信息。
+ * 表示通知服务，用于更新 Fitables 实例信息。
  *
  * @author 董智豪
  * @since 2025-06-20
