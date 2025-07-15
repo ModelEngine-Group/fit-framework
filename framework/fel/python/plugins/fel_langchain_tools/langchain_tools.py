@@ -5,21 +5,10 @@
 # ======================================================================================================================
 import json
 from urllib.parse import quote_plus
-import psycopg2
-from langchain.agents import AgentExecutor
 
-from langchain_community.utilities.sql_database import SQLDatabase
-from langchain_community.agent_toolkits import create_sql_agent
-from langchain_community.tools.sql_database.tool import (
-    InfoSQLDatabaseTool,
-    ListSQLDatabaseTool,
-    QuerySQLCheckerTool,
-    QuerySQLDataBaseTool,
-)
-from langchain_core.tools import BaseTool
-from langchain_openai import ChatOpenAI, OpenAI
-from langchain_community.utilities.requests import TextRequestsWrapper
+from langchain.agents import AgentExecutor
 from langchain_community.agent_toolkits import JsonToolkit, create_json_agent
+from langchain_community.agent_toolkits import create_sql_agent
 from langchain_community.tools.json.tool import JsonSpec
 from langchain_community.tools.requests.tool import (
     RequestsDeleteTool,
@@ -28,6 +17,17 @@ from langchain_community.tools.requests.tool import (
     RequestsPostTool,
     RequestsPutTool,
 )
+from langchain_community.tools.sql_database.tool import (
+    InfoSQLDatabaseTool,
+    ListSQLDatabaseTool,
+    QuerySQLCheckerTool,
+    QuerySQLDataBaseTool,
+)
+from langchain_community.utilities.requests import TextRequestsWrapper
+from langchain_community.utilities.sql_database import SQLDatabase
+from langchain_core.tools import BaseTool
+from langchain_openai import ChatOpenAI
+
 from .langchain_registers import register_function_tools, register_api_tools
 
 

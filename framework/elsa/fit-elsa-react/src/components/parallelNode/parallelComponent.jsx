@@ -37,7 +37,7 @@ export const parallelComponent = (jadeConfig, shape) => {
           from: FROM_TYPE.EXPAND,
           value: [],
         },
-        DEFAULT_ADD_TOOL_NODE_CONTEXT],
+        JSON.parse(JSON.stringify(DEFAULT_ADD_TOOL_NODE_CONTEXT))],
       outputParams: [{
         id: uuidv4(),
         name: OUTPUT,

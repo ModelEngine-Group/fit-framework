@@ -20,6 +20,7 @@ import {
 } from '@/common/Consts.js';
 import {getEndNodeType} from '@/components/end/endNodeUtils.js';
 import {pageProcessor} from '@/flow/pageProcessors.js';
+import {FORM_TYPE} from '@/components/intelligentForm/Consts.js';
 
 /**
  * page 兼容处理器.
@@ -53,6 +54,10 @@ export const pageCompatibilityProcessor = (pageData, graph) => {
         return questionClassificationCompatibilityProcessor(shapeData, g, self);
       case 'loopNodeState':
         return loopNodeCompatibilityProcessor(shapeData, g, self);
+      case 'manualCheckNodeState':
+        return manualCheckNodeCompatibilityProcessor(shapeData, g, self);
+      case 'intelligentFormNodeState':
+        return intelligentFormNodeCompatibilityProcessor(shapeData, g, self);
       default:
         return shapeCompatibilityProcessor(shapeData, g, self);
     }
@@ -206,13 +211,60 @@ export const loopNodeCompatibilityProcessor = (shapeData, graph, pageHandler) =>
     const jober = self.shapeData.flowMeta.jober;
     if (!jober.entity.params.exist(param => param.name === 'context')) {
        jober.entity.params.push({name: 'context'});
-       jober.converter.entity.inputParams.push(DEFAULT_ADD_TOOL_NODE_CONTEXT);
+       jober.converter.entity.inputParams.push(JSON.parse(JSON.stringify(DEFAULT_ADD_TOOL_NODE_CONTEXT)));
     }
   };
 
   return self;
 };
 
+/**
+ * 人工表单节点兼容性处理器.
+ *
+ * @override
+ */
+export const manualCheckNodeCompatibilityProcessor = (shapeData, graph, pageHandler) => {
+  const self = shapeCompatibilityProcessor(shapeData, graph, pageHandler);
+
+  /**
+   * @override
+   */
+  const process = self.process;
+  self.process = () => {
+    process.apply(self);
+    self.shapeData.type = 'intelligentFormNodeState';
+    self.shapeData.componentName = 'intelligentFormComponent';
+    const task = self.shapeData.flowMeta.task;
+    if (!task.formType) {
+      task.formType = FORM_TYPE.MANUAL;
+    }
+  };
+
+  return self;
+};
+
+/**
+ * 智能表单节点兼容性处理器.
+ *
+ * @override
+ */
+export const intelligentFormNodeCompatibilityProcessor = (shapeData, graph, pageHandler) => {
+  const self = shapeCompatibilityProcessor(shapeData, graph, pageHandler);
+
+  /**
+   * @override
+   */
+  const process = self.process;
+  self.process = () => {
+    process.apply(self);
+    const task = self.shapeData.flowMeta.task;
+    if (!task.formType) {
+      task.formType = FORM_TYPE.ORCHESTRATION;
+    }
+  };
+
+  return self;
+};
 
 /**
  * 开始节点兼容性处理器.
@@ -360,7 +412,7 @@ export const llmCompatibilityProcessor = (shapeData, graph, pageHandler) => {
     const ensureParam = (params, defaultParam) => {
       const existingParam = params.find(i => i.name === defaultParam.name);
       if (!existingParam) {
-        params.push(defaultParam);
+        params.push(JSON.parse(JSON.stringify(defaultParam)));
       }
     };
 
@@ -415,7 +467,7 @@ export const knowledgeRetrievalCompatibilityProcessor = (shapeData, graph, pageH
       }
 
       if (Array.isArray(optionValue) && !optionValue.some(v => v.name === 'knowledgeConfigId')) {
-        optionValue.push(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID);
+        optionValue.push(JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID)));
       }
     };
 
