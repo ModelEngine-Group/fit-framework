@@ -19,6 +19,7 @@
 
     <properties>
         <lombok.version>1.18.36</lombok.version>
+        <nacos.version>3.0.1</nacos.version>
     </properties>
 
     <modules>
@@ -38,6 +39,7 @@
         <module>fit-server-http</module>
         <module>fit-service-coordination-locator</module>
         <module>fit-service-coordination-simple</module>
+        <module>fit-service-coordination-nacos</module>
         <module>fit-service-discovery</module>
         <module>fit-service-registry</module>
         <module>fit-value-fastjson</module>
@@ -49,6 +51,11 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -9,7 +9,6 @@ package modelengine.fit.heartbeat.server;
 import lombok.Data;
 import modelengine.fitframework.annotation.AcceptConfigValues;
 import modelengine.fitframework.annotation.Component;
-import modelengine.fitframework.conf.Config;
 
 /**
  * 表示配置项 {@code 'nacos.heartbeat'} 下的配置。
@@ -21,7 +20,6 @@ import modelengine.fitframework.conf.Config;
 @AcceptConfigValues("nacos.heartbeat")
 @Data
 public class HeartbeatConfig {
-
     /**
      * 是否为临时实例，默认为 true。
      * 临时实例在服务注销后会自动从注册中心移除。
@@ -35,13 +33,13 @@ public class HeartbeatConfig {
     private Float weight = 1.0F;
 
     /**
-     * 心跳间隔时间（单位：秒）。
+     * 心跳间隔时间（单位：毫秒）。
      * 定义服务发送心跳的时间间隔。
      */
     private Integer heartBeatInterval;
 
     /**
-     * 心跳超时时间（单位：秒）。
+     * 心跳超时时间（单位：毫秒）。
      * 定义服务在未收到心跳后判定为超时的时间。
      */
     private Integer heartBeatTimeout;

@@ -16,7 +16,7 @@ import java.util.List;
  * 用于提供心跳相关的服务。
  *
  * @author 董智豪
- * @since 2025/6/4
+ * @since 2025-06-04
  */
 @Component
 public class HeartbeatServer implements HeartbeatService {
