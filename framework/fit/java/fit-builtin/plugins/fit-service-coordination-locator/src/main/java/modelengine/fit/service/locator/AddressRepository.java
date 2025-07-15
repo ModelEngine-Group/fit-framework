@@ -6,6 +6,7 @@
 
 package modelengine.fit.service.locator;
 
+import static modelengine.fitframework.inspection.Validation.greaterThan;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fit.server.FitServer;
@@ -52,25 +53,23 @@ public class AddressRepository implements RegistryLocator {
         int port = matata.registry().port();
         int protocolCode = matata.registry().protocolCode();
         CommunicationProtocol protocol = matata.registry().protocol();
-        if(0 == port){
-            Endpoint endpoint = fitServer.endpoints().stream().findFirst().orElse(null);
-            notNull(endpoint, "The fit server must have at least one endpoint.");
+        if (port == 0) {
+            log.debug("The registry port is not set, using the first endpoint of the fit server.");
+            int size = fitServer.endpoints().size();
+            greaterThan(size, 0, "The fit server must have at least one endpoint.");
+            Endpoint endpoint = fitServer.endpoints().get(0);
             port = endpoint.port();
             protocolCode = endpoint.protocolCode();
             protocol = CommunicationProtocol.from(endpoint.protocol());
         }
         String host = matata.registry().host();
-        if(StringUtils.isBlank(matata.registry().host())) {
+        if (StringUtils.isBlank(matata.registry().host())) {
+            log.debug("The registry host is not set, using the worker host.");
             host = worker.host();
         }
-        boolean isRegistryLocalhost = isRegistryLocalhost(actualServers,
-                worker.host(),
-                worker.domain(),
-                host,
-                port,
-                protocolCode);
-        String registryWorkerId =
-                isRegistryLocalhost ? worker.id() : host + ":" + port;
+        boolean isRegistryLocalhost =
+                isRegistryLocalhost(actualServers, worker.host(), worker.domain(), host, port, protocolCode);
+        String registryWorkerId = isRegistryLocalhost ? worker.id() : host + ":" + port;
         this.registryTarget = Target.custom()
                 .workerId(registryWorkerId)
                 .host(host)
@@ -85,7 +84,7 @@ public class AddressRepository implements RegistryLocator {
     }
 
     private static boolean isRegistryLocalhost(List<FitServer> servers, String localHost, String localDomain,
-                                               String registryHost, int registryPort, int registryProtocol) {
+            String registryHost, int registryPort, int registryProtocol) {
         if (!isRegistryHost(localHost, localDomain, registryHost)) {
             return false;
         }

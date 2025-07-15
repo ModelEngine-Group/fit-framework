@@ -6,10 +6,7 @@
 
 package modelengine.fit.service.server;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import modelengine.fitframework.annotation.AcceptConfigValues;
 import modelengine.fitframework.annotation.Component;
 
@@ -53,4 +50,3 @@ public class NacosConfig {
      */
     private String namespace;
 }
-

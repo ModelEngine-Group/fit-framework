@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
-  ~ This file is a part of the ModelEngine Project.
-  ~ Licensed under the MIT License. See License.txt in the project root for license information.
-  -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.fitframework.plugin</groupId>
         <artifactId>fit-plugin-parent</artifactId>
@@ -18,18 +12,12 @@
     <artifactId>fit-service-coordination-nacos</artifactId>
 
     <name>FIT Service Coordination Nacos</name>
-    <description>FIT Framework Service Coordination Nacos Plugin module provides a nacos-based implementation of FIT service
-        registry center.
+    <description>FIT Framework Service Coordination Nacos Plugin module provides a nacos-based implementation of FIT
+        service registry center.
     </description>
     <url>https://github.com/ModelEngine-Group/fit-framework</url>
 
     <dependencies>
-        <!-- nacos-client -->
-        <dependency>
-            <groupId>com.alibaba.nacos</groupId>
-            <artifactId>nacos-client</artifactId>
-            <version>3.0.1</version>
-        </dependency>
         <!-- FIT core -->
         <dependency>
             <groupId>org.fitframework</groupId>
@@ -54,6 +42,16 @@
             <artifactId>fit-http-classic</artifactId>
         </dependency>
 
+        <!-- Third-party -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -69,11 +67,6 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
-        </dependency>
-        <!--  tool -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 
@@ -99,5 +92,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

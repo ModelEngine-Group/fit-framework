@@ -18,9 +18,8 @@ import java.util.List;
  * @since 2025-06-20
  */
 public interface Notify {
-
     /**
-     * 通知更新Fitables 实例。
+     * 通知更新 Fitables 实例。
      *
      * @param fitableInstances 表示指定服务实现的所有实例信息的 {@link List}{@code <}{@link FitableAddressInstance}{@code >}。
      */
