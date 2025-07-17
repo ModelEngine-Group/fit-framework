@@ -53,7 +53,7 @@
 
         <!-- Third-party versions -->
         <byte-buddy.version>1.17.6</byte-buddy.version>
-        <druid.version>1.2.20</druid.version>
+        <druid.version>1.2.25</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>32.0.1-jre</guava.version>
         <hanlp.version>portable-1.8.4</hanlp.version>
