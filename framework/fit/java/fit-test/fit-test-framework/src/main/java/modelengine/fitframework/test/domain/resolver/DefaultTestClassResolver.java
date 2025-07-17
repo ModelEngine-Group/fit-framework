@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 默认的单测类解析器。
@@ -30,8 +32,7 @@ import java.util.stream.Collectors;
  * @since 2023-01-17
  */
 public class DefaultTestClassResolver implements TestClassResolver {
-    private static final Set<String> DEFAULT_SCAN_PACKAGES = new HashSet<>(Arrays.asList(
-            "modelengine.fit.value",
+    private static final Set<String> DEFAULT_SCAN_PACKAGES = new HashSet<>(Arrays.asList("modelengine.fit.value",
             "modelengine.fit.serialization",
             "modelengine.fitframework.validation"));
 
@@ -41,7 +42,8 @@ public class DefaultTestClassResolver implements TestClassResolver {
         Class<?>[] includeClasses = this.resolveIncludeClasses(testConfigurationClass);
         return TestContextConfiguration.custom()
                 .testClass(clazz)
-                .includeClasses(includeClasses)
+                .includeClasses(Stream.of(includeClasses)
+                        .collect(Collectors.toMap(Function.identity(), key -> () -> null)))
                 .excludeClasses(this.resolveExcludeClasses(clazz))
                 .scannedPackages(this.scanBeans(includeClasses))
                 .mockedBeanFields(this.scanMockBeansFieldSet(clazz))
@@ -86,7 +88,7 @@ public class DefaultTestClassResolver implements TestClassResolver {
 
     private Set<String> getBasePackages(Class<?> clazz) {
         Optional<ScanPackages> opScanPackagesAnnotation = AnnotationUtils.getAnnotation(clazz, ScanPackages.class);
-        if (!opScanPackagesAnnotation.isPresent()) {
+        if (opScanPackagesAnnotation.isEmpty()) {
             return new HashSet<>();
         }
         Set<String> basePackages = new HashSet<>(Arrays.asList(opScanPackagesAnnotation.get().value()));

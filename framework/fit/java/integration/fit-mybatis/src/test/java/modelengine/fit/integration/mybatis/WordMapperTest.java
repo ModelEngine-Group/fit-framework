@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  * @since 2025-02-25
  */
 @MybatisTest(classes = {WordMapper.class})
-@Sql(scripts = "sql/create/word.sql")
+@Sql(before = "sql/create/word.sql")
 @DisplayName("测试自动转换驼峰形式")
 public class WordMapperTest {
     @Fit
