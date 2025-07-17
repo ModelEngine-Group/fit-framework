@@ -19,7 +19,7 @@
 
     <properties>
         <!-- Third-party versions -->
-        <snakeyaml.version>2.3</snakeyaml.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
     </properties>
 
     <dependencies>
