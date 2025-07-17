@@ -58,7 +58,7 @@
         <guava.version>32.0.1-jre</guava.version>
         <hanlp.version>portable-1.8.4</hanlp.version>
         <lombok.version>1.18.36</lombok.version>
-        <jackson.version>2.18.2</jackson.version>
+        <jackson.version>2.19.1</jackson.version>
         <mybatis.version>3.5.13</mybatis.version>
 
         <!-- Test framework versions -->
