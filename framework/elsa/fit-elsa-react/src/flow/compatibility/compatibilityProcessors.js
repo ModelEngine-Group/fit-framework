@@ -16,7 +16,7 @@ import {
   DEFAULT_MAX_MEMORY_ROUNDS,
   END_NODE_TYPE,
   FLOW_TYPE,
-  FROM_TYPE,
+  FROM_TYPE, DEFAULT_MCP_SERVERS,
 } from '@/common/Consts.js';
 import {getEndNodeType} from '@/components/end/endNodeUtils.js';
 import {pageProcessor} from '@/flow/pageProcessors.js';
@@ -432,6 +432,7 @@ export const llmCompatibilityProcessor = (shapeData, graph, pageHandler) => {
     const outputObject = self.shapeData.flowMeta.jober.converter.entity.outputParams.find(i => i.name === 'output');
     ensureParam(inputParams, DEFAULT_MAX_MEMORY_ROUNDS);
     ensureParam(inputParams, DEFAULT_LLM_KNOWLEDGE_BASES);
+    ensureParam(inputParams, DEFAULT_MCP_SERVERS);
     ensureParam(outputObject.value, DEFAULT_LLM_REFERENCE_OUTPUT);
     addEnableLog(inputParams);
     if (!self.shapeData.flowMeta.jober.converter.entity.tempReference) {

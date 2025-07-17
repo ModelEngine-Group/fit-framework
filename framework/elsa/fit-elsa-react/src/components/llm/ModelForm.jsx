@@ -223,11 +223,4 @@ DialogueRound.propTypes = {
   onConversationTurnChange: PropTypes.func,
 };
 
-_ModelForm.propTypes = {
-  shapeId: PropTypes.string.isRequired, // 确保 shapeId 是一个必需的string类型
-  modelData: PropTypes.object.isRequired, // 确保 modelData 是一个必需的object类型
-  modelOptions: PropTypes.array.isRequired, // 确保 modelOptions 是一个必需的array类型
-  disabled: PropTypes.bool, // 确保 modelOptions 是一个必需的array类型
-};
-
 export const ModelForm = React.memo(_ModelForm, areEqual);

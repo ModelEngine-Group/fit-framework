@@ -710,5 +710,8 @@
   "parallelNode": "并行节点",
   "type": "类型",
   "orchestration": "编排",
-  "manual": "人工"
+  "manual": "人工",
+  "mcpServerConfig": "MCP服务配置",
+  "pleaseEnterValidJson": "请输入合法的 JSON 格式！",
+  "mcpServerConfigPopover": "示例：\n{\n  \"server_name\": {\n    \"url\": \"https://127.0.0.1:80/sse\",\n    \"headers\": {},\n    \"timeout\": 10,\n    \"sse_read_timeout\": 300\n  }\n}"
 }
