@@ -19,7 +19,7 @@
     <properties>
         <!-- Third-party versions -->
         <okhttp.version>4.12.0</okhttp.version>
-        <caffeine.version>3.2.0</caffeine.version>
+        <caffeine.version>3.2.1</caffeine.version>
     </properties>
 
     <dependencies>
