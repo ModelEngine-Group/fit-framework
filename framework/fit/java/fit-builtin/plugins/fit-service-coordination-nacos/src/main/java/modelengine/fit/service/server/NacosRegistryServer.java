@@ -70,6 +70,7 @@ public class NacosRegistryServer implements RegistryService {
     private static final String WORKER_KEY = "worker";
     private static final String APPLICATION_KEY = "application";
     private static final String FITABLE_META_KEY = "fitable-meta";
+    private static final String SEPARATOR = "::";
 
     private final HeartbeatConfig heartbeatConfig;
     private final NamingService namingService;
@@ -102,14 +103,14 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * Builds a unique key in the format {@code <groupName>::<serviceName>} for {@code <serviceSubscriptions>}
+     * Builds a unique key in the format {@code <groupName>::<serviceName>} for {@code <serviceSubscriptions>}.
      *
-     * @param groupName group name
-     * @param serviceName service name
-     * @return a concatenated key like {@code groupName::serviceName}
+     * @param groupName The group name as {@link String}.
+     * @param serviceName The service name as {@link String}.
+     * @return A concatenated key like {@code groupName::serviceName}.
      */
     private String buildServiceKey(String groupName, String serviceName) {
-        return groupName + "::" + serviceName;
+        return groupName + SEPARATOR + serviceName;
     }
 
     @Override
@@ -135,15 +136,15 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     private String getServiceName(FitableInfo fitable) {
-        return fitable.getFitableId() + "::" + fitable.getFitableVersion();
+        return fitable.getFitableId() + SEPARATOR + fitable.getFitableVersion();
     }
 
     private String getGroupName(FitableInfo fitable) {
-        return fitable.getGenericableId() + "::" + fitable.getGenericableVersion();
+        return fitable.getGenericableId() + SEPARATOR + fitable.getGenericableVersion();
     }
 
     private String getGroupName(GenericableInfo genericable) {
-        return genericable.getGenericableId() + "::" + genericable.getGenericableVersion();
+        return genericable.getGenericableId() + SEPARATOR + genericable.getGenericableVersion();
     }
 
     private List<Instance> createInstance(Worker worker, Application application, FitableMeta meta) {
@@ -158,31 +159,53 @@ public class NacosRegistryServer implements RegistryService {
                 Instance instance = new Instance();
                 instance.setIp(address.getHost());
                 instance.setPort(endpoint.getPort());
-                HashMap<String, String> metadata = new HashMap<>();
-                if (!heartbeatConfig.getIsEphemeral()) {
-                    instance.setEphemeral(false);
-                }
-                if (heartbeatConfig.getWeight() != null) {
-                    instance.setWeight(heartbeatConfig.getWeight());
-                }
-                if (heartbeatConfig.getHeartBeatInterval() != null) {
-                    metadata.put(HEART_BEAT_INTERVAL, String.valueOf(heartbeatConfig.getHeartBeatInterval()));
-                }
-                if (heartbeatConfig.getHeartBeatTimeout() != null) {
-                    metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(heartbeatConfig.getHeartBeatTimeout()));
-                }
-                try {
-                    metadata.put(WORKER_KEY, objectMapper.writeValueAsString(worker));
-                    metadata.put(APPLICATION_KEY, objectMapper.writeValueAsString(application));
-                    metadata.put(FITABLE_META_KEY, objectMapper.writeValueAsString(meta));
-                } catch (JsonProcessingException e) {
-                    log.error("Failed to serialize metadata for worker.", e);
-                }
+                HashMap<String, String> metadata = buildInstanceMetadata(worker, application, meta);
                 instance.setMetadata(metadata);
+                setInstanceProperties(instance);
                 instances.add(instance);
             }
         }
         return instances;
+    }
+
+    /**
+     * 构建服务实例的元数据，包括工作节点、应用和 FitableMeta 信息。
+     *
+     * @param worker 工作节点对象。
+     * @param application 应用对象。
+     * @param meta {@link FitableMeta} 元数据对象。
+     * @return 包含所有序列化元数据的 {@link Map}。
+     */
+    private HashMap<String, String> buildInstanceMetadata(Worker worker, Application application, FitableMeta meta) {
+        HashMap<String, String> metadata = new HashMap<>();
+        if (heartbeatConfig.getHeartBeatInterval() != null) {
+            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(heartbeatConfig.getHeartBeatInterval()));
+        }
+        if (heartbeatConfig.getHeartBeatTimeout() != null) {
+            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(heartbeatConfig.getHeartBeatTimeout()));
+        }
+        try {
+            metadata.put(WORKER_KEY, objectMapper.writeValueAsString(worker));
+            metadata.put(APPLICATION_KEY, objectMapper.writeValueAsString(application));
+            metadata.put(FITABLE_META_KEY, objectMapper.writeValueAsString(meta));
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize metadata for worker.", e);
+        }
+        return metadata;
+    }
+
+    /**
+     * 设置服务实例的属性，权重和临时性。
+     *
+     * @param instance 服务实例对象。
+     */
+    private void setInstanceProperties(Instance instance) {
+        if (!heartbeatConfig.getIsEphemeral()) {
+            instance.setEphemeral(false);
+        }
+        if (heartbeatConfig.getWeight() != null) {
+            instance.setWeight(heartbeatConfig.getWeight());
+        }
     }
 
     @Override
@@ -194,17 +217,15 @@ public class NacosRegistryServer implements RegistryService {
             try {
                 List<Instance> instances = namingService.selectInstances(serviceName, groupName, true);
                 for (Instance instance : instances) {
-                    try {
-                        Worker worker = objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
-                        if (Objects.equals(workerId, worker.getId())) {
-                            namingService.deregisterInstance(serviceName, groupName, instance);
-                        }
-                    } catch (JsonProcessingException e) {
-                        log.error("Failed to parse worker metadata for fitable.", e);
+                    Worker worker = objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
+                    if (Objects.equals(workerId, worker.getId())) {
+                        namingService.deregisterInstance(serviceName, groupName, instance);
                     }
                 }
             } catch (NacosException e) {
                 log.error("Failed to unregister fitable due to registry error.", e);
+            } catch (JsonProcessingException e) {
+                log.error("Failed to parse worker metadata for fitable.", e);
             }
         }
     }
@@ -220,36 +241,59 @@ public class NacosRegistryServer implements RegistryService {
                 if (instances.isEmpty()) {
                     continue;
                 }
-                Map<Application, List<Instance>> appInstancesMap = groupInstancesByApplication(instances);
-                for (Map.Entry<Application, List<Instance>> entry : appInstancesMap.entrySet()) {
-                    Application application = entry.getKey();
-                    List<Instance> appInstances = entry.getValue();
-                    FitableMeta meta = parseFitableMeta(appInstances.get(0));
-                    Set<Worker> workers = new HashSet<>();
-                    for (Instance instance : appInstances) {
-                        Worker worker = parseWorker(instance);
-                        workers.add(worker);
-                    }
-                    if (application.getExtensions().containsKey(CLUSTER_DOMAIN_KEY)) {
-                        replaceAddresses(workers, application);
-                    }
-                    FitableAddressInstance fai = resultMap.computeIfAbsent(fitable, k -> {
-                        FitableAddressInstance newFai = new FitableAddressInstance();
-                        newFai.setFitable(fitable);
-                        newFai.setApplicationInstances(new ArrayList<>());
-                        return newFai;
-                    });
-                    ApplicationInstance appInstance = new ApplicationInstance();
-                    appInstance.setApplication(application);
-                    appInstance.setFormats(meta.getFormats());
-                    appInstance.setWorkers(new ArrayList<>(workers));
-                    fai.getApplicationInstances().add(appInstance);
-                }
+                processApplicationInstances(resultMap, fitable, instances);
             } catch (Exception e) {
                 log.error("Failed to query fitables for genericableId.", e);
             }
         }
         return new ArrayList<>(resultMap.values());
+    }
+
+    /**
+     * 处理服务实例，按应用分组并填充 FitableAddressInstance。
+     *
+     * @param resultMap 结果映射表。
+     * @param fitable 当前 {@link FitableInfo}。
+     * @param instances 查询到的服务实例列表。
+     */
+    private void processApplicationInstances(Map<FitableInfo, FitableAddressInstance> resultMap, FitableInfo fitable, List<Instance> instances) {
+        Map<Application, List<Instance>> appInstancesMap = groupInstancesByApplication(instances);
+        for (Map.Entry<Application, List<Instance>> entry : appInstancesMap.entrySet()) {
+            Application application = entry.getKey();
+            List<Instance> appInstances = entry.getValue();
+            FitableMeta meta = parseFitableMeta(appInstances.get(0));
+            Set<Worker> workers = extractWorkers(appInstances, application);
+            FitableAddressInstance fai = resultMap.computeIfAbsent(fitable, k -> {
+                FitableAddressInstance newFai = new FitableAddressInstance();
+                newFai.setFitable(fitable);
+                newFai.setApplicationInstances(new ArrayList<>());
+                return newFai;
+            });
+            ApplicationInstance appInstance = new ApplicationInstance();
+            appInstance.setApplication(application);
+            appInstance.setFormats(meta.getFormats());
+            appInstance.setWorkers(new ArrayList<>(workers));
+            fai.getApplicationInstances().add(appInstance);
+        }
+    }
+
+    /**
+     * 提取所有实例对应的 Worker，并根据应用扩展信息调整地址。
+     *
+     * @param appInstances 应用实例列表。
+     * @param application 应用对象。
+     * @return Worker 集合。
+     */
+    private Set<Worker> extractWorkers(List<Instance> appInstances, Application application) {
+        Set<Worker> workers = new HashSet<>();
+        for (Instance instance : appInstances) {
+            Worker worker = parseWorker(instance);
+            workers.add(worker);
+        }
+        if (application.getExtensions().containsKey(CLUSTER_DOMAIN_KEY)) {
+            replaceAddresses(workers, application);
+        }
+        return workers;
     }
 
     private Map<Application, List<Instance>> groupInstancesByApplication(List<Instance> instances) {
@@ -343,21 +387,18 @@ public class NacosRegistryServer implements RegistryService {
             try {
                 String groupName = getGroupName(fitable);
                 String serviceName = getServiceName(fitable);
-                if( serviceSubscriptions.containsKey(buildServiceKey(groupName, serviceName))) {
+                if (serviceSubscriptions.containsKey(buildServiceKey(groupName, serviceName))) {
                     log.debug("Already subscribed to service. [groupName={}, serviceName={}]", groupName, serviceName);
                     continue;
                 }
                 EventListener eventListener =
-                        serviceSubscriptions.computeIfAbsent(buildServiceKey(groupName, serviceName), k -> {
-                            EventListener listener = event -> {
-                                if (event instanceof NamingEvent || event instanceof NamingChangeEvent) {
-                                    onServiceChanged(fitable);
-                                }
-                            };
-                            return listener;
+                        serviceSubscriptions.computeIfAbsent(buildServiceKey(groupName, serviceName), k -> event -> {
+                            if (event instanceof NamingEvent || event instanceof NamingChangeEvent) {
+                                onServiceChanged(fitable);
+                            }
                         });
                 namingService.subscribe(serviceName, groupName, eventListener);
-            } catch (Exception e) {
+            } catch (NacosException e) {
                 log.error("Failed to subscribe to Nacos service.", e);
             }
         }
@@ -377,13 +418,17 @@ public class NacosRegistryServer implements RegistryService {
                 EventListener listener = serviceSubscriptions.get(buildServiceKey(groupName, serviceName));
                 namingService.unsubscribe(serviceName, groupName, listener);
                 serviceSubscriptions.remove(buildServiceKey(groupName, serviceName));
-            } catch (Exception e) {
+            } catch (NacosException e) {
                 log.error("Failed to unsubscribe from Nacos service.", e);
             }
         }
     }
 
-    // 服务变更处理
+    /**
+     * 处理服务变更事件，查询并通知更新 Fitables 实例信息。
+     *
+     * @param fitableInfo 变更的 Fitables 信息。
+     */
     private void onServiceChanged(FitableInfo fitableInfo) {
         List<FitableAddressInstance> fitableAddressInstances =
                 this.queryFitables(Collections.singletonList(fitableInfo), worker.id());
@@ -408,17 +453,14 @@ public class NacosRegistryServer implements RegistryService {
                     }
                     FitableMeta meta = parseFitableMeta(instances.get(0));
                     for (Instance instance : instances) {
-                        try {
-                            Worker worker =
-                                    objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
-                            metaEnvironments.computeIfAbsent(meta, k -> new HashSet<>()).add(worker.getEnvironment());
-                        } catch (JsonProcessingException e) {
-                            log.error("Failed to parse worker metadata.", e);
-                        }
+                        Worker worker = objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
+                        metaEnvironments.computeIfAbsent(meta, k -> new HashSet<>()).add(worker.getEnvironment());
                     }
                 }
-            } catch (Exception e) {
+            } catch (NacosException e) {
                 log.error("Failed to query fitable metas.", e);
+            } catch (JsonProcessingException e) {
+                log.error("Failed to parse worker metadata.", e);
             }
         }
         for (Map.Entry<FitableMeta, Set<String>> entry : metaEnvironments.entrySet()) {
@@ -429,5 +471,4 @@ public class NacosRegistryServer implements RegistryService {
         }
         return results;
     }
-
 }
