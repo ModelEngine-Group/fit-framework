@@ -1,0 +1,8 @@
+nacos:
+  serverAddr: 127.0.0.1:8848
+
+fit:
+  beans:
+    packages:
+      - 'modelengine.fit.service'
+      - 'modelengine.fit.heartbeat'
