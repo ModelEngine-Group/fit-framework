@@ -14,7 +14,6 @@ import modelengine.fel.tool.info.entity.PropertyEntity;
 import modelengine.fel.tool.info.entity.ReturnPropertyEntity;
 import modelengine.fel.tool.info.entity.SchemaEntity;
 import modelengine.fitframework.annotation.Property;
-import modelengine.fitframework.util.StringUtils;
 
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.method.MethodDescription;
@@ -78,9 +77,7 @@ public class ByteBuddySchemaParser {
         if (returnPropertyEntity.getConvertor() != null) {
             returnProperty.put("convertor", returnPropertyEntity.getConvertor());
         }
-        if (StringUtils.isNotBlank(returnPropertyEntity.getExample())) {
-            returnProperty.put("example", returnPropertyEntity.getExample());
-        }
+        returnProperty.put("examples", returnPropertyEntity.getExamples());
         return returnProperty;
     }
 
@@ -115,7 +112,7 @@ public class ByteBuddySchemaParser {
             entity.setDescription(property.description());
             entity.setNeed(property.required());
             entity.setDefaultValue(property.defaultValue());
-            entity.setExample(property.example());
+            entity.setExamples(Arrays.stream(property.example().split(",\\\\s*")).toList());
         }
         return entity;
     }
@@ -128,7 +125,7 @@ public class ByteBuddySchemaParser {
             Property property = returnAnnotation.load();
             returnPropertyEntity.setName(property.name());
             returnPropertyEntity.setDescription(property.description());
-            returnPropertyEntity.setExample(property.example());
+            returnPropertyEntity.setExamples(Arrays.stream(property.example().split(",\\\\s*")).toList());
         }
         notNull(methodDescription.getReturnType(), "The return type cannot be null.");
         JsonNode jsonNode = JacksonTypeParser.getParameterSchema(methodDescription.getReturnType());
