@@ -99,7 +99,10 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
                 return;
             }
             toRemoved.forEach(this.responses::remove);
-            toRemoved.forEach(this.emitters::remove);
+            for (String s : toRemoved) {
+                Emitter<TextEvent> removed = this.emitters.remove(s);
+                removed.complete();
+            }
             log.info("Channels are inactive, remove emitters and responses. [sessionIds={}]", toRemoved);
         }).build());
     }
