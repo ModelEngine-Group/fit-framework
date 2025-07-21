@@ -13,23 +13,47 @@
           "type" : "object",
           "properties" : {
             "location" : {
-              "defaultValue" : "",
               "description" : "查询地点",
               "name" : "location",
               "type" : "string",
-              "example" : ""
+              "examples" : [ "Hangzhou" ],
+              "default" : ""
             },
             "date" : {
-              "defaultValue" : "",
               "description" : "查询日期",
               "name" : "date",
               "type" : "string",
-              "example" : ""
+              "examples" : [ "" ],
+              "default" : ""
+            },
+            "rainPosition" : {
+              "description" : "下雨的经纬度",
+              "name" : "rainPosition",
+              "type" : "object",
+              "properties" : {
+                "latitude" : {
+                  "type" : "string"
+                },
+                "longitude" : {
+                  "type" : "string"
+                }
+              },
+              "examples" : [ "" ],
+              "required" : [ "latitude", "longitude" ],
+              "default" : ""
+            },
+            "info" : {
+              "description" : "其他信息",
+              "name" : "info",
+              "type" : "object",
+              "properties" : [ ],
+              "examples" : [ "" ],
+              "default" : ""
             }
           },
           "required" : [ "location", "date" ]
         },
-        "order" : [ "location", "date" ],
+        "order" : [ "location", "date", "rainPosition", "info" ],
         "return" : {
           "type" : "string",
           "convertor" : ""
@@ -85,16 +109,35 @@
             "date" : {
               "name" : "date",
               "type" : "string"
+            },
+            "rainPosition" : {
+              "name" : "rainPosition",
+              "type" : "object",
+              "properties" : {
+                "latitude" : {
+                  "type" : "string"
+                },
+                "longitude" : {
+                  "type" : "string"
+                }
+              },
+              "required" : [ "latitude", "longitude" ]
+            },
+            "info" : {
+              "name" : "info",
+              "type" : "object",
+              "properties" : [ ]
             }
           },
           "required" : [ ]
         },
-        "order" : [ "location", "date" ],
+        "order" : [ "location", "date", "rainPosition", "info" ],
         "return" : {
           "name" : "",
           "description" : "获取今日下雨信息的结果",
           "type" : "string",
-          "convertor" : ""
+          "convertor" : "",
+          "examples" : [ "" ]
         }
       },
       "runnables" : {
@@ -131,7 +174,8 @@
           "name" : "",
           "description" : "获取明日下雨信息的结果",
           "type" : "string",
-          "convertor" : ""
+          "convertor" : "",
+          "examples" : [ "" ]
         }
       },
       "runnables" : {
@@ -166,11 +210,29 @@
             "date" : {
               "name" : "date",
               "type" : "string"
+            },
+            "rainPosition" : {
+              "name" : "rainPosition",
+              "type" : "object",
+              "properties" : {
+                "latitude" : {
+                  "type" : "string"
+                },
+                "longitude" : {
+                  "type" : "string"
+                }
+              },
+              "required" : [ "latitude", "longitude" ]
+            },
+            "info" : {
+              "name" : "info",
+              "type" : "object",
+              "properties" : [ ]
             }
           },
           "required" : [ ]
         },
-        "order" : [ "location", "date" ],
+        "order" : [ "location", "date", "rainPosition", "info" ],
         "return" : {
           "type" : "string",
           "convertor" : ""

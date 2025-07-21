@@ -6,6 +6,8 @@
 
 package modelengine.fel.tool.info.entity;
 
+import modelengine.fitframework.annotation.Property;
+
 import java.util.List;
 
 /**
@@ -16,13 +18,14 @@ import java.util.List;
  * @since 2024-10-26
  */
 public class PropertyEntity {
+    @Property(name = "default")
     private String defaultValue;
     private String description;
     private String name;
     private String type;
     private Object items;
     private Object properties;
-    private String example;
+    private List<String> examples;
     private List<String> required;
     private transient boolean need;
 
@@ -173,18 +176,18 @@ public class PropertyEntity {
     /**
      * 获取参数的示例值。
      *
-     * @return 表示参数的示例值的 {@link String}。
+     * @return 表示参数的示例值的 {@link List}{@code <}{@link String}{@code >}。
      */
-    public String getExample() {
-        return this.example;
+    public List<String> getExamples() {
+        return this.examples;
     }
 
     /**
      * 设置参数的示例值。
      *
-     * @param example 表示参数的示例值的 {@link String}。
+     * @param examples 表示参数的示例值的 {@link List}{@code <}{@link String}{@code >}。
      */
-    public void setExample(String example) {
-        this.example = example;
+    public void setExamples(List<String> examples) {
+        this.examples = examples;
     }
 }
