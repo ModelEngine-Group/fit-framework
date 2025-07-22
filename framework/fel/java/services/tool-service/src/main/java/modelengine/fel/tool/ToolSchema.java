@@ -9,7 +9,6 @@ package modelengine.fel.tool;
 /**
  * 表示工具元数据中的键。
  *
- * @author 刘信宏
  * @since 2024-06-26
  */
 public interface ToolSchema {

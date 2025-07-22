@@ -13,8 +13,6 @@ import modelengine.fitframework.annotation.Genericable;
 /**
  * 添加测试用的工具的定义。
  *
- * @author 曹嘉美
- * @author 杭潇
  * @since 2024-10-24
  */
 @Group(name = "defGroup_weather_Wind")

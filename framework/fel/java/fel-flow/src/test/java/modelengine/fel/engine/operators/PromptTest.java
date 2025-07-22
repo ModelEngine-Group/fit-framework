@@ -34,7 +34,6 @@ import java.util.List;
 /**
  * 提示词测试。
  *
- * @author 刘信宏
  * @since 2024-05-08
  */
 @DisplayName("测试提示词")

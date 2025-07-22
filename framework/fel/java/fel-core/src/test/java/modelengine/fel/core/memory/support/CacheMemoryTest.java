@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * 表示 {@link CacheMemory} 的测试集。
  *
- * @author 易文渊
  * @since 2024-08-09
  */
 @DisplayName("测试 CacheMemory")

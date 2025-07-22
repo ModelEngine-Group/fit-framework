@@ -18,7 +18,6 @@ import java.util.Collections;
  *
  * @param <I> 表示输入数据的类型。
  * @param <O> 表示流程处理完成的数据类型。
- * @author 宋永坦
  * @since 2025-05-16
  */
 public class FlowNodeSupportable<I, O> extends AbstractFlowPattern<I, O> {

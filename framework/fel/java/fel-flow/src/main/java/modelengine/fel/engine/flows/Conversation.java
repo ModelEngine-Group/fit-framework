@@ -29,7 +29,6 @@ import java.util.function.Consumer;
  *
  * @param <D> 流程开始节点传入的数据类型。
  * @param <R> 流程结束节点输出的数据类型。
- * @author 刘信宏
  * @since 2024-04-28
  */
 public class Conversation<D, R> {

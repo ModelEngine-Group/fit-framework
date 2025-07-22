@@ -15,7 +15,6 @@ import modelengine.fit.http.client.HttpClassicClientRequest;
 /**
  * 提供 http 请求的相关工具方法。
  *
- * @author 易文渊
  * @since 2024-08-07
  */
 public class HttpUtils {

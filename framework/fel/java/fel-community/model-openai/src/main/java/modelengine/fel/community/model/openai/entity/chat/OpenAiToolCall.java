@@ -13,7 +13,6 @@ import modelengine.fitframework.serialization.annotation.SerializeStrategy;
 /**
  * 表示 {@link ToolCall} 的 openai 实现。
  *
- * @author 易文渊
  * @since 2024-08-17
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)

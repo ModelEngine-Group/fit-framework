@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class PingHandler extends AbstractMessageHandler<PingHandler.PingRequest> {
@@ -31,7 +30,6 @@ public class PingHandler extends AbstractMessageHandler<PingHandler.PingRequest>
     }
 
     /**
-     * @author 季聿阶
      * @since 2025-05-15
      */
     public static class PingRequest extends MessageRequest {}

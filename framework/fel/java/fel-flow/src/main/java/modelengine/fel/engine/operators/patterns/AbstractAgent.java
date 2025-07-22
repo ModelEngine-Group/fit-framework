@@ -26,7 +26,6 @@ import java.util.List;
 /**
  * Agent 基类。
  *
- * @author 刘信宏
  * @since 2024-04-12
  */
 public abstract class AbstractAgent extends AbstractFlowPattern<Prompt, ChatMessage> {

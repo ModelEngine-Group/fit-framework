@@ -14,8 +14,6 @@ import modelengine.fitframework.annotation.Property;
 /**
  * 表示天气服务的接口定义。
  *
- * @author 易文渊
- * @author 杭潇
  * @since 2024-09-02
  */
 @Group(name = "weather_service")

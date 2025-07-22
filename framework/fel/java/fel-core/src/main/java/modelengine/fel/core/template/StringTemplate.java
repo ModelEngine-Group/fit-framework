@@ -13,7 +13,6 @@ import java.util.Map;
 /**
  * 字符串模板接口定义。
  *
- * @author 易文渊
  * @since 2024-04-27
  */
 public interface StringTemplate extends GenericTemplate<Map<String, String>, String> {

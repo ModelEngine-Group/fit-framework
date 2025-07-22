@@ -18,7 +18,6 @@ import java.util.Map;
  * 表示实现解析 json 片段的 {@link JsonOutputParser}
  *
  * @param <O> 表示输出对象类型。
- * @author 易文渊
  * @since 2024-04-28
  */
 public final class PartialJsonOutputParser<O> implements JsonOutputParser<O> {

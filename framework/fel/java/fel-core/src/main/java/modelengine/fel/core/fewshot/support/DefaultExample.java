@@ -13,7 +13,6 @@ import modelengine.fel.core.fewshot.Example;
 /**
  * 表示 {@link Example} 的默认实现。
  *
- * @author 易文渊
  * @since 2024-04-25
  */
 public class DefaultExample implements Example {

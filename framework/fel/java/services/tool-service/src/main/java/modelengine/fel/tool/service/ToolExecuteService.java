@@ -13,7 +13,6 @@ import java.util.Map;
 /**
  * 表示工具的执行服务。
  *
- * @author 季聿阶
  * @since 2024-04-08
  */
 public interface ToolExecuteService {

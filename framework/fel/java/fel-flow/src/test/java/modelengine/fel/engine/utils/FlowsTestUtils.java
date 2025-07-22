@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 /**
  * 异步流程测试等待工具方法。
  *
- * @author 刘信宏
  * @since 2024-04-29
  */
 public final class FlowsTestUtils {

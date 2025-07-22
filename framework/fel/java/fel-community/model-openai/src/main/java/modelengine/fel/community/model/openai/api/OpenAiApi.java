@@ -9,8 +9,6 @@ package modelengine.fel.community.model.openai.api;
 /**
  * 提供 OpenAI 客户端接口：发送 OpenAI API 格式的请求并接收响应。
  *
- * @author 易文渊
- * @author 张庭怿
  * @since 2024-04-30
  */
 public interface OpenAiApi {

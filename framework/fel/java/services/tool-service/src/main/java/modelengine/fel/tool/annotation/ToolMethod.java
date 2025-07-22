@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
 /**
  * 用于工具方法的定义。
  *
- * @author 杭潇
  * @since 2024-06-13
  */
 @Retention(RetentionPolicy.RUNTIME)

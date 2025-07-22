@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 /**
  * 表示批量生成字符串模板的实现。
  *
- * @author 何嘉斌
  * @since 2024-05-13
  */
 public class DefaultBulkStringTemplate implements BulkStringTemplate {

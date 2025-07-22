@@ -25,7 +25,6 @@ import java.util.stream.DoubleStream;
 /**
  * 基于 RRF 算法的后处理器。
  *
- * @author 马朝阳
  * @since 2024-09-29
  */
 public class RrfPostProcessor implements DocumentPostProcessor {

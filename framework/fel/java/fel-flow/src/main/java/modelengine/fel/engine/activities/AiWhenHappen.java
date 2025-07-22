@@ -22,7 +22,6 @@ import modelengine.fitframework.inspection.Validation;
  * @param <RF> The internal flow type, extending {@link Flow}{@code <D>}.
  * @param <F> The AI flow type, extending {@link AiFlow}{@code <D, RF>}.
  *
- * @author 宋永坦
  * @since 2025-06-12
  */
 public class AiWhenHappen<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> {

@@ -19,7 +19,6 @@ import java.util.Map;
 /**
  * 表示文件加载器的抽象实现。
  *
- * @author 易文渊
  * @since 2024-08-07
  */
 public abstract class AbstractFileSource implements Source<File> {

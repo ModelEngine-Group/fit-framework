@@ -14,8 +14,6 @@ import java.util.List;
 /**
  * 表示 OpenAi API 格式的 嵌入请求。
  *
- * @author 易文渊
- * @author 张庭怿
  * @since 2024-4-30
  */
 public class OpenAiEmbeddingRequest {

@@ -14,8 +14,6 @@ import modelengine.fitframework.util.StringUtils;
 /**
  * 表示 {@link ChatMessage} 的抽象实现。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-04-16
  */
 public abstract class AbstractChatMessage implements ChatMessage {

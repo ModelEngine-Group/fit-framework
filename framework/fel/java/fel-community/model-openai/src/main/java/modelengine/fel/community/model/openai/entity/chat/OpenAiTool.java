@@ -13,8 +13,6 @@ import java.util.Map;
 /**
  * 模型所使用的工具，用于 OpenAI 请求中 tools 字段。
  *
- * @author 易文渊
- * @author 张庭怿
  * @since 2024-4-30
  */
 public class OpenAiTool {

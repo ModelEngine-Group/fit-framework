@@ -11,7 +11,6 @@ import modelengine.fel.core.pattern.Model;
 /**
  * 阻塞模型。
  *
- * @author 刘信宏
  * @since 2024-06-07
  */
 public interface BlockModel<I, O> extends Model<I, O> {}

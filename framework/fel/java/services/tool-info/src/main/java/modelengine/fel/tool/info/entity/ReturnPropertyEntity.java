@@ -9,8 +9,6 @@ package modelengine.fel.tool.info.entity;
 /**
  * 表示方法返回的参数的属性类。
  *
- * @author 曹嘉美
- * @author 李金绪
  * @since 2024-10-26
  */
 public class ReturnPropertyEntity extends PropertyEntity {

@@ -9,7 +9,6 @@ package modelengine.fel.core.fewshot;
 /**
  * 提示词例子的接口定义。
  *
- * @author 易文渊
  * @since 2024-04-25
  */
 public interface Example {

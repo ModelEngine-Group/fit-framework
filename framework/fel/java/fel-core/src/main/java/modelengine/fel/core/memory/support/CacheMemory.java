@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link Memory} 的简单内存实现，不要在生产环境中使用。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-05-08
  */
 public class CacheMemory implements Memory {

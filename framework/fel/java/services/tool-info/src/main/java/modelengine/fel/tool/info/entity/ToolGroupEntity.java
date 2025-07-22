@@ -11,8 +11,6 @@ import java.util.List;
 /**
  * 表示实现组的实体类。
  *
- * @author 曹嘉美
- * @author 李金绪
  * @since 2024-10-26
  */
 public class ToolGroupEntity extends GroupEntity {

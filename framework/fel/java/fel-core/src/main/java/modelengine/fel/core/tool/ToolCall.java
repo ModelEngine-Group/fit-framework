@@ -12,7 +12,6 @@ import modelengine.fitframework.pattern.builder.BuilderFactory;
 /**
  * 表示工具调用请求的实体。
  *
- * @author 易文渊
  * @since 2024-04-16
  */
 public interface ToolCall {

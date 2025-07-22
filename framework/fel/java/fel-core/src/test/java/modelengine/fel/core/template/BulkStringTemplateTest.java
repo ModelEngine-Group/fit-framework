@@ -22,7 +22,6 @@ import java.util.Map;
 /**
  * 表示 {@link BulkStringTemplate} 的单元测试。
  *
- * @author 何嘉斌
  * @since 2024-05-15
  */
 @DisplayName("测试 BulkStringTemplateTest")

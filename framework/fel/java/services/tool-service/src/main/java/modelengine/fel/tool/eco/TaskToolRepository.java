@@ -9,7 +9,6 @@ package modelengine.fel.tool.eco;
 /**
  * 表示 {@link TaskTool} 的仓库。
  *
- * @author 季聿阶
  * @since 2024-06-05
  */
 public interface TaskToolRepository {}

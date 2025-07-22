@@ -17,8 +17,6 @@ import java.util.Date;
 /**
  * 添加测试用的工具的定义。
  *
- * @author 杭潇
- * @author 曹嘉美
  * @since 2024-10-26
  */
 @Group(name = "defGroup_weather_Rain", summary = "雨天", description = "下雨的定义组")

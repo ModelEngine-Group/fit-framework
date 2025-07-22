@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * AI 流程基础表达式的测试。
  *
- * @author 刘信宏
  * @since 2024-04-29
  */
 @DisplayName("测试 AiFlow 的基础表达式")

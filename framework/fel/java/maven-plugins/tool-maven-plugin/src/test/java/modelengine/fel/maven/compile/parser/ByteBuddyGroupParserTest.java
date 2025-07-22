@@ -27,8 +27,6 @@ import java.util.List;
 /**
  * 添加组解析的测试。
  *
- * @author 曹嘉美
- * @author 杭潇
  * @since 2024-10-30
  */
 @DisplayName("测试 ByteBuddyGroupParserTest 类")

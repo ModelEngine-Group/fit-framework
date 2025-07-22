@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * 表示 {@link RecentMemory} 的测试。
  *
- * @author 宋永坦
  * @since 2025-07-04
  */
 class RecentMemoryTest {

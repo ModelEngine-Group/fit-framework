@@ -17,7 +17,6 @@ import java.net.URL;
 /**
  * 表示 OpenAi 格式的图片。
  *
- * @author 何嘉斌
  * @since 2024-12-17
  */
 public class OpenAiImage {

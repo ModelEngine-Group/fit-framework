@@ -52,7 +52,6 @@ import java.util.function.Function;
 /**
  * 表示 {@link Tool} 的 Http 调用实现。
  *
- * @author 季聿阶
  * @since 2024-05-10
  */
 public class HttpTool extends AbstractTool {

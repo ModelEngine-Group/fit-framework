@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  * 数据发射源实现，支持注册多个监听器。仅支持主动逐个发射数据。
  *
  * @param <T> 表示数据源的业务数据类型。
- * @author 刘信宏
  * @since 2024-04-28
  */
 public class Source<T> implements Emitter<T, FlowSession> {

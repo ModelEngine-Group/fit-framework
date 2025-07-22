@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link ToolFactory} 的自动装配器。
  *
- * @author 易文渊
  * @since 2024-08-15
  */
 @Component

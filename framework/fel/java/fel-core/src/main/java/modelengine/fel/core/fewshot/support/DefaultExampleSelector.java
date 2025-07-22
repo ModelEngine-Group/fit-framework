@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link ExampleSelector} 的默认实现。
  *
- * @author 易文渊
  * @since 2024-04-25
  */
 public class DefaultExampleSelector implements ExampleSelector {

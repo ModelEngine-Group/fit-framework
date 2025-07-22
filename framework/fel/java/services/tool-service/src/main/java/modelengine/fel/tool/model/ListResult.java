@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * 适配查询工具返回工具总数的包装类。
  *
- * @author 鲁为
  * @since 2024-06-13
  */
 public class ListResult<T> {

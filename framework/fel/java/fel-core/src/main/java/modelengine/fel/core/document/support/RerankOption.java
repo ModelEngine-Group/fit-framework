@@ -11,7 +11,6 @@ import modelengine.fitframework.pattern.builder.BuilderFactory;
 /**
  * 表示 rerank 模型参数的实体。
  *
- * @author 马朝阳
  * @since 2024-09-23
  */
 public interface RerankOption {

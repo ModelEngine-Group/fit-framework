@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 /**
  * 表示 {@link MessageTemplate} 的单元测试。
  *
- * @author 易文渊
  * @since 2024-04-25
  */
 @DisplayName("测试 MessageTemplate")

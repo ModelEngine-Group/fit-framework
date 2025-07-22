@@ -13,8 +13,6 @@ import java.util.List;
 /**
  * 对话历史记录。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-04-28
  */
 public interface Memory {

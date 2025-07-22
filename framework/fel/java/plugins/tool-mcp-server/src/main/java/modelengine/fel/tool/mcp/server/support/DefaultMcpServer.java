@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The default implementation of {@link McpServer}.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 @Component

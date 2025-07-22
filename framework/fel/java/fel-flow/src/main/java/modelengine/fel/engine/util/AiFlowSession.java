@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 /**
  * {@link FlowSession} 线程变量。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-06-18
  */
 public class AiFlowSession {

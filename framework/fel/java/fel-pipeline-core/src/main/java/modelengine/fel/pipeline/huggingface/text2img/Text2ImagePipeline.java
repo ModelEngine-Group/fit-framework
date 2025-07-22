@@ -16,7 +16,6 @@ import java.util.List;
 /**
  * 表示 {@link PipelineTask#TEXT_TO_IMAGE} 任务的流水线。
  *
- * @author 易文渊
  * @since 2024-06-06
  */
 public class Text2ImagePipeline extends ExplicitPipeline<Text2ImageInput, List<Media>> {

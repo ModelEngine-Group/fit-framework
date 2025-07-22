@@ -19,7 +19,6 @@ import modelengine.fitframework.util.StringUtils;
  * 该实现不保证流式片段聚合的线程安全，需要外部使用方保证线程安全。
  * </p>
  *
- * @author 刘信宏
  * @since 2024-12-23
  */
 public class DefaultToolCallChunk implements ToolCallChunk {

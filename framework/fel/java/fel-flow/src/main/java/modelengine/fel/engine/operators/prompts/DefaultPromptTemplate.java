@@ -15,7 +15,6 @@ import modelengine.fitframework.inspection.Validation;
 /**
  * 人类提示词模板。文本数据渲染模板，媒体数据直接与提示词一起组装为 {@link Prompt}。
  *
- * @author 刘信宏
  * @since 2024-04-12
  */
 public class DefaultPromptTemplate implements PromptTemplate<Tip> {

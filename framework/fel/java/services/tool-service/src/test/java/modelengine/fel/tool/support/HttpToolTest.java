@@ -45,7 +45,6 @@ import java.util.stream.Stream;
 /**
  * 表示 {@link HttpTool} 的单元测试。
  *
- * @author 何天放
  * @since 2024-06-12
  */
 public class HttpToolTest {

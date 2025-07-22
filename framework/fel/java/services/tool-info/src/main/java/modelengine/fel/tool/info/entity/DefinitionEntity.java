@@ -9,8 +9,6 @@ package modelengine.fel.tool.info.entity;
 /**
  * 表示定义的实体类，用于存储定义信息。
  *
- * @author 曹嘉美
- * @author 李金绪
  * @since 2024-10-26
  */
 public class DefinitionEntity {

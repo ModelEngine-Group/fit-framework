@@ -46,7 +46,6 @@ import java.util.Set;
 /**
  * 表示 {@link Tool} 的单元测试。
  *
- * @author 季聿阶
  * @since 2024-04-06
  */
 @DisplayName("测试 FitJsonSchemaFunctionalTool")

@@ -11,7 +11,6 @@ import java.util.Map;
 /**
  * 表示组的基本实体类。
  *
- * @author 李金绪
  * @since 2024-12-12
  */
 public class GroupEntity {

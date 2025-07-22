@@ -11,7 +11,6 @@ import modelengine.fel.tool.Tool;
 /**
  * 表示 {@link Tool} 的生态任务型工具实现。
  *
- * @author 季聿阶
  * @since 2024-06-04
  */
 public interface TaskTool extends Tool {

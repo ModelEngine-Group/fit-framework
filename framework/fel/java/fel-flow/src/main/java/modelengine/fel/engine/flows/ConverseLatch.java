@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * 流程调用的同步器。
  *
- * @author 刘信宏
  * @since 2024-04-10
  */
 public class ConverseLatch<T> {

@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @param <D> 表示流程开始节点传入的数据类型。
  * @param <R> 表示流程结束节点输出的数据类型。
- * @author 刘信宏
  * @since 2024-04-28
  */
 public class AiProcessFlow<D, R> extends AiFlow<D, ProcessFlow<D>>

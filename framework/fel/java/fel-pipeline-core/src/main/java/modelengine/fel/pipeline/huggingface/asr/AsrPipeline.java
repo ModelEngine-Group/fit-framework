@@ -13,7 +13,6 @@ import modelengine.fel.service.pipeline.HuggingFacePipelineService;
 /**
  * 表示 {@link PipelineTask#AUTOMATIC_SPEECH_RECOGNITION} 任务的流水线。
  *
- * @author 易文渊
  * @since 2024-06-04
  */
 public class AsrPipeline extends ExplicitPipeline<AsrInput, AsrOutput> {

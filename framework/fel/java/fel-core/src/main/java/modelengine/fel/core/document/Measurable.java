@@ -11,7 +11,6 @@ import modelengine.fitframework.inspection.Nonnull;
 /**
  * 表示具有量化能力的对象。
  *
- * @author 易文渊
  * @since 2024-08-08
  */
 public interface Measurable {

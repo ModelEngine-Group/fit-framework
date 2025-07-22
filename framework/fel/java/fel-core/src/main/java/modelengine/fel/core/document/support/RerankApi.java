@@ -9,7 +9,6 @@ package modelengine.fel.core.document.support;
 /**
  * 提供 Rerank 客户端接口：发送 Rerank API 格式的请求并接收响应。
  *
- * @author 马朝阳
  * @since 2024-09-27
  */
 public interface RerankApi {

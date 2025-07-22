@@ -11,7 +11,6 @@ import modelengine.fitframework.serialization.ObjectSerializer;
 /**
  * 表示对象输出解析器，根据 schema，输出 java 集合或者 java 对象。
  *
- * @author 易文渊
  * @since 2024-08-29
  */
 public class ObjectJsonOutputParser extends AbstractJsonOutputParser<Object> {

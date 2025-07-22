@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * 用于 tools.json 的序列化与反序列化的实体类。
  *
- * @author 曹嘉美
  * @since 2024-10-26
  */
 public class ToolJsonEntity {

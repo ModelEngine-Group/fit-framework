@@ -21,7 +21,6 @@ import java.util.Set;
 /**
  * 表示大模型的工具。
  *
- * @author 季聿阶
  * @since 2024-04-05
  */
 public interface Tool {

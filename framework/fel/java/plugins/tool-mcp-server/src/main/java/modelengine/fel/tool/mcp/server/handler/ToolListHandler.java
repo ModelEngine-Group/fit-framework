@@ -18,7 +18,6 @@ import modelengine.fitframework.util.MapBuilder;
  * {@link ToolListRequest} messages by retrieving the list of tools from the associated {@link McpServer}
  * and returning them in a structured map format.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class ToolListHandler extends AbstractMessageHandler<ToolListHandler.ToolListRequest> {
@@ -45,7 +44,6 @@ public class ToolListHandler extends AbstractMessageHandler<ToolListHandler.Tool
      * This request is handled by {@link ToolListHandler} to retrieve the list of available tools
      * from the server and return them in a structured format.
      *
-     * @author 季聿阶
      * @since 2025-05-15
      */
     public static class ToolListRequest extends MessageRequest {}

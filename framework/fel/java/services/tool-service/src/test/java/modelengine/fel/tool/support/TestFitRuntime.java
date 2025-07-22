@@ -16,7 +16,6 @@ import modelengine.fitframework.util.ThreadUtils;
 /**
  * 用于测试的统一 FIT 运行时。
  *
- * @author 何天放
  * @since 2024-06-15
  */
 public class TestFitRuntime {

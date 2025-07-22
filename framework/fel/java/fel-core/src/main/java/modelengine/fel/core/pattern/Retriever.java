@@ -14,7 +14,6 @@ import java.util.List;
  * 表示检索算子。
  *
  * @param <I> 表示输入参数的类型。
- * @author 刘信宏
  * @since 2024-04-28
  */
 @FunctionalInterface

@@ -13,7 +13,6 @@ import modelengine.fel.engine.activities.AiDataStart;
  *
  * @param <T> 表示输入数据类型。
  * @param <R> 表示数据流的数据类型。
- * @author 夏斐
  * @since 2024-05-18
  */
 @FunctionalInterface

@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
  * 表示实现从 markdown 格式字符串解析的  {@link OutputParser}。
  *
  * @param <O> 表示输出对象类型。
- * @author 易文渊
  * @since 2024-05-10
  */
 public class MarkdownCompatibleParser<O> implements OutputParser<O> {
