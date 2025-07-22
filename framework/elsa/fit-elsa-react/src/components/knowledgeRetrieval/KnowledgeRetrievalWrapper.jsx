@@ -13,6 +13,7 @@ import {useTranslation} from 'react-i18next';
 import {useDispatch} from '@/components/DefaultRoot.jsx';
 import {SearchForm} from '@/components/knowledgeRetrieval/SearchForm.jsx';
 import {getConfigValue} from '@/components/util/JadeConfigUtils.js';
+import {OutsideRerankForm} from '@/components/knowledgeRetrieval/OutsideRerankForm.jsx';
 
 /**
  * retrieval组件Wrapper
@@ -46,6 +47,7 @@ export const KnowledgeRetrievalWrapper = ({data, shapeStatus}) => {
       editable={false}/>
     <KnowledgeForm knowledge={knowledge} groupId={groupId} knowledgeConfigId={knowledgeConfigId} disabled={shapeStatus.disabled}/>
     <SearchForm option={option} groupId={groupId} shapeStatus={shapeStatus}/>
+    <OutsideRerankForm option={option} shapeStatus={shapeStatus}/>
     <OutputForm outputParams={outputParams} outputPopover={'knowledgeBaseOutputPopover'}/>
   </>);
 };

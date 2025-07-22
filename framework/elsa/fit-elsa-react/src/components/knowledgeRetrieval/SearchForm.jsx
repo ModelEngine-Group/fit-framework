@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import React from 'react';
-import {Button, Collapse, Switch} from 'antd';
+import {Button, Collapse} from 'antd';
 import {useTranslation} from 'react-i18next';
 import SearchConfigIcon from '../asserts/icon-search-args-config.svg?react';
 import PropTypes from 'prop-types';
@@ -65,7 +65,6 @@ export const _SearchForm = ({option, groupId, shapeStatus}) => {
     const referenceLimitType = getConfigValue(option, ['referenceLimit', 'type']);
     const referenceLimitValue = getConfigValue(option, ['referenceLimit', 'value']);
     const similarityThreshold = getConfigValue(option, ['similarityThreshold']);
-    const rerank = getConfigValue(option, ['rerankParam', 'enableRerank']);
     return (<>
       <div className={'search-args-config-form-content'}>
         <div className={'search-args-config-form-column'}>

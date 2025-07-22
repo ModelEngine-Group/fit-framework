@@ -223,3 +223,27 @@ export const DEFAULT_MCP_SERVERS = {
   from: FROM_TYPE.INPUT,
   value: {}
 };
+
+export const DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL = {
+  id: uuidv4(),
+  name: 'model',
+  type: DATA_TYPES.STRING,
+  from: FROM_TYPE.INPUT,
+  value: undefined,
+};
+
+export const DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI = {
+  id: uuidv4(),
+  name: 'baseUri',
+  type: DATA_TYPES.STRING,
+  from: FROM_TYPE.INPUT,
+  value: undefined,
+};
+
+export const DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N = {
+  id: uuidv4(),
+  name: 'topN',
+  type: DATA_TYPES.INTEGER,
+  from: FROM_TYPE.INPUT,
+  value: 3,
+};

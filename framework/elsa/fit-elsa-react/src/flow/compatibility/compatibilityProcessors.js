@@ -16,7 +16,7 @@ import {
   DEFAULT_MAX_MEMORY_ROUNDS,
   END_NODE_TYPE,
   FLOW_TYPE,
-  FROM_TYPE, DEFAULT_MCP_SERVERS,
+  FROM_TYPE, DEFAULT_MCP_SERVERS, DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL, DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI, DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N,
 } from '@/common/Consts.js';
 import {getEndNodeType} from '@/components/end/endNodeUtils.js';
 import {pageProcessor} from '@/flow/pageProcessors.js';
@@ -469,6 +469,15 @@ export const knowledgeRetrievalCompatibilityProcessor = (shapeData, graph, pageH
 
       if (Array.isArray(optionValue) && !optionValue.some(v => v.name === 'knowledgeConfigId')) {
         optionValue.push(JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID)));
+      }
+
+      if (Array.isArray(optionValue)) {
+        const rerankParamValue = optionValue.find(v => v.name === 'rerankParam')?.value;
+        if (!rerankParamValue.some(v => v.name === 'model')) {
+          rerankParamValue.push(DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL);
+          rerankParamValue.push(DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI);
+          rerankParamValue.push(DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N);
+        }
       }
     };
 

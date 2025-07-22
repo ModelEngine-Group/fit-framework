@@ -175,3 +175,45 @@ export const UpdateGroupIdAndConfigIdReducer = () => {
 
   return self;
 };
+
+/**
+ * changeRerankParam 事件处理器.
+ * 修改为每次更新都创建全新的对象引用
+ */
+export const ChangeRerankParamReducer = () => {
+  const self = {};
+  self.type = 'changeRerankParam';
+
+  self.reduce = (config, action) => {
+    return {
+      ...config,
+      inputParams: config.inputParams.map(ip => {
+        if (ip.name !== 'option') {
+          return {...ip};
+        }
+        return {
+          ...ip,
+          value: ip.value.map(v => {
+            if (v.name !== 'rerankParam') {
+              return {...v};
+            }
+            return {
+              ...v,
+              value: v.value.map(param => {
+                if (param.name !== action.name) {
+                  return {...param};
+                }
+                return {
+                  ...param,
+                  value: action.value,
+                };
+              })
+            };
+          })
+        };
+      })
+    };
+  };
+
+  return self;
+};

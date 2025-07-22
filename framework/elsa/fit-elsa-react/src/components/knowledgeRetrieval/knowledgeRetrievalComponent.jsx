@@ -7,8 +7,17 @@
 import {v4 as uuidv4} from 'uuid';
 import {KnowledgeRetrievalWrapper} from '@/components/knowledgeRetrieval/KnowledgeRetrievalWrapper.jsx';
 import {retrievalComponent} from '@/components/retrieval/retrievalComponent.jsx';
-import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP, DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID, FROM_TYPE} from '@/common/Consts.js';
 import {
+  DATA_TYPES,
+  DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL,
+  DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI,
+  DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N,
+  DEFAULT_KNOWLEDGE_REPO_GROUP,
+  DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID,
+  FROM_TYPE,
+} from '@/common/Consts.js';
+import {
+  ChangeRerankParamReducer,
   UpdateGroupIdAndConfigIdReducer,
   UpdateInputParamReducer,
   UpdateKnowledgeReducer,
@@ -29,6 +38,7 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
   addReducer(builtInReducers, UpdateOptionReducer());
   addReducer(builtInReducers, UpdateKnowledgeReducer());
   addReducer(builtInReducers, UpdateGroupIdAndConfigIdReducer());
+  addReducer(builtInReducers, ChangeRerankParamReducer());
 
   /**
    * 必填
@@ -129,6 +139,9 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
                 from: FROM_TYPE.INPUT,
                 value: false,
               },
+              DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL,
+              DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI,
+              DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N,
             ],
           },
           {
