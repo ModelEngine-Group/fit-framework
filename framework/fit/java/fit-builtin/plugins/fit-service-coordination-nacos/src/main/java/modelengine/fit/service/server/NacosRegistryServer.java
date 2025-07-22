@@ -178,16 +178,16 @@ public class NacosRegistryServer implements RegistryService {
      */
     private HashMap<String, String> buildInstanceMetadata(Worker worker, Application application, FitableMeta meta) {
         HashMap<String, String> metadata = new HashMap<>();
-        if (heartbeatConfig.getHeartBeatInterval() != null) {
-            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(heartbeatConfig.getHeartBeatInterval()));
+        if (this.heartbeatConfig.getHeartBeatInterval() != null) {
+            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.heartbeatConfig.getHeartBeatInterval()));
         }
-        if (heartbeatConfig.getHeartBeatTimeout() != null) {
-            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(heartbeatConfig.getHeartBeatTimeout()));
+        if (this.heartbeatConfig.getHeartBeatTimeout() != null) {
+            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.heartbeatConfig.getHeartBeatTimeout()));
         }
         try {
-            metadata.put(WORKER_KEY, objectMapper.writeValueAsString(worker));
-            metadata.put(APPLICATION_KEY, objectMapper.writeValueAsString(application));
-            metadata.put(FITABLE_META_KEY, objectMapper.writeValueAsString(meta));
+            metadata.put(WORKER_KEY, this.objectMapper.writeValueAsString(worker));
+            metadata.put(APPLICATION_KEY, this.objectMapper.writeValueAsString(application));
+            metadata.put(FITABLE_META_KEY, this.objectMapper.writeValueAsString(meta));
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize metadata for worker.", e);
         }
@@ -200,11 +200,11 @@ public class NacosRegistryServer implements RegistryService {
      * @param instance 服务实例对象。
      */
     private void setInstanceProperties(Instance instance) {
-        if (!heartbeatConfig.getIsEphemeral()) {
+        if (!this.heartbeatConfig.getIsEphemeral()) {
             instance.setEphemeral(false);
         }
-        if (heartbeatConfig.getWeight() != null) {
-            instance.setWeight(heartbeatConfig.getWeight());
+        if (this.heartbeatConfig.getWeight() != null) {
+            instance.setWeight(this.heartbeatConfig.getWeight());
         }
     }
 
@@ -212,20 +212,47 @@ public class NacosRegistryServer implements RegistryService {
     public void unregisterFitables(List<FitableInfo> fitables, String workerId) {
         log.debug("Unregistering fitables for worker. [fitables={}, workerId={}]", fitables, workerId);
         for (FitableInfo fitable : fitables) {
-            String groupName = getGroupName(fitable);
-            String serviceName = getServiceName(fitable);
+            unregisterSingleFitable(fitable, workerId);
+        }
+    }
+
+    /**
+     * 注销单个 Fitable 的所有匹配实例。
+     *
+     * @param fitable 要注销的 {@link Fitable} 信息
+     * @param workerId 工作节点 ID
+     */
+    private void unregisterSingleFitable(FitableInfo fitable, String workerId) {
+        String groupName = getGroupName(fitable);
+        String serviceName = getServiceName(fitable);
+        try {
+            List<Instance> instances = this.namingService.selectInstances(serviceName, groupName, true);
+            unregisterMatchingInstances(instances, workerId, serviceName, groupName);
+        } catch (NacosException e) {
+            log.error("Failed to unregister fitable due to registry error.", e);
+        }
+    }
+
+    /**
+     * 注销所有匹配指定工作节点 ID 的实例。
+     *
+     * @param instances 实例列表
+     * @param workerId 工作节点 ID
+     * @param serviceName 服务名称
+     * @param groupName 组名称
+     */
+    private void unregisterMatchingInstances(List<Instance> instances, String workerId, String serviceName,
+            String groupName) {
+        for (Instance instance : instances) {
             try {
-                List<Instance> instances = namingService.selectInstances(serviceName, groupName, true);
-                for (Instance instance : instances) {
-                    Worker worker = objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
-                    if (Objects.equals(workerId, worker.getId())) {
-                        namingService.deregisterInstance(serviceName, groupName, instance);
-                    }
+                Worker worker = this.objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
+                if (Objects.equals(workerId, worker.getId())) {
+                    this.namingService.deregisterInstance(serviceName, groupName, instance);
                 }
-            } catch (NacosException e) {
-                log.error("Failed to unregister fitable due to registry error.", e);
             } catch (JsonProcessingException e) {
                 log.error("Failed to parse worker metadata for fitable.", e);
+            } catch (NacosException e) {
+                log.error("Failed to deregister instance.", e);
             }
         }
     }
@@ -249,14 +276,8 @@ public class NacosRegistryServer implements RegistryService {
         return new ArrayList<>(resultMap.values());
     }
 
-    /**
-     * 处理服务实例，按应用分组并填充 FitableAddressInstance。
-     *
-     * @param resultMap 结果映射表。
-     * @param fitable 当前 {@link FitableInfo}。
-     * @param instances 查询到的服务实例列表。
-     */
-    private void processApplicationInstances(Map<FitableInfo, FitableAddressInstance> resultMap, FitableInfo fitable, List<Instance> instances) {
+    private void processApplicationInstances(Map<FitableInfo, FitableAddressInstance> resultMap, FitableInfo fitable,
+            List<Instance> instances) {
         Map<Application, List<Instance>> appInstancesMap = groupInstancesByApplication(instances);
         for (Map.Entry<Application, List<Instance>> entry : appInstancesMap.entrySet()) {
             Application application = entry.getKey();
@@ -308,12 +329,12 @@ public class NacosRegistryServer implements RegistryService {
     private List<Instance> queryInstances(FitableInfo fitable) throws NacosException {
         String groupName = getGroupName(fitable);
         String serviceName = getServiceName(fitable);
-        return namingService.selectInstances(serviceName, groupName, true);
+        return this.namingService.selectInstances(serviceName, groupName, true);
     }
 
     private FitableMeta parseFitableMeta(Instance instance) {
         try {
-            return objectMapper.readValue(instance.getMetadata().get(FITABLE_META_KEY), FitableMeta.class);
+            return this.objectMapper.readValue(instance.getMetadata().get(FITABLE_META_KEY), FitableMeta.class);
         } catch (JsonProcessingException e) {
             log.error("Failed to parse fitable meta for instance.", e);
             FitableMeta meta = new FitableMeta();
@@ -324,7 +345,7 @@ public class NacosRegistryServer implements RegistryService {
 
     private Application parseApplication(Instance instance) {
         try {
-            return objectMapper.readValue(instance.getMetadata().get(APPLICATION_KEY), Application.class);
+            return this.objectMapper.readValue(instance.getMetadata().get(APPLICATION_KEY), Application.class);
         } catch (JsonProcessingException e) {
             log.error("Failed to parse application metadata for instance.", e);
             Application app = new Application();
@@ -335,7 +356,7 @@ public class NacosRegistryServer implements RegistryService {
 
     private Worker parseWorker(Instance instance) {
         try {
-            return objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
+            return this.objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
         } catch (JsonProcessingException e) {
             log.error("Failed to parse worker metadata for instance.", e);
             Worker worker = new Worker();
@@ -387,17 +408,18 @@ public class NacosRegistryServer implements RegistryService {
             try {
                 String groupName = getGroupName(fitable);
                 String serviceName = getServiceName(fitable);
-                if (serviceSubscriptions.containsKey(buildServiceKey(groupName, serviceName))) {
+                if (this.serviceSubscriptions.containsKey(buildServiceKey(groupName, serviceName))) {
                     log.debug("Already subscribed to service. [groupName={}, serviceName={}]", groupName, serviceName);
                     continue;
                 }
                 EventListener eventListener =
-                        serviceSubscriptions.computeIfAbsent(buildServiceKey(groupName, serviceName), k -> event -> {
-                            if (event instanceof NamingEvent || event instanceof NamingChangeEvent) {
-                                onServiceChanged(fitable);
-                            }
-                        });
-                namingService.subscribe(serviceName, groupName, eventListener);
+                        this.serviceSubscriptions.computeIfAbsent(buildServiceKey(groupName, serviceName),
+                                k -> event -> {
+                                    if (event instanceof NamingEvent || event instanceof NamingChangeEvent) {
+                                        onServiceChanged(fitable);
+                                    }
+                                });
+                this.namingService.subscribe(serviceName, groupName, eventListener);
             } catch (NacosException e) {
                 log.error("Failed to subscribe to Nacos service.", e);
             }
@@ -415,9 +437,9 @@ public class NacosRegistryServer implements RegistryService {
             try {
                 String groupName = getGroupName(fitable);
                 String serviceName = getServiceName(fitable);
-                EventListener listener = serviceSubscriptions.get(buildServiceKey(groupName, serviceName));
-                namingService.unsubscribe(serviceName, groupName, listener);
-                serviceSubscriptions.remove(buildServiceKey(groupName, serviceName));
+                EventListener listener = this.serviceSubscriptions.get(buildServiceKey(groupName, serviceName));
+                this.namingService.unsubscribe(serviceName, groupName, listener);
+                this.serviceSubscriptions.remove(buildServiceKey(groupName, serviceName));
             } catch (NacosException e) {
                 log.error("Failed to unsubscribe from Nacos service.", e);
             }
@@ -431,38 +453,64 @@ public class NacosRegistryServer implements RegistryService {
      */
     private void onServiceChanged(FitableInfo fitableInfo) {
         List<FitableAddressInstance> fitableAddressInstances =
-                this.queryFitables(Collections.singletonList(fitableInfo), worker.id());
-        notify.notifyFitables(fitableAddressInstances);
+                this.queryFitables(Collections.singletonList(fitableInfo), this.worker.id());
+        this.notify.notifyFitables(fitableAddressInstances);
     }
 
     @Override
     @Fitable(id = "33b1f9b8f1cc49d19719a6536c96e854")
     public List<FitableMetaInstance> queryFitableMetas(List<GenericableInfo> genericables) {
         log.debug("Querying fitable metas for genericables. [genericables={}]", genericables);
-        List<FitableMetaInstance> results = new ArrayList<>();
         Map<FitableMeta, Set<String>> metaEnvironments = new HashMap<>();
 
         for (GenericableInfo genericable : genericables) {
-            String groupName = getGroupName(genericable);
+            processGenericableServices(genericable, metaEnvironments);
+        }
+
+        return buildFitableMetaInstances(metaEnvironments);
+    }
+
+    private void processGenericableServices(GenericableInfo genericable,
+            Map<FitableMeta, Set<String>> metaEnvironments) {
+        String groupName = getGroupName(genericable);
+        try {
+            ListView<String> services = this.namingService.getServicesOfServer(1, Integer.MAX_VALUE, groupName);
+            for (String serviceName : services.getData()) {
+                processServiceInstances(serviceName, groupName, metaEnvironments);
+            }
+        } catch (NacosException e) {
+            log.error("Failed to query fitable metas.", e);
+        }
+    }
+
+    private void processServiceInstances(String serviceName, String groupName,
+            Map<FitableMeta, Set<String>> metaEnvironments) {
+        try {
+            List<Instance> instances = this.namingService.selectInstances(serviceName, groupName, true);
+            if (instances.isEmpty()) {
+                return;
+            }
+            FitableMeta meta = parseFitableMeta(instances.get(0));
+            collectEnvironmentsFromInstances(instances, meta, metaEnvironments);
+        } catch (NacosException e) {
+            log.error("Failed to select instances for service: " + serviceName, e);
+        }
+    }
+
+    private void collectEnvironmentsFromInstances(List<Instance> instances, FitableMeta meta,
+            Map<FitableMeta, Set<String>> metaEnvironments) {
+        for (Instance instance : instances) {
             try {
-                ListView<String> services = namingService.getServicesOfServer(1, Integer.MAX_VALUE, groupName);
-                for (String serviceName : services.getData()) {
-                    List<Instance> instances = namingService.selectInstances(serviceName, groupName, true);
-                    if (instances.isEmpty()) {
-                        continue;
-                    }
-                    FitableMeta meta = parseFitableMeta(instances.get(0));
-                    for (Instance instance : instances) {
-                        Worker worker = objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
-                        metaEnvironments.computeIfAbsent(meta, k -> new HashSet<>()).add(worker.getEnvironment());
-                    }
-                }
-            } catch (NacosException e) {
-                log.error("Failed to query fitable metas.", e);
+                Worker worker = this.objectMapper.readValue(instance.getMetadata().get(WORKER_KEY), Worker.class);
+                metaEnvironments.computeIfAbsent(meta, k -> new HashSet<>()).add(worker.getEnvironment());
             } catch (JsonProcessingException e) {
                 log.error("Failed to parse worker metadata.", e);
             }
         }
+    }
+
+    private List<FitableMetaInstance> buildFitableMetaInstances(Map<FitableMeta, Set<String>> metaEnvironments) {
+        List<FitableMetaInstance> results = new ArrayList<>();
         for (Map.Entry<FitableMeta, Set<String>> entry : metaEnvironments.entrySet()) {
             FitableMetaInstance instance = new FitableMetaInstance();
             instance.setMeta(entry.getKey());
