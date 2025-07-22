@@ -114,7 +114,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "dedaa28cfb2742819a9b0271bc34f72a")
+    @Fitable(id = "register_fitables")
     public void registerFitables(List<FitableMeta> fitableMetas, Worker worker, Application application) {
         try {
             log.debug("Registering fitables. [fitableMetas={}, worker={}, aplication={}]",
@@ -209,6 +209,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
+    @Fitable(id = "unregister_fitables")
     public void unregisterFitables(List<FitableInfo> fitables, String workerId) {
         log.debug("Unregistering fitables for worker. [fitables={}, workerId={}]", fitables, workerId);
         for (FitableInfo fitable : fitables) {
@@ -258,7 +259,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "5807f06a3a704708b264ea3c6cfbbd53")
+    @Fitable(id = "query_fitables_addresses")
     public List<FitableAddressInstance> queryFitables(List<FitableInfo> fitables, String workerId) {
         log.debug("Querying fitables for worker. [fitables={}, workerId={}]", fitables, workerId);
         Map<FitableInfo, FitableAddressInstance> resultMap = new HashMap<>();
@@ -397,7 +398,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "ee0a8337d3654a22a548d5d5abe1d5f3")
+    @Fitable(id = "subscribe_fitables")
     public List<FitableAddressInstance> subscribeFitables(List<FitableInfo> fitables, String workerId,
             String callbackFitableId) {
         log.debug("Subscribing to fitables for worker. [fitables={}, workerId={}, callbackFitableId={}]",
@@ -428,6 +429,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
+    @Fitable(id = "unsubscribe_fitables")
     public void unsubscribeFitables(List<FitableInfo> fitables, String workerId, String callbackFitableId) {
         log.debug("Unsubscribing from fitables for worker. [fitables={}, workerId={}, callbackFitableId={}]",
                 fitables,
@@ -458,7 +460,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "33b1f9b8f1cc49d19719a6536c96e854")
+    @Fitable(id = "query_running_fitables")
     public List<FitableMetaInstance> queryFitableMetas(List<GenericableInfo> genericables) {
         log.debug("Querying fitable metas for genericables. [genericables={}]", genericables);
         Map<FitableMeta, Set<String>> metaEnvironments = new HashMap<>();
