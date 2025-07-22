@@ -21,12 +21,13 @@ import java.util.List;
 @Component
 public class HeartbeatServer implements HeartbeatService {
     @Override
-    @Fitable(id = "DBC9E2F7C0E443F1AC986BBC3D58C27B")
+    @Fitable(id = "send_heartbeat")
     public Boolean sendHeartbeat(List<HeartbeatInfo> heartbeatInfo, Address address) {
         return true;
     }
 
     @Override
+    @Fitable(id = "stop_heartbeat")
     public Boolean stopHeartbeat(List<HeartbeatInfo> heartbeatInfo, Address address) {
         return true;
     }

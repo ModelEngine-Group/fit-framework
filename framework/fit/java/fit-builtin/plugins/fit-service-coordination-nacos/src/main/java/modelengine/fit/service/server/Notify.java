@@ -23,6 +23,6 @@ public interface Notify {
      *
      * @param fitableInstances 表示指定服务实现的所有实例信息的 {@link List}{@code <}{@link FitableAddressInstance}{@code >}。
      */
-    @Genericable(id = "b69df5e8cbcd4166aa5029602e7a58cf")
+    @Genericable(id = "modelengine.fit.service.registry-listener.notify-fitables")
     void notifyFitables(List<FitableAddressInstance> fitableInstances);
 }

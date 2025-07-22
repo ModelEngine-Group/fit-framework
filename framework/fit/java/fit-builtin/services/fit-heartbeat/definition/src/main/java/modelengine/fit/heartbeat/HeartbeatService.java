@@ -24,7 +24,7 @@ public interface HeartbeatService {
      * @param address 表示本地地址的 {@link Address}。
      * @return 表示发送结果的 {@link Boolean}。
      */
-    @Genericable(id = "e12fd1c57fd84f50a673d93d13074082")
+    @Genericable(id = "modelengine.fit.heartbeat.send-heartbeat")
     Boolean sendHeartbeat(List<HeartbeatInfo> heartbeatInfo, Address address);
 
     /**
@@ -34,7 +34,7 @@ public interface HeartbeatService {
      * @param address 表示本地地址的 {@link Address}。
      * @return 表示发送结果的 {@link Boolean}。
      */
-    @Genericable(id = "67e6370725df427ebab9a6a6f1ada60c")
+    @Genericable(id = "modelengine.fit.heartbeat.stop-heartbeat")
     Boolean stopHeartbeat(List<HeartbeatInfo> heartbeatInfo, Address address);
 
     /**
