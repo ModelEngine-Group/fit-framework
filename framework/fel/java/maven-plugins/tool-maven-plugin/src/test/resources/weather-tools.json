@@ -46,7 +46,7 @@
               "description" : "其他信息",
               "name" : "info",
               "type" : "object",
-              "properties" : [ ],
+              "properties" : { },
               "examples" : [ "" ],
               "default" : ""
             }
@@ -126,7 +126,7 @@
             "info" : {
               "name" : "info",
               "type" : "object",
-              "properties" : [ ]
+              "properties" : { }
             }
           },
           "required" : [ ]
@@ -227,7 +227,7 @@
             "info" : {
               "name" : "info",
               "type" : "object",
-              "properties" : [ ]
+              "properties" : { }
             }
           },
           "required" : [ ]

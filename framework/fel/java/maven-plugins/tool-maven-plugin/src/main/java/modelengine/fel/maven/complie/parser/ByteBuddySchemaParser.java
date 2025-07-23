@@ -151,7 +151,7 @@ public class ByteBuddySchemaParser {
                 jsonNode.get("properties").fieldNames().forEachRemaining(requiredFields::add);
                 returnPropertyEntity.setRequired(requiredFields);
             } else {
-                returnPropertyEntity.setProperties(new ArrayList<>());
+                returnPropertyEntity.setProperties(new LinkedHashMap<>());
             }
         }
     }
