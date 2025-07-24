@@ -16,5 +16,6 @@
         <module>05-aop-log-plugin</module>
         <module>06-spring-boot-starter</module>
         <module>07-http-client-proxy</module>
+        <module>08-nacos-complicated-apps</module>
     </modules>
 </project>

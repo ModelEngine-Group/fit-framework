@@ -1,0 +1,15 @@
+application:
+  name: 'assistant'
+
+worker:
+  id: 'assistant'
+  host: '127.0.0.1'
+  environment: 'local'
+  environment-sequence: 'local'
+
+nacos:
+  serverAddr: 127.0.0.1:8848
+
+server:
+  http:
+    port: 8080

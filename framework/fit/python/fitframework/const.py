@@ -161,7 +161,7 @@ HEART_BEAT_EXIT_UNEXPECTEDLY_FIT_ID = 'HEART_BEAT_EXIT_UNEXPECTEDLY_FIT_ID'
 GET_FIT_SERVICE_ADDRESS_LIST_GEN_ID = '564286f7db6349b2b29db49feac3b7da'
 GET_FIT_SERVICE_ADDRESS_LIST_FITABLE_ID = '9602150ac5694585ab9a9e3d7561f48b'
 
-NOTIFY_FIT_SERVICE_GEN_ID = 'b69df5e8cbcd4166aa5029602e7a58cf'
+NOTIFY_FIT_SERVICE_GEN_ID = 'modelengine.fit.service.registry-listener.notify-fitables'
 NOTIFY_FIT_SERVICE_FITABLE_ID = 'NOTIFY_FIT_SERVICE_FITABLE_ID'
 
 ONLINE_FIT_SERVICE_GEN_ID = '2ac926e6e40245b78b7bdda23bcb727b'
@@ -230,13 +230,13 @@ FIT_CONFIGURATION_SERVER_UPLOAD_GEN_ID = 'ae024f34dd7a4dc88e19a1a8cf801f29'
 FIT_CONFIGURATION_SERVER_UPLOAD_FIT_ID = '2ae9d88f46894f7bb0fcd45cf544cb52'
 
 # registry server
-QUERY_FIT_SERVICE_GEN_ID = '33be4142494e4742aa122555a451d996'
-SUBSCRIBE_FIT_SERVICE_GEN_ID = 'c9aa580f3fa845c99c2c6145a0499e45'
-REGISTER_FIT_SERVICE_GEN_ID = '85bdce64cf724589b87cb6b6a950999d'
-QUERY_FITABLE_METAS_GEN_ID = '7c52fb4fdfa243af928f23607fbbee02'
+QUERY_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.query-fitables-addresses'
+SUBSCRIBE_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.subscribe-fitables'
+REGISTER_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.register-fitables'
+QUERY_FITABLE_METAS_GEN_ID = 'modelengine.fit.registry.registry-service.query-running-fitables'
 
 # heartbeat server
-HEART_BEAT_GEN_ID = 'e12fd1c57fd84f50a673d93d13074082'
+HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.send-heartbeat'
 
 # debugger
 DEBUGGER_START_FIT_ID = 'debugger_start_fitable_id'

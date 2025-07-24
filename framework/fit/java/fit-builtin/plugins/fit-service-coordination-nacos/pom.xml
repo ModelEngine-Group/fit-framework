@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.fitframework.plugin</groupId>
+        <artifactId>fit-plugin-parent</artifactId>
+        <version>3.6.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>fit-service-coordination-nacos</artifactId>
+
+    <name>FIT Service Coordination Nacos</name>
+    <description>FIT Framework Service Coordination Nacos Plugin module provides a nacos-based implementation of FIT
+        service registry center.
+    </description>
+    <url>https://github.com/ModelEngine-Group/fit-framework</url>
+
+    <dependencies>
+        <!-- FIT core -->
+        <dependency>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-util</artifactId>
+        </dependency>
+
+        <!-- Services -->
+        <dependency>
+            <groupId>org.fitframework.service</groupId>
+            <artifactId>fit-heartbeat</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.service</groupId>
+            <artifactId>fit-service-registry-and-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.service</groupId>
+            <artifactId>fit-http-classic</artifactId>
+        </dependency>
+
+        <!-- Third-party -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar"
+                                      todir="../../../../../../build/plugins"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
