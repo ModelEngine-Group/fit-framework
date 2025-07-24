@@ -117,7 +117,6 @@ public class DefaultHttpClassicServerRequest extends AbstractHttpClassicRequest 
 
     @Override
     public void close() throws IOException {
-        this.serverRequest.close();
         if (this.entityLoader.isLoaded()) {
             Optional<Entity> entity = this.entityLoader.get();
             if (entity.isPresent()) {

@@ -22,6 +22,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.Attribute;
+import io.netty.util.AttributeMap;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.server.HttpHandler;
 import modelengine.fit.http.server.netty.support.DefaultNettyServerConfig;
@@ -72,9 +73,9 @@ class HttpClassicRequestAssemblerTest {
         this.ctx = mock(ChannelHandlerContext.class);
         Channel channel = mock(Channel.class);
         when(this.ctx.channel()).thenReturn(channel);
-        ChannelId channelId = mock(ChannelId.class);
         Attribute attribute = mock(Attribute.class);
-        when(channel.attr(any())).thenReturn(attribute);
+        when(((AttributeMap) this.ctx).attr(any())).thenReturn(attribute);
+        ChannelId channelId = mock(ChannelId.class);
         when(channelId.asLongText()).thenReturn("requestId");
         this.requestAssembler = new HttpClassicRequestAssembler(classicServer,
                 false,
