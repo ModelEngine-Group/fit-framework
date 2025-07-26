@@ -56,7 +56,7 @@ export const OutsideRerankForm = ({option, shapeStatus}) => {
           value: item.serviceName,
           label: item.serviceName,
           title: t(item.tag),
-          baseUri: item.baseUri,
+          baseUri: item.baseUrl,
         };
       })));
       setHasLoaded(true);
