@@ -9,14 +9,14 @@ import {KnowledgeRetrievalWrapper} from '@/components/knowledgeRetrieval/Knowled
 import {retrievalComponent} from '@/components/retrieval/retrievalComponent.jsx';
 import {
   DATA_TYPES,
-  DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL,
-  DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI,
+  DEFAULT_KNOWLEDGE_NODE_ACCESS_INFO,
   DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N,
   DEFAULT_KNOWLEDGE_REPO_GROUP,
   DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID,
   FROM_TYPE,
 } from '@/common/Consts.js';
 import {
+  ChangeAccessInfoReducer,
   ChangeRerankParamReducer,
   UpdateGroupIdAndConfigIdReducer,
   UpdateInputParamReducer,
@@ -39,6 +39,7 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
   addReducer(builtInReducers, UpdateKnowledgeReducer());
   addReducer(builtInReducers, UpdateGroupIdAndConfigIdReducer());
   addReducer(builtInReducers, ChangeRerankParamReducer());
+  addReducer(builtInReducers, ChangeAccessInfoReducer());
 
   /**
    * 必填
@@ -139,8 +140,7 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
                 from: FROM_TYPE.INPUT,
                 value: false,
               },
-              DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL,
-              DEFAULT_KNOWLEDGE_NODE_RERANK_MODEL_BASE_URI,
+              DEFAULT_KNOWLEDGE_NODE_ACCESS_INFO,
               DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N,
             ],
           },

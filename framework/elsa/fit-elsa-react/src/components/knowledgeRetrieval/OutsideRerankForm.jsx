@@ -44,6 +44,10 @@ export const OutsideRerankForm = ({option, shapeStatus}) => {
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
 
+  const handleAccessInfoChange = (serviceName, tag) => {
+    dispatch({type: 'changeAccessInfo', serviceName: serviceName, tag: tag});
+  };
+
   const handleRerankParamChange = (name, e) => {
     dispatch({type: 'changeRerankParam', name: name, value: e});
   };
@@ -56,7 +60,7 @@ export const OutsideRerankForm = ({option, shapeStatus}) => {
           value: item.serviceName,
           label: item.serviceName,
           title: t(item.tag),
-          baseUri: item.baseUrl,
+          tag: item.tag,
         };
       })));
       setHasLoaded(true);
@@ -114,8 +118,7 @@ export const OutsideRerankForm = ({option, shapeStatus}) => {
                 loading={loading}
                 onDropdownVisibleChange={handleDropdownVisibleChange}
                 onChange={(value, option) => {
-                  handleRerankParamChange('model', value);
-                  handleRerankParamChange('baseUri', option.baseUri);
+                  handleAccessInfoChange(value, option.tag);
                 }}
                 notFoundContent={loading ? <Spin size="small"/> : t('noContent')}
                 options={options}

@@ -217,3 +217,60 @@ export const ChangeRerankParamReducer = () => {
 
   return self;
 };
+
+/**
+ * changeAccessInfo 事件处理器.
+ *
+ * @return {{}} 处理器对象.
+ * @constructor
+ */
+export const ChangeAccessInfoReducer = () => {
+  const self = {};
+  self.type = 'changeAccessInfo';
+
+  const _updateAccessInfoValue = (accessInfoValue, serviceName, tag) => {
+    if (accessInfoValue.name === 'serviceName') {
+      return {...accessInfoValue, value: serviceName};
+    } else if (accessInfoValue.name === 'tag') {
+      return {...accessInfoValue, value: tag};
+    }
+    return accessInfoValue;
+  };
+
+  /**
+   * 处理方法.
+   *
+   * @param config 配置数据.
+   * @param action 事件对象.
+   * @return {*} 处理之后的数据.
+   */
+  self.reduce = (config, action) => {
+    return {
+      ...config,
+      inputParams: config.inputParams.map(ip => {
+        if (ip.name !== 'option') {
+          return {...ip};
+        }
+        return {
+          ...ip,
+          value: ip.value.map(v => {
+            if (v.name !== 'rerankParam') {
+              return {...v};
+            }
+            return {
+              ...v,
+              value: v.value.map(item => {
+                return item.name === 'accessInfo' ? {
+                  ...item,
+                  value: item.value.map(accessInfoValue => _updateAccessInfoValue(accessInfoValue, action.serviceName, action.tag)),
+                } : item;
+              })
+            };
+          })
+        };
+      })
+    };
+  };
+
+  return self;
+};
