@@ -175,6 +175,11 @@ public class HttpClassicRequestAssembler extends SimpleChannelInboundHandler<Htt
             this.exceptionCaught(ctx, cause, request);
         } finally {
             request.removeExecuteThread();
+            try {
+                request.tryClose();
+            } catch (IOException e) {
+                log.warn("Failed to close netty http server request when request finished, ignored.", e);
+            }
         }
     }
 
@@ -195,6 +200,11 @@ public class HttpClassicRequestAssembler extends SimpleChannelInboundHandler<Htt
         try {
             if (content instanceof LastHttpContent) {
                 serverRequest.receiveLastHttpContent(cast(content));
+                try {
+                    serverRequest.tryClose();
+                } catch (IOException e) {
+                    log.warn("Failed to close netty http server request when received last http content, ignored.", e);
+                }
             } else {
                 serverRequest.receiveHttpContent(content);
             }
