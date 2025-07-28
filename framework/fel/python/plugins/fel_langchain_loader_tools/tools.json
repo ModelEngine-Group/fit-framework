@@ -1,418 +1,618 @@
 {
-  "tools": [
-    {
-      "tags": [
-        "langchain"
-      ],
-      "runnables": {
-        "langchain": {
-          "genericableId": "langchain.tool",
-          "fitableId": "py_pdf_loader"
-        }
-      },
-      "schema": {
-        "name": "py_pdf_loader",
-        "description": "Load PDF using pypdf into list of documents.",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "file_path": {
-              "title": "File Path",
-              "type": "string"
+  "version" : "1.0.0",
+  "definitionGroups" : [ {
+    "name" : "langchain_loader_tools",
+    "summary" : "",
+    "description" : "",
+    "extensions" : { },
+    "definitions" : [ {
+      "schema" : {
+        "name" : "PDFPlumberLoaderTool",
+        "description" : "主要用于处理 PDF 表格及结构化数据，按页解析为文档列表",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "defaultValue" : "",
+              "description" : "PDF 文件路径",
+              "name" : "file_path",
+              "type" : "string",
+              "example" : ""
             }
           },
-          "required": [
-            "file_path"
-          ]
+          "required" : [ "file_path" ]
         },
-        "return": {
-          "title": "A Piece Of Text And Associated Metadata.",
-          "type": "array",
-          "items": {
-            "title": "Document",
-            "description": "Document.",
-            "type": "object",
-            "properties": {
-              "content": {
-                "title": "Content",
-                "type": "string"
+        "order" : [ "file_path" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
               },
-              "media": {
-                "title": "Media",
-                "description": "Media.",
-                "type": "object",
-                "properties": {
-                  "mime": {
-                    "title": "Mime",
-                    "type": "string"
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
                   },
-                  "data": {
-                    "title": "Data",
-                    "type": "string"
+                  "data" : {
+                    "type" : "string"
                   }
-                },
-                "required": [
-                  "mime",
-                  "data"
-                ]
+                }
               },
-              "metadata": {
-                "title": "Metadata",
-                "type": "object"
+              "metadata" : {
+                "type" : "object"
               }
-            },
-            "required": [
-              "content",
-              "metadata"
-            ]
-          }
-        }
-      }
-    },
-    {
-      "tags": [
-        "langchain"
-      ],
-      "runnables": {
-        "langchain": {
-          "genericableId": "langchain.tool",
-          "fitableId": "pdfplumber_loader"
-        }
-      },
-      "schema": {
-        "name": "pdfplumber_loader",
-        "description": "Load PDF using pdfplumber into list of documents",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "file_path": {
-              "title": "File Path",
-              "type": "string"
             }
           },
-          "required": [
-            "file_path"
-          ]
-        },
-        "return": {
-          "title": "A Piece Of Text And Associated Metadata.",
-          "type": "array",
-          "items": {
-            "title": "Document",
-            "description": "Document.",
-            "type": "object",
-            "properties": {
-              "content": {
-                "title": "Content",
-                "type": "string"
-              },
-              "media": {
-                "title": "Media",
-                "description": "Media.",
-                "type": "object",
-                "properties": {
-                  "mime": {
-                    "title": "Mime",
-                    "type": "string"
-                  },
-                  "data": {
-                    "title": "Data",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "mime",
-                  "data"
-                ]
-              },
-              "metadata": {
-                "title": "Metadata",
-                "type": "object"
-              }
-            },
-            "required": [
-              "content",
-              "metadata"
-            ]
-          }
+          "convertor" : ""
         }
       }
-    },
-    {
-      "tags": [
-        "langchain"
-      ],
-      "runnables": {
-        "langchain": {
-          "genericableId": "langchain.tool",
-          "fitableId": "py_mupdf_loader"
-        }
-      },
-      "schema": {
-        "name": "py_mupdf_loader",
-        "description": "Load PDF using PyMuPDF into list of documents",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "file_path": {
-              "title": "File Path",
-              "type": "string"
+    }, {
+      "schema" : {
+        "name" : "PyPDFLoaderTool",
+        "description" : "用于快速处理纯文字型 PDF，按页解析为文档列表",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "defaultValue" : "",
+              "description" : "PDF 文件路径",
+              "name" : "file_path",
+              "type" : "string",
+              "example" : ""
             }
           },
-          "required": [
-            "file_path"
-          ]
+          "required" : [ "file_path" ]
         },
-        "return": {
-          "title": "A Piece Of Text And Associated Metadata.",
-          "type": "array",
-          "items": {
-            "title": "Document",
-            "description": "Document.",
-            "type": "object",
-            "properties": {
-              "content": {
-                "title": "Content",
-                "type": "string"
+        "order" : [ "file_path" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
               },
-              "media": {
-                "title": "Media",
-                "description": "Media.",
-                "type": "object",
-                "properties": {
-                  "mime": {
-                    "title": "Mime",
-                    "type": "string"
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
                   },
-                  "data": {
-                    "title": "Data",
-                    "type": "string"
+                  "data" : {
+                    "type" : "string"
                   }
-                },
-                "required": [
-                  "mime",
-                  "data"
-                ]
+                }
               },
-              "metadata": {
-                "title": "Metadata",
-                "type": "object"
+              "metadata" : {
+                "type" : "object"
               }
-            },
-            "required": [
-              "content",
-              "metadata"
-            ]
-          }
-        }
-      }
-    },
-    {
-      "tags": [
-        "langchain"
-      ],
-      "runnables": {
-        "langchain": {
-          "genericableId": "langchain.tool",
-          "fitableId": "py_pdfium2_loader"
-        }
-      },
-      "schema": {
-        "name": "py_pdfium2_loader",
-        "description": "Load PDF using pypdfium2 into list of documents",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "file_path": {
-              "title": "File Path",
-              "type": "string"
             }
           },
-          "required": [
-            "file_path"
-          ]
-        },
-        "return": {
-          "title": "A Piece Of Text And Associated Metadata.",
-          "type": "array",
-          "items": {
-            "title": "Document",
-            "description": "Document.",
-            "type": "object",
-            "properties": {
-              "content": {
-                "title": "Content",
-                "type": "string"
-              },
-              "media": {
-                "title": "Media",
-                "description": "Media.",
-                "type": "object",
-                "properties": {
-                  "mime": {
-                    "title": "Mime",
-                    "type": "string"
-                  },
-                  "data": {
-                    "title": "Data",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "mime",
-                  "data"
-                ]
-              },
-              "metadata": {
-                "title": "Metadata",
-                "type": "object"
-              }
-            },
-            "required": [
-              "content",
-              "metadata"
-            ]
-          }
+          "convertor" : ""
         }
       }
-    },
-    {
-      "tags": [
-        "langchain"
-      ],
-      "runnables": {
-        "langchain": {
-          "genericableId": "langchain.tool",
-          "fitableId": "py_miner_loader"
-        }
-      },
-      "schema": {
-        "name": "py_miner_loader",
-        "description": "Load PDF using PDFMiner into list of documents",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "file_path": {
-              "title": "File Path",
-              "type": "string"
+    }, {
+      "schema" : {
+        "name" : "PyMinerLoaderTool",
+        "description" : "用于高精度的纯文字 PDF 解析，如法律、合同文档",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "defaultValue" : "",
+              "description" : "PDF 文件路径",
+              "name" : "file_path",
+              "type" : "string",
+              "example" : ""
             }
           },
-          "required": [
-            "file_path"
-          ]
+          "required" : [ "file_path" ]
         },
-        "return": {
-          "title": "A Piece Of Text And Associated Metadata.",
-          "type": "array",
-          "items": {
-            "title": "Document",
-            "description": "Document.",
-            "type": "object",
-            "properties": {
-              "content": {
-                "title": "Content",
-                "type": "string"
+        "order" : [ "file_path" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
               },
-              "media": {
-                "title": "Media",
-                "description": "Media.",
-                "type": "object",
-                "properties": {
-                  "mime": {
-                    "title": "Mime",
-                    "type": "string"
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
                   },
-                  "data": {
-                    "title": "Data",
-                    "type": "string"
+                  "data" : {
+                    "type" : "string"
                   }
-                },
-                "required": [
-                  "mime",
-                  "data"
-                ]
+                }
               },
-              "metadata": {
-                "title": "Metadata",
-                "type": "object"
+              "metadata" : {
+                "type" : "object"
               }
-            },
-            "required": [
-              "content",
-              "metadata"
-            ]
-          }
-        }
-      }
-    },
-    {
-      "tags": [
-        "langchain"
-      ],
-      "runnables": {
-        "langchain": {
-          "genericableId": "langchain.tool",
-          "fitableId": "py_pdf_directory_loader"
-        }
-      },
-      "schema": {
-        "name": "py_pdf_directory_loader",
-        "description": "Load a directory with `PDF` files using `pypdf` and chunks at character level",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "directory": {
-              "title": "Directory",
-              "type": "string"
             }
           },
-          "required": [
-            "directory"
-          ]
-        },
-        "return": {
-          "title": "A Piece Of Text And Associated Metadata.",
-          "type": "array",
-          "items": {
-            "title": "Document",
-            "description": "Document.",
-            "type": "object",
-            "properties": {
-              "content": {
-                "title": "Content",
-                "type": "string"
-              },
-              "media": {
-                "title": "Media",
-                "description": "Media.",
-                "type": "object",
-                "properties": {
-                  "mime": {
-                    "title": "Mime",
-                    "type": "string"
-                  },
-                  "data": {
-                    "title": "Data",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "mime",
-                  "data"
-                ]
-              },
-              "metadata": {
-                "title": "Metadata",
-                "type": "object"
-              }
-            },
-            "required": [
-              "content",
-              "metadata"
-            ]
-          }
+          "convertor" : ""
         }
       }
-    }
-  ]
+    }, {
+      "schema" : {
+        "name" : "PyPDFium2LoaderTool",
+        "description" : "用于图片渲染及 OCR 场景下的 PDF 文件解析",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "defaultValue" : "",
+              "description" : "PDF 文件路径",
+              "name" : "file_path",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "file_path" ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "PyPDFDirectoryLoaderTool",
+        "description" : "用于批量快速处理目录下多个 PDF 文件",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "directory" : {
+              "defaultValue" : "",
+              "description" : "PDF 文件夹路径",
+              "name" : "directory",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "directory" ]
+        },
+        "order" : [ "directory" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "PyMuPDFLoaderTool",
+        "description" : "用于图文混排类 PDF 的解析，支持文本+图像混合提取",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "defaultValue" : "",
+              "description" : "PDF 文件路径",
+              "name" : "file_path",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "file_path" ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      }
+    } ]
+  } ],
+  "toolGroups" : [ {
+    "name" : "langchain_loader_tools_impl",
+    "summary" : "",
+    "description" : "",
+    "extensions" : { },
+    "definitionGroupName" : "langchain_loader_tools",
+    "tools" : [ {
+      "namespace" : "pdfplumber_loader",
+      "schema" : {
+        "name" : "PDFPlumberLoaderTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "name" : "file_path",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回按页分割的文档列表，包含PDF表格及结构化数据的内容",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.pdfplumber_loader",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PDFPlumberLoaderTool"
+    }, {
+      "namespace" : "py_pdf_loader",
+      "schema" : {
+        "name" : "PyPDFLoaderTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "name" : "file_path",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回按页分割的文档列表，仅包含PDF中的纯文本内容",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.py_pdf_loader",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PyPDFLoaderTool"
+    }, {
+      "namespace" : "py_miner_loader",
+      "schema" : {
+        "name" : "PyMinerLoaderTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "name" : "file_path",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回高精度按页分割的文档列表，适用于法律、合同等纯文字PDF",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.py_miner_loader",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PyMinerLoaderTool"
+    }, {
+      "namespace" : "py_pdfium2_loader",
+      "schema" : {
+        "name" : "PyPDFium2LoaderTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "name" : "file_path",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回经过图片渲染和OCR处理后的按页文档列表",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.py_pdfium2_loader",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PyPDFium2LoaderTool"
+    }, {
+      "namespace" : "py_pdf_directory_loader",
+      "schema" : {
+        "name" : "PyPDFDirectoryLoaderTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "directory" : {
+              "name" : "directory",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "directory" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回目录下所有PDF文件的按页文档列表，支持批量处理",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.py_pdf_directory_loader",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PyPDFDirectoryLoaderTool"
+    }, {
+      "namespace" : "py_mupdf_loader",
+      "schema" : {
+        "name" : "PyMuPDFLoaderTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "file_path" : {
+              "name" : "file_path",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "file_path" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回包含文本和图像内容的按页文档列表，适用于图文混排PDF",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
+              },
+              "media" : {
+                "type" : "object",
+                "properties" : {
+                  "mime" : {
+                    "type" : "string"
+                  },
+                  "data" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "metadata" : {
+                "type" : "object"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.py_mupdf_loader",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PyMuPDFLoaderTool"
+    } ]
+  } ]
 }
