@@ -32,8 +32,8 @@ body:
       label: 版本信息 / Version Information
       description: 您使用的是哪个版本？/ Which version are you using?
       options:
-        - "v3.5.0-M3"
-        - "elsa-v0.2.0"
+        - "v3.5.0-M4"
+        - "elsa-v0.3.0"
         - "其他 (请在下方说明) / Other (please specify below)"
     validations:
       required: true

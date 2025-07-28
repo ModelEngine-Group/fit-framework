@@ -13,7 +13,6 @@ import modelengine.fitframework.serialization.ObjectSerializer;
 /**
  * 表示测试使用的 Rerank 接口。
  *
- * @author 马朝阳
  * @since 2024-09-27
  */
 @Component

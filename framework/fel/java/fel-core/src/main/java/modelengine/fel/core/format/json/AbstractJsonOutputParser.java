@@ -17,7 +17,6 @@ import java.lang.reflect.Type;
  * 表示 {@link JsonOutputParser} 的抽象实现。
  *
  * @param <O> 表示输出对象类型。
- * @author 易文渊
  * @since 2024-04-28
  */
 public abstract class AbstractJsonOutputParser<O> implements JsonOutputParser<O> {

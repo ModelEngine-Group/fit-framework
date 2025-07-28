@@ -13,7 +13,6 @@ import java.util.Map;
 /**
  * 表示 pipeline 推理服务。
  *
- * @author 易文渊
  * @since 2024-06-03
  */
 public interface HuggingFacePipelineService {

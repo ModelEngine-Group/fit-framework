@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import React from 'react';
+import React, {useState} from 'react';
 import {Button, Col, Form, Input, Popover, Row} from 'antd';
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import './prompt.css';
@@ -39,10 +39,12 @@ export const Prompt = (
   }) => {
   const shape = useShapeContext();
   const form = useFormContext();
+  const [promptContent, setPromptContent] = useState(prompt.value);
 
   const _onChange = (promptText) => {
     onChange(promptText);
     form.setFieldsValue({[name]: promptText});
+    setPromptContent(promptText);
   };
 
   /**
@@ -96,7 +98,7 @@ export const Prompt = (
             name={name}
             label={getLabel()}
             rules={rules}
-            initialValue={prompt.value}
+            initialValue={promptContent}
             validateTrigger='onBlur'
           >
             <TextArea
@@ -108,7 +110,7 @@ export const Prompt = (
             />
           </Form.Item>
           <PromptDrawer
-            value={prompt.value}
+            value={promptContent}
             name={name}
             title={title}
             rules={rules}

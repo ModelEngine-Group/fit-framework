@@ -26,8 +26,6 @@ import java.util.stream.Collectors;
 /**
  * A simple implementation of the {@link ToolRepository} interface.
  *
- * @author 易文渊
- * @author 杭潇
  * @since 2024-08-15
  */
 @Component

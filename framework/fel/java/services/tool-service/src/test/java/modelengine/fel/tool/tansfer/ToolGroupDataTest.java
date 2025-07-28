@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * 表示添加工具组数据的单元测试。
  *
- * @author 王攀博
  * @since 2024-10-28
  */
 public class ToolGroupDataTest {

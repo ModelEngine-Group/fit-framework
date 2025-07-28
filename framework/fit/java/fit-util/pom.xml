@@ -17,7 +17,7 @@
 
     <properties>
         <!-- Third-party versions -->
-        <jackson.version>2.18.2</jackson.version>
+        <jackson.version>2.19.1</jackson.version>
     </properties>
 
     <dependencies>

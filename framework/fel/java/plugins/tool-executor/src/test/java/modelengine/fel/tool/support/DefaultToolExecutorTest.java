@@ -43,9 +43,6 @@ import java.util.Optional;
 /**
  * 表示 {@link DefaultToolExecutor} 的测试集。
  *
- * @author 王攀博
- * @author 易文渊
- * @author 杭潇
  * @since 2024-04-27
  */
 @DisplayName("测试 DefaultToolExecutor")

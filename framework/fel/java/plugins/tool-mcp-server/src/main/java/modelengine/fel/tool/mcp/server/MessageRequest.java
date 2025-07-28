@@ -11,7 +11,6 @@ package modelengine.fel.tool.mcp.server;
  * This class serves as a common ancestor for specific message request classes,
  * providing a shared structure and type for message handling in the system.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class MessageRequest {}

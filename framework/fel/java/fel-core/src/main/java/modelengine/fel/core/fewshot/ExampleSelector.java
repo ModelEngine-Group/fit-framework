@@ -11,7 +11,6 @@ import modelengine.fel.core.fewshot.support.DefaultExampleSelector;
 /**
  * 例子选择器接口定义。
  *
- * @author 易文渊
  * @since 2024-04-25
  */
 public interface ExampleSelector {

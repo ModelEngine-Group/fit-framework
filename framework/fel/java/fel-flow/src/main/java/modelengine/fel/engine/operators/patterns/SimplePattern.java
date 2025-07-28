@@ -14,7 +14,6 @@ import java.util.function.Function;
 /**
  * 委托单元的简单实现。
  *
- * @author 刘信宏
  * @since 2024-06-11
  */
 public class SimplePattern<I, O> implements Pattern<I, O> {

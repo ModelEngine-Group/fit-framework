@@ -18,7 +18,6 @@ import java.util.Map;
 /**
  * 为 {@link MessageTemplate} 提供参数数据。
  *
- * @author 易文渊
  * @since 2024-04-25
  */
 public class Tip {

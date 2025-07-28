@@ -18,8 +18,8 @@
 
     <properties>
         <!-- Third-party versions -->
-        <bytebuddy.version>1.17.5</bytebuddy.version>
-        <mybatis.version>3.5.13</mybatis.version>
+        <bytebuddy.version>1.17.6</bytebuddy.version>
+        <mybatis.version>3.5.19</mybatis.version>
     </properties>
 
     <dependencies>

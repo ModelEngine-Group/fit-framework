@@ -11,7 +11,6 @@ import modelengine.fitframework.flowable.Choir;
 /**
  * 表示聊天模型推理服务。
  *
- * @author 易文渊
  * @since 2024-04-13
  */
 public interface ChatModel {

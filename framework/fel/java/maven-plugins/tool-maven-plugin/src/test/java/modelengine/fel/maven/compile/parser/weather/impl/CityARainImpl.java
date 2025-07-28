@@ -6,6 +6,7 @@
 
 package modelengine.fel.maven.compile.parser.weather.impl;
 
+import modelengine.fel.maven.compile.parser.weather.dto.RainPosition;
 import modelengine.fel.tool.annotation.Attribute;
 import modelengine.fel.tool.annotation.Group;
 import modelengine.fel.tool.annotation.ToolMethod;
@@ -18,8 +19,6 @@ import java.util.Date;
 /**
  * 添加测试用的工具的实现。
  *
- * @author 杭潇
- * @author 曹嘉美
  * @since 2024-10-26
  */
 @Group(name = "implGroup_weather_rain_city_a", extensions = {
@@ -34,7 +33,7 @@ public class CityARainImpl implements Rain {
     })
     @Property(description = "获取今日下雨信息的结果")
     @Override
-    public String today(String location, Date date) {
+    public String today(String location, Date date, RainPosition rainPosition, Object info) {
         return null;
     }
 

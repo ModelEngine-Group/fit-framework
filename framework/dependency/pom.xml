@@ -52,14 +52,14 @@
         <fit.version>3.6.0-SNAPSHOT</fit.version>
 
         <!-- Third-party versions -->
-        <byte-buddy.version>1.17.5</byte-buddy.version>
-        <druid.version>1.2.20</druid.version>
+        <byte-buddy.version>1.17.6</byte-buddy.version>
+        <druid.version>1.2.25</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>32.0.1-jre</guava.version>
         <hanlp.version>portable-1.8.4</hanlp.version>
         <lombok.version>1.18.36</lombok.version>
-        <jackson.version>2.18.2</jackson.version>
-        <mybatis.version>3.5.13</mybatis.version>
+        <jackson.version>2.19.1</jackson.version>
+        <mybatis.version>3.5.19</mybatis.version>
 
         <!-- Test framework versions -->
         <assertj.version>3.27.3</assertj.version>

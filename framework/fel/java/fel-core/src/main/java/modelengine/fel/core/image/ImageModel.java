@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * 表示大模型图像生成服务。
  *
- * @author 何嘉斌
  * @since 2024-12-17
  */
 public interface ImageModel {

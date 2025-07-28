@@ -25,7 +25,6 @@ import java.util.Map;
 /**
  * 表示 {@link Tool} 的抽象实现类。
  *
- * @author 季聿阶
  * @since 2024-04-25
  */
 public abstract class AbstractTool implements Tool {

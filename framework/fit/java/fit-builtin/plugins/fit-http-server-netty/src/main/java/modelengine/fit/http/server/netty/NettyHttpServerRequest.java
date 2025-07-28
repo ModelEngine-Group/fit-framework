@@ -63,6 +63,7 @@ public class NettyHttpServerRequest implements ServerRequest, OnHttpContentRecei
         this.startLine = this.initStartLine();
         this.headers = this.initHeaders();
         this.body = this.isLargeBody() ? NettyReadableMessageBody.large() : NettyReadableMessageBody.common();
+        log.info("Netty http request initialized. [id={0}, request={1}]", ctx.name(), this.startLine());
     }
 
     private boolean isLargeBody() {

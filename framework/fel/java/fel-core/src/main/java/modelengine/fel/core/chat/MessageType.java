@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 /**
  * 表示消息类型的枚举。
  *
- * @author 易文渊
  * @since 2024-04-16
  */
 public enum MessageType {

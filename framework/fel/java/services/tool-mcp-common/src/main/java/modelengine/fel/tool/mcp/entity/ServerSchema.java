@@ -14,7 +14,6 @@ import java.util.Map;
  * Represents a server entity in the MCP framework, encapsulating information about the server's protocol version,
  * capabilities, and additional server details.
  *
- * @author 季聿阶
  * @since 2025-05-22
  */
 public record ServerSchema(String protocolVersion, Capabilities capabilities, Info serverInfo) {

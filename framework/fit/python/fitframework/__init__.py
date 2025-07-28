@@ -212,9 +212,9 @@ def main():
 
 
 if __package__ == 'fitframework' and sys.argv[0].find("pytest") == -1:  # 避免执行两次main
-    if platform.system() == 'Windows':
+    if platform.system() in ('Windows', 'Darwin'):  # Windows 或 macOS
         main()
-    else:
+    else:  # Linux 及其他
         while True:
             main_process = Process(target=main, name='MainProcess')
             main_process.start()

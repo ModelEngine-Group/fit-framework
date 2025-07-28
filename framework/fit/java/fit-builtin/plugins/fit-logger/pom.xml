@@ -19,7 +19,7 @@
 
     <properties>
         <!-- Third-party versions -->
-        <log4j2.version>2.24.3</log4j2.version>
+        <log4j2.version>2.25.1</log4j2.version>
     </properties>
 
     <dependencies>

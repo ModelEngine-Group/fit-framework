@@ -9,7 +9,6 @@ package modelengine.fel.core.retriever.filter;
 /**
  * 表达式解析的接口定义。
  *
- * @author 易文渊
  * @since 2024-08-10
  */
 public interface ExpressionParser {

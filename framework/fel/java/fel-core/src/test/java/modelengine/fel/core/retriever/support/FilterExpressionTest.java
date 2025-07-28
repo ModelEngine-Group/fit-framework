@@ -19,7 +19,6 @@ import java.util.Arrays;
 /**
  * 表示 {@link Filter} 的测试集。
  *
- * @author 易文渊
  * @since 2024-08-10
  */
 @DisplayName("测试 Filter")

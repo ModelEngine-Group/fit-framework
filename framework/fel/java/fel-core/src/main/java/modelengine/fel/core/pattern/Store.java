@@ -10,7 +10,6 @@ package modelengine.fel.core.pattern;
  * 表示持久化存储的实体。
  *
  * @param <D> 表示待添加数据的泛型。
- * @author 易文渊
  * @since 2024-08-06
  */
 @FunctionalInterface

@@ -13,7 +13,6 @@ import java.io.IOException;
 /**
  * 工具解析接口。
  *
- * @author 曹嘉美
  * @since 2024-10-26
  */
 public interface GroupParser {

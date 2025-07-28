@@ -11,7 +11,6 @@ import java.util.Map;
 /**
  * 用于 plugin.json 的序列化与反序列化的实体类。
  *
- * @author 李金绪
  * @since 2024-10-28
  */
 public class PluginJsonEntity {

@@ -16,7 +16,6 @@ import modelengine.fitframework.inspection.Validation;
  * @param <D> 表示处理的数据类型。
  * @param <RF> 表示 AI 流程内部装饰的流程类型，是 {@link Flow}{@code <}{@link D}{@code >} 的扩展。
  * @param <F> 表示 AI 流程的类型，是 {@link AiFlow}{@code <}{@link D}{@code , }{@link RF}{@code >} 的扩展。
- * @author 刘信宏
  * @since 2024-04-28
  */
 public class AiActivity<D, RF extends Flow<D>, F extends AiFlow<D, RF>> {

@@ -15,7 +15,6 @@ import java.util.Map;
 /**
  * 表示语音识别任务的输入参数。
  *
- * @author 易文渊
  * @since 2024-06-04
  */
 @Data

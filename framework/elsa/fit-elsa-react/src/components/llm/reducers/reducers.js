@@ -817,3 +817,43 @@ export const UpdateLogStatusReducer = () => {
 
   return self;
 };
+
+/**
+ * changeMcpServers 事件处理器.
+ *
+ * @return {{}} 处理器对象.
+ * @constructor
+ */
+export const ChangeMcpServersReducer = () => {
+  const self = {};
+  self.type = 'changeMcpServers';
+
+  /**
+   * 处理方法.
+   *
+   * @param config 配置数据.
+   * @param action 事件对象.
+   * @return {*} 处理之后的数据.
+   */
+  self.reduce = (config, action) => {
+    const newConfig = {};
+    Object.entries(config).forEach(([key, value]) => {
+      if (key === 'inputParams') {
+        newConfig[key] = value.map(item => {
+          if (item.name === 'mcpServers') {
+            return {
+              ...item, value: action.value,
+            };
+          } else {
+            return item;
+          }
+        });
+      } else {
+        newConfig[key] = value;
+      }
+    });
+    return newConfig;
+  };
+
+  return self;
+};

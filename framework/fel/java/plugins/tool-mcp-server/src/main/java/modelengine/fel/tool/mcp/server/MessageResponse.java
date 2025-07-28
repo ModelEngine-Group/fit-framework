@@ -11,7 +11,6 @@ package modelengine.fel.tool.mcp.server;
  * This class serves as a common ancestor for specific message response classes,
  * providing a shared structure and type for returning results after message processing.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class MessageResponse {}

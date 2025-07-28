@@ -17,6 +17,7 @@ import modelengine.fitframework.test.domain.mvc.request.MockMvcRequestBuilders;
 import modelengine.fitframework.test.domain.mvc.request.MockRequestBuilder;
 import modelengine.fitframework.test.domain.resolver.TestContextConfiguration;
 import modelengine.fitframework.test.domain.util.AnnotationUtils;
+import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.StringUtils;
 import modelengine.fitframework.util.ThreadUtils;
 
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 用于注入 mockMvc 的监听器。
@@ -50,12 +52,12 @@ public class MockMvcListener implements TestListener {
 
     @Override
     public Optional<TestContextConfiguration> config(Class<?> clazz) {
-        if (!AnnotationUtils.getAnnotation(clazz, EnableMockMvc.class).isPresent()) {
+        if (AnnotationUtils.getAnnotation(clazz, EnableMockMvc.class).isEmpty()) {
             return Optional.empty();
         }
         TestContextConfiguration configuration = TestContextConfiguration.custom()
                 .testClass(clazz)
-                .includeClasses(new Class[] {MockController.class})
+                .includeClasses(MapBuilder.<Class<?>, Supplier<Object>>get().put(MockController.class, null).build())
                 .scannedPackages(DEFAULT_SCAN_PACKAGES)
                 .build();
         return Optional.of(configuration);
@@ -64,7 +66,7 @@ public class MockMvcListener implements TestListener {
     @Override
     public void beforeTestClass(TestContext context) {
         Class<?> testClass = context.testClass();
-        if (!AnnotationUtils.getAnnotation(testClass, EnableMockMvc.class).isPresent()) {
+        if (AnnotationUtils.getAnnotation(testClass, EnableMockMvc.class).isEmpty()) {
             return;
         }
         MockMvc mockMvc = new MockMvc(this.port);

@@ -54,7 +54,6 @@ import java.util.function.Consumer;
  * Represents a default implementation of the MCP client, responsible for interacting with the MCP server.
  * This class provides methods for initializing the client, retrieving tools, and calling tools.
  *
- * @author 季聿阶
  * @since 2025-05-21
  */
 public class DefaultMcpClient implements McpClient {

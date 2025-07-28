@@ -7,7 +7,7 @@
 import LlmFormWrapper from './LlmFormWrapper.jsx';
 import {v4 as uuidv4} from 'uuid';
 import {defaultComponent} from '@/components/defaultComponent.js';
-import {DEFAULT_MAX_MEMORY_ROUNDS} from '@/common/Consts.js';
+import {DEFAULT_MAX_MEMORY_ROUNDS, DEFAULT_MCP_SERVERS} from '@/common/Consts.js';
 import {
     AddInputParamReducer,
     AddOutputParamReducer,
@@ -15,7 +15,7 @@ import {
     ChangeAccessInfoConfigReducer,
     ChangeConfigReducer,
     ChangeInputParamsReducer,
-    ChangeKnowledgeReducer,
+    ChangeKnowledgeReducer, ChangeMcpServersReducer,
     ChangeOutputParamReducer,
     ChangePromptReducer,
     ChangeSkillConfigReducer,
@@ -55,6 +55,7 @@ export const llmComponent = (jadeConfig, shape) => {
     addReducer(builtInReducers, DeleteToolReducer(shape, self));
     addReducer(builtInReducers, MoveKnowledgeItemReducer(shape, self));
     addReducer(builtInReducers, UpdateLogStatusReducer(shape, self));
+    addReducer(builtInReducers, ChangeMcpServersReducer(shape, self));
 
     /**
      * 必须.
@@ -126,6 +127,7 @@ export const llmComponent = (jadeConfig, shape) => {
                     type: 'Array',
                     value: [],
                 },
+                JSON.parse(JSON.stringify(DEFAULT_MCP_SERVERS)),
             ],
             outputParams: [
                 {

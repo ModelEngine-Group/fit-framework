@@ -46,7 +46,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * FIT MCP Server controller.
  *
- * @author 季聿阶
  * @since 2025-05-13
  */
 @Component
@@ -88,19 +87,22 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
             if (MapUtils.isEmpty(this.responses)) {
                 return;
             }
-            List<String> toRemoved = new ArrayList<>();
+            List<String> obsoleteSessionIds = new ArrayList<>();
             for (Map.Entry<String, HttpClassicServerResponse> entry : this.responses.entrySet()) {
                 if (entry.getValue().isActive()) {
                     continue;
                 }
-                toRemoved.add(entry.getKey());
+                obsoleteSessionIds.add(entry.getKey());
             }
-            if (CollectionUtils.isEmpty(toRemoved)) {
+            if (CollectionUtils.isEmpty(obsoleteSessionIds)) {
                 return;
             }
-            toRemoved.forEach(this.responses::remove);
-            toRemoved.forEach(this.emitters::remove);
-            log.info("Channels are inactive, remove emitters and responses. [sessionIds={}]", toRemoved);
+            obsoleteSessionIds.forEach(this.responses::remove);
+            for (String obsoleteSessionId : obsoleteSessionIds) {
+                Emitter<TextEvent> removed = this.emitters.remove(obsoleteSessionId);
+                removed.complete();
+            }
+            log.info("Channels are inactive, remove emitters and responses. [sessionIds={}]", obsoleteSessionIds);
         }).build());
     }
 

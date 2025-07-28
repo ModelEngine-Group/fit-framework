@@ -31,7 +31,6 @@ import java.util.stream.Stream;
 /**
  * 表示基于方法构建的工具元数据。
  *
- * @author 王攀博
  * @since 2024-04-18
  */
 public class MethodToolMetadata implements Tool.Metadata {

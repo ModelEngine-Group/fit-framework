@@ -21,6 +21,9 @@ import modelengine.fitframework.ioc.BeanFactory;
  * @since 2023-08-23
  */
 public class InfoBuilder implements EntityBuilder<Info> {
+    private static final String FIT_VERSION = "3.6.0-SNAPSHOT";
+    private static final String SWAGGER_UI_VERSION = "v5.27.0";
+
     private final ApplicationConfig applicationConfig;
 
     InfoBuilder(BeanContainer container) {
@@ -38,7 +41,7 @@ public class InfoBuilder implements EntityBuilder<Info> {
                 .summary("该文档由 FIT for Java 进行构建")
                 .description("- 默认显示的 `OpenAPI` 文档地址为 `/v3/openapi`，如果需要修改，可以在顶端搜索栏自定义修改。\n"
                         + "- 如果需要去除某一个 `API` 的文档显示，可以在对应的方法上增加 `@DocumentIgnored` 注解。")
-                .version("FIT:3.6.0-SNAPSHOT Swagger-UI:v5.17.12")
+                .version("FIT:" + FIT_VERSION + " Swagger-UI:" + SWAGGER_UI_VERSION)
                 .build();
     }
 }

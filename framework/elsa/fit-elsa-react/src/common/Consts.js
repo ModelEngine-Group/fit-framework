@@ -215,3 +215,11 @@ export const DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID = {
   from: FROM_TYPE.INPUT,
   value: '',
 };
+
+export const DEFAULT_MCP_SERVERS = {
+  id: uuidv4(),
+  name: "mcpServers",
+  type: DATA_TYPES.OBJECT,
+  from: FROM_TYPE.INPUT,
+  value: {}
+};

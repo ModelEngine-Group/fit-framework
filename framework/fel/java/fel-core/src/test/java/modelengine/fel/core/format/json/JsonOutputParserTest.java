@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 /**
  * 表示 {@link JsonOutputParser} 的单元测试。
  *
- * @author 易文渊
  * @since 2024-04-28
  */
 @DisplayName(("测试 JsonOutputParser"))

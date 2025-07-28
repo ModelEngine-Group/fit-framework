@@ -27,7 +27,9 @@ import modelengine.fitframework.test.domain.resolver.TestContextConfiguration;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,7 +66,7 @@ public class TestPlugin extends AbstractRootPlugin implements Plugin {
                 Validation.notNull(configuration, "The configuration to create test plugin cannot be null.");
         this.packageScanner = this.scanner((packageScanner, clazz) -> this.onClassDetected(packageScanner, clazz,
                 // 包含的类已经提前注册，因此需要将包含的和排除的类进行合并。
-                Stream.concat(Arrays.stream(this.configuration.includeClasses()),
+                Stream.concat(this.configuration.includeClasses().keySet().stream(),
                         Arrays.stream(this.configuration.excludeClasses())).collect(Collectors.toSet())));
     }
 
@@ -93,6 +95,7 @@ public class TestPlugin extends AbstractRootPlugin implements Plugin {
     @Override
     protected void scanBeans() {
         this.registerBeans(this.configuration.includeClasses());
+        this.configuration.actions().forEach(action -> action.accept(this));
         this.scan(this.configuration.scannedPackages());
         this.registerMockedBeans(this.configuration.mockedBeanFields());
     }
@@ -111,10 +114,22 @@ public class TestPlugin extends AbstractRootPlugin implements Plugin {
         }
     }
 
-    private void registerBeans(Class<?>[] classArray) {
-        Arrays.stream(classArray)
-                .filter(clazz -> !this.container().lookup(clazz).isPresent())
-                .forEach(clazz -> this.container().registry().register(clazz));
+    private void registerBeans(Map<Class<?>, Supplier<Object>> classes) {
+        classes.entrySet()
+                .stream()
+                .filter(entry -> this.container().lookup(entry.getKey()).isEmpty())
+                .forEach(entry -> {
+                    if (entry.getValue() == null) {
+                        this.container().registry().register(entry.getKey());
+                    } else {
+                        Object bean = entry.getValue().get();
+                        if (bean == null) {
+                            this.container().registry().register(entry.getKey());
+                        } else {
+                            this.container().registry().register(bean);
+                        }
+                    }
+                });
     }
 
     private void scan(Set<String> basePackages) {

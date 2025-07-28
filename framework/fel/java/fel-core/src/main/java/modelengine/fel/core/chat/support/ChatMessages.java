@@ -18,8 +18,6 @@ import java.util.List;
 /**
  * 表示 {@link Prompt} 的默认实现。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-05-06
  */
 public class ChatMessages implements Prompt {

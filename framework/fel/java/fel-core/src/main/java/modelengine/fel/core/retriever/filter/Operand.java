@@ -15,7 +15,6 @@ import modelengine.fitframework.util.ObjectUtils;
 /**
  * 表示操作符的实体。
  *
- * @author 易文渊
  * @since 2024-08-08
  */
 public interface Operand {

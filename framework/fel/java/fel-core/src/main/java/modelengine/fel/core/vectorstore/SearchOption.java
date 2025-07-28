@@ -12,7 +12,6 @@ import modelengine.fitframework.pattern.builder.BuilderFactory;
 /**
  * 表示向量检索的参数。
  *
- * @author 易文渊
  * @since 2024-08-06
  */
 public interface SearchOption {

@@ -20,7 +20,6 @@ import java.util.Map;
  *     <li>{@link java.util.List}{@code <}{@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >>}。</li>
  * </ul>
  *
- * @author 易文渊
  * @since 2024-06-04
  */
 public class GeneralPipeline implements Pipeline<Map<String, Object>, Object> {

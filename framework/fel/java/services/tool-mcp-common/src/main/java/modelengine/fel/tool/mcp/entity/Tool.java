@@ -11,7 +11,6 @@ import java.util.Map;
 /**
  * Represents a tool entity with name, description, and schema.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class Tool {

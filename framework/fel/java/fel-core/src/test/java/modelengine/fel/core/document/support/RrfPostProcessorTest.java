@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * RRF 算法测试。
  *
- * @author 马朝阳
  * @since 2024-09-29
  */
 public class RrfPostProcessorTest {

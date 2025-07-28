@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * 表示 Rerank API 格式的请求。
  *
- * @author 马朝阳
  * @since 2024-09-27
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)

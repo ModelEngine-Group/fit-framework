@@ -26,7 +26,6 @@ import java.util.List;
 /**
  * 提示词工具方法。用于 {@link AiStart#prompt(PromptTemplate[])} 构造提示词。
  *
- * @author 刘信宏
  * @since 2024-04-12
  */
 public class Prompts {

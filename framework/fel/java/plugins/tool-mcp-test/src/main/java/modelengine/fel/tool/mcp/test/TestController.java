@@ -24,7 +24,6 @@ import java.util.Map;
  * Represents a test controller for interacting with the MCP (Model Communication Protocol) client.
  * This class provides methods to initialize the MCP client and retrieve a list of available tools.
  *
- * @author 季聿阶
  * @since 2025-05-21
  */
 @Component

@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * 表示 {@link Document} 的存储对象。
  *
- * @author 易文渊
  * @since 2024-08-12
  */
 public interface DocumentStore extends Store<List<Document>> {}

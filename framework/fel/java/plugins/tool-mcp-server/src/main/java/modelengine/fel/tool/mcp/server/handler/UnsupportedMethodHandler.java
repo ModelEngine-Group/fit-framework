@@ -14,7 +14,6 @@ import modelengine.fel.tool.mcp.server.MessageResponse;
  * This request is handled by {@link UnsupportedMethodHandler} to indicate that the
  * corresponding operation is not implemented or supported.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class UnsupportedMethodHandler
@@ -38,7 +37,6 @@ public class UnsupportedMethodHandler
      * This class is used in conjunction with {@link UnsupportedMethodHandler} to signal
      * that the requested method has no implementation.
      *
-     * @author 季聿阶
      * @since 2025-05-15
      */
     public static class UnsupportedMethodRequest extends MessageRequest {}

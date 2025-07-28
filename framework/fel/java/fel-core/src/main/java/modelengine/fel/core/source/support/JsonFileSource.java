@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 /**
  * 表示 json 文件加载器的实体。
  *
- * @author 易文渊
  * @since 2024-08-08
  */
 public class JsonFileSource extends AbstractFileSource {

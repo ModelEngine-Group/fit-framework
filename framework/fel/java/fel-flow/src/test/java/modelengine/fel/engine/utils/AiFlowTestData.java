@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 用于测试的数据结构。
  *
- * @author 刘信宏
  * @since 2024-04-29
  */
 public class AiFlowTestData {

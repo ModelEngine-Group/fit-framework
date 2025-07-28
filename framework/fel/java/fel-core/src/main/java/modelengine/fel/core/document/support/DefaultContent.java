@@ -20,7 +20,6 @@ import java.util.List;
 /**
  * 表示消息内容的实体。
  *
- * @author 易文渊
  * @since 2024-06-17
  */
 public final class DefaultContent implements Content {

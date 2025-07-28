@@ -30,7 +30,6 @@ import java.util.Map;
 /**
  * 表示测试用的模拟 HTTP 服务端。
  *
- * @author 何天放
  * @since 2024-06-15
  */
 @Component

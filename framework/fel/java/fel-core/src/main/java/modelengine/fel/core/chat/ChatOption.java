@@ -15,8 +15,6 @@ import java.util.List;
 /**
  * 表示聊天大模型参数的实体。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-04-12
  */
 public interface ChatOption {

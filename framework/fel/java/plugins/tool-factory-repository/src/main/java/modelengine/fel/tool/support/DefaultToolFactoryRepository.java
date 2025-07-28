@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 表示 {@link ToolFactoryRepository} 的默认实现。
  *
- * @author 易文渊
  * @since 2024-08-15
  */
 @Component

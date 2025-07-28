@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 /**
  * 表示聊天大模型输入的接口。
  *
- * @author 易文渊
  * @since 2024-04-16
  */
 public interface Prompt {

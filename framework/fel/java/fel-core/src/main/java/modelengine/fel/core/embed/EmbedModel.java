@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * 表示嵌入模型模型服务。
  *
- * @author 易文渊
  * @since 2024-04-13
  */
 public interface EmbedModel {

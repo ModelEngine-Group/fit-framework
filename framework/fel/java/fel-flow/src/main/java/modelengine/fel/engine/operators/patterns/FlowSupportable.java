@@ -14,7 +14,6 @@ import modelengine.fitframework.inspection.Validation;
  *
  * @param <I> 表示输入数据的类型。
  * @param <O> 表示流程处理完成的数据类型。
- * @author 刘信宏
  * @since 2024-04-22
  */
 public class FlowSupportable<I, O> extends AbstractFlowPattern<I, O> {

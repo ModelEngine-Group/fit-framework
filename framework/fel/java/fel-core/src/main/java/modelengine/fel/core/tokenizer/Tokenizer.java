@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * 表示分词器的接口。
  *
- * @author 易文渊
  * @since 2024-08-06
  */
 public interface Tokenizer {

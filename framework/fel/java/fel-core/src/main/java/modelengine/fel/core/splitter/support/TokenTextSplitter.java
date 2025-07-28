@@ -19,7 +19,6 @@ import java.util.List;
 /**
  * 表示根据 token 数量进行分割的 {@link Splitter}。
  *
- * @author 易文渊
  * @since 2024-08-06
  */
 public class TokenTextSplitter extends AbstractTextSplitter {

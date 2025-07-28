@@ -26,7 +26,6 @@ import java.util.Map;
  * It serializes the result using the provided {@link ObjectSerializer} and returns a structured
  * response through the {@link ToolCallResponse} class.
  *
- * @author 季聿阶
  * @since 2025-05-15
  */
 public class ToolCallHandler extends AbstractMessageHandler<ToolCallHandler.ToolCallRequest> {
@@ -79,7 +78,6 @@ public class ToolCallHandler extends AbstractMessageHandler<ToolCallHandler.Tool
      * to be passed to the tool. It is handled by {@link ToolCallHandler} to execute the tool
      * and return the result.
      *
-     * @author 季聿阶
      * @since 2025-05-15
      */
     public static class ToolCallRequest extends MessageRequest {
@@ -133,7 +131,6 @@ public class ToolCallHandler extends AbstractMessageHandler<ToolCallHandler.Tool
      * <p>Each content item has a type and text value, which can be used to represent
      * the result or error message from the tool execution.</p>
      *
-     * @author 季聿阶
      * @since 2025-05-15
      */
     public static class ToolCallResponse extends MessageResponse {
@@ -185,7 +182,6 @@ public class ToolCallHandler extends AbstractMessageHandler<ToolCallHandler.Tool
          * <p>This class supports multiple content formats, allowing flexible representation
          * of the tool's output.</p>
          *
-         * @author 季聿阶
          * @since 2025-05-15
          */
         public static class Content {

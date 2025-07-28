@@ -16,6 +16,7 @@ import {Trans, useTranslation} from 'react-i18next';
 import {v4 as uuidv4} from 'uuid';
 import {SkillForm} from '@/components/llm/SkillForm.jsx';
 import {KnowledgeForm} from './KnowledgeForm.jsx';
+import {McpConfigForm} from '@/components/llm/McpConfigForm.jsx';
 
 LlmFormWrapper.propTypes = {
   data: PropTypes.object.isRequired,
@@ -53,6 +54,7 @@ export default function LlmFormWrapper({data, shapeStatus}) {
     prompt: data.inputParams.filter(item => item.name === 'prompt')
       .flatMap(item => item.value)
       .find(item => item.name === 'template'),
+    mcpServers: data.inputParams.find(item => item.name === 'mcpServers'),
   };
   const knowledgeData = data.inputParams.find(item => item.name === 'knowledgeBases');
   const enableLogData = data.inputParams.find(item => item.name === 'enableLog');
@@ -195,6 +197,7 @@ export default function LlmFormWrapper({data, shapeStatus}) {
         modelData={modelData} shapeId={shape.id}
         modelOptions={modelOptions}/>
       <SkillForm disabled={shapeStatus.disabled} toolOptions={toolOptions}/>
+      <McpConfigForm disabled={shapeStatus.disabled} modelData={modelData} shapeId={shape.id}/>
       <LlmOutput outputItems={data.outputParams} enableLogData={enableLogData} disabled={shapeStatus.disabled}/>
     </div>
   );

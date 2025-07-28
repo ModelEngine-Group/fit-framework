@@ -9,7 +9,6 @@ package modelengine.fel.tool.model.entity;
 /**
  * 表示用于标识工具的传输层实体类。
  *
- * @author 李金绪
  * @since 2024-09-13
  */
 public class ToolIdentifier {

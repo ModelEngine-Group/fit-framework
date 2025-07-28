@@ -30,7 +30,7 @@
         <fit.version>3.6.0-SNAPSHOT</fit.version>
 
         <!-- Byte-buddy version -->
-        <byte-buddy.version>1.17.5</byte-buddy.version>
+        <byte-buddy.version>1.17.6</byte-buddy.version>
 
         <!-- Maven plugin versions -->
         <maven.gpg.version>3.2.7</maven.gpg.version>

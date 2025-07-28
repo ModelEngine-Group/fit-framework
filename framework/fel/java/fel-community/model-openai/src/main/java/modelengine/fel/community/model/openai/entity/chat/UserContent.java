@@ -18,7 +18,6 @@ import modelengine.fitframework.serialization.annotation.SerializeStrategy;
  *     <li>图片类型；</li>
  * </ol>
  *
- * @author 易文渊
  * @since 2024-08-17
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)

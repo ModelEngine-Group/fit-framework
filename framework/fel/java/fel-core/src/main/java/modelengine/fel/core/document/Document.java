@@ -16,8 +16,6 @@ import java.util.Map;
 /**
  * 表示检索文档的实体。
  *
- * @author 刘信宏
- * @author 易文渊
  * @since 2024-06-13
  */
 public interface Document extends Content {

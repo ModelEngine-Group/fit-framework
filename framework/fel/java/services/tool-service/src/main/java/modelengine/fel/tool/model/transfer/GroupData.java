@@ -11,7 +11,6 @@ import java.util.Map;
 /**
  * 表示组的基本内容。
  *
- * @author 李金绪
  * @since 2024-12-09
  */
 public class GroupData {

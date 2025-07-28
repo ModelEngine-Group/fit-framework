@@ -9,7 +9,6 @@ package modelengine.fel.tool.annotation;
 /**
  * 用于工具方法额外参数的定义。
  *
- * @author 易文渊
  * @since 2024-08-19
  */
 public @interface Attribute {

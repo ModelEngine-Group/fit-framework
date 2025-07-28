@@ -24,7 +24,6 @@ import modelengine.fitframework.util.StringUtils;
  * 平行分支工具。<p>用于 {@link AiStart#runnableParallel(Pattern[])} 表达式。
  * 每个分支生成一个键值对。</p>
  *
- * @author 刘信宏
  * @since 2024-05-07
  */
 public interface SyncTipper<I> extends Pattern<I, Tip> {

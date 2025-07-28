@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
 /**
  * 用于组的定义。
  *
- * @author 曹嘉美
  * @since 2024-10-25
  */
 @Retention(RetentionPolicy.RUNTIME)

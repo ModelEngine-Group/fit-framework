@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 /**
  * 表示文本分割器的抽象实现。
  *
- * @author 易文渊
  * @since 2024-08-06
  */
 public abstract class AbstractTextSplitter implements Splitter<Document> {

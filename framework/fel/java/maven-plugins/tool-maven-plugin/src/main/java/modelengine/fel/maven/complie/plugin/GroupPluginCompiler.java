@@ -22,7 +22,6 @@ import java.net.URLClassLoader;
 /**
  * 向目标文件夹下输出编译产物。
  *
- * @author 曹嘉美
  * @since 2024-10-26
  */
 public class GroupPluginCompiler extends AbstractCompiler {

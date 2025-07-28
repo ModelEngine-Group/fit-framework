@@ -12,7 +12,6 @@ import java.util.List;
  * 表示数据切分算子。
  *
  * @param <D> 表示切分算子入参的泛型。
- * @author 刘信宏
  * @since 2024-04-28
  */
 @FunctionalInterface

@@ -6,6 +6,7 @@
 
 package modelengine.fel.maven.compile.parser.weather;
 
+import modelengine.fel.maven.compile.parser.weather.dto.RainPosition;
 import modelengine.fel.tool.annotation.Group;
 import modelengine.fel.tool.annotation.ToolMethod;
 import modelengine.fitframework.annotation.Genericable;
@@ -16,8 +17,6 @@ import java.util.Date;
 /**
  * 添加测试用的工具的定义。
  *
- * @author 杭潇
- * @author 曹嘉美
  * @since 2024-10-26
  */
 @Group(name = "defGroup_weather_Rain", summary = "雨天", description = "下雨的定义组")
@@ -31,8 +30,10 @@ public interface Rain {
      */
     @ToolMethod(name = "rain_today", description = "该方法获取今天的下雨信息")
     @Genericable("genericable_weather_rain_today")
-    String today(@Property(description = "查询地点", required = true) String location,
-            @Property(description = "查询日期", required = true) Date date);
+    String today(@Property(description = "查询地点", required = true, example = "Hangzhou") String location,
+            @Property(description = "查询日期", required = true) Date date,
+            @Property(description = "下雨的经纬度") RainPosition rainPosition,
+            @Property(description = "其他信息") Object info);
 
     /**
      * 获取明天下雨信息的结果。

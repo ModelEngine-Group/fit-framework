@@ -14,6 +14,12 @@
 
     <name>FEL Maven Plugin Parent</name>
 
+    <properties>
+        <!-- Maven plugin versions -->
+        <maven.version>3.8.8</maven.version>
+        <maven.plugin.version>3.8.2</maven.plugin.version>
+    </properties>
+
     <modules>
         <module>tool-maven-plugin</module>
     </modules>

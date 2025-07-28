@@ -66,7 +66,6 @@ import java.util.stream.Collectors;
 /**
  * 表示 openai 模型服务。
  *
- * @author 易文渊
  * @since 2024-08-07
  */
 @Component

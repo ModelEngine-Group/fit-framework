@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 /**
  * 表示 {@link HanlpTokenizer} 的测试集。
  *
- * @author 易文渊
  * @since 2024-09-24
  */
 @DisplayName("测试 hanlpTokenizer")

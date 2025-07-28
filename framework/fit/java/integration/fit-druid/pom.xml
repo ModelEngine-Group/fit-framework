@@ -17,7 +17,7 @@
 
     <properties>
         <!-- Third-party versions -->
-        <druid.version>1.2.20</druid.version>
+        <druid.version>1.2.25</druid.version>
     </properties>
 
     <dependencies>

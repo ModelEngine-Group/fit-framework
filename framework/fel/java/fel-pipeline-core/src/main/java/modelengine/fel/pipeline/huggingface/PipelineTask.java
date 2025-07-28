@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 /**
  * 表示 huggingface pipeline 任务类型枚举。
  *
- * @author 易文渊
  * @since 2024-06-04
  */
 @Getter
