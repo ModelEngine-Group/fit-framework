@@ -13,10 +13,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 表示 OpenAi API 格式的 重排响应。
+ * 表示 OpenAI API 格式的重排响应。
  *
- * @author 陈镕希
- * @since 2025-07-28
+ * @since 2024-09-27
  */
 public class OpenAiRerankResponse {
     private List<OpenAiRerankResponse.RerankOrder> results;

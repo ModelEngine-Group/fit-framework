@@ -14,10 +14,9 @@ import modelengine.fitframework.serialization.annotation.SerializeStrategy;
 import java.util.List;
 
 /**
- * 表示 OpenAi API 格式的 重排请求。
+ * 表示 OpenAI API 格式的重排请求。
  *
- * @author 陈镕希
- * @since 2025-07-28
+ * @since 2024-09-27
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)
 public class OpenAiRerankRequest {
