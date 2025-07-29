@@ -8,29 +8,13 @@ package modelengine.fel.core.document.support;
 
 import modelengine.fel.core.document.DocumentPostProcessor;
 import modelengine.fel.core.document.MeasurableDocument;
-import modelengine.fel.core.rerank.RerankApi;
 import modelengine.fel.core.rerank.RerankModel;
 import modelengine.fel.core.rerank.RerankOption;
-import modelengine.fit.http.client.HttpClassicClient;
-import modelengine.fit.http.client.HttpClassicClientFactory;
-import modelengine.fit.http.client.HttpClassicClientRequest;
-import modelengine.fit.http.client.HttpClassicClientResponse;
-import modelengine.fit.http.entity.Entity;
-import modelengine.fit.http.entity.ObjectEntity;
-import modelengine.fit.http.protocol.HttpRequestMethod;
-import modelengine.fit.http.protocol.HttpResponseStatus;
-import modelengine.fitframework.exception.FitException;
 import modelengine.fitframework.inspection.Validation;
-import modelengine.fitframework.log.Logger;
-import modelengine.fitframework.resource.UrlUtils;
 import modelengine.fitframework.util.CollectionUtils;
-import modelengine.fitframework.util.LazyLoader;
-import modelengine.fitframework.util.ObjectUtils;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 表示检索文档的后置重排序接口。

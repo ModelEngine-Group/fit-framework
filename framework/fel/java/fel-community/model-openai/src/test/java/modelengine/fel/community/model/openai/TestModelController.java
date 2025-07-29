@@ -9,9 +9,11 @@ package modelengine.fel.community.model.openai;
 import static modelengine.fel.community.model.openai.api.OpenAiApi.CHAT_ENDPOINT;
 import static modelengine.fel.community.model.openai.api.OpenAiApi.EMBEDDING_ENDPOINT;
 import static modelengine.fel.community.model.openai.api.OpenAiApi.IMAGE_ENDPOINT;
+import static modelengine.fel.community.model.openai.api.OpenAiApi.RERANK_ENDPOINT;
 
 import modelengine.fel.community.model.openai.entity.embed.OpenAiEmbeddingResponse;
 import modelengine.fel.community.model.openai.entity.image.OpenAiImageResponse;
+import modelengine.fel.community.model.openai.entity.rerank.OpenAiRerankResponse;
 import modelengine.fit.http.annotation.PostMapping;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.flowable.Choir;
@@ -80,5 +82,18 @@ public class TestModelController {
         String json = "{\"object\":\"list\","
                 + "\"data\":[{\"b64_json\":\"123\"}, {\"b64_json\":\"456\"}, {\"b64_json\":\"789\"}]}";
         return this.serializer.deserialize(json, OpenAiImageResponse.class);
+    }
+
+    /**
+     * 测试用重排接口。
+     *
+     * @return 表示重排响应的 {@link OpenAiRerankResponse}。
+     */
+    @PostMapping(RERANK_ENDPOINT)
+    public OpenAiRerankResponse rerank() {
+        String json =
+                "{\"results\":[{\"index\":2,\"relevance_score\":0.999071},{\"index\":3,\"relevance_score\":0.7867867},"
+                        + "{\"index\":0,\"relevance_score\":0.32713068}]}";
+        return this.serializer.deserialize(json, OpenAiRerankResponse.class);
     }
 }

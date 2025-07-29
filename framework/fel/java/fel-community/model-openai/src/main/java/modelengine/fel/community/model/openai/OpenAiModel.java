@@ -35,7 +35,6 @@ import modelengine.fel.core.embed.Embedding;
 import modelengine.fel.core.image.ImageModel;
 import modelengine.fel.core.image.ImageOption;
 import modelengine.fel.core.model.http.SecureConfig;
-import modelengine.fel.core.rerank.RerankApi;
 import modelengine.fel.core.rerank.RerankModel;
 import modelengine.fel.core.rerank.RerankOption;
 import modelengine.fit.http.client.HttpClassicClient;
@@ -180,13 +179,13 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankMod
     public List<MeasurableDocument> generate(List<MeasurableDocument> documents, RerankOption rerankOption) {
         notEmpty(documents, "The documents cannot be empty.");
         notNull(rerankOption, "The rerank option cannot be null.");
-        List<String> docs = documents.stream().map(MeasurableDocument::text).collect(Collectors.toList());
-        OpenAiRerankRequest fields = new OpenAiRerankRequest(rerankOption, docs);
-
+        String modelSource = StringUtils.blankIf(rerankOption.baseUri(), this.baseUrl);
         HttpClassicClientRequest request = this.httpClient.get()
                 .createRequest(HttpRequestMethod.POST,
-                        UrlUtils.combine(rerankOption.baseUri(), RerankApi.RERANK_ENDPOINT));
+                        UrlUtils.combine(modelSource, OpenAiApi.RERANK_ENDPOINT));
         HttpUtils.setBearerAuth(request, StringUtils.blankIf(rerankOption.apiKey(), this.defaultApiKey));
+        List<String> docs = documents.stream().map(MeasurableDocument::text).collect(Collectors.toList());
+        OpenAiRerankRequest fields = new OpenAiRerankRequest(rerankOption, docs);
         request.entity(Entity.createObject(request, fields));
         OpenAiRerankResponse rerankResponse = this.rerankExchange(request);
 

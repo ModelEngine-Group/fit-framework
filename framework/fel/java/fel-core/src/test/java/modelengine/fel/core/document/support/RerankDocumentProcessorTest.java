@@ -11,14 +11,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import modelengine.fel.core.document.Document;
 import modelengine.fel.core.document.MeasurableDocument;
-import modelengine.fel.core.rerank.RerankModel;
 import modelengine.fel.core.rerank.RerankOption;
-import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fitframework.annotation.Fit;
-import modelengine.fitframework.exception.FitException;
-import modelengine.fitframework.test.annotation.Mock;
-import modelengine.fitframework.test.annotation.MvcTest;
-import modelengine.fitframework.test.domain.mockito.MockitoMockBean;
 import modelengine.fitframework.test.domain.mvc.MockMvc;
 
 import org.junit.jupiter.api.BeforeEach;

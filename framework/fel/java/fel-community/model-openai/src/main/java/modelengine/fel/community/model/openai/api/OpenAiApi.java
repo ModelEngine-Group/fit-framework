@@ -28,6 +28,11 @@ public interface OpenAiApi {
     String IMAGE_ENDPOINT = "/images/generations";
 
     /**
+     * 重排请求的端点。
+     */
+    String RERANK_ENDPOINT = "/rerank";
+
+    /**
      * 请求头模型密钥字段。
      */
     String AUTHORIZATION = "Authorization";
