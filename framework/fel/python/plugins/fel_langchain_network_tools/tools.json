@@ -1,0 +1,1485 @@
+{
+  "version" : "1.0.0",
+  "definitionGroups" : [ {
+    "name" : "langchain_network_tools",
+    "summary" : "",
+    "description" : "",
+    "extensions" : { },
+    "definitions" : [ {
+      "schema" : {
+        "name" : "RedditSearchTool",
+        "description" : "用于在指定子版块中搜索帖子。需先配置 Reddit API 的 ID、密钥和 User-Agent，输入关键词、时间范围与排序规则，即可检索匹配的帖子并返回结果。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "sort" : {
+              "defaultValue" : "",
+              "description" : "检索排序顺序，如时间热度",
+              "name" : "sort",
+              "type" : "string",
+              "example" : ""
+            },
+            "time_filter" : {
+              "defaultValue" : "",
+              "description" : "检索内容时间范围，日/月/年",
+              "name" : "time_filter",
+              "type" : "string",
+              "example" : ""
+            },
+            "subreddit" : {
+              "defaultValue" : "",
+              "description" : "检索的Reddit的子版块名称",
+              "name" : "subreddit",
+              "type" : "string",
+              "example" : ""
+            },
+            "limit" : {
+              "defaultValue" : "",
+              "description" : "限制返回搜索结果的条数",
+              "name" : "limit",
+              "type" : "string",
+              "example" : ""
+            },
+            "client_id" : {
+              "defaultValue" : "",
+              "description" : "Reddit API分配的客户端ID",
+              "name" : "client_id",
+              "type" : "string",
+              "example" : ""
+            },
+            "client_secret" : {
+              "defaultValue" : "",
+              "description" : "Reddit分配的客户端密钥",
+              "name" : "client_secret",
+              "type" : "string",
+              "example" : ""
+            },
+            "user_agent" : {
+              "defaultValue" : "",
+              "description" : "标识调用方的 User-Agent",
+              "name" : "user_agent",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "sort", "time_filter", "subreddit", "limit", "client_id", "client_secret", "user_agent" ]
+        },
+        "order" : [ "query", "sort", "time_filter", "subreddit", "limit", "client_id", "client_secret", "user_agent" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "ArXivTool",
+        "description" : "用于从ArXiv拉取检索的论文。使用时需输入论文唯一id或者关键字，函数会在arXiv中进行检索，最终会返回相关内容的两篇文献的正文片段",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "arxiv_id" : {
+              "defaultValue" : "",
+              "description" : "检索关键词或者论文唯一id",
+              "name" : "arxiv_id",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "arxiv_id" ]
+        },
+        "order" : [ "arxiv_id" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "BingSearchTool",
+        "description" : "用于检索Bing搜索引擎中的内容。使用时输入检索关键词以及Azure官网配置的key和url，返回结果汇总摘要文本",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "bing_subscription_key" : {
+              "defaultValue" : "",
+              "description" : "在Azure获取的Key",
+              "name" : "bing_subscription_key",
+              "type" : "string",
+              "example" : ""
+            },
+            "bing_search_url" : {
+              "defaultValue" : "",
+              "description" : "在Azure获取的Endpoint",
+              "name" : "bing_search_url",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "bing_subscription_key", "bing_search_url" ]
+        },
+        "order" : [ "query", "bing_subscription_key", "bing_search_url" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "BraveSearchTool",
+        "description" : "通过API进行检索。使用时传入检索关键词、检索结果的数量以及注册的API，返回由多条搜索结果组成的纯文本",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "count" : {
+              "defaultValue" : "",
+              "description" : "检索结果的数量",
+              "name" : "count",
+              "type" : "integer",
+              "example" : ""
+            },
+            "api_key" : {
+              "defaultValue" : "",
+              "description" : "从Brave开发者中心注册的API",
+              "name" : "api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "count", "api_key" ]
+        },
+        "order" : [ "query", "count", "api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "DuckDuckGoSearchTool",
+        "description" : "DuckDuckGo搜索引擎执行关键词搜索，返回即可搜索结果文本。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query" ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "GoogleJobsTool",
+        "description" : "通过注册获取的API在Google Jobs进行搜索使用时要传入职位关键词以及API，函数执行检索后返回职位信息",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "serapi_api_key" : {
+              "defaultValue" : "",
+              "description" : "由SeraAPI提供的Google Job API ",
+              "name" : "serapi_api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "serapi_api_key" ]
+        },
+        "order" : [ "query", "serapi_api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "GooglePlaceTool",
+        "description" : "用于Google的地址查询服务,使用时传入地址关键词，以及注册调用的API，通过检索函数返回地点检索结果。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "gplace_api_key" : {
+              "defaultValue" : "",
+              "description" : "获取的API",
+              "name" : "gplace_api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "gplace_api_key" ]
+        },
+        "order" : [ "query", "gplace_api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "GoogleScholarTool",
+        "description" : "用于查询学术论文，辅助综述写作等。使用时输入检索的学术论文标题或内容关键词，输出相关的纯文本式的文献信息",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "serp_api_key" : {
+              "defaultValue" : "",
+              "description" : "获取的API",
+              "name" : "serp_api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "serp_api_key" ]
+        },
+        "order" : [ "query", "serp_api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "GoogleSearchTool",
+        "description" : "以google自定义API执行关键词搜索，cse，k，以及siterestrict四个参数设定API，最后输入关键词返回相关的标题以及Google链接等",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "google_api_key" : {
+              "defaultValue" : "",
+              "description" : "指定调用到的检索服务API接口",
+              "name" : "google_api_key",
+              "type" : "string",
+              "example" : ""
+            },
+            "google_cse_id" : {
+              "defaultValue" : "",
+              "description" : "通过CSE定制的搜索范围",
+              "name" : "google_cse_id",
+              "type" : "string",
+              "example" : ""
+            },
+            "k" : {
+              "defaultValue" : "",
+              "description" : "限制检索结果的最大数量",
+              "name" : "k",
+              "type" : "integer",
+              "example" : ""
+            },
+            "siterestrict" : {
+              "defaultValue" : "",
+              "description" : "是否启用cse规定的域名限制",
+              "name" : "siterestrict",
+              "type" : "boolean",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "google_api_key", "google_cse_id", "k", "siterestrict" ]
+        },
+        "order" : [ "query", "google_api_key", "google_cse_id", "k", "siterestrict" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "GoogleSerperTool",
+        "description" : "用于通过Serper代理访问全局的Google搜索。使用时需要输入检索关键字以及检索信息条数，代理服务的地区、语言，通过Serper代理方申请的API，输出搜索到的标题网址等。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "k" : {
+              "defaultValue" : "",
+              "description" : "检索结果的数量",
+              "name" : "k",
+              "type" : "integer",
+              "example" : ""
+            },
+            "gl" : {
+              "defaultValue" : "",
+              "description" : "搜索地址",
+              "name" : "gl",
+              "type" : "string",
+              "example" : ""
+            },
+            "hl" : {
+              "defaultValue" : "",
+              "description" : "检索语言",
+              "name" : "hl",
+              "type" : "string",
+              "example" : ""
+            },
+            "serper_api_key" : {
+              "defaultValue" : "",
+              "description" : "官网申请的API",
+              "name" : "serper_api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "k", "gl", "hl", "serper_api_key" ]
+        },
+        "order" : [ "query", "k", "gl", "hl", "serper_api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "GoldenQueryTool",
+        "description" : "通过调用Golden平台的语义搜索API进行搜索。使用时用户需要输入检索的关键字以及在官网申请的API，返回有关回答",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "golden_api_key" : {
+              "defaultValue" : "",
+              "description" : "用于指定调用的搜索服务API",
+              "name" : "golden_api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "golden_api_key" ]
+        },
+        "order" : [ "query", "golden_api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "PubmedTool",
+        "description" : "用于医疗信息领域的检索。使用时输入关键字，输出检索得到的结构化的文献信息",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query" ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "MojeekTool",
+        "description" : "通过调用Mojeek搜索引擎API，配合关键词进行检索，使用时要从Mojeek官网获取私人地API key并同关键词一起作为参数传入该函数，最后得到搜索内容的原始输出",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "api_key" : {
+              "defaultValue" : "",
+              "description" : "指定调用的搜索服务API",
+              "name" : "api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "api_key" ]
+        },
+        "order" : [ "query", "api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "SearxNGTool",
+        "description" : "通过自建搜索聚合器，在各大网站进行搜索后拉取到自建网站。使用时给出自建网站的位置，以及检索关键字，返回检索结果",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "searx_host" : {
+              "defaultValue" : "",
+              "description" : "自建IP/域名/端口",
+              "name" : "searx_host",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "searx_host" ]
+        },
+        "order" : [ "query", "searx_host" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "SerpAPITool",
+        "description" : "通过第三方引擎到各个搜索引擎去获取检索信息，使用时输入检索关键字以及官网注册得到的API通过商业代理检索，最后输出检索信息",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "serpapi_api_key" : {
+              "defaultValue" : "",
+              "description" : "官网申请得到的API",
+              "name" : "serpapi_api_key",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "serpapi_api_key" ]
+        },
+        "order" : [ "query", "serpapi_api_key" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "TwilioTool",
+        "description" : "发送短信,通过输入的参数信息调用Twilio去发送信息到指定号码，返回已发送信息的sid证明信息已经发送",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "body" : {
+              "defaultValue" : "",
+              "description" : "发送的消息文本",
+              "name" : "body",
+              "type" : "string",
+              "example" : ""
+            },
+            "to" : {
+              "defaultValue" : "",
+              "description" : "对方的电话号码",
+              "name" : "to",
+              "type" : "string",
+              "example" : ""
+            },
+            "account_sid" : {
+              "defaultValue" : "",
+              "description" : "用户的官网SID",
+              "name" : "account_sid",
+              "type" : "string",
+              "example" : ""
+            },
+            "auth_token" : {
+              "defaultValue" : "",
+              "description" : "账户对应的API访问密钥",
+              "name" : "auth_token",
+              "type" : "string",
+              "example" : ""
+            },
+            "from_number" : {
+              "defaultValue" : "",
+              "description" : "用户的电话号码",
+              "name" : "from_number",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "body", "to", "account_sid", "auth_token", "from_number" ]
+        },
+        "order" : [ "body", "to", "account_sid", "auth_token", "from_number" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "WikidataTool",
+        "description" : "基于维基百科进行检索服务，主要用于查询事实内容,使用时输入检索关键词，输出一个或者多个事实条例。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query" ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "WikipediaTool",
+        "description" : "基于维基百科进行检索服务,使用时传入要搜索的关键词即可查询相关的背景内容",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query" ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "WolframAlphaTool",
+        "description" : "用于复杂计算，金融统计等计算型任务。使用时输入查询内容，转化为数学推理等形式，输出含有计算过程等的数据计算。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            },
+            "wolfram_alpha_appid" : {
+              "defaultValue" : "",
+              "description" : "官网申请注册的appid",
+              "name" : "wolfram_alpha_appid",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query", "wolfram_alpha_appid" ]
+        },
+        "order" : [ "query", "wolfram_alpha_appid" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    }, {
+      "schema" : {
+        "name" : "YouTubeSearchTool",
+        "description" : "用于检索Youtube中的视频链接等,使用时输入关键字，返回相关视频的链接",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "defaultValue" : "",
+              "description" : "检索关键词",
+              "name" : "query",
+              "type" : "string",
+              "example" : ""
+            }
+          },
+          "required" : [ "query" ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "type" : "string",
+          "convertor" : ""
+        }
+      }
+    } ]
+  } ],
+  "toolGroups" : [ {
+    "name" : "langchain_network_tools_impl",
+    "summary" : "",
+    "description" : "",
+    "extensions" : { },
+    "definitionGroupName" : "langchain_network_tools",
+    "tools" : [ {
+      "namespace" : "reddit_search",
+      "schema" : {
+        "name" : "RedditSearchTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "sort" : {
+              "name" : "sort",
+              "type" : "string"
+            },
+            "time_filter" : {
+              "name" : "time_filter",
+              "type" : "string"
+            },
+            "subreddit" : {
+              "name" : "subreddit",
+              "type" : "string"
+            },
+            "limit" : {
+              "name" : "limit",
+              "type" : "string"
+            },
+            "client_id" : {
+              "name" : "client_id",
+              "type" : "string"
+            },
+            "client_secret" : {
+              "name" : "client_secret",
+              "type" : "string"
+            },
+            "user_agent" : {
+              "name" : "user_agent",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "sort", "time_filter", "subreddit", "limit", "client_id", "client_secret", "user_agent" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回匹配 Reddit 帖子的摘要信息，包含帖子的标题、链接等内容。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.reddit_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "RedditSearchTool"
+    }, {
+      "namespace" : "arxiv",
+      "schema" : {
+        "name" : "ArXivTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "arxiv_id" : {
+              "name" : "arxiv_id",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "arxiv_id" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回与输入关键词或 ID 匹配的两篇 Arxiv 论文正文片段。",
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.arxiv",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "ArXivTool"
+    }, {
+      "namespace" : "bing_search",
+      "schema" : {
+        "name" : "BingSearchTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "bing_subscription_key" : {
+              "name" : "bing_subscription_key",
+              "type" : "string"
+            },
+            "bing_search_url" : {
+              "name" : "bing_search_url",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "bing_subscription_key", "bing_search_url" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回 Bing 搜索结果的摘要文本，聚合主要内容。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.bing_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "BingSearchTool"
+    }, {
+      "namespace" : "brave_search",
+      "schema" : {
+        "name" : "BraveSearchTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "count" : {
+              "name" : "count",
+              "type" : "integer"
+            },
+            "api_key" : {
+              "name" : "api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "count", "api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回多条 Brave 搜索结果拼接后的纯文本内容。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.brave_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "BraveSearchTool"
+    }, {
+      "namespace" : "duck_duck_go_search",
+      "schema" : {
+        "name" : "DuckDuckGoSearchTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回 DuckDuckGo 搜索结果摘要文本。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.duck_duck_go_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "DuckDuckGoSearchTool"
+    }, {
+      "namespace" : "google_jobs",
+      "schema" : {
+        "name" : "GoogleJobsTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "serapi_api_key" : {
+              "name" : "serapi_api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "serapi_api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回匹配的职位招聘信息，如职位标题、公司名、地址等。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.google_jobs",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "GoogleJobsTool"
+    }, {
+      "namespace" : "google_places",
+      "schema" : {
+        "name" : "GooglePlaceTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "gplace_api_key" : {
+              "name" : "gplace_api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "gplace_api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回与地址关键词相关的 Google 地点搜索结果。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.google_places",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "GooglePlaceTool"
+    }, {
+      "namespace" : "google_scholar",
+      "schema" : {
+        "name" : "GoogleScholarTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "serp_api_key" : {
+              "name" : "serp_api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "serp_api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回与关键词相关的 Google Scholar 学术论文引用信息。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.google_scholar",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "GoogleScholarTool"
+    }, {
+      "namespace" : "google_search",
+      "schema" : {
+        "name" : "GoogleSearchTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "google_api_key" : {
+              "name" : "google_api_key",
+              "type" : "string"
+            },
+            "google_cse_id" : {
+              "name" : "google_cse_id",
+              "type" : "string"
+            },
+            "k" : {
+              "name" : "k",
+              "type" : "integer"
+            },
+            "siterestrict" : {
+              "name" : "siterestrict",
+              "type" : "boolean"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "google_api_key", "google_cse_id", "k", "siterestrict" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回关键词对应的 Google 搜索标题与链接结果。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.google_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "GoogleSearchTool"
+    }, {
+      "namespace" : "google_serper",
+      "schema" : {
+        "name" : "GoogleSerperTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "k" : {
+              "name" : "k",
+              "type" : "integer"
+            },
+            "gl" : {
+              "name" : "gl",
+              "type" : "string"
+            },
+            "hl" : {
+              "name" : "hl",
+              "type" : "string"
+            },
+            "serper_api_key" : {
+              "name" : "serper_api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "k", "gl", "hl", "serper_api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回由 Serper 提供的 Google 搜索结果摘要，包括标题和网址。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.google_serper",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "GoogleSerperTool"
+    }, {
+      "namespace" : "golden_query",
+      "schema" : {
+        "name" : "GoldenQueryTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "golden_api_key" : {
+              "name" : "golden_api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "golden_api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回由 Golden API 查询得到的结构化实体信息或回答内容。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.golden_query",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "GoldenQueryTool"
+    }, {
+      "namespace" : "pub_med",
+      "schema" : {
+        "name" : "PubmedTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回与医学关键词相关的 PubMed 文献结构化摘要。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.pub_med",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "PubmedTool"
+    }, {
+      "namespace" : "mojeek_query",
+      "schema" : {
+        "name" : "MojeekTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "api_key" : {
+              "name" : "api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回 Mojeek 搜索结果的原始输出文本。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.mojeek_query",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "MojeekTool"
+    }, {
+      "namespace" : "searxng_search",
+      "schema" : {
+        "name" : "SearxNGTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "searx_host" : {
+              "name" : "searx_host",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "searx_host" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回 SearxNG 聚合搜索引擎拉取的多站点搜索摘要。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.searxng_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "SearxNGTool"
+    }, {
+      "namespace" : "serp_api",
+      "schema" : {
+        "name" : "SerpAPITool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "serpapi_api_key" : {
+              "name" : "serpapi_api_key",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "serpapi_api_key" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回由 SerpAPI 聚合的多平台搜索结果信息。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.serp_api",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "SerpAPITool"
+    }, {
+      "namespace" : "twilio",
+      "schema" : {
+        "name" : "TwilioTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "body" : {
+              "name" : "body",
+              "type" : "string"
+            },
+            "to" : {
+              "name" : "to",
+              "type" : "string"
+            },
+            "account_sid" : {
+              "name" : "account_sid",
+              "type" : "string"
+            },
+            "auth_token" : {
+              "name" : "auth_token",
+              "type" : "string"
+            },
+            "from_number" : {
+              "name" : "from_number",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "body", "to", "account_sid", "auth_token", "from_number" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回已发送短信的消息 SID，用于确认 Twilio 成功发送信息。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.twilio",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "TwilioTool"
+    }, {
+      "namespace" : "wikidata",
+      "schema" : {
+        "name" : "WikidataTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回维基数据中与关键词相关的事实内容条目。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.wikidata",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "WikidataTool"
+    }, {
+      "namespace" : "wikipedia",
+      "schema" : {
+        "name" : "WikipediaTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回与关键词相关的维基百科条目的背景信息摘要。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.wikipedia",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "WikipediaTool"
+    }, {
+      "namespace" : "wolfram_alpha",
+      "schema" : {
+        "name" : "WolframAlphaTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            },
+            "wolfram_alpha_appid" : {
+              "name" : "wolfram_alpha_appid",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query", "wolfram_alpha_appid" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回 Wolfram Alpha 对计算性问题的解析与结果，包括数学推导与数据分析。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.wolfram_alpha",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "WolframAlphaTool"
+    }, {
+      "namespace" : "youtube_search",
+      "schema" : {
+        "name" : "YouTubeSearchTool",
+        "description" : "",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "query" : {
+              "name" : "query",
+              "type" : "string"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "query" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回与关键词相关的 YouTube 视频链接与标题信息。",
+          "type" : "string",
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "langchain.tool.youtube_search",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Langchain" ]
+      },
+      "definitionName" : "YouTubeSearchTool"
+    } ]
+  } ]
+}
