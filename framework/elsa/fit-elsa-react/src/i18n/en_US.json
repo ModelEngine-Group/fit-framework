@@ -420,7 +420,7 @@
   "manual": "Manual",
   "mcpServerConfig": "MCP Server Configuration",
   "pleaseEnterValidJson": "Please enter a valid JSON format!",
-  "mcpServerConfigPopover": "Example: \n{\n  \"server_name\": {\n    \"url\": \"https://127.0.0.1:80/sse\",\n    \"headers\": {},\n    \"timeout\": 10,\n    \"sse_read_timeout\": 300\n  }\n}",
+  "mcpServerConfigPopover": "Example:(Authentication is not currently supported) \n{\n  \"server_name\": {\n    \"url\": \"https://127.0.0.1:80/sse\",\n  }\n}",
   "enableRerank": "Enable Rerank",
   "rerankModel": "Rerank Model",
   "rerankTopN": "Rerank Top N",
