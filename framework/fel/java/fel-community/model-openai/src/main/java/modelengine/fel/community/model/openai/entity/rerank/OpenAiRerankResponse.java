@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.core.document.support;
+package modelengine.fel.community.model.openai.entity.rerank;
 
 import modelengine.fitframework.annotation.Property;
 import modelengine.fitframework.util.CollectionUtils;
@@ -13,25 +13,26 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 表示 Rerank API 格式的请求。
+ * 表示 OpenAi API 格式的 重排响应。
  *
- * @since 2024-09-27
+ * @author 陈镕希
+ * @since 2025-07-28
  */
-public class RerankResponse {
-    private List<RerankOrder> results;
+public class OpenAiRerankResponse {
+    private List<OpenAiRerankResponse.RerankOrder> results;
 
     /**
      * 获取重新排序后的文档列表。
      *
-     * @return 表示重新排序后的文档列表的 {@link List}{@code <}{@link RerankOrder}{@code >}。
+     * @return 表示重新排序后的文档列表的 {@link List}{@code <}{@link OpenAiRerankResponse.RerankOrder}{@code >}。
      */
-    public List<RerankOrder> results() {
+    public List<OpenAiRerankResponse.RerankOrder> results() {
         return CollectionUtils.isEmpty(this.results)
                 ? Collections.emptyList()
                 : Collections.unmodifiableList(this.results);
     }
 
-    static class RerankOrder {
+    public static class RerankOrder {
         private int index;
         @Property(name = "relevance_score")
         private double relevanceScore;

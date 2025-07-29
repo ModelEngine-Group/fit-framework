@@ -6,16 +6,19 @@
 
 package modelengine.fel.core.document.support;
 
-import static modelengine.fel.core.document.support.TestRerankModelController.FAIL_ENDPOINT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import modelengine.fel.core.document.Document;
 import modelengine.fel.core.document.MeasurableDocument;
+import modelengine.fel.core.rerank.RerankModel;
+import modelengine.fel.core.rerank.RerankOption;
 import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.exception.FitException;
+import modelengine.fitframework.test.annotation.Mock;
 import modelengine.fitframework.test.annotation.MvcTest;
+import modelengine.fitframework.test.domain.mockito.MockitoMockBean;
 import modelengine.fitframework.test.domain.mvc.MockMvc;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,53 +36,46 @@ import java.util.List;
  *
  * @since 2024-09-14
  */
-@MvcTest(classes = TestRerankModelController.class)
 public class RerankDocumentProcessorTest {
     private static final String[] DOCS = new String[] {"Burgers", "Carson", "Shanghai", "Beijing", "Test"};
 
     private RerankDocumentProcessor client;
 
     @Fit
-    private HttpClassicClientFactory httpClientFactory;
-
-    @Fit
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setUp() {
-        this.client = new RerankDocumentProcessor(httpClientFactory,
-                RerankOption.custom()
-                        .baseUri("http://localhost:" + mockMvc.getPort())
-                        .model("rerank1")
-                        .query("What is the capital of the united states?")
-                        .topN(3)
-                        .build());
+        this.client = new RerankDocumentProcessor(RerankOption.custom()
+                .model("rerank1")
+                .apiKey("")
+                .query("What is the capital of the united states?")
+                .topN(3)
+                .build(), new RerankModelStub());
     }
 
     @Test
     @DisplayName("测试 Rerank 接口调用响应成功")
     public void testWhenCallRerankModelThenSuccess() {
-        List<String> texts = Arrays.asList(DOCS[3], DOCS[4], DOCS[0]);
-        List<Double> scores = Arrays.asList(0.999071, 0.7867867, 0.32713068);
+        List<String> texts = Arrays.asList(DOCS[0], DOCS[1], DOCS[2], DOCS[3], DOCS[4]);
         List<MeasurableDocument> docs = this.client.process(this.getRequest());
         assertThat(docs).extracting(MeasurableDocument::text).isEqualTo(texts);
-        assertThat(docs).extracting(MeasurableDocument::score).isEqualTo(scores);
     }
 
     @Test
-    @DisplayName("测试 Rerank 接口调用响应异常")
-    public void testWhenCallRerankModelThenResponseException() {
-        RerankDocumentProcessor client1 = new RerankDocumentProcessor(httpClientFactory,
-                RerankOption.custom().baseUri("http://localhost:" + mockMvc.getPort() + FAIL_ENDPOINT).build());
-        assertThatThrownBy(() -> client1.process(this.getRequest())).isInstanceOf(FitException.class);
+    @DisplayName("测试 Rerank 接口参数为空响应异常")
+    public void testWhenCallRerankOptionNullParamThenResponseException() {
+        assertThatThrownBy(() -> new RerankDocumentProcessor(null, new RerankModelStub())).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RerankDocumentProcessor(RerankOption.custom().build(), null)).isInstanceOf(
+                IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("测试 Rerank 接口参数为空响应异常")
     public void testWhenCallRerankModelNullParamThenResponseException() {
-        assertThatThrownBy(() -> new RerankDocumentProcessor(this.httpClientFactory, null)).isInstanceOf(
-                IllegalArgumentException.class);
-        assertThatThrownBy(() -> new RerankDocumentProcessor(null, RerankOption.custom().build())).isInstanceOf(
+        assertThatThrownBy(() -> new RerankDocumentProcessor(RerankOption.custom()
+                .build(), null)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RerankDocumentProcessor(RerankOption.custom().build(), null)).isInstanceOf(
                 IllegalArgumentException.class);
     }
 
@@ -98,10 +94,5 @@ public class RerankDocumentProcessorTest {
                         .metadata(new HashMap<>())
                         .build(), -1)));
         return documents;
-    }
-
-    private String getMockReRankResponseBody() {
-        return "{\"results\":[{\"index\":3,\"relevance_score\":0.999071},{\"index\":4,\"relevance_score\":0.7867867},"
-                + "{\"index\":0,\"relevance_score\":0.32713068}]}";
     }
 }

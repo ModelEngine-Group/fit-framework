@@ -4,8 +4,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.core.document.support;
+package modelengine.fel.community.model.openai.entity.rerank;
 
+import modelengine.fel.core.rerank.RerankOption;
 import modelengine.fitframework.annotation.Property;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.serialization.annotation.SerializeStrategy;
@@ -13,12 +14,13 @@ import modelengine.fitframework.serialization.annotation.SerializeStrategy;
 import java.util.List;
 
 /**
- * 表示 Rerank API 格式的请求。
+ * 表示 OpenAi API 格式的 重排请求。
  *
- * @since 2024-09-27
+ * @author 陈镕希
+ * @since 2025-07-28
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)
-public class RerankRequest {
+public class OpenAiRerankRequest {
     private final String model;
     private final String query;
     private final List<String> documents;
@@ -26,12 +28,12 @@ public class RerankRequest {
     private final Integer topN;
 
     /**
-     * 创建 {@link RerankRequest} 的实体。
+     * 创建 {@link OpenAiRerankRequest} 的实体。
      *
      * @param documents 表示要重新排序的文档对象。
      * @param rerankOption 表示 rerank 模型参数。
      */
-    public RerankRequest(RerankOption rerankOption, List<String> documents) {
+    public OpenAiRerankRequest(RerankOption rerankOption, List<String> documents) {
         Validation.notNull(rerankOption, "The rerankOption cannot be null.");
         this.model = rerankOption.model();
         this.query = rerankOption.query();

@@ -8,6 +8,9 @@ package modelengine.fel.core.document.support;
 
 import modelengine.fel.core.document.DocumentPostProcessor;
 import modelengine.fel.core.document.MeasurableDocument;
+import modelengine.fel.core.rerank.RerankApi;
+import modelengine.fel.core.rerank.RerankModel;
+import modelengine.fel.core.rerank.RerankOption;
 import modelengine.fit.http.client.HttpClassicClient;
 import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fit.http.client.HttpClassicClientRequest;
@@ -35,22 +38,18 @@ import java.util.stream.Collectors;
  * @since 2024-09-14
  */
 public class RerankDocumentProcessor implements DocumentPostProcessor {
-    private static final Logger log = Logger.get(RerankDocumentProcessor.class);
-
-    private final LazyLoader<HttpClassicClient> httpClient;
     private final RerankOption rerankOption;
+    private final RerankModel rerankModel;
 
     /**
      * 创建 {@link RerankDocumentProcessor} 的实体。
      *
-     * @param httpClientFactory 表示 {@link HttpClassicClientFactory} 的实例。
      * @param rerankOption 表示 rerank 模型参数的 {@link  RerankOption}
+     * @param rerankModel 表示 rerank 模型接口的 {@link  RerankModel}
      */
-    public RerankDocumentProcessor(HttpClassicClientFactory httpClientFactory, RerankOption rerankOption) {
-        Validation.notNull(httpClientFactory, "The httpClientFactory cannot be null.");
-        this.httpClient =
-                new LazyLoader<>(() -> httpClientFactory.create(HttpClassicClientFactory.Config.builder().build()));
+    public RerankDocumentProcessor(RerankOption rerankOption, RerankModel rerankModel) {
         this.rerankOption = Validation.notNull(rerankOption, "The rerankOption cannot be null.");
+        this.rerankModel = Validation.notNull(rerankModel, "The rerankModel cannot be null.");
     }
 
     /**
@@ -63,35 +62,6 @@ public class RerankDocumentProcessor implements DocumentPostProcessor {
         if (CollectionUtils.isEmpty(documents)) {
             return Collections.emptyList();
         }
-        List<String> docs = documents.stream().map(MeasurableDocument::text).collect(Collectors.toList());
-        RerankRequest fields = new RerankRequest(this.rerankOption, docs);
-
-        HttpClassicClientRequest request = this.httpClient.get()
-                .createRequest(HttpRequestMethod.POST,
-                        UrlUtils.combine(this.rerankOption.baseUri(), RerankApi.RERANK_ENDPOINT));
-        request.entity(Entity.createObject(request, fields));
-        RerankResponse rerankResponse = this.rerankExchange(request);
-
-        return rerankResponse.results()
-                .stream()
-                .map(result -> new MeasurableDocument(documents.get(result.index()), result.relevanceScore()))
-                .sorted((document1, document2) -> (int) (document2.score() - document1.score()))
-                .collect(Collectors.toList());
-    }
-
-    private RerankResponse rerankExchange(HttpClassicClientRequest request) {
-        try (HttpClassicClientResponse<Object> response = request.exchange(RerankResponse.class)) {
-            if (response.statusCode() != HttpResponseStatus.OK.statusCode()) {
-                log.error("Failed to get rerank model response. [code={}, reason={}]",
-                        response.statusCode(),
-                        response.reasonPhrase());
-                throw new FitException("Failed to get rerank model response.");
-            }
-            return ObjectUtils.cast(response.objectEntity()
-                    .map(ObjectEntity::object)
-                    .orElseThrow(() -> new FitException("The response body is abnormal.")));
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to request rerank model.", e);
-        }
+        return rerankModel.generate(documents, rerankOption);
     }
 }

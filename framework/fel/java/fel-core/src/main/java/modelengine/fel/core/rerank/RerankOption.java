@@ -4,8 +4,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.core.document.support;
+package modelengine.fel.core.rerank;
 
+import modelengine.fel.core.model.http.SecureConfig;
 import modelengine.fitframework.pattern.builder.BuilderFactory;
 
 /**
@@ -36,11 +37,25 @@ public interface RerankOption {
     String baseUri();
 
     /**
+     * 获取模型接口秘钥。
+     *
+     * @return 表示模型接口秘钥的 {@link String}。
+     */
+    String apiKey();
+
+    /**
      * 获取返回的最相关的文档数量。
      *
      * @return 表示返回的最相关的文档数量的 {@link Integer}。
      */
     Integer topN();
+
+    /**
+     * 获取调用重排模型服务的安全配置。
+     *
+     * @return 表示调用重排模型服务安全配置的 {@link SecureConfig}。
+     */
+    SecureConfig secureConfig();
 
     /**
      * {@link RerankOption} 的构建器。
@@ -71,12 +86,28 @@ public interface RerankOption {
         Builder baseUri(String baseUri);
 
         /**
+         * 设置模型接口秘钥。
+         *
+         * @param apiKey 表示模型接口秘钥的 {@link String}。
+         * @return 表示当前构建器的 {@link RerankOption.Builder}。
+         */
+        Builder apiKey(String apiKey);
+
+        /**
          * 设置返回的最相关的文档数量。
          *
          * @param topN 表示返回的最相关的文档数量的 {@link Integer}。
          * @return 表示当前构建器的 {@link Builder}。
          */
         Builder topN(Integer topN);
+
+        /**
+         * 设置调用重排模型服务的安全配置。
+         *
+         * @param secureConfig 表示调用重排模型服务安全配置的 {@link SecureConfig}。
+         * @return 表示当前构建器的 {@link Builder}。
+         */
+        Builder secureConfig(SecureConfig secureConfig);
 
         /**
          * 构建对象。

@@ -19,6 +19,8 @@ import modelengine.fel.community.model.openai.entity.embed.OpenAiEmbeddingReques
 import modelengine.fel.community.model.openai.entity.embed.OpenAiEmbeddingResponse;
 import modelengine.fel.community.model.openai.entity.image.OpenAiImageRequest;
 import modelengine.fel.community.model.openai.entity.image.OpenAiImageResponse;
+import modelengine.fel.community.model.openai.entity.rerank.OpenAiRerankRequest;
+import modelengine.fel.community.model.openai.entity.rerank.OpenAiRerankResponse;
 import modelengine.fel.community.model.openai.enums.ModelProcessingState;
 import modelengine.fel.community.model.openai.util.HttpUtils;
 import modelengine.fel.core.chat.ChatMessage;
@@ -26,18 +28,24 @@ import modelengine.fel.core.chat.ChatModel;
 import modelengine.fel.core.chat.ChatOption;
 import modelengine.fel.core.chat.Prompt;
 import modelengine.fel.core.chat.support.AiMessage;
+import modelengine.fel.core.document.MeasurableDocument;
 import modelengine.fel.core.embed.EmbedModel;
 import modelengine.fel.core.embed.EmbedOption;
 import modelengine.fel.core.embed.Embedding;
 import modelengine.fel.core.image.ImageModel;
 import modelengine.fel.core.image.ImageOption;
 import modelengine.fel.core.model.http.SecureConfig;
+import modelengine.fel.core.rerank.RerankApi;
+import modelengine.fel.core.rerank.RerankModel;
+import modelengine.fel.core.rerank.RerankOption;
 import modelengine.fit.http.client.HttpClassicClient;
 import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fit.http.client.HttpClassicClientRequest;
 import modelengine.fit.http.client.HttpClassicClientResponse;
+import modelengine.fit.http.entity.Entity;
 import modelengine.fit.http.entity.ObjectEntity;
 import modelengine.fit.http.protocol.HttpRequestMethod;
+import modelengine.fit.http.protocol.HttpResponseStatus;
 import modelengine.fit.security.Decryptor;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Fit;
@@ -69,7 +77,7 @@ import java.util.stream.Collectors;
  * @since 2024-08-07
  */
 @Component
-public class OpenAiModel implements EmbedModel, ChatModel, ImageModel {
+public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankModel {
     private static final Logger log = Logger.get(OpenAiModel.class);
     private static final Map<String, Boolean> HTTPS_CONFIG_KEY_MAPS = MapBuilder.<String, Boolean>get()
             .put("client.http.secure.ignore-trust", Boolean.FALSE)
@@ -165,6 +173,43 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel {
                     .orElseThrow(() -> new FitException("The response body is abnormal."));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to close response.", e);
+        }
+    }
+
+    @Override
+    public List<MeasurableDocument> generate(List<MeasurableDocument> documents, RerankOption rerankOption) {
+        notEmpty(documents, "The documents cannot be empty.");
+        notNull(rerankOption, "The rerank option cannot be null.");
+        List<String> docs = documents.stream().map(MeasurableDocument::text).collect(Collectors.toList());
+        OpenAiRerankRequest fields = new OpenAiRerankRequest(rerankOption, docs);
+
+        HttpClassicClientRequest request = this.httpClient.get()
+                .createRequest(HttpRequestMethod.POST,
+                        UrlUtils.combine(rerankOption.baseUri(), RerankApi.RERANK_ENDPOINT));
+        HttpUtils.setBearerAuth(request, StringUtils.blankIf(rerankOption.apiKey(), this.defaultApiKey));
+        request.entity(Entity.createObject(request, fields));
+        OpenAiRerankResponse rerankResponse = this.rerankExchange(request);
+
+        return rerankResponse.results()
+                .stream()
+                .map(result -> new MeasurableDocument(documents.get(result.index()), result.relevanceScore()))
+                .sorted((document1, document2) -> (int) (document2.score() - document1.score()))
+                .collect(Collectors.toList());
+    }
+
+    private OpenAiRerankResponse rerankExchange(HttpClassicClientRequest request) {
+        try (HttpClassicClientResponse<Object> response = request.exchange(OpenAiRerankResponse.class)) {
+            if (response.statusCode() != HttpResponseStatus.OK.statusCode()) {
+                log.error("Failed to get rerank model response. [code={}, reason={}]",
+                        response.statusCode(),
+                        response.reasonPhrase());
+                throw new FitException("Failed to get rerank model response.");
+            }
+            return ObjectUtils.cast(response.objectEntity()
+                    .map(ObjectEntity::object)
+                    .orElseThrow(() -> new FitException("The response body is abnormal.")));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to request rerank model.", e);
         }
     }
 
