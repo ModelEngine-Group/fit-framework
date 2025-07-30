@@ -180,9 +180,8 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankMod
         notEmpty(documents, "The documents cannot be empty.");
         notNull(rerankOption, "The rerank option cannot be null.");
         String modelSource = StringUtils.blankIf(rerankOption.baseUri(), this.baseUrl);
-        HttpClassicClientRequest request = this.httpClient.get()
-                .createRequest(HttpRequestMethod.POST,
-                        UrlUtils.combine(modelSource, OpenAiApi.RERANK_ENDPOINT));
+        HttpClassicClientRequest request = this.getHttpClient(rerankOption.secureConfig())
+                .createRequest(HttpRequestMethod.POST, UrlUtils.combine(modelSource, OpenAiApi.RERANK_ENDPOINT));
         HttpUtils.setBearerAuth(request, StringUtils.blankIf(rerankOption.apiKey(), this.defaultApiKey));
         List<String> docs = documents.stream().map(MeasurableDocument::text).collect(Collectors.toList());
         OpenAiRerankRequest fields = new OpenAiRerankRequest(rerankOption, docs);

@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * 表示重排模型服务。
  *
- * @author 陈镕希
  * @since 2025-07-26
  */
 public interface RerankModel {

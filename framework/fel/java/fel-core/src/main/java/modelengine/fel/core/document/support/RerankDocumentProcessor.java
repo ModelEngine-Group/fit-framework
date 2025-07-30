@@ -28,12 +28,12 @@ public class RerankDocumentProcessor implements DocumentPostProcessor {
     /**
      * 创建 {@link RerankDocumentProcessor} 的实体。
      *
-     * @param rerankOption 表示 rerank 模型参数的 {@link RerankOption}。
-     * @param rerankModel 表示 rerank 模型接口的 {@link RerankModel}。
+     * @param rerankOption 表示重排模型参数的 {@link RerankOption}。
+     * @param rerankModel 表示重排模型接口的 {@link RerankModel}。
      */
     public RerankDocumentProcessor(RerankOption rerankOption, RerankModel rerankModel) {
-        this.rerankOption = Validation.notNull(rerankOption, "The rerankOption cannot be null.");
-        this.rerankModel = Validation.notNull(rerankModel, "The rerankModel cannot be null.");
+        this.rerankOption = Validation.notNull(rerankOption, "The rerank option cannot be null.");
+        this.rerankModel = Validation.notNull(rerankModel, "The rerank model cannot be null.");
     }
 
     /**

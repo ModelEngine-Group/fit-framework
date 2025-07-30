@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * 重排模型服务的打桩实现。
  *
- * @author 陈镕希
  * @since 2025-07-28
  */
 class RerankModelStub implements RerankModel {

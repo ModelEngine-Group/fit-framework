@@ -47,10 +47,10 @@ import java.util.stream.Collectors;
  */
 @MvcTest(classes = TestModelController.class)
 public class OpenAiModelTest {
-    private OpenAiModel openAiModel;
     private static final int EXPECTED_TOP_K = 3;
     private static final String HIGHEST_RANKED_TEXT = "C++ offers high performance.";
     private static final double EXPECTED_HIGHEST_SCORE = 0.999071;
+    private OpenAiModel openAiModel;
 
     @Fit
     private HttpClassicClientFactory httpClientFactory;
@@ -111,10 +111,10 @@ public class OpenAiModelTest {
                 doc("3", "Rust offers high performance."),
                 doc("4", "C offers high performance."));
 
-        RerankOption rerankOption = RerankOption.custom().model("rerank-model").build();
+        RerankOption rerankOption = RerankOption.custom().model("rerank-model").topN(EXPECTED_TOP_K).build();
 
         // When: 调用重排接口
-        List<MeasurableDocument> result = openAiModel.generate(inputDocs, rerankOption);
+        List<MeasurableDocument> result = this.openAiModel.generate(inputDocs, rerankOption);
 
         // Then: 验证结果
         assertAll(() -> assertThat(result).as("应返回 top-%d 结果", EXPECTED_TOP_K).hasSize(EXPECTED_TOP_K),

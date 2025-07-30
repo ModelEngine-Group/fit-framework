@@ -13,11 +13,17 @@ import static modelengine.fel.community.model.openai.api.OpenAiApi.RERANK_ENDPOI
 
 import modelengine.fel.community.model.openai.entity.embed.OpenAiEmbeddingResponse;
 import modelengine.fel.community.model.openai.entity.image.OpenAiImageResponse;
+import modelengine.fel.community.model.openai.entity.rerank.OpenAiRerankRequest;
 import modelengine.fel.community.model.openai.entity.rerank.OpenAiRerankResponse;
 import modelengine.fit.http.annotation.PostMapping;
+import modelengine.fit.http.annotation.RequestBody;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.flowable.Choir;
 import modelengine.fitframework.serialization.ObjectSerializer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 表示测试使用的聊天接口。
@@ -90,10 +96,20 @@ public class TestModelController {
      * @return 表示重排响应的 {@link OpenAiRerankResponse}。
      */
     @PostMapping(RERANK_ENDPOINT)
-    public OpenAiRerankResponse rerank() {
-        String json =
-                "{\"results\":[{\"index\":2,\"relevance_score\":0.999071},{\"index\":3,\"relevance_score\":0.7867867},"
-                        + "{\"index\":0,\"relevance_score\":0.32713068}]}";
-        return this.serializer.deserialize(json, OpenAiRerankResponse.class);
+    public OpenAiRerankResponse rerank(@RequestBody OpenAiRerankRequest request) {
+        int topN = request.getTopN();
+        List<String> docs = request.getDocuments();
+        // 模拟生成结果：按 index 顺序生成 relevance_score，最多返回 topN 个
+        List<OpenAiRerankResponse.RerankOrder> results = new ArrayList<>();
+        double[] mockScores = {0.32713068, 0.4, 0.999071, 0.7867867, 0.6}; // 对应 index 0~4
+        List<OpenAiRerankResponse.RerankOrder> allResults = new ArrayList<>();
+        for (int i = 0; i < mockScores.length && i < docs.size(); i++) {
+            allResults.add(new OpenAiRerankResponse.RerankOrder(i, mockScores[i]));
+        }
+        allResults.sort((a, b) -> Double.compare(b.relevanceScore(), a.relevanceScore()));
+        List<OpenAiRerankResponse.RerankOrder> limitedResults = allResults.stream()
+                .limit(topN)
+                .collect(Collectors.toList());
+        return new OpenAiRerankResponse(limitedResults);
     }
 }

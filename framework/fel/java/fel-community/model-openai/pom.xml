@@ -42,6 +42,12 @@
             <artifactId>fel-core</artifactId>
         </dependency>
 
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Test Plugins -->
         <dependency>
             <groupId>org.fitframework.plugin</groupId>

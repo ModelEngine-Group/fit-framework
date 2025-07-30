@@ -6,6 +6,9 @@
 
 package modelengine.fel.community.model.openai.entity.rerank;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import modelengine.fitframework.annotation.Property;
 import modelengine.fitframework.util.CollectionUtils;
 
@@ -17,6 +20,9 @@ import java.util.List;
  *
  * @since 2024-09-27
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OpenAiRerankResponse {
     private List<OpenAiRerankResponse.RerankOrder> results;
 
@@ -31,6 +37,13 @@ public class OpenAiRerankResponse {
                 : Collections.unmodifiableList(this.results);
     }
 
+    /**
+     * 表示重排序后的文档项，包含文档在原始列表中的索引和重新计算的相关性评分。
+     * 用于存储和访问重新排序后的文档信息。
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class RerankOrder {
         private int index;
         @Property(name = "relevance_score")

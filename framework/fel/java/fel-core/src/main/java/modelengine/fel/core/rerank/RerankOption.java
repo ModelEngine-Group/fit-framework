@@ -10,7 +10,7 @@ import modelengine.fel.core.model.http.SecureConfig;
 import modelengine.fitframework.pattern.builder.BuilderFactory;
 
 /**
- * 表示 rerank 模型参数的实体。
+ * 表示重排模型参数的实体。
  *
  * @since 2024-09-23
  */
