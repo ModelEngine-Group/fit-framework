@@ -159,7 +159,7 @@ fit.public.genericables.modelengine.fit.registry.registry-service.query-running-
   tags:
     - "nonTraceable"
   route:
-    default: "query_running_fitables"
+    default: "query-running-fitables"
 fit.public.genericables.GET_FITABLES_OF_GENERICABLE_GEN_ID:
   name: "get_fitables_of_genericable"
   tags:
@@ -210,13 +210,13 @@ fit.public.genericables.modelengine.fit.registry.registry-service.subscribe-fita
   tags:
     - "nonTraceable"
   route:
-    default: "subscribe_fitables"
+    default: "subscribe-fitables"
 fit.public.genericables.modelengine.fit.registry.registry-service.query-fitables-addresses:
   name: "query_fitable_addresses"
   tags:
     - "nonTraceable"
   route:
-    default: "query_fitables_addresses"
+    default: "query-fitables-addresses"
 fit.public.genericables.2d47d38f33fc32c47f049289a2a432d2:
   name: "dynamic_loading_start"
   tags:

@@ -11,7 +11,7 @@ import modelengine.fitframework.annotation.AcceptConfigValues;
 import modelengine.fitframework.annotation.Component;
 
 /**
- * 表示配置项 {@code 'nacos.heartbeat'} 下的配置。
+ * Represents configuration under the {@code 'nacos.heartbeat'} configuration item.
  *
  * @author 董智豪
  * @since 2025-06-21
@@ -21,26 +21,26 @@ import modelengine.fitframework.annotation.Component;
 @Data
 public class HeartbeatConfig {
     /**
-     * 是否为临时实例，默认为 true。
-     * 临时实例在服务注销后会自动从注册中心移除。
+     * Whether it is an ephemeral instance, default is true.
+     * Ephemeral instances will be automatically removed from the registry after service deregistration.
      */
     private Boolean isEphemeral = true;
 
     /**
-     * 服务权重，默认为 1.0。
-     * 用于负载均衡时的权重计算。
+     * Service weight, default is 1.0.
+     * Used for weight calculation during load balancing.
      */
     private Float weight = 1.0F;
 
     /**
-     * 心跳间隔时间（单位：毫秒）。
-     * 定义服务发送心跳的时间间隔。
+     * Heartbeat interval time (unit: milliseconds).
+     * Defines the time interval for services to send heartbeats.
      */
     private Long heartBeatInterval;
 
     /**
-     * 心跳超时时间（单位：毫秒）。
-     * 定义服务在未收到心跳后判定为超时的时间。
+     * Heartbeat timeout time (unit: milliseconds).
+     * Defines the time after which a service is considered timed out when no heartbeat is received.
      */
     private Long heartBeatTimeout;
 }
