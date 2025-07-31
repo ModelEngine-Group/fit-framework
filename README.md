@@ -1,7 +1,7 @@
 <div align="center">
   <img src="docs/resources/fit-logo.png" alt="FIT Logo" width="395">
 
-# FIT Framework v3.5.0-SNAPSHOT
+# FIT Framework v3.5.0-M6
 
 **Java 企业级 AI 开发框架，提供多语言函数引擎（FIT）、流式编排引擎（WaterFlow）及 Java 生态的 LangChain 替代方案（FEL）。原生 /
 Spring 双模运行，支持插件热插拔与智能聚散部署，无缝统一大模型与业务系统。**

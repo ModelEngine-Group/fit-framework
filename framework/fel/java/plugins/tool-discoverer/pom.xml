@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fitframework.fel</groupId>
         <artifactId>fel-plugin-parent</artifactId>
-        <version>3.5.0-SNAPSHOT</version>
+        <version>3.5.0-M6</version>
     </parent>
 
     <artifactId>fel-tool-discoverer</artifactId>

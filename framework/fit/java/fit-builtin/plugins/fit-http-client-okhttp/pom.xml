@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fitframework.plugin</groupId>
         <artifactId>fit-plugin-parent</artifactId>
-        <version>3.5.0-SNAPSHOT</version>
+        <version>3.5.0-M6</version>
     </parent>
 
     <artifactId>fit-http-client-okhttp</artifactId>

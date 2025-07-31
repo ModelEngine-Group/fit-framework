@@ -69,7 +69,7 @@ import java.util.stream.Collectors;
  * @since 2023-01-31
  */
 public abstract class AbstractFitRuntime extends AbstractDisposable implements FitRuntime {
-    private static final String FRAMEWORK_VERSION = "3.5.0-SNAPSHOT";
+    private static final String FRAMEWORK_VERSION = "3.5.0-M6";
     private static final String GLOBAL_CONFIG_NAME = "Global Config";
     private static final String EXTERNAL_CONFIG_CHAIN_NAME = "External Config Chain";
     private static final String BUILTIN_CONFIG_CHAIN_NAME = "Builtin Config Chain";

@@ -75,7 +75,7 @@ public class DefaultMcpServerTest {
 
             ServerSchema.Info serverInfo = info.serverInfo();
             assertThat(serverInfo).returns("FIT Store MCP Server", ServerSchema.Info::name)
-                    .returns("3.5.0-SNAPSHOT", ServerSchema.Info::version);
+                    .returns("3.5.0-M6", ServerSchema.Info::version);
         }
     }
 

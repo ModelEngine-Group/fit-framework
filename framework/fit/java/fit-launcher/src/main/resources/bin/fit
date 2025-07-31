@@ -5,7 +5,7 @@ CURRENT_DIR=$(pwd)
 CMD_PATH=$(dirname $(readlink -f $0))
 
 # 定义版本号
-VERSION="3.5.0-SNAPSHOT"
+VERSION="3.5.0-M6"
 
 function start {
     local DEBUG_ARGS=""

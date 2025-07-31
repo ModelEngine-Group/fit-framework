@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fitframework.fel</groupId>
         <artifactId>fel-community-parent</artifactId>
-        <version>3.5.0-SNAPSHOT</version>
+        <version>3.5.0-M6</version>
     </parent>
 
     <artifactId>fel-model-openai-plugin</artifactId>

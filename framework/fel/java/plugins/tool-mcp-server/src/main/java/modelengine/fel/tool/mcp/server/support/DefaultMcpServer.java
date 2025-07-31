@@ -48,7 +48,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
 
     @Override
     public ServerSchema getSchema() {
-        ServerSchema.Info info = new ServerSchema.Info("FIT Store MCP Server", "3.5.0-SNAPSHOT");
+        ServerSchema.Info info = new ServerSchema.Info("FIT Store MCP Server", "3.5.0-M6");
         ServerSchema.Capabilities.Logging logging = new ServerSchema.Capabilities.Logging();
         ServerSchema.Capabilities.Tools tools = new ServerSchema.Capabilities.Tools(true);
         ServerSchema.Capabilities capabilities = new ServerSchema.Capabilities(logging, tools);
