@@ -83,8 +83,7 @@ public class NacosRegistryServer implements RegistryService {
     private final Map<String, com.alibaba.nacos.api.naming.listener.EventListener> serviceSubscriptions =
             new ConcurrentHashMap<>();
 
-    public NacosRegistryServer(Notify notify, WorkerConfig worker, Config config)
-            throws NacosException {
+    public NacosRegistryServer(Notify notify, WorkerConfig worker, Config config) throws NacosException {
         notNull(config, "The configuration cannot be null.");
         this.nacosConfig = config.get("nacos", NacosConfig.class);
         this.heartbeatConfig = config.get("nacos.heartbeat", HeartbeatConfig.class);
@@ -162,9 +161,9 @@ public class NacosRegistryServer implements RegistryService {
                 Instance instance = new Instance();
                 instance.setIp(address.getHost());
                 instance.setPort(endpoint.getPort());
-                HashMap<String, String> metadata = buildInstanceMetadata(worker, application, meta);
+                HashMap<String, String> metadata = this.buildInstanceMetadata(worker, application, meta);
                 instance.setMetadata(metadata);
-                setInstanceProperties(instance);
+                this.setInstanceProperties(instance);
                 instances.add(instance);
             }
         }
@@ -216,7 +215,7 @@ public class NacosRegistryServer implements RegistryService {
     public void unregisterFitables(List<FitableInfo> fitables, String workerId) {
         log.debug("Unregistering fitables for worker. [fitables={}, workerId={}]", fitables, workerId);
         for (FitableInfo fitable : fitables) {
-            unregisterSingleFitable(fitable, workerId);
+            this.unregisterSingleFitable(fitable, workerId);
         }
     }
 
@@ -231,7 +230,7 @@ public class NacosRegistryServer implements RegistryService {
         String serviceName = getServiceName(fitable);
         try {
             List<Instance> instances = this.namingService.selectInstances(serviceName, groupName, true);
-            unregisterMatchingInstances(instances, workerId, serviceName, groupName);
+            this.unregisterMatchingInstances(instances, workerId, serviceName, groupName);
         } catch (NacosException e) {
             log.error("Failed to unregister fitable due to registry error.", e);
         }
@@ -268,11 +267,11 @@ public class NacosRegistryServer implements RegistryService {
         Map<FitableInfo, FitableAddressInstance> resultMap = new HashMap<>();
         for (FitableInfo fitable : fitables) {
             try {
-                List<Instance> instances = queryInstances(fitable);
+                List<Instance> instances = this.queryInstances(fitable);
                 if (instances.isEmpty()) {
                     continue;
                 }
-                processApplicationInstances(resultMap, fitable, instances);
+                this.processApplicationInstances(resultMap, fitable, instances);
             } catch (Exception e) {
                 log.error("Failed to query fitables for genericableId.", e);
             }
@@ -316,7 +315,7 @@ public class NacosRegistryServer implements RegistryService {
             workers.add(worker);
         }
         if (application.getExtensions().containsKey(CLUSTER_DOMAIN_KEY)) {
-            replaceAddresses(workers, application);
+            this.replaceAddresses(workers, application);
         }
         return workers;
     }
@@ -324,7 +323,7 @@ public class NacosRegistryServer implements RegistryService {
     private Map<Application, List<Instance>> groupInstancesByApplication(List<Instance> instances) {
         Map<Application, List<Instance>> map = new HashMap<>();
         for (Instance instance : instances) {
-            Application app = parseApplication(instance);
+            Application app = this.parseApplication(instance);
             map.computeIfAbsent(app, k -> new ArrayList<>()).add(instance);
         }
         return map;
@@ -428,7 +427,7 @@ public class NacosRegistryServer implements RegistryService {
                 log.error("Failed to subscribe to Nacos service.", e);
             }
         }
-        return queryFitables(fitables, workerId);
+        return this.queryFitables(fitables, workerId);
     }
 
     @Override
@@ -469,10 +468,10 @@ public class NacosRegistryServer implements RegistryService {
         Map<FitableMeta, Set<String>> metaEnvironments = new HashMap<>();
 
         for (GenericableInfo genericable : genericables) {
-            processGenericableServices(genericable, metaEnvironments);
+            this.processGenericableServices(genericable, metaEnvironments);
         }
 
-        return buildFitableMetaInstances(metaEnvironments);
+        return this.buildFitableMetaInstances(metaEnvironments);
     }
 
     private void processGenericableServices(GenericableInfo genericable,
@@ -481,7 +480,7 @@ public class NacosRegistryServer implements RegistryService {
         try {
             ListView<String> services = this.namingService.getServicesOfServer(1, Integer.MAX_VALUE, groupName);
             for (String serviceName : services.getData()) {
-                processServiceInstances(serviceName, groupName, metaEnvironments);
+                this.processServiceInstances(serviceName, groupName, metaEnvironments);
             }
         } catch (NacosException e) {
             log.error("Failed to query fitable metas.", e);
@@ -496,7 +495,7 @@ public class NacosRegistryServer implements RegistryService {
                 return;
             }
             FitableMeta meta = parseFitableMeta(instances.get(0));
-            collectEnvironmentsFromInstances(instances, meta, metaEnvironments);
+            this.collectEnvironmentsFromInstances(instances, meta, metaEnvironments);
         } catch (NacosException e) {
             log.error("Failed to select instances for service: " + serviceName, e);
         }
