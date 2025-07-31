@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import modelengine.fit.heartbeat.server.HeartbeatConfig;
+import modelengine.fit.service.Notify;
 import modelengine.fit.service.RegistryService;
 import modelengine.fit.service.entity.Address;
 import modelengine.fit.service.entity.Application;
@@ -35,6 +36,7 @@ import modelengine.fit.service.entity.GenericableInfo;
 import modelengine.fit.service.entity.Worker;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Fitable;
+import modelengine.fitframework.conf.Config;
 import modelengine.fitframework.conf.runtime.CommunicationProtocol;
 import modelengine.fitframework.conf.runtime.WorkerConfig;
 import modelengine.fitframework.log.Logger;
@@ -57,7 +59,7 @@ import java.util.regex.Pattern;
 import javax.naming.event.NamingEvent;
 
 /**
- * 用于提供 Nacos 注册中心的服务。
+ * Service for providing Nacos registry center functionality.
  *
  * @author 董智豪
  * @since 2025-06-04
@@ -81,11 +83,12 @@ public class NacosRegistryServer implements RegistryService {
     private final Map<String, com.alibaba.nacos.api.naming.listener.EventListener> serviceSubscriptions =
             new ConcurrentHashMap<>();
 
-    public NacosRegistryServer(HeartbeatConfig heartbeatConfig, Notify notify, NacosConfig nacosConfig,
-            WorkerConfig worker) throws NacosException {
+    public NacosRegistryServer(Notify notify, WorkerConfig worker, Config config)
+            throws NacosException {
+        notNull(config, "The configuration cannot be null.");
+        this.nacosConfig = config.get("nacos", NacosConfig.class);
+        this.heartbeatConfig = config.get("nacos.heartbeat", HeartbeatConfig.class);
         this.notify = notNull(notify, "The registry listener cannot be null.");
-        this.heartbeatConfig = notNull(heartbeatConfig, "The heartbeat config cannot be null.");
-        this.nacosConfig = notNull(nacosConfig, "The nacos config cannot be null.");
         this.worker = notNull(worker, "The worker config cannot be null.");
         this.namingService = NamingFactory.createNamingService(getNacosProperties());
         notBlank(this.nacosConfig.getServerAddr(), "The nacos address cannot be blank.");
@@ -114,7 +117,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "register_fitables")
+    @Fitable(id = "register-fitables")
     public void registerFitables(List<FitableMeta> fitableMetas, Worker worker, Application application) {
         try {
             log.debug("Registering fitables. [fitableMetas={}, worker={}, aplication={}]",
@@ -169,12 +172,12 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * 构建服务实例的元数据，包括工作节点、应用和 FitableMeta 信息。
+     * Build metadata for service instance, including worker, application and FitableMeta information.
      *
-     * @param worker 工作节点对象。
-     * @param application 应用对象。
-     * @param meta {@link FitableMeta} 元数据对象。
-     * @return 包含所有序列化元数据的 {@link Map}。
+     * @param worker The worker node object.
+     * @param application The application object.
+     * @param meta The {@link FitableMeta} metadata object.
+     * @return A {@link Map} containing all serialized metadata.
      */
     private HashMap<String, String> buildInstanceMetadata(Worker worker, Application application, FitableMeta meta) {
         HashMap<String, String> metadata = new HashMap<>();
@@ -195,9 +198,9 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * 设置服务实例的属性，权重和临时性。
+     * Set properties for service instance, including weight and ephemeral status.
      *
-     * @param instance 服务实例对象。
+     * @param instance The service instance object.
      */
     private void setInstanceProperties(Instance instance) {
         if (!this.heartbeatConfig.getIsEphemeral()) {
@@ -209,7 +212,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "unregister_fitables")
+    @Fitable(id = "unregister-fitables")
     public void unregisterFitables(List<FitableInfo> fitables, String workerId) {
         log.debug("Unregistering fitables for worker. [fitables={}, workerId={}]", fitables, workerId);
         for (FitableInfo fitable : fitables) {
@@ -218,10 +221,10 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * 注销单个 Fitable 的所有匹配实例。
+     * Unregister a single Fitable and all its matching instances.
      *
-     * @param fitable 要注销的 {@link Fitable} 信息
-     * @param workerId 工作节点 ID
+     * @param fitable The {@link Fitable} information to unregister
+     * @param workerId The worker node ID
      */
     private void unregisterSingleFitable(FitableInfo fitable, String workerId) {
         String groupName = getGroupName(fitable);
@@ -235,12 +238,12 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * 注销所有匹配指定工作节点 ID 的实例。
+     * Unregister all instances matching the specified worker node ID.
      *
-     * @param instances 实例列表
-     * @param workerId 工作节点 ID
-     * @param serviceName 服务名称
-     * @param groupName 组名称
+     * @param instances The instance list
+     * @param workerId The worker node ID
+     * @param serviceName The service name
+     * @param groupName The group name
      */
     private void unregisterMatchingInstances(List<Instance> instances, String workerId, String serviceName,
             String groupName) {
@@ -259,7 +262,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "query_fitables_addresses")
+    @Fitable(id = "query-fitables-addresses")
     public List<FitableAddressInstance> queryFitables(List<FitableInfo> fitables, String workerId) {
         log.debug("Querying fitables for worker. [fitables={}, workerId={}]", fitables, workerId);
         Map<FitableInfo, FitableAddressInstance> resultMap = new HashMap<>();
@@ -300,11 +303,11 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * 提取所有实例对应的 Worker，并根据应用扩展信息调整地址。
+     * Extract all workers corresponding to instances and adjust addresses based on application extension information.
      *
-     * @param appInstances 应用实例列表。
-     * @param application 应用对象。
-     * @return Worker 集合。
+     * @param appInstances The list of application instances.
+     * @param application The application object.
+     * @return Set of workers.
      */
     private Set<Worker> extractWorkers(List<Instance> appInstances, Application application) {
         Set<Worker> workers = new HashSet<>();
@@ -398,7 +401,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "subscribe_fitables")
+    @Fitable(id = "subscribe-fitables")
     public List<FitableAddressInstance> subscribeFitables(List<FitableInfo> fitables, String workerId,
             String callbackFitableId) {
         log.debug("Subscribing to fitables for worker. [fitables={}, workerId={}, callbackFitableId={}]",
@@ -429,7 +432,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "unsubscribe_fitables")
+    @Fitable(id = "unsubscribe-fitables")
     public void unsubscribeFitables(List<FitableInfo> fitables, String workerId, String callbackFitableId) {
         log.debug("Unsubscribing from fitables for worker. [fitables={}, workerId={}, callbackFitableId={}]",
                 fitables,
@@ -449,9 +452,9 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     /**
-     * 处理服务变更事件，查询并通知更新 Fitables 实例信息。
+     * Handle service change events, query and notify updates to Fitables instance information.
      *
-     * @param fitableInfo 变更的 Fitables 信息。
+     * @param fitableInfo The changed Fitables information.
      */
     private void onServiceChanged(FitableInfo fitableInfo) {
         List<FitableAddressInstance> fitableAddressInstances =
@@ -460,7 +463,7 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "query_running_fitables")
+    @Fitable(id = "query-running-fitables")
     public List<FitableMetaInstance> queryFitableMetas(List<GenericableInfo> genericables) {
         log.debug("Querying fitable metas for genericables. [genericables={}]", genericables);
         Map<FitableMeta, Set<String>> metaEnvironments = new HashMap<>();

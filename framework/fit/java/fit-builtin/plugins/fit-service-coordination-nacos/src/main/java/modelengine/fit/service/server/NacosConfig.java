@@ -11,7 +11,7 @@ import modelengine.fitframework.annotation.AcceptConfigValues;
 import modelengine.fitframework.annotation.Component;
 
 /**
- * 表示配置项 {@code 'nacos'} 下的配置。
+ * Represents configuration under the {@code 'nacos'} configuration item.
  *
  * @author 董智豪
  * @since 2025-06-14
@@ -21,32 +21,32 @@ import modelengine.fitframework.annotation.Component;
 @Data
 public class NacosConfig {
     /**
-     * Nacos 服务器地址
+     * Nacos server address
      */
     private String serverAddr;
 
     /**
-     * 登录用户名
+     * Login username
      */
     private String username;
 
     /**
-     * 登录密码
+     * Login password
      */
     private String password;
 
     /**
-     * 访问密钥
+     * Access key
      */
     private String accessKey;
 
     /**
-     * 秘钥
+     * Secret key
      */
     private String secretKey;
 
     /**
-     * 命名空间
+     * Namespace
      */
     private String namespace;
 }

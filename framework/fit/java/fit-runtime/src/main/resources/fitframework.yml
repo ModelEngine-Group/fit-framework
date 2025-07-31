@@ -11,16 +11,13 @@ worker:
 
 matata:
   registry:
-    # host: 'localhost' # 默认连接的注册中心为本地 # 注释原因：用户未配置则使用应用本地地址，而不是提前写死
-    # port: 8080 # 默认连接注册中心的端口为本地默认的 8080 端口 # 注释原因：用户未配置则使用应用本地监听地址，而不是提前写死
-    # protocol: 2 # 注册中心默认使用 Http 的传输协议 # 注释原因：用户未配置则使用应用本地默认协议，而不是提前写死
     environment: "local" # 默认注册中心的环境标和本地默认配置一致
     available-services: # 将注册中心和获取地址相关的服务进行配置，其他服务都可以通过以下服务进行地址获取
       # 订阅服务并获取所订阅服务地址的接口
       - genericable-name: "modelengine.fit.registry.RegistryService.subscribeFitables"
         genericable-id: "modelengine.fit.registry.registry-service.subscribe-fitables"
         genericable-version: "1.0.0"
-        fitable-id: "subscribe_fitables"
+        fitable-id: "subscribe-fitables"
         fitable-version: "1.0.0"
         formats:
           - 1
@@ -28,7 +25,7 @@ matata:
       - genericable-name: "modelengine.fit.registry.RegistryService.queryFitablesAddresses"
         genericable-id: "modelengine.fit.registry.registry-service.query-fitables-addresses"
         genericable-version: "1.0.0"
-        fitable-id: "query_fitables_addresses"
+        fitable-id: "query-fitables-addresses"
         fitable-version: "1.0.0"
         formats:
           - 1
@@ -36,7 +33,7 @@ matata:
       - genericable-name: "modelengine.fit.registry.RegistryService.queryRunningFitables"
         genericable-id: "modelengine.fit.registry.registry-service.query-running-fitables"
         genericable-version: "1.0.0"
-        fitable-id: "query_running_fitables"
+        fitable-id: "query-running-fitables"
         fitable-version: "1.0.0"
         formats:
           - 1
@@ -44,7 +41,7 @@ matata:
       - genericable-name: "modelengine.fit.registry.TokenService.applyToken"
         genericable-id: "matata.registry.secure-access.apply-token"
         genericable-version: "1.0.0"
-        fitable-id: "apply_token"
+        fitable-id: "apply-token"
         fitable-version: "1.0.0"
         formats:
           - 1
@@ -52,7 +49,7 @@ matata:
       - genericable-name: "modelengine.fit.registry.TokenService.refreshToken"
         genericable-id: "matata.registry.secure-access.refresh-token"
         genericable-version: "1.0.0"
-        fitable-id: "refresh_token_for_registry_server"
+        fitable-id: "refresh-token-for-registry-server"
         fitable-version: "1.0.0"
         formats:
           - 1
@@ -60,7 +57,7 @@ matata:
       - genericable-name: "modelengine.fit.heartbeat.sendHeartbeat"
         genericable-id: "modelengine.fit.heartbeat.send-heartbeat"
         genericable-version: "1.0.0"
-        fitable-id: "send_heartbeat"
+        fitable-id: "send-heartbeat"
         fitable-version: "1.0.0"
         formats:
           - 1
@@ -68,7 +65,7 @@ matata:
       - genericable-name: "modelengine.fit.registry.RegistryService.registerFitables"
         genericable-id: "modelengine.fit.registry.registry-service.register-fitables"
         genericable-version: "1.0.0"
-        fitable-id: "register_fitables"
+        fitable-id: "register-fitables"
         fitable-version: "1.0.0"
         formats:
           - 1

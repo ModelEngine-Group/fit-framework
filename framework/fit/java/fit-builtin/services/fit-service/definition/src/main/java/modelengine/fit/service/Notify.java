@@ -4,7 +4,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  */
 
-package modelengine.fit.service.server;
+package modelengine.fit.service;
 
 import modelengine.fit.service.entity.FitableAddressInstance;
 import modelengine.fitframework.annotation.Genericable;
@@ -12,16 +12,17 @@ import modelengine.fitframework.annotation.Genericable;
 import java.util.List;
 
 /**
- * 表示通知服务，用于更新 Fitables 实例信息。
+ * Represents notification service for updating Fitables instance information.
  *
  * @author 董智豪
  * @since 2025-06-20
  */
 public interface Notify {
     /**
-     * 通知更新 Fitables 实例。
+     * Notify to update Fitables instances.
      *
-     * @param fitableInstances 表示指定服务实现的所有实例信息的 {@link List}{@code <}{@link FitableAddressInstance}{@code >}。
+     * @param fitableInstances A {@link List}{@code <}{@link FitableAddressInstance}{@code >} representing all instance
+     * information for specified service implementations.
      */
     @Genericable(id = "modelengine.fit.service.registry-listener.notify-fitables")
     void notifyFitables(List<FitableAddressInstance> fitableInstances);

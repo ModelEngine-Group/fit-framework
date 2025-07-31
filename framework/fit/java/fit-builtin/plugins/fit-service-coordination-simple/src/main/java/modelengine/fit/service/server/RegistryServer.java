@@ -88,7 +88,7 @@ public class RegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "register_fitables")
+    @Fitable(id = "register-fitables")
     public void registerFitables(List<FitableMeta> fitableMetas, Worker worker, Application application) {
         if (!this.workers.containsKey(worker.getId()) && this.workers.size() >= MAX_WORKER_NUM) {
             throw new IllegalStateException("Too many workers.");
@@ -121,11 +121,11 @@ public class RegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "unregister_fitables")
+    @Fitable(id = "unregister-fitables")
     public void unregisterFitables(List<FitableInfo> fitables, String workerId) {}
 
     @Override
-    @Fitable(id = "query_fitables_addresses")
+    @Fitable(id = "query-fitables-addresses")
     public List<FitableAddressInstance> queryFitables(List<FitableInfo> fitables, String workerId) {
         List<FitableAddressInstance> instances = new ArrayList<>();
         for (Map.Entry<String, Set<FitableMeta>> entry : this.applicationMetas.entrySet()) {
@@ -204,18 +204,18 @@ public class RegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "subscribe_fitables")
+    @Fitable(id = "subscribe-fitables")
     public List<FitableAddressInstance> subscribeFitables(List<FitableInfo> fitables, String workerId,
             String callbackFitableId) {
         return this.queryFitables(fitables, workerId);
     }
 
     @Override
-    @Fitable(id = "unsubscribe_fitables")
+    @Fitable(id = "unsubscribe-fitables")
     public void unsubscribeFitables(List<FitableInfo> fitables, String workerId, String callbackFitableId) {}
 
     @Override
-    @Fitable(id = "query_running_fitables")
+    @Fitable(id = "query-running-fitables")
     public List<FitableMetaInstance> queryFitableMetas(List<GenericableInfo> genericables) {
         Map<FitableMeta, FitableMetaInstance> instances = new HashMap<>();
         for (Map.Entry<String, Set<FitableMeta>> entry : this.applicationMetas.entrySet()) {

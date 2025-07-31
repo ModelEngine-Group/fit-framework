@@ -34,7 +34,7 @@ public class HeartbeatServer implements HeartbeatService {
     }
 
     @Override
-    @Fitable(id = "send_heartbeat")
+    @Fitable(id = "send-heartbeat")
     public Boolean sendHeartbeat(List<HeartbeatInfo> beatInfos, Address address) {
         if (address == null || StringUtils.isBlank(address.getId())) {
             return false;

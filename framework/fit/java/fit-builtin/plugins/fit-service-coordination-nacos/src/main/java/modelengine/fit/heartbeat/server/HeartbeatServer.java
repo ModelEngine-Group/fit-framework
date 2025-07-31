@@ -13,7 +13,7 @@ import modelengine.fitframework.annotation.Fitable;
 import java.util.List;
 
 /**
- * 用于提供心跳相关的服务。
+ * Service for providing heartbeat-related functionality.
  *
  * @author 董智豪
  * @since 2025-06-04
@@ -21,13 +21,13 @@ import java.util.List;
 @Component
 public class HeartbeatServer implements HeartbeatService {
     @Override
-    @Fitable(id = "send_heartbeat")
+    @Fitable(id = "send-heartbeat")
     public Boolean sendHeartbeat(List<HeartbeatInfo> heartbeatInfo, Address address) {
         return true;
     }
 
     @Override
-    @Fitable(id = "stop_heartbeat")
+    @Fitable(id = "stop-heartbeat")
     public Boolean stopHeartbeat(List<HeartbeatInfo> heartbeatInfo, Address address) {
         return true;
     }
