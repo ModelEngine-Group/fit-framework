@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.fitframework.example</groupId>
+    <artifactId>nacos-assistant-for-complicated</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
+
+        <!-- FIT version -->
+        <fit.version>3.6.0-SNAPSHOT</fit.version>
+
+        <!-- Maven plugin versions -->
+        <maven.compiler.version>3.14.0</maven.compiler.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.fitframework.example</groupId>
+            <artifactId>nacos-weather-for-complicated</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-starter</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+
+        <!-- FIT plugins -->
+        <dependency>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-plugins-starter-web</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+
+        <!-- 不在默认插件集合中的插件列表 -->
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-client-http</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-http-client-okhttp</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-heartbeat-client</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-service-registry</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-service-discovery</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-service-coordination-locator</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- 注册中心的内nacos版实现 -->
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-service-coordination-nacos</artifactId>
+            <version>${fit.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.fitframework</groupId>
+                <artifactId>fit-build-maven-plugin</artifactId>
+                <version>${fit.version}</version>
+                <executions>
+                    <execution>
+                        <id>package-app</id>
+                        <goals>
+                            <goal>package-app</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

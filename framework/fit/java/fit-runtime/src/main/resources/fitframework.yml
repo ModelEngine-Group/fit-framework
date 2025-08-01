@@ -1,105 +1,102 @@
 application:
-  name: 'application' # 默认应用名
+  name: "application" # 默认应用名
 
 worker:
-  id: 'default-worker-id' # 默认的进程唯一标识，该配置需要进行覆盖，避免workerId相同注册服务混乱
-  host: 'localhost' # 该配置需要修改为真实启动的本地ip地址
-  environment: 'local' # 默认环境标
-  environment-sequence: 'local' # 默认环境调用链
+  id: "default-worker-id" # 默认的进程唯一标识，该配置需要进行覆盖，避免workerId相同注册服务混乱
+  host: "localhost" # 该配置需要修改为真实启动的本地ip地址
+  environment: "local" # 默认环境标
+  environment-sequence: "local" # 默认环境调用链
   exit:
     graceful: true
 
 matata:
   registry:
-    host: 'localhost' # 默认连接的注册中心为本地
-    port: 8080 # 默认连接注册中心的端口为本地默认的 8080 端口
-    protocol: 2 # 注册中心默认使用 Http 的传输协议
-    environment: 'local' # 默认注册中心的环境标和本地默认配置一致
+    environment: "local" # 默认注册中心的环境标和本地默认配置一致
     available-services: # 将注册中心和获取地址相关的服务进行配置，其他服务都可以通过以下服务进行地址获取
-    # 订阅服务并获取所订阅服务地址的接口
-    - genericable-name: 'modelengine.fit.registry.RegistryService.subscribeFitables'
-      genericable-id: 'c9aa580f3fa845c99c2c6145a0499e45'
-      genericable-version: '1.0.0'
-      fitable-id: 'ee0a8337d3654a22a548d5d5abe1d5f3'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
-    # 直接获取服务地址的接口
-    - genericable-name: 'modelengine.fit.registry.RegistryService.queryFitablesAddresses'
-      genericable-id: '33be4142494e4742aa122555a451d996'
-      genericable-version: '1.0.0'
-      fitable-id: '5807f06a3a704708b264ea3c6cfbbd53'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
-    # 查询注册中心正在运行的服务实现信息的接口
-    - genericable-name: 'modelengine.fit.registry.RegistryService.queryRunningFitables'
-      genericable-id: '7c52fb4fdfa243af928f23607fbbee02'
-      genericable-version: '1.0.0'
-      fitable-id: '33b1f9b8f1cc49d19719a6536c96e854'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
-    # 向注册中心申请令牌的接口
-    - genericable-name: 'modelengine.fit.registry.TokenService.applyToken'
-      genericable-id: 'matata.registry.secure-access.apply-token'
-      genericable-version: '1.0.0'
-      fitable-id: 'apply_token'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
-    # 向注册中心刷新令牌的接口
-    - genericable-name: 'modelengine.fit.registry.TokenService.refreshToken'
-      genericable-id: 'matata.registry.secure-access.refresh-token'
-      genericable-version: '1.0.0'
-      fitable-id: 'refresh_token_for_registry_server'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
-    # 向注册中心发送心跳
-    - genericable-name: 'modelengine.fit.heartbeat.sendHeartbeat'
-      genericable-id: 'e12fd1c57fd84f50a673d93d13074082'
-      genericable-version: '1.0.0'
-      fitable-id: 'DBC9E2F7C0E443F1AC986BBC3D58C27B'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
-    # 向注册中心注册服务信息
-    - genericable-name: 'modelengine.fit.registry.RegistryService.registerFitables'
-      genericable-id: '85bdce64cf724589b87cb6b6a950999d'
-      genericable-version: '1.0.0'
-      fitable-id: 'dedaa28cfb2742819a9b0271bc34f72a'
-      fitable-version: '1.0.0'
-      formats:
-      - 1
+      # 订阅服务并获取所订阅服务地址的接口
+      - genericable-name: "modelengine.fit.registry.RegistryService.subscribeFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.subscribe-fitables"
+        genericable-version: "1.0.0"
+        fitable-id: "subscribe-fitables"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
+      # 直接获取服务地址的接口
+      - genericable-name: "modelengine.fit.registry.RegistryService.queryFitablesAddresses"
+        genericable-id: "modelengine.fit.registry.registry-service.query-fitables-addresses"
+        genericable-version: "1.0.0"
+        fitable-id: "query-fitables-addresses"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
+      # 查询注册中心正在运行的服务实现信息的接口
+      - genericable-name: "modelengine.fit.registry.RegistryService.queryRunningFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.query-running-fitables"
+        genericable-version: "1.0.0"
+        fitable-id: "query-running-fitables"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
+      # 向注册中心申请令牌的接口
+      - genericable-name: "modelengine.fit.registry.TokenService.applyToken"
+        genericable-id: "matata.registry.secure-access.apply-token"
+        genericable-version: "1.0.0"
+        fitable-id: "apply-token"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
+      # 向注册中心刷新令牌的接口
+      - genericable-name: "modelengine.fit.registry.TokenService.refreshToken"
+        genericable-id: "matata.registry.secure-access.refresh-token"
+        genericable-version: "1.0.0"
+        fitable-id: "refresh-token-for-registry-server"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
+      # 向注册中心发送心跳
+      - genericable-name: "modelengine.fit.heartbeat.sendHeartbeat"
+        genericable-id: "modelengine.fit.heartbeat.send-heartbeat"
+        genericable-version: "1.0.0"
+        fitable-id: "send-heartbeat"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
+      # 向注册中心注册服务信息
+      - genericable-name: "modelengine.fit.registry.RegistryService.registerFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.register-fitables"
+        genericable-version: "1.0.0"
+        fitable-id: "register-fitables"
+        fitable-version: "1.0.0"
+        formats:
+          - 1
     auth-required-services: # 将注册中心和心跳相关的服务进行配置，表示其需要认证鉴权
-    # 订阅服务并获取所订阅服务地址的接口
-    - genericable-name: 'modelengine.fit.registry.RegistryService.subscribeFitables'
-      genericable-id: 'c9aa580f3fa845c99c2c6145a0499e45'
-    # 直接获取服务地址的接口
-    - genericable-name: 'modelengine.fit.registry.RegistryService.queryFitablesAddresses'
-      genericable-id: '33be4142494e4742aa122555a451d996'
-    # 查询注册中心正在运行的服务实现信息的接口
-    - genericable-name: 'modelengine.fit.registry.RegistryService.queryRunningFitables'
-      genericable-id: '7c52fb4fdfa243af928f23607fbbee02'
-    # 向注册中心服务端注册服务实现列表
-    - genericable-name: 'modelengine.fit.registry.RegistryService.registerFitables'
-      genericable-id: '85bdce64cf724589b87cb6b6a950999d'
-    # 向注册中心服务端取消注册服务实现列表
-    - genericable-name: 'modelengine.fit.registry.RegistryService.unregisterFitables'
-      genericable-id: 'c02af9dafb5b4a609f8c586a8e884710'
-    # 向注册中心服务端取消订阅指定服务实现的实例信息
-    - genericable-name: 'modelengine.fit.registry.RegistryService.unsubscribeFitables'
-      genericable-id: '087994fc907b4f76b9f9b2a62e07ef2c'
-    # 发送心跳信息
-    - genericable-name: 'modelengine.fit.heartbeat.sendHeartbeat'
-      genericable-id: 'e12fd1c57fd84f50a673d93d13074082'
-    # 发送停止心跳信息
-    - genericable-name: 'modelengine.fit.heartbeat.stopHeartbeat'
-      genericable-id: '67e6370725df427ebab9a6a6f1ada60c'
+      # 订阅服务并获取所订阅服务地址的接口
+      - genericable-name: "modelengine.fit.registry.RegistryService.subscribeFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.subscribe-fitables"
+      # 直接获取服务地址的接口
+      - genericable-name: "modelengine.fit.registry.RegistryService.queryFitablesAddresses"
+        genericable-id: "modelengine.fit.registry.registry-service.query-fitables-addresses"
+      # 查询注册中心正在运行的服务实现信息的接口
+      - genericable-name: "modelengine.fit.registry.RegistryService.queryRunningFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.query-running-fitables"
+      # 向注册中心服务端注册服务实现列表
+      - genericable-name: "modelengine.fit.registry.RegistryService.registerFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.register-fitables"
+      # 向注册中心服务端取消注册服务实现列表
+      - genericable-name: "modelengine.fit.registry.RegistryService.unregisterFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.unregister-fitables"
+      # 向注册中心服务端取消订阅指定服务实现的实例信息
+      - genericable-name: "modelengine.fit.registry.RegistryService.unsubscribeFitables"
+        genericable-id: "modelengine.fit.registry.registry-service.unsubscribe-fitables"
+      # 发送心跳信息
+      - genericable-name: "modelengine.fit.heartbeat.sendHeartbeat"
+        genericable-id: "modelengine.fit.heartbeat.send-heartbeat"
+      # 发送停止心跳信息
+      - genericable-name: "modelengine.fit.heartbeat.stopHeartbeat"
+        genericable-id: "modelengine.fit.heartbeat.stop-heartbeat"
 
 fit:
   beans:
     packages:
-    - 'modelengine.fitframework'
-    - 'modelengine.fit'
+      - "modelengine.fitframework"
+      - "modelengine.fit"

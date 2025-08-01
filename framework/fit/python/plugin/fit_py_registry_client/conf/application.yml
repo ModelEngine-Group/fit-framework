@@ -1,22 +1,21 @@
 registry-center:
   client:
     service_id: 2
-    mode: 'pull' # pull or push
+    mode: "pull" # pull or push
     pull-frequency: 60
     registry_fitable_frequency: 15
     registered-fitables-expire-interval: 30 #    expected expire interval used by server
     invalid_address_ttl: 60
   server:
     addresses:
-      - 'localhost:8080'
+      - "localhost:8080"
     protocol: 2
     formats:
       - 1
     context-path: ""
   service_ids:
-    - '85bdce64cf724589b87cb6b6a950999d'
-    - 'bcad5d59d90b4ee88f195cd7356389fc'
-    - '33be4142494e4742aa122555a451d996'
-    - 'c9aa580f3fa845c99c2c6145a0499e45'
-    - '7c52fb4fdfa243af928f23607fbbee02'
-    - 'e12fd1c57fd84f50a673d93d13074082'
+    - "modelengine.fit.registry.registry-service.register-fitables"
+    - "modelengine.fit.registry.registry-service.query-fitables-addresses"
+    - "modelengine.fit.registry.registry-service.subscribe-fitables"
+    - "modelengine.fit.registry.registry-service.query-running-fitables"
+    - "modelengine.fit.heartbeat.send-heartbeat"

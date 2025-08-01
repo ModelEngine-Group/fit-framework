@@ -1,502 +1,502 @@
 fit.public.genericables.9289a2a4322d47d38f33fc32c47f04d2:
-  name: 'StartServer'
+  name: "StartServer"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     911533a440e541a2900da06e01d3e6de:
       aliases:
-        - 'fit.http.server.py'
+        - "fit.http.server.py"
     8f1e46e8a25a4ed391cb115b766d76db:
       aliases:
-        - 'fit.grpc.server.py'
+        - "fit.grpc.server.py"
     FIT_SERVER_START_UC_FITABLE_ID:
       aliases:
-        - 'fit.uc.server.py'
+        - "fit.uc.server.py"
 fit.public.genericables.d45f8ecbfb9c4d11a38143233c878a8f:
   tags:
-    - 'localOnly'
+    - "localOnly"
   fitables:
     913d6d1c47ed4c4481dd84a5b667a1ef:
     2fb08101aa94495face6aeef49cdc98a:
 fit.public.genericables.1b9bfc4a2b2141d5b31aa06791d645b4:
-  name: 'StopServer'
+  name: "StopServer"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     2f661c07515f43cf802e30f7d81efbae:
       aliases:
-        - 'fit.http.server.py'
+        - "fit.http.server.py"
     0970e120501047fa800078edd7437fa4:
       aliases:
-        - 'fit.grpc.server.py'
+        - "fit.grpc.server.py"
     FIT_SERVER_STOP_UC_FITABLE_ID:
       aliases:
-        - 'fit.uc.server.py'
+        - "fit.uc.server.py"
 fit.public.genericables.8f69322009a8411ca7df1e3a67a856e5:
-  name: 'GetServerAddress'
+  name: "GetServerAddress"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     FIT_SERVER_GET_ADDRESS_HTTP_FITABLE_ID:
       aliases:
-        - 'fit.http.server.py'
+        - "fit.http.server.py"
     FIT_SERVER_GET_ADDRESS_GRPC_FITABLE_ID:
       aliases:
-        - 'fit.grpc.server.py'
+        - "fit.grpc.server.py"
     FIT_SERVER_GET_ADDRESS_UC_FITABLE_ID:
       aliases:
-        - 'fit.uc.server.py'
+        - "fit.uc.server.py"
 fit.public.genericables.9046fe29c2a947448d86bf8178c745e1:
-  name: 'load-balancer'
+  name: "load-balancer"
   route:
-    default: 'c5fcfc2cd8b54fa6940ad8ef67f257b4'
+    default: "c5fcfc2cd8b54fa6940ad8ef67f257b4"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     c5fcfc2cd8b54fa6940ad8ef67f257b4:
       aliases:
-        - 'python_default_lb'
+        - "python_default_lb"
 fit.public.genericables.d58a444c9cd546b5b284353c0326209c:
-  name: 'load-balance-filter'
+  name: "load-balance-filter"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '8a67f9e84e7e4077897a9b615c067dd4'
+    default: "8a67f9e84e7e4077897a9b615c067dd4"
   fitables:
     8a67f9e84e7e4077897a9b615c067dd4:
       aliases:
-        - 'lb_filter_python_impl'
+        - "lb_filter_python_impl"
 fit.public.genericables.093325db3dfa4b42872512d91e865ccb:
-  name: 'config-subscribeConfiguration'
+  name: "config-subscribeConfiguration"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     753f1399a2754d1ea6c749e41c25bfd0:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.2514453162a4498791b59e7e299b36d1:
-  name: 'config-unsubscribeConfiguration'
+  name: "config-unsubscribeConfiguration"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     9cf969d1e56d48e2a15435750b6358d2:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.4c0e733d04e94f488c122925052aceb1: # 测试环境下，需使用生产配置；实际生产环境下不需要
-  name: 'config-download'
+  name: "config-download"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     ef327ef3a9a040bcb223311a70959872:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.ae024f34dd7a4dc88e19a1a8cf801f29:
-  name: 'server-config-upload'
+  name: "server-config-upload"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '2ae9d88f46894f7bb0fcd45cf544cb52'
+    default: "2ae9d88f46894f7bb0fcd45cf544cb52"
 fit.public.genericables.887837e5d33f4fdfa76b05c75458fa0c:
-  name: 'request_response'
+  name: "request_response"
   route:
-    dynamic: 'b0d8a8e116a34f1b8e45ce2be8dde6b9'
+    dynamic: "b0d8a8e116a34f1b8e45ce2be8dde6b9"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.bf2e1029e8844fe9afb698affb95d39c:
-  name: 'heart-beat-online'
+  name: "heart-beat-online"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     6bd00d54d5684a0480cb567a058210f7:
       aliases:
-        - 'heart_beat_online_fit_python'
+        - "heart_beat_online_fit_python"
     CM_ONLINE_HEART_BEAT_FIT_ID:
       aliases:
-        - 'heart_beat_online_om_python'
+        - "heart_beat_online_om_python"
 fit.public.genericables.HEART_BEAT_EXIT_UNEXPECTEDLY_GEN_ID:
-  name: 'heart-beat-exit-unexpectedly'
+  name: "heart-beat-exit-unexpectedly"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   route:
-    default: 'HEART_BEAT_EXIT_UNEXPECTEDLY_FIT_ID'
+    default: "HEART_BEAT_EXIT_UNEXPECTEDLY_FIT_ID"
 fit.public.genericables.18e47e184fd44c70af63eec3227bee2e:
-  name: 'heart-beat-offline'
+  name: "heart-beat-offline"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     4e01a11d760a4614b431f760ee7f51ac:
       aliases:
-        - 'heart_beat_offline_python'
+        - "heart_beat_offline_python"
 fit.public.genericables.564286f7db6349b2b29db49feac3b7da:
-  name: 'get_fit_service_address_list'
+  name: "get_fit_service_address_list"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     9602150ac5694585ab9a9e3d7561f48b:
       aliases:
-        - 'get_service_address_list_python'
+        - "get_service_address_list_python"
 fit.public.genericables.2ac926e6e40245b78b7bdda23bcb727b:
-  name: 'online_fit_services'
+  name: "online_fit_services"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     ONLINE_FIT_SERVICE_FITABLE_ID:
       aliases:
-        - 'online_fit_services_python'
+        - "online_fit_services_python"
   route:
-    default: 'ONLINE_FIT_SERVICE_FITABLE_ID'
-fit.public.genericables.7c52fb4fdfa243af928f23607fbbee02:
-  name: 'QUERY_FITABLE_METAS_GEN_ID'
+    default: "ONLINE_FIT_SERVICE_FITABLE_ID"
+fit.public.genericables.modelengine.fit.registry.registry-service.query-running-fitables:
+  name: "QUERY_FITABLE_METAS_GEN_ID"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '33b1f9b8f1cc49d19719a6536c96e854'
+    default: "query-running-fitables"
 fit.public.genericables.GET_FITABLES_OF_GENERICABLE_GEN_ID:
-  name: 'get_fitables_of_genericable'
+  name: "get_fitables_of_genericable"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   route:
-    default: 'GET_FITABLES_OF_GENERICABLE_FIT_ID'
+    default: "GET_FITABLES_OF_GENERICABLE_FIT_ID"
 fit.public.genericables.8b7f3c01ec4f4a5aa6a291e82587e946:
-  name: 'offline_fit_service'
+  name: "offline_fit_service"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     d4b42ada0f744441a8b1eca9f2919a8a:
       aliases:
-        - 'offline_fit_service_python'
+        - "offline_fit_service_python"
 fit.public.genericables.49612be00e38424cac2e8ea812936cb4:
-  name: 'get_registry_address'
+  name: "get_registry_address"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     e482bcfaded042be87873bb63884bc14:
       aliases:
-        - 'get_registry_address_fit_python'
+        - "get_registry_address_fit_python"
   route:
-    default: 'e482bcfaded042be87873bb63884bc14'
+    default: "e482bcfaded042be87873bb63884bc14"
 fit.public.genericables.e5f5a8809c534d21a6639e0e1ae2ccae:
-  name: 'set_fitable_instance_status'
+  name: "set_fitable_instance_status"
   fitables:
     711de8c45e3d498b885801b5bc7394ad:
       aliases:
-        - 'set_fitable_status_python'
+        - "set_fitable_status_python"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.0e166105f93c46a49966ba774d9ec10a:
-  name: 'remove_fit_listener'
+  name: "remove_fit_listener"
   fitables:
     af0d9d541ac94da7a8d28cfd465107f5:
       aliases:
-        - 'remove_fit_listener_python'
+        - "remove_fit_listener_python"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
-fit.public.genericables.c9aa580f3fa845c99c2c6145a0499e45:
-  name: 'registry_server_subscribe'
+    - "localOnly"
+    - "nonTraceable"
+fit.public.genericables.modelengine.fit.registry.registry-service.subscribe-fitables:
+  name: "registry_server_subscribe"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: 'ee0a8337d3654a22a548d5d5abe1d5f3'
-fit.public.genericables.33be4142494e4742aa122555a451d996:
-  name: 'query_fitable_addresses'
+    default: "subscribe-fitables"
+fit.public.genericables.modelengine.fit.registry.registry-service.query-fitables-addresses:
+  name: "query_fitable_addresses"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '5807f06a3a704708b264ea3c6cfbbd53'
+    default: "query-fitables-addresses"
 fit.public.genericables.2d47d38f33fc32c47f049289a2a432d2:
-  name: 'dynamic_loading_start'
+  name: "dynamic_loading_start"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '6e01d3e6911533a440e541a2900da0de'
+    default: "6e01d3e6911533a440e541a2900da0de"
 fit.public.genericables.fd059427d2b742f590533ea95391144a:
-  name: 'configuration_server_append'
+  name: "configuration_server_append"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '0c3217aa311a405e8a7cff40e9fee60a'
+    default: "0c3217aa311a405e8a7cff40e9fee60a"
   fitables:
     0c3217aa311a405e8a7cff40e9fee60a:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.01c48f78a6964f4392d026df694b33e5:
-  name: 'configuration_server_remove'
+  name: "configuration_server_remove"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: '87736d2ff21d4e57923bd1760e1bca3f'
+    default: "87736d2ff21d4e57923bd1760e1bca3f"
   fitables:
     87736d2ff21d4e57923bd1760e1bca3f:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.d166effd0ef842fe85b8133d02568057:
-  name: 'configuration_agent_unsubscribe'
+  name: "configuration_agent_unsubscribe"
   route:
-    default: 'unsubscribe'
+    default: "unsubscribe"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.918fbf55d64b4de8910d08cfcb41d31c:
-  name: 'configuration_agent_download'
+  name: "configuration_agent_download"
   fitables:
     ef64c99ddeeb48259e10828bc62c211f:
       aliases:
-        - 'py_impl'
+        - "py_impl"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.90c52daf8cc14e22ad8cfb9a19d21157:
-  name: 'configuration_agent_upload'
+  name: "configuration_agent_upload"
   fitables:
     CONFIGURATION_AGENT_UPLOAD_FIT_ID:
       aliases:
-        - 'python_configuration_upload'
+        - "python_configuration_upload"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.63ee92ae39c54ee7a529460e29aee542:
-  name: 'server_response'
+  name: "server_response"
   fitables:
     25827389e64248f1807a015118509326:
       aliases:
-        - 'python_default_server_response'
+        - "python_default_server_response"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.782eed4bb8ed4867a67d66894719ad09:
-  name: 'recycle'
+  name: "recycle"
   route:
-    default: '37210e40e78c46beb148a05b99d6fd72'
+    default: "37210e40e78c46beb148a05b99d6fd72"
 fit.public.genericables.ea9c023c1c154cc8a72b1f012d828183:
   route:
-    default: '98a7e567803c4a4eac0ffd29b4e0a505'
+    default: "98a7e567803c4a4eac0ffd29b4e0a505"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.f54d01848ca146d7aa450afe77027ddf:
-  name: 'fit.matata.ruleEngine.rule.json.Execute'
+  name: "fit.matata.ruleEngine.rule.json.Execute"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: 'f11c6ee7826f4efeab22c0b7675ee1d8'
+    default: "f11c6ee7826f4efeab22c0b7675ee1d8"
   fitables:
     f11c6ee7826f4efeab22c0b7675ee1d8:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.41151994d1e74245ad1416b75c8eff39:
-  name: 'fit.matata.tagCenter.tagger.Tag'
+  name: "fit.matata.tagCenter.tagger.Tag"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   route:
-    default: 'aeb64b5c96cf4e68be4b557bf5cde49a'
+    default: "aeb64b5c96cf4e68be4b557bf5cde49a"
   fitables:
     aeb64b5c96cf4e68be4b557bf5cde49a:
       aliases:
-        - 'default'
+        - "default"
 fit.public.genericables.f770d409efe54555ac7c1ed53efaf1aa:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.d1a7264b528a41708905463385e0148f:
-  name: 'notify_fit_service'
+  name: "notify_fit_service"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.7a896417dc764a7fbb0381bcf128e9ec:
-  name: 'mq_agent_subscribe'
+  name: "mq_agent_subscribe"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     MQ_AGENT_SUBSCRIBE_FIT_ID:
       aliases:
-        - 'mq_agent_subscribe_python'
+        - "mq_agent_subscribe_python"
 fit.public.genericables.9815d4c839e24e038a71b387de2150ea:
-  name: 'mq_agent_unsubscribe'
+  name: "mq_agent_unsubscribe"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     MQ_AGENT_UNSUBSCRIBE_FIT_ID:
       aliases:
-        - 'mq_agent_unsubscribe_python'
+        - "mq_agent_unsubscribe_python"
 fit.public.genericables.bd82ccd28c6047afa85818e835a4c3d7:
-  name: 'mq_agent_consume'
+  name: "mq_agent_consume"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
   fitables:
     MQ_AGENT_CONSUME_FIT_ID:
       aliases:
-        - 'mq_agent_consume_python'
+        - "mq_agent_consume_python"
 fit.public.genericables.3788e36a1faf4fed8c50410ebc9bffa8:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     FIT_GET_ALL_GLOBAL_CONTEXT_FIT_ID:
       aliases:
-        - 'py_impl'
+        - "py_impl"
 fit.public.genericables.bc3e4e7d642e4acb8a48fb28cf74376f:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     FIT_PUT_GLOBAL_CONTEXT_FIT_ID:
       aliases:
-        - 'py_impl'
+        - "py_impl"
 fit.public.genericables.327426d21bda4fe58bc6dc7ef726ffa2:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     FIT_RESTORE_GLOBAL_CONTEXT_FIT_ID:
       aliases:
-        - 'py_impl'
+        - "py_impl"
 fit.public.genericables.bfbc3d446c324e0a9ddc2ea55255a168:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     FIT_GET_GLOBAL_CONTEXT_FIT_ID:
       aliases:
-        - 'py_impl'
+        - "py_impl"
 fit.public.genericables.fd3244e74b044cf0af5a43c045601160:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     FIT_GET_ALL_ROUTE_CONTEXT_FIT_ID:
       aliases:
-        - 'py_impl'
+        - "py_impl"
 fit.public.genericables.23e5a8c3e98d4639913799cde09f34ab:
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
   fitables:
     FIT_PUT_ROUTE_CONTEXT_FIT_ID:
       aliases:
-        - 'py_impl'
+        - "py_impl"
 fit.public.genericables.ce40a173086a4cf795559441cdffd71f:
-  name: 'is_ready'
+  name: "is_ready"
   route:
-    default: 'e117c6fc9be044b8be7f6273e0a3a55b'
+    default: "e117c6fc9be044b8be7f6273e0a3a55b"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.ac31756b9122448eae9a701e7691ac55:
-  name: 'hi'
+  name: "hi"
   route:
-    default: '3ee4572b5aa34b448ec6419ac62715b1'
+    default: "3ee4572b5aa34b448ec6419ac62715b1"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.1f54daa450848ca1e77027dd46d70aff:
-  name: 'dynamic_loading_start'
+  name: "dynamic_loading_start"
   route:
-    default: 'd14167424b75c8eff351994d1e5a4119'
+    default: "d14167424b75c8eff351994d1e5a4119"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.read.meta:
-  name: 'read_meta_from_big_data_cache'
+  name: "read_meta_from_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.create.str:
-  name: 'create_str_in_big_data_cache'
+  name: "create_str_in_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.create.bytes:
-  name: 'create_bytes_in_big_data_cache'
+  name: "create_bytes_in_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.read.str:
-  name: 'read_str_from_big_data_cache'
+  name: "read_str_from_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.read.bytes:
-  name: 'read_bytes_from_big_data_cache'
+  name: "read_bytes_from_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.delete:
-  name: 'delete_value_in_big_data_cache'
+  name: "delete_value_in_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.validate.capacity:
-  name: 'validate_capacity_in_big_data_cache'
+  name: "validate_capacity_in_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.get.info:
-  name: 'get_info_in_big_data_cache'
+  name: "get_info_in_big_data_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.bigdata.cache.is_databus:
-  name: 'get_is_databus_cache'
+  name: "get_is_databus_cache"
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'nonTraceable'
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.get.all.plugins.ready:
-  name: 'modelengine.fit.get.all.plugins.ready'
+  name: "modelengine.fit.get.all.plugins.ready"
   fitables:
     local-worker:
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.get.running.async.task.count:
-  name: 'modelengine.fit.get.running.async.task.count'
+  name: "modelengine.fit.get.running.async.task.count"
   fitables:
     local-worker:
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.get.should.terminate.main:
-  name: 'modelengine.fit.get.should.terminate.main'
+  name: "modelengine.fit.get.should.terminate.main"
   fitables:
     local-worker:
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.get.last.success.time:
-  name: 'modelengine.fit.get.last.success.time'
+  name: "modelengine.fit.get.last.success.time"
   fitables:
     local-worker:
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
 fit.public.genericables.modelengine.fit.get.earliest.start.time:
-  name: 'modelengine.fit.get.earliest.start.time'
+  name: "modelengine.fit.get.earliest.start.time"
   fitables:
     local-worker:
   route:
-    default: 'local-worker'
+    default: "local-worker"
   tags:
-    - 'localOnly'
-    - 'nonTraceable'
+    - "localOnly"
+    - "nonTraceable"
