@@ -40,7 +40,7 @@ public interface RegistryService {
      * @param fitables 表示待取消注册的服务实现列表的 {@link List}{@code <}{@link FitableInfo}{@code >}。
      * @param workerId 表示服务实现所在的进程的唯一标识的 {@link String}。
      */
-    @Genericable(id = "c02af9dafb5b4a609f8c586a8e884710")
+    @Genericable(id = "unregister-fitables")
     void unregisterFitables(List<FitableInfo> fitables, String workerId);
 
     /**

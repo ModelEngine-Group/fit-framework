@@ -15,7 +15,6 @@ registry-center:
     context-path: ""
   service_ids:
     - "modelengine.fit.registry.registry-service.register-fitables"
-    - "bcad5d59d90b4ee88f195cd7356389fc"
     - "modelengine.fit.registry.registry-service.query-fitables-addresses"
     - "modelengine.fit.registry.registry-service.subscribe-fitables"
     - "modelengine.fit.registry.registry-service.query-running-fitables"

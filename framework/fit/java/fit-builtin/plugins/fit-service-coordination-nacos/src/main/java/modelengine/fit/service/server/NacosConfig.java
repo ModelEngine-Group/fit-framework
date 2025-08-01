@@ -21,32 +21,38 @@ import modelengine.fitframework.annotation.Component;
 @Data
 public class NacosConfig {
     /**
-     * Nacos server address
+     * Nacos server address.
+     * Specifies the connection address for the Nacos server, typically in the format "host:port".
      */
     private String serverAddr;
 
     /**
-     * Login username
+     * Login username for Nacos authentication.
+     * Required when Nacos server has authentication enabled.
      */
     private String username;
 
     /**
-     * Login password
+     * Login password for Nacos authentication.
+     * Used together with username for authentication when connecting to secured Nacos server.
      */
     private String password;
 
     /**
-     * Access key
+     * Access key for Nacos authentication.
+     * Used for access control in cloud environments or when using AK/SK authentication.
      */
     private String accessKey;
 
     /**
-     * Secret key
+     * Secret key for Nacos authentication.
+     * Used together with access key for AK/SK authentication mechanism.
      */
     private String secretKey;
 
     /**
-     * Namespace
+     * Namespace for logical isolation in Nacos.
+     * Used to isolate different environments or tenants within the same Nacos server.
      */
     private String namespace;
 }

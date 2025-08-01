@@ -84,7 +84,7 @@ matata:
         genericable-id: "modelengine.fit.registry.registry-service.register-fitables"
       # 向注册中心服务端取消注册服务实现列表
       - genericable-name: "modelengine.fit.registry.RegistryService.unregisterFitables"
-        genericable-id: "c02af9dafb5b4a609f8c586a8e884710"
+        genericable-id: "unregister-fitables"
       # 向注册中心服务端取消订阅指定服务实现的实例信息
       - genericable-name: "modelengine.fit.registry.RegistryService.unsubscribeFitables"
         genericable-id: "modelengine.fit.registry.registry-service.unsubscribe-fitables"
