@@ -3,10 +3,9 @@ nacos:
   heartbeat:
     isEphemeral: true
     weight: 1
-    heartBeatInterval: 5000
 
 fit:
   beans:
     packages:
-      - 'modelengine.fit.service'
-      - 'modelengine.fit.heartbeat'
+    - 'modelengine.fit.service'
+    - 'modelengine.fit.heartbeat'

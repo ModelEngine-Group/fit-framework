@@ -180,11 +180,11 @@ public class NacosRegistryServer implements RegistryService {
      */
     private HashMap<String, String> buildInstanceMetadata(Worker worker, Application application, FitableMeta meta) {
         HashMap<String, String> metadata = new HashMap<>();
-        if (this.heartbeatConfig.getHeartBeatInterval() != null) {
-            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.heartbeatConfig.getHeartBeatInterval()));
+        if (this.heartbeatConfig.getHeartbeatInterval() != null) {
+            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.heartbeatConfig.getHeartbeatInterval()));
         }
-        if (this.heartbeatConfig.getHeartBeatTimeout() != null) {
-            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.heartbeatConfig.getHeartBeatTimeout()));
+        if (this.heartbeatConfig.getHeartbeatTimeout() != null) {
+            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.heartbeatConfig.getHeartbeatTimeout()));
         }
         try {
             metadata.put(WORKER_KEY, this.objectMapper.writeValueAsString(worker));

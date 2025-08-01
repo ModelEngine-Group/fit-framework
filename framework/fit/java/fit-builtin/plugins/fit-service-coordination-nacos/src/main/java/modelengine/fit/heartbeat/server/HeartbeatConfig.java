@@ -36,11 +36,11 @@ public class HeartbeatConfig {
      * Heartbeat interval time (unit: milliseconds).
      * Defines the time interval for services to send heartbeats.
      */
-    private Long heartBeatInterval;
+    private Long heartbeatInterval;
 
     /**
      * Heartbeat timeout time (unit: milliseconds).
      * Defines the time after which a service is considered timed out when no heartbeat is received.
      */
-    private Long heartBeatTimeout;
+    private Long heartbeatTimeout;
 }
