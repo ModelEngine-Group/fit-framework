@@ -77,7 +77,7 @@ public class DefaultMcpClient implements McpClient {
     private final Object toolsLock = LockUtils.newSynchronizedLock();
     private final Map<Long, Consumer<JsonRpc.Response<Long>>> responseConsumers = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> pendingRequests = new ConcurrentHashMap<>();
-    private final Map<Long, Object> pendingResults = new ConcurrentHashMap<>();
+    private final Map<Long, Result> pendingResults = new ConcurrentHashMap<>();
 
     private volatile Subscription subscription;
     private volatile ThreadPoolScheduler pingScheduler;
@@ -197,10 +197,6 @@ public class DefaultMcpClient implements McpClient {
                     response.error());
             throw new IllegalStateException(response.error().toString());
         }
-        synchronized (this.initializedLock) {
-            this.initialized = true;
-            this.initializedLock.notifyAll();
-        }
         this.recordServerSchema(response);
         HttpClassicClientRequest request =
                 this.client.createRequest(HttpRequestMethod.POST, this.baseUri + this.messageEndpoint);
@@ -224,6 +220,10 @@ public class DefaultMcpClient implements McpClient {
             }
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        }
+        synchronized (this.initializedLock) {
+            this.initialized = true;
+            this.initializedLock.notifyAll();
         }
         this.pingScheduler = ThreadPoolScheduler.custom()
                 .threadPoolName("mcp-client-ping-" + this.name)
@@ -262,16 +262,23 @@ public class DefaultMcpClient implements McpClient {
         while (this.pendingRequests.get(requestId)) {
             ThreadUtils.sleep(100);
         }
-        synchronized (this.toolsLock) {
-            return this.tools;
+        Result result = this.pendingResults.remove(requestId);
+        this.pendingRequests.remove(requestId);
+        if (result.isSuccess()) {
+            synchronized (this.toolsLock) {
+                return this.tools;
+            }
+        } else {
+            throw new IllegalStateException(result.getError());
         }
     }
 
     private void getTools0(JsonRpc.Response<Long> response) {
         if (response.error() != null) {
-            log.error("Failed to get tools list from MCP server. [sessionId={}, response={}]",
+            String error = StringUtils.format("Failed to get tools list from MCP server. [sessionId={0}, response={1}]",
                     this.sessionId,
                     response);
+            this.pendingResults.put(response.id(), Result.error(error));
             this.pendingRequests.put(response.id(), false);
             return;
         }
@@ -283,6 +290,7 @@ public class DefaultMcpClient implements McpClient {
                     .map(rawTool -> ObjectUtils.<Tool>toCustomObject(rawTool, Tool.class))
                     .toList());
         }
+        this.pendingResults.put(response.id(), Result.success(this.tools));
         this.pendingRequests.put(response.id(), false);
     }
 
@@ -303,32 +311,46 @@ public class DefaultMcpClient implements McpClient {
         while (this.pendingRequests.get(requestId)) {
             ThreadUtils.sleep(100);
         }
-        return this.pendingResults.get(requestId);
+        Result result = this.pendingResults.remove(requestId);
+        this.pendingRequests.remove(requestId);
+        if (result.isSuccess()) {
+            return result.getContent();
+        } else {
+            throw new IllegalStateException(result.getError());
+        }
     }
 
     private void callTools0(JsonRpc.Response<Long> response) {
         if (response.error() != null) {
-            log.error("Failed to call tool from MCP server. [sessionId={}, response={}]", this.sessionId, response);
+            String error = StringUtils.format("Failed to call tool from MCP server. [sessionId={0}, response={1}]",
+                    this.sessionId,
+                    response);
+            this.pendingResults.put(response.id(), Result.error(error));
             this.pendingRequests.put(response.id(), false);
             return;
         }
         Map<String, Object> result = cast(response.result());
         boolean isError = cast(result.get("isError"));
         if (isError) {
-            log.error("Failed to call tool from MCP server. [sessionId={}, result={}]", this.sessionId, result);
+            String error = StringUtils.format("Failed to call tool from MCP server. [sessionId={0}, result={1}]",
+                    this.sessionId,
+                    result);
+            this.pendingResults.put(response.id(), Result.error(error));
             this.pendingRequests.put(response.id(), false);
             return;
         }
         List<Map<String, Object>> rawContents = cast(result.get("content"));
         if (CollectionUtils.isEmpty(rawContents)) {
-            log.error("Failed to call tool from MCP server: no result returned. [sessionId={}, result={}]",
+            String error = StringUtils.format(
+                    "Failed to call tool from MCP server: no result returned. [sessionId={0}, result={1}]",
                     this.sessionId,
                     result);
+            this.pendingResults.put(response.id(), Result.error(error));
             this.pendingRequests.put(response.id(), false);
             return;
         }
         Map<String, Object> rawContent = rawContents.get(0);
-        this.pendingResults.put(response.id(), rawContent.get("text"));
+        this.pendingResults.put(response.id(), Result.success(rawContent.get("text")));
         this.pendingRequests.put(response.id(), false);
     }
 
