@@ -37,6 +37,13 @@ public interface MatataConfig {
         String host();
 
         /**
+         * 获取 {@code 'matata.registry.mode'} 的配置项。
+         *
+         * @return 表示 {@code 'matata.registry.mode'} 的配置项的 {@link RegistryCenterMode}。
+         */
+        RegistryCenterMode mode();
+
+        /**
          * 获取 {@code 'matata.registry.port'} 的配置项。
          *
          * @return 表示 {@code 'matata.registry.port'} 的配置项的 {@code int}。
@@ -102,6 +109,8 @@ public interface MatataConfig {
          * @return 表示 {@code 'matata.registry.secure-access'} 的配置项的 {@link SecureAccess}。
          */
         SecureAccess secureAccess();
+
+        Nacos nacos();
 
         /**
          * 表示 {@code 'matata.registry'} 中关于可用服务的配置项。
@@ -197,6 +206,67 @@ public interface MatataConfig {
              * @return 表示 {@code 'matata.registry.secure-access.secret-key'} 的配置项的 {@link String}。
              */
             String secretKey();
+        }
+
+        /**
+         * 表示 {@code 'matata.registry.nacos'} 前缀的配置项。
+         */
+        interface Nacos {
+            /**
+             * 获取 {@code 'matata.registry.nacos.username'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.username'} 的配置项的 {@link String}。
+             */
+            String username();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.password'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.password'} 的配置项的 {@link String}。
+             */
+            String password();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.access-key'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.access-key'} 的配置项的 {@link String}。
+             */
+            String accessKey();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.secret-key'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.secret-key'} 的配置项的 {@link String}。
+             */
+            String secretKey();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.is-ephemeral'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.is-ephemeral'} 的配置项的 {@link Boolean}。
+             */
+            Boolean isEphemeral();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.weight'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.weight'} 的配置项的 {@link Float}。
+             */
+            Float weight();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.heartbeat-interval'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.heartbeat-interval'} 的配置项的 {@link Long}。
+             */
+            Long heartbeatInterval();
+
+            /**
+             * 获取 {@code 'matata.registry.nacos.heartbeat-timeout'} 的配置项。
+             *
+             * @return 表示 {@code 'matata.registry.nacos.heartbeat-timeout'} 的配置项的 {@link Long}。
+             */
+            Long heartbeatTimeout();
         }
     }
 }

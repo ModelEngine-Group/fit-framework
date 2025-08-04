@@ -21,7 +21,6 @@ import com.alibaba.nacos.client.naming.listener.NamingChangeEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import modelengine.fit.heartbeat.server.HeartbeatConfig;
 import modelengine.fit.service.Notify;
 import modelengine.fit.service.RegistryService;
 import modelengine.fit.service.entity.Address;
@@ -38,6 +37,7 @@ import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Fitable;
 import modelengine.fitframework.conf.Config;
 import modelengine.fitframework.conf.runtime.CommunicationProtocol;
+import modelengine.fitframework.conf.runtime.MatataConfig;
 import modelengine.fitframework.conf.runtime.WorkerConfig;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.ObjectUtils;
@@ -74,33 +74,33 @@ public class NacosRegistryServer implements RegistryService {
     private static final String FITABLE_META_KEY = "fitable-meta";
     private static final String SEPARATOR = "::";
 
-    private final HeartbeatConfig heartbeatConfig;
     private final NamingService namingService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final MatataConfig matata;
     private final Notify notify;
-    private final NacosConfig nacosConfig;
     private final WorkerConfig worker;
     private final Map<String, com.alibaba.nacos.api.naming.listener.EventListener> serviceSubscriptions =
             new ConcurrentHashMap<>();
 
-    public NacosRegistryServer(Notify notify, WorkerConfig worker, Config config) throws NacosException {
+    public NacosRegistryServer(Notify notify, WorkerConfig worker, Config config, MatataConfig matata)
+            throws NacosException {
         notNull(config, "The configuration cannot be null.");
-        this.nacosConfig = config.get("nacos", NacosConfig.class);
-        this.heartbeatConfig = config.get("nacos.heartbeat", HeartbeatConfig.class);
+        this.matata = notNull(matata, "The matata config cannot be null.");
         this.notify = notNull(notify, "The registry listener cannot be null.");
         this.worker = notNull(worker, "The worker config cannot be null.");
         this.namingService = NamingFactory.createNamingService(getNacosProperties());
-        notBlank(this.nacosConfig.getServerAddr(), "The nacos address cannot be blank.");
     }
 
     private Properties getNacosProperties() {
         Properties properties = new Properties();
-        properties.put("serverAddr", this.nacosConfig.getServerAddr());
-        properties.put("username", ObjectUtils.nullIf(this.nacosConfig.getUsername(), StringUtils.EMPTY));
-        properties.put("password", ObjectUtils.nullIf(this.nacosConfig.getPassword(), StringUtils.EMPTY));
-        properties.put("namespace", ObjectUtils.nullIf(this.nacosConfig.getNamespace(), StringUtils.EMPTY));
-        properties.put("accessKey", ObjectUtils.nullIf(this.nacosConfig.getAccessKey(), StringUtils.EMPTY));
-        properties.put("secretKey", ObjectUtils.nullIf(this.nacosConfig.getSecretKey(), StringUtils.EMPTY));
+        String serverAddr = this.matata.registry().host() + ":" + this.matata.registry().port();
+        notBlank(serverAddr, "The Nacos server address cannot be blank.");
+        properties.put("serverAddr", serverAddr);
+        properties.put("username", ObjectUtils.nullIf(this.matata.registry().nacos().username(), StringUtils.EMPTY));
+        properties.put("password", ObjectUtils.nullIf(this.matata.registry().nacos().password(), StringUtils.EMPTY));
+        properties.put("namespace", ObjectUtils.nullIf(this.matata.registry().environment(), StringUtils.EMPTY));
+        properties.put("accessKey", ObjectUtils.nullIf(this.matata.registry().nacos().accessKey(), StringUtils.EMPTY));
+        properties.put("secretKey", ObjectUtils.nullIf(this.matata.registry().nacos().secretKey(), StringUtils.EMPTY));
         return properties;
     }
 
@@ -180,11 +180,11 @@ public class NacosRegistryServer implements RegistryService {
      */
     private HashMap<String, String> buildInstanceMetadata(Worker worker, Application application, FitableMeta meta) {
         HashMap<String, String> metadata = new HashMap<>();
-        if (this.heartbeatConfig.getHeartbeatInterval() != null) {
-            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.heartbeatConfig.getHeartbeatInterval()));
+        if (this.matata.registry().nacos().heartbeatInterval() != null) {
+            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.matata.registry().nacos().heartbeatInterval()));
         }
-        if (this.heartbeatConfig.getHeartbeatTimeout() != null) {
-            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.heartbeatConfig.getHeartbeatTimeout()));
+        if (this.matata.registry().nacos().heartbeatTimeout() != null) {
+            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.matata.registry().nacos().heartbeatTimeout()));
         }
         try {
             metadata.put(WORKER_KEY, this.objectMapper.writeValueAsString(worker));
@@ -202,11 +202,11 @@ public class NacosRegistryServer implements RegistryService {
      * @param instance The service instance object.
      */
     private void setInstanceProperties(Instance instance) {
-        if (!this.heartbeatConfig.getIsEphemeral()) {
+        if (!this.matata.registry().nacos().isEphemeral()) {
             instance.setEphemeral(false);
         }
-        if (this.heartbeatConfig.getWeight() != null) {
-            instance.setWeight(this.heartbeatConfig.getWeight());
+        if (this.matata.registry().nacos().weight() != null) {
+            instance.setWeight(this.matata.registry().nacos().weight());
         }
     }
 

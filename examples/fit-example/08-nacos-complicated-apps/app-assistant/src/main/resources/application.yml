@@ -7,8 +7,12 @@ worker:
   environment: 'local'
   environment-sequence: 'local'
 
-nacos:
-  serverAddr: 127.0.0.1:8848
+matata:
+  registry:
+    mode: 'NACOS'
+    host: '127.0.0.1'
+    port: 8848
+    environment: 'local'
 
 server:
   http:

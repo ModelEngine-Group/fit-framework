@@ -16,6 +16,7 @@ import modelengine.fitframework.broker.Endpoint;
 import modelengine.fitframework.broker.Target;
 import modelengine.fitframework.conf.runtime.CommunicationProtocol;
 import modelengine.fitframework.conf.runtime.MatataConfig;
+import modelengine.fitframework.conf.runtime.RegistryCenterMode;
 import modelengine.fitframework.conf.runtime.WorkerConfig;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.ObjectUtils;
@@ -53,20 +54,19 @@ public class AddressRepository implements RegistryLocator {
         int port = matata.registry().port();
         int protocolCode = matata.registry().protocolCode();
         CommunicationProtocol protocol = matata.registry().protocol();
-        if (port == 0) {
-            log.debug("The registry port is not set, using the first endpoint of the fit server.");
+        String host = matata.registry().host();
+
+        if(matata.registry().mode() != null && RegistryCenterMode.NACOS.equals(matata.registry().mode())) {
+            log.debug("The registry mode is Nacos, using the local proxy registry center.");
             int size = fitServer.endpoints().size();
             greaterThan(size, 0, "The fit server must have at least one endpoint.");
             Endpoint endpoint = fitServer.endpoints().get(0);
             port = endpoint.port();
             protocolCode = endpoint.protocolCode();
             protocol = CommunicationProtocol.from(endpoint.protocol());
-        }
-        String host = matata.registry().host();
-        if (StringUtils.isBlank(matata.registry().host())) {
-            log.debug("The registry host is not set, using the worker host.");
             host = worker.host();
         }
+
         boolean isRegistryLocalhost =
                 isRegistryLocalhost(actualServers, worker.host(), worker.domain(), host, port, protocolCode);
         String registryWorkerId = isRegistryLocalhost ? worker.id() : host + ":" + port;

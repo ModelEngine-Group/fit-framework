@@ -31,6 +31,8 @@ public class DefaultRegistry implements Registry {
     private List<DefaultAvailableService> authRequiredServices;
     private Map<String, Object> extensions;
     private DefaultSecureAccess secureAccess;
+    private DefaultNacos nacos = new DefaultNacos();
+    private String mode = RegistryCenterMode.MEMORY.name();
 
     /**
      * 设置主机地址的配置。
@@ -106,9 +108,32 @@ public class DefaultRegistry implements Registry {
         this.extensions = extensions;
     }
 
+    /**
+     * 设置 registry center 模式。
+     *
+     * @param mode 表示待设置的 mode 配置的 {@link DefaultNacos}。
+     */
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    /**
+     * 设置 Nacos 相关的配置。
+     *
+     * @param nacos 表示待设置的注册中心模式配置的 {@link String}。
+     */
+    public void setNacos(DefaultNacos nacos) {
+        this.nacos = nacos;
+    }
+
     @Override
     public String host() {
         return this.host;
+    }
+
+    @Override
+    public RegistryCenterMode mode() {
+        return RegistryCenterMode.fromMode(this.mode);
     }
 
     @Override
@@ -171,10 +196,15 @@ public class DefaultRegistry implements Registry {
     }
 
     @Override
+    public Nacos nacos() {
+        return this.nacos;
+    }
+
+    @Override
     public String toString() {
         return StringUtils.format("/{\"host\": \"{0}\", \"port\": {1}, \"protocol\": {2}, \"environment\": \"{3}\", "
                         + "\"available-services\": {4}, \"auth-required-services\": {5}, \"extensions\": {6}, "
-                        + "\"secure-access\": {7}/}",
+                        + "\"secure-access\": {7}, \"nacos\": {8}/}",
                 this.host,
                 this.port,
                 this.protocol,
@@ -182,6 +212,7 @@ public class DefaultRegistry implements Registry {
                 this.availableServices,
                 this.authRequiredServices,
                 this.extensions,
-                this.secureAccess);
+                this.secureAccess,
+                this.nacos);
     }
 }
