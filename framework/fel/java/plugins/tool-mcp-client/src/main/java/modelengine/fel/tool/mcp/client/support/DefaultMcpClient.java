@@ -72,9 +72,7 @@ public class DefaultMcpClient implements McpClient {
     private volatile ServerSchema serverSchema;
     private volatile boolean initialized = false;
     private volatile boolean closed = false;
-    private final List<Tool> tools = new ArrayList<>();
     private final Object initializedLock = LockUtils.newSynchronizedLock();
-    private final Object toolsLock = LockUtils.newSynchronizedLock();
     private final Map<Long, Consumer<JsonRpc.Response<Long>>> responseConsumers = new ConcurrentHashMap<>();
     private final Map<Long, Boolean> pendingRequests = new ConcurrentHashMap<>();
     private final Map<Long, Result> pendingResults = new ConcurrentHashMap<>();
@@ -265,9 +263,7 @@ public class DefaultMcpClient implements McpClient {
         Result result = this.pendingResults.remove(requestId);
         this.pendingRequests.remove(requestId);
         if (result.isSuccess()) {
-            synchronized (this.toolsLock) {
-                return this.tools;
-            }
+            return ObjectUtils.cast(result.getContent());
         } else {
             throw new IllegalStateException(result.getError());
         }
@@ -284,13 +280,10 @@ public class DefaultMcpClient implements McpClient {
         }
         Map<String, Object> result = cast(response.result());
         List<Map<String, Object>> rawTools = cast(result.get("tools"));
-        synchronized (this.toolsLock) {
-            this.tools.clear();
-            this.tools.addAll(rawTools.stream()
-                    .map(rawTool -> ObjectUtils.<Tool>toCustomObject(rawTool, Tool.class))
-                    .toList());
-        }
-        this.pendingResults.put(response.id(), Result.success(this.tools));
+        List<Tool> tools = new ArrayList<>(rawTools.stream()
+                .map(rawTool -> ObjectUtils.<Tool>toCustomObject(rawTool, Tool.class))
+                .toList());
+        this.pendingResults.put(response.id(), Result.success(tools));
         this.pendingRequests.put(response.id(), false);
     }
 
