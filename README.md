@@ -106,7 +106,9 @@ chmod +x build/bin/*
 **启动命令**
 
 ```
-build/bin/fit start
+mkdir dynamic-plugins
+cd dynamic-plugins
+../build/bin/fit start
 ```
 
 > 以上编译构建出的 `fit` 命令可以通过系统操作（别名或添加系统路径）来简化输入。
@@ -119,6 +121,8 @@ build/bin/fit start
 - 新建任意目录作为插件目录，在该目录下存放插件，可在插件目录下使用命令 `fit start` 启动服务。
 
 > 以上环境配置步骤请根据使用的操作系统使用相应的路径分隔符和环境变量配置操作。
+> 
+> `fit` 命令无法在包含 FIT 框架的目录中执行，只能够在一个新建的动态插件目录下执行。
 
 ## 快速开始
 
