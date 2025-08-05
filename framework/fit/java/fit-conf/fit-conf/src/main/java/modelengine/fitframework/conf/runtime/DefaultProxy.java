@@ -9,12 +9,12 @@ package modelengine.fitframework.conf.runtime;
 import modelengine.fitframework.util.StringUtils;
 
 /**
- * Represents the default implementation of {@link MatataConfig.Registry.Nacos}.
+ * Represents the default implementation of {@link MatataConfig.Registry.Proxy}.
  *
  * @author 董智豪
  * @since 2025-08-01
  */
-public class DefaultNacos implements MatataConfig.Registry.Nacos {
+public class DefaultProxy implements MatataConfig.Registry.Proxy {
     private String username;
     private String password;
     private String accessKey;

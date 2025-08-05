@@ -31,8 +31,8 @@ public class DefaultRegistry implements Registry {
     private List<DefaultAvailableService> authRequiredServices;
     private Map<String, Object> extensions;
     private DefaultSecureAccess secureAccess;
-    private DefaultNacos nacos = new DefaultNacos();
-    private String mode = RegistryCenterMode.MEMORY.name();
+    private DefaultProxy proxy = new DefaultProxy();
+    private String mode = RegistryConnectMode.DIRECT.name();
 
     /**
      * 设置主机地址的配置。
@@ -109,9 +109,9 @@ public class DefaultRegistry implements Registry {
     }
 
     /**
-     * 设置 registry center 模式。
+     * 设置 registry center 连接模式。
      *
-     * @param mode 表示待设置的 mode 配置的 {@link DefaultNacos}。
+     * @param mode 表示待设置的 mode 配置的 {@link DefaultProxy}。
      */
     public void setMode(String mode) {
         this.mode = mode;
@@ -120,10 +120,10 @@ public class DefaultRegistry implements Registry {
     /**
      * 设置 Nacos 相关的配置。
      *
-     * @param nacos 表示待设置的注册中心模式配置的 {@link String}。
+     * @param proxy 表示待设置的注册中心模式配置的 {@link String}。
      */
-    public void setNacos(DefaultNacos nacos) {
-        this.nacos = nacos;
+    public void setProxy(DefaultProxy proxy) {
+        this.proxy = proxy;
     }
 
     @Override
@@ -132,8 +132,8 @@ public class DefaultRegistry implements Registry {
     }
 
     @Override
-    public RegistryCenterMode mode() {
-        return RegistryCenterMode.fromMode(this.mode);
+    public RegistryConnectMode mode() {
+        return RegistryConnectMode.fromMode(this.mode);
     }
 
     @Override
@@ -196,8 +196,8 @@ public class DefaultRegistry implements Registry {
     }
 
     @Override
-    public Nacos nacos() {
-        return this.nacos;
+    public Proxy proxy() {
+        return this.proxy;
     }
 
     @Override
@@ -213,6 +213,6 @@ public class DefaultRegistry implements Registry {
                 this.authRequiredServices,
                 this.extensions,
                 this.secureAccess,
-                this.nacos);
+                this.proxy);
     }
 }

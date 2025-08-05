@@ -16,7 +16,7 @@ import modelengine.fitframework.broker.Endpoint;
 import modelengine.fitframework.broker.Target;
 import modelengine.fitframework.conf.runtime.CommunicationProtocol;
 import modelengine.fitframework.conf.runtime.MatataConfig;
-import modelengine.fitframework.conf.runtime.RegistryCenterMode;
+import modelengine.fitframework.conf.runtime.RegistryConnectMode;
 import modelengine.fitframework.conf.runtime.WorkerConfig;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.ObjectUtils;
@@ -56,7 +56,7 @@ public class AddressRepository implements RegistryLocator {
         CommunicationProtocol protocol = matata.registry().protocol();
         String host = matata.registry().host();
 
-        if(matata.registry().mode() != null && RegistryCenterMode.NACOS.equals(matata.registry().mode())) {
+        if(matata.registry().mode() != null && RegistryConnectMode.PROXY.equals(matata.registry().mode())) {
             log.debug("The registry mode is Nacos, using the local proxy registry center.");
             int size = fitServer.endpoints().size();
             greaterThan(size, 0, "The fit server must have at least one endpoint.");

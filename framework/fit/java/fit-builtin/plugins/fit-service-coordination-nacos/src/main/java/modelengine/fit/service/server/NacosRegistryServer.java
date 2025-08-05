@@ -15,6 +15,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.listener.EventListener;
+import com.alibaba.nacos.api.naming.listener.NamingEvent;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ListView;
 import com.alibaba.nacos.client.naming.listener.NamingChangeEvent;
@@ -56,8 +57,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.event.NamingEvent;
-
 /**
  * Service for providing Nacos registry center functionality.
  *
@@ -96,11 +95,11 @@ public class NacosRegistryServer implements RegistryService {
         String serverAddr = this.matata.registry().host() + ":" + this.matata.registry().port();
         notBlank(serverAddr, "The Nacos server address cannot be blank.");
         properties.put("serverAddr", serverAddr);
-        properties.put("username", ObjectUtils.nullIf(this.matata.registry().nacos().username(), StringUtils.EMPTY));
-        properties.put("password", ObjectUtils.nullIf(this.matata.registry().nacos().password(), StringUtils.EMPTY));
+        properties.put("username", ObjectUtils.nullIf(this.matata.registry().proxy().username(), StringUtils.EMPTY));
+        properties.put("password", ObjectUtils.nullIf(this.matata.registry().proxy().password(), StringUtils.EMPTY));
         properties.put("namespace", ObjectUtils.nullIf(this.matata.registry().environment(), StringUtils.EMPTY));
-        properties.put("accessKey", ObjectUtils.nullIf(this.matata.registry().nacos().accessKey(), StringUtils.EMPTY));
-        properties.put("secretKey", ObjectUtils.nullIf(this.matata.registry().nacos().secretKey(), StringUtils.EMPTY));
+        properties.put("accessKey", ObjectUtils.nullIf(this.matata.registry().proxy().accessKey(), StringUtils.EMPTY));
+        properties.put("secretKey", ObjectUtils.nullIf(this.matata.registry().proxy().secretKey(), StringUtils.EMPTY));
         return properties;
     }
 
@@ -180,11 +179,11 @@ public class NacosRegistryServer implements RegistryService {
      */
     private HashMap<String, String> buildInstanceMetadata(Worker worker, Application application, FitableMeta meta) {
         HashMap<String, String> metadata = new HashMap<>();
-        if (this.matata.registry().nacos().heartbeatInterval() != null) {
-            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.matata.registry().nacos().heartbeatInterval()));
+        if (this.matata.registry().proxy().heartbeatInterval() != null) {
+            metadata.put(HEART_BEAT_INTERVAL, String.valueOf(this.matata.registry().proxy().heartbeatInterval()));
         }
-        if (this.matata.registry().nacos().heartbeatTimeout() != null) {
-            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.matata.registry().nacos().heartbeatTimeout()));
+        if (this.matata.registry().proxy().heartbeatTimeout() != null) {
+            metadata.put(HEART_BEAT_TIMEOUT, String.valueOf(this.matata.registry().proxy().heartbeatTimeout()));
         }
         try {
             metadata.put(WORKER_KEY, this.objectMapper.writeValueAsString(worker));
@@ -202,11 +201,11 @@ public class NacosRegistryServer implements RegistryService {
      * @param instance The service instance object.
      */
     private void setInstanceProperties(Instance instance) {
-        if (!this.matata.registry().nacos().isEphemeral()) {
+        if (!this.matata.registry().proxy().isEphemeral()) {
             instance.setEphemeral(false);
         }
-        if (this.matata.registry().nacos().weight() != null) {
-            instance.setWeight(this.matata.registry().nacos().weight());
+        if (this.matata.registry().proxy().weight() != null) {
+            instance.setWeight(this.matata.registry().proxy().weight());
         }
     }
 
