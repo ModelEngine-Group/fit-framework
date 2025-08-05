@@ -431,5 +431,7 @@
   "textConcatenationOutputPopover": "Concatenated text.",
   "templateInputPopover": "<p>Enter information to be added to the word template.</p>\n<p> The information can be referenced by the word template.</p>",
   "textConcatenateNodeTitle": "Text Joiner",
-  "concatenatedTextLabel": "Template"
+  "concatenatedTextLabel": "Template",
+  "add": "Add",
+  "value": "Value"
 }

@@ -1,0 +1,11 @@
+.jade-variable-update-button.jade-variable-update-button {
+    display: flex;
+    align-items: center;
+    margin-left: auto !important;
+}
+
+.jade-variable-update-input-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

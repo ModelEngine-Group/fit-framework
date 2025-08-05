@@ -4,11 +4,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {jadeNode} from "@/components/base/jadeNode.jsx";
-import "./style.css";
-import {codeComponent} from "@/components/code/codeComponent.jsx";
-import {SECTION_TYPE} from "@/common/Consts.js";
-import {codeNodeDrawer} from "@/components/code/CodeNodeDrawer.jsx";
+import {jadeNode} from '@/components/base/jadeNode.jsx';
+import './style.css';
+import {codeComponent} from '@/components/code/codeComponent.jsx';
+import {SECTION_TYPE} from '@/common/Consts.js';
+import {codeNodeDrawer} from '@/components/code/CodeNodeDrawer.jsx';
 
 /**
  * 代码节点shape
@@ -18,7 +18,6 @@ import {codeNodeDrawer} from "@/components/code/CodeNodeDrawer.jsx";
 export const codeNodeState = (id, x, y, width, height, parent, drawer) => {
     const self = jadeNode(id, x, y, width, height, parent, drawer ? drawer : codeNodeDrawer);
     self.type = "codeNodeState";
-    self.width = 360;
     self.componentName = "codeComponent";
     self.text = "代码节点"
     self.width = 368;

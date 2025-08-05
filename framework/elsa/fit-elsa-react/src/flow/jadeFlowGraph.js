@@ -61,6 +61,8 @@ import {parallelNodeState} from '@/components/parallelNode/parallelNodeState.jsx
 import {parallelComponent} from '@/components/parallelNode/parallelComponent.jsx';
 import {textConcatenateNodeState} from "@/components/textConcatenationNode/textConcatenateNodeState.jsx";
 import {textConcatenateNodeComponent} from "@/components/textConcatenationNode/textConcatenateNodeComponent.jsx";
+import {variableUpdateNodeState} from '@/components/variableUpdate/variableUpdateNodeState.jsx';
+import {variableUpdateComponent} from '@/components/variableUpdate/variableUpdateComponent.jsx';
 
 /**
  * jadeFlow的专用画布.
@@ -169,6 +171,8 @@ export const jadeFlowGraph = (div, title) => {
     self.registerPlugin('parallelComponent', parallelComponent);
     self.registerPlugin('textConcatenateNodeState', textConcatenateNodeState);
     self.registerPlugin('textConcatenateNodeComponent', textConcatenateNodeComponent);
+    self.registerPlugin('variableUpdateNodeState', variableUpdateNodeState);
+    self.registerPlugin('variableUpdateComponent', variableUpdateComponent);
     return initialize.apply(self);
   };
 
