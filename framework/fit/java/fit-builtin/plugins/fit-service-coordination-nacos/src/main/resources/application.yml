@@ -1,9 +1,3 @@
-nacos:
-  serverAddr: 127.0.0.1:8848
-  heartbeat:
-    isEphemeral: true
-    weight: 1
-
 fit:
   beans:
     packages:
