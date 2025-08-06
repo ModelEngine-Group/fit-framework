@@ -126,8 +126,8 @@ public class NacosRegistryServer implements RegistryService {
                     application.getNameVersion());
             for (FitableMeta meta : fitableMetas) {
                 FitableInfo fitable = meta.getFitable();
-                String groupName = getGroupName(fitable);
-                String serviceName = getServiceName(fitable);
+                String groupName = this.getGroupName(fitable);
+                String serviceName = this.getServiceName(fitable);
                 List<Instance> instances = createInstance(worker, application, meta);
                 for (Instance instance : instances) {
                     this.namingService.registerInstance(serviceName, groupName, instance);
@@ -312,8 +312,8 @@ public class NacosRegistryServer implements RegistryService {
     }
 
     private List<Instance> queryInstances(FitableInfo fitable) throws NacosException {
-        String groupName = getGroupName(fitable);
-        String serviceName = getServiceName(fitable);
+        String groupName = this.getGroupName(fitable);
+        String serviceName = this.getServiceName(fitable);
         return this.namingService.selectInstances(serviceName, groupName, true);
     }
 
@@ -391,8 +391,8 @@ public class NacosRegistryServer implements RegistryService {
                 callbackFitableId);
         for (FitableInfo fitable : fitables) {
             try {
-                String groupName = getGroupName(fitable);
-                String serviceName = getServiceName(fitable);
+                String groupName = this.getGroupName(fitable);
+                String serviceName = this.getServiceName(fitable);
                 if (this.serviceSubscriptions.containsKey(buildServiceKey(groupName, serviceName))) {
                     log.debug("Already subscribed to service. [groupName={}, serviceName={}]", groupName, serviceName);
                     continue;
@@ -421,8 +421,8 @@ public class NacosRegistryServer implements RegistryService {
                 callbackFitableId);
         for (FitableInfo fitable : fitables) {
             try {
-                String groupName = getGroupName(fitable);
-                String serviceName = getServiceName(fitable);
+                String groupName = this.getGroupName(fitable);
+                String serviceName = this.getServiceName(fitable);
                 EventListener listener = this.serviceSubscriptions.get(buildServiceKey(groupName, serviceName));
                 this.namingService.unsubscribe(serviceName, groupName, listener);
                 this.serviceSubscriptions.remove(buildServiceKey(groupName, serviceName));
@@ -458,7 +458,7 @@ public class NacosRegistryServer implements RegistryService {
 
     private void processGenericableServices(GenericableInfo genericable,
             Map<FitableMeta, Set<String>> metaEnvironments) {
-        String groupName = getGroupName(genericable);
+        String groupName = this.getGroupName(genericable);
         try {
             ListView<String> services = this.namingService.getServicesOfServer(1, Integer.MAX_VALUE, groupName);
             for (String serviceName : services.getData()) {
