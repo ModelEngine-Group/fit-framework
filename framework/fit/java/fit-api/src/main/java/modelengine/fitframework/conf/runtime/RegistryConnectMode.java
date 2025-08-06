@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -37,7 +37,7 @@ public enum RegistryConnectMode {
     /**
      * 构造函数，初始化连接模式标识符。
      *
-     * @param mode 注册中心连接模式的标识符（不能为空）
+     * @param mode 注册中心连接模式的标识符（不能为空）。
      */
     RegistryConnectMode(String mode) {
         this.mode = notBlank(mode, "The registry connect mode cannot be blank.");
@@ -46,8 +46,8 @@ public enum RegistryConnectMode {
     /**
      * 根据字符串标识获取对应的枚举值。
      *
-     * @param mode 字符串标识（如 "DIRECT"、"PROXY"）
-     * @return 匹配的 {@link RegistryConnectMode} 枚举值；如果无匹配项则返回 {@code null}
+     * @param mode 字符串标识（如 "DIRECT"、"PROXY"）。
+     * @return 匹配的 {@link RegistryConnectMode} 枚举值；如果无匹配项则返回 {@code DIRECT}，默认为直连模式。
      */
     public static RegistryConnectMode fromMode(String mode) {
         return Arrays.stream(RegistryConnectMode.values())

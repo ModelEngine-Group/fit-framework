@@ -237,14 +237,6 @@ public class NacosRegistryServer implements RegistryService {
         }
     }
 
-    /**
-     * Unregister all instances matching the specified worker node ID.
-     *
-     * @param instances The instance list
-     * @param workerId The worker node ID
-     * @param serviceName The service name
-     * @param groupName The group name
-     */
     private void unregisterMatchingInstances(List<Instance> instances, String workerId, String serviceName,
             String groupName) {
         for (Instance instance : instances) {

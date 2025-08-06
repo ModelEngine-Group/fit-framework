@@ -108,9 +108,9 @@ public class DefaultRegistry implements Registry {
     }
 
     /**
-     * 设置 registry center 连接模式。
+     * 设置注册中心连接模式。
      *
-     * @param mode 表示待设置的 mode 配置的 {@link RegistryConnectMode}。
+     * @param mode 表示待设置的模式配置的 {@link String}。
      */
     public void setMode(String mode) {
         this.mode = mode;

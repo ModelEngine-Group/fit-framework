@@ -45,11 +45,13 @@ public class NacosConfig {
      * Ephemeral instances will be automatically removed from the registry after service deregistration.
      */
     private Boolean isEphemeral;
+
     /**
      * Service weight.
      * Used for weight calculation during load balancing.
      */
     private Float weight;
+
     /**
      * Heartbeat interval time (unit: milliseconds).
      * Defines the time interval for services to send heartbeats.
