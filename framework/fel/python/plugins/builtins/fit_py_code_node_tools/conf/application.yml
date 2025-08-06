@@ -5,7 +5,6 @@ user:
 code:
   import:
     whitelist:
-      - 'asyncio'
       - 'json'
       - 'typing'
       - 'pandas'
@@ -25,6 +24,7 @@ code:
       - 'multiprocessing'
       - 'timeit'
       - 'platform'
+      - 'asyncio'
   timeout: 10
   max_pool: 4
   mem_limit: 189792256 # 181*1024*1024

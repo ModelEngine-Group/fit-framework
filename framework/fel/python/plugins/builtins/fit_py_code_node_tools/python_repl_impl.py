@@ -44,7 +44,7 @@ GLOBAL_CONFIG = \
         "header": _PYTHON_REPL_HEADER,
         "header_len": len(_PYTHON_REPL_HEADER.split('\n')),
         "entrypoint": 'main',
-        "whitelist": ['asyncio', 'json', 'typing'],
+        "whitelist": ['json', 'typing'],
         "blacklist": ['os', 'sys', 'cmd', 'subprocess', 'multiprocessing', 'timeit', 'platform'],
         "timeout": 10,
         "max_pool": 4,
