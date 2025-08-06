@@ -197,11 +197,6 @@ public class NacosRegistryServer implements RegistryService {
         return metadata;
     }
 
-    /**
-     * Set properties for service instance, including weight and ephemeral status.
-     *
-     * @param instance The service instance object.
-     */
     private void setInstanceProperties(Instance instance) {
         if (!this.nacosConfig.getIsEphemeral()) {
             instance.setEphemeral(false);
@@ -220,15 +215,9 @@ public class NacosRegistryServer implements RegistryService {
         }
     }
 
-    /**
-     * Unregister a single Fitable and all its matching instances.
-     *
-     * @param fitable The {@link Fitable} information to unregister
-     * @param workerId The worker node ID
-     */
     private void unregisterSingleFitable(FitableInfo fitable, String workerId) {
-        String groupName = getGroupName(fitable);
-        String serviceName = getServiceName(fitable);
+        String groupName = this.getGroupName(fitable);
+        String serviceName = this.getServiceName(fitable);
         try {
             List<Instance> instances = this.namingService.selectInstances(serviceName, groupName, true);
             this.unregisterMatchingInstances(instances, workerId, serviceName, groupName);
