@@ -56,7 +56,7 @@ public class AddressRepository implements RegistryLocator {
         CommunicationProtocol protocol = matata.registry().protocol();
         String host = matata.registry().host();
 
-        if(matata.registry().mode() != null && RegistryConnectMode.PROXY.equals(matata.registry().mode())) {
+        if (RegistryConnectMode.PROXY.equals(matata.registry().mode())) {
             log.debug("The registry mode is Nacos, using the local proxy registry center.");
             int size = fitServer.endpoints().size();
             greaterThan(size, 0, "The fit server must have at least one endpoint.");

@@ -31,7 +31,6 @@ public class DefaultRegistry implements Registry {
     private List<DefaultAvailableService> authRequiredServices;
     private Map<String, Object> extensions;
     private DefaultSecureAccess secureAccess;
-    private DefaultProxy proxy = new DefaultProxy();
     private String mode = RegistryConnectMode.DIRECT.name();
 
     /**
@@ -111,19 +110,10 @@ public class DefaultRegistry implements Registry {
     /**
      * 设置 registry center 连接模式。
      *
-     * @param mode 表示待设置的 mode 配置的 {@link DefaultProxy}。
+     * @param mode 表示待设置的 mode 配置的 {@link RegistryConnectMode}。
      */
     public void setMode(String mode) {
         this.mode = mode;
-    }
-
-    /**
-     * 设置 Nacos 相关的配置。
-     *
-     * @param proxy 表示待设置的注册中心模式配置的 {@link String}。
-     */
-    public void setProxy(DefaultProxy proxy) {
-        this.proxy = proxy;
     }
 
     @Override
@@ -196,15 +186,10 @@ public class DefaultRegistry implements Registry {
     }
 
     @Override
-    public Proxy proxy() {
-        return this.proxy;
-    }
-
-    @Override
     public String toString() {
         return StringUtils.format("/{\"host\": \"{0}\", \"port\": {1}, \"protocol\": {2}, \"environment\": \"{3}\", "
                         + "\"available-services\": {4}, \"auth-required-services\": {5}, \"extensions\": {6}, "
-                        + "\"secure-access\": {7}, \"nacos\": {8}/}",
+                        + "\"secure-access\": {7}/}",
                 this.host,
                 this.port,
                 this.protocol,
@@ -212,7 +197,6 @@ public class DefaultRegistry implements Registry {
                 this.availableServices,
                 this.authRequiredServices,
                 this.extensions,
-                this.secureAccess,
-                this.proxy);
+                this.secureAccess);
     }
 }

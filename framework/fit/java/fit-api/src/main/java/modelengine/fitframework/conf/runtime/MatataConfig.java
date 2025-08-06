@@ -111,13 +111,6 @@ public interface MatataConfig {
         SecureAccess secureAccess();
 
         /**
-         * 获取 {@code 'matata.registry.proxy'} 的配置项。
-         *
-         * @return 表示 {@code 'matata.registry.proxy'} 的配置项的 {@link Proxy}。
-         */
-        Proxy proxy();
-
-        /**
          * 表示 {@code 'matata.registry'} 中关于可用服务的配置项。
          */
         interface AvailableService {
@@ -211,67 +204,6 @@ public interface MatataConfig {
              * @return 表示 {@code 'matata.registry.secure-access.secret-key'} 的配置项的 {@link String}。
              */
             String secretKey();
-        }
-
-        /**
-         * 表示 {@code 'matata.registry.proxy'} 前缀的配置项。
-         */
-        interface Proxy {
-            /**
-             * 获取 {@code 'matata.registry.proxy.username'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.username'} 的配置项的 {@link String}。
-             */
-            String username();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.password'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.password'} 的配置项的 {@link String}。
-             */
-            String password();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.access-key'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.access-key'} 的配置项的 {@link String}。
-             */
-            String accessKey();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.secret-key'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.secret-key'} 的配置项的 {@link String}。
-             */
-            String secretKey();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.is-ephemeral'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.is-ephemeral'} 的配置项的 {@link Boolean}。
-             */
-            Boolean isEphemeral();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.weight'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.weight'} 的配置项的 {@link Float}。
-             */
-            Float weight();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.heartbeat-interval'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.heartbeat-interval'} 的配置项的 {@link Long}。
-             */
-            Long heartbeatInterval();
-
-            /**
-             * 获取 {@code 'matata.registry.proxy.heartbeat-timeout'} 的配置项。
-             *
-             * @return 表示 {@code 'matata.registry.proxy.heartbeat-timeout'} 的配置项的 {@link Long}。
-             */
-            Long heartbeatTimeout();
         }
     }
 }

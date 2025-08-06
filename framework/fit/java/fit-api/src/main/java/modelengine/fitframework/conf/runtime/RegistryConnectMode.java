@@ -1,3 +1,9 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
+ *  This file is a part of the ModelEngine Project.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 package modelengine.fitframework.conf.runtime;
 
 import static modelengine.fitframework.inspection.Validation.notBlank;
@@ -47,6 +53,6 @@ public enum RegistryConnectMode {
         return Arrays.stream(RegistryConnectMode.values())
                 .filter(registryConnectMode -> StringUtils.equals(registryConnectMode.mode, mode))
                 .findFirst()
-                .orElse(null);
+                .orElse(DIRECT);
     }
 }
