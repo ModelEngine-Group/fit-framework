@@ -21,109 +21,111 @@ from langchain_community.utilities.reddit_search import RedditSearchAPIWrapper
 from langchain_community.utilities.wikidata import WikidataAPIWrapper
 from langchain_core.documents import Document
 
-from .callable_registers import register_callable_tool
+from fitframework.api.decorators import fitable
 
-
-def langchain_network(**kwargs) -> str:
+def langchain_network() -> str:
     time.sleep(5)
     return ""
 
-
-def arxiv(arxiv_id: str, **kwargs) -> List[str]:
+@fitable("langchain.tool.arxiv", "default")
+def arxiv(arxiv_id: str) -> List[str]:
     retriever = ArxivRetriever(load_max_docs=2)
     docs: List[Document] = retriever.get_relevant_documents(query=arxiv_id)
     return [doc.page_content for doc in docs]
 
-
-def bing_search(query: str, bing_subscription_key: str, bing_search_url: str, **kwargs) -> str:
+@fitable("langchain.tool.bing_search", "default")
+def bing_search(query: str, bing_subscription_key: str, bing_search_url: str) -> str:
     os.environ["BING_SUBSCRIPTION_KEY"] = bing_subscription_key
     os.environ["BING_SEARCH_URL"] = bing_search_url
     search = BingSearchAPIWrapper()
     return search.run(query)
 
-
-def brave_search(query: str, count: int, api_key: str, **kwargs) -> str:
+@fitable("langchain.tool.brave_search", "default")
+def brave_search(query: str, count: int, api_key: str) -> str:
     brave_search_ = BraveSearch.from_api_key(api_key=api_key, search_kwargs={"count": count})
     return brave_search_.run(query)
 
-
-def duck_duck_go_search(query: str, **kwargs) -> str:
+@fitable("langchain.tool.duck_duck_go_search", "default")
+def duck_duck_go_search(query: str) -> str:
     search = DuckDuckGoSearchRun()
     return search.invoke(query)
 
-
-def google_jobs(query: str, serapi_api_key: str, **kwargs) -> str:
+@fitable("langchain.tool.google_jobs", "default")
+def google_jobs(query: str, serapi_api_key: str) -> str:
     os.environ["SERPAPI_API_KEY"] = serapi_api_key
     google_job_tool = GoogleJobsQueryRun(api_wrapper=GoogleJobsAPIWrapper())
     return google_job_tool.run(query)
 
-
-def google_places(query: str, gplaces_api_key: str, **kwargs) -> str:
+@fitable("langchain.tool.google_places", "default")
+def google_places(query: str, gplaces_api_key: str) -> str:
     os.environ["GPLACES_API_KEY"] = gplaces_api_key
     places = GooglePlacesTool()
     return places.run(query)
 
-
-def google_scholar(query: str, serp_api_key: str, **kwargs) -> str:
+@fitable("langchain.tool.google_scholar", "default")
+def google_scholar(query: str, serp_api_key: str) -> str:
     os.environ["SERP_API_KEY"] = serp_api_key
     google_job_tool = GoogleScholarQueryRun(api_wrapper=GoogleScholarAPIWrapper())
     return google_job_tool.run(query)
 
-
-def google_search(query: str, google_api_key: str, google_cse_id: str, k: int, siterestrict: bool, **kwargs) -> str:
+@fitable("langchain.tool.google_search", "default")
+def google_search(query: str, google_api_key: str, google_cse_id: str, k: int, siterestrict: bool) -> str:
     wrapper = GoogleSearchAPIWrapper(google_api_key=google_api_key, google_cse_id=google_cse_id, k=k,
                                      siterestrict=siterestrict)
     search = GoogleSearchRun(api_wrapper=wrapper)
     return search.run(query)
 
-
-def google_serper(query: str, k: int, gl: str, hl: str, serper_api_key: str, **kwargs) -> str:
+@fitable("langchain.tool.google_serper", "default")
+def google_serper(query: str, k: int, gl: str, hl: str, serper_api_key: str) -> str:
     os.environ["SERPER_API_KEY"] = serper_api_key
     search = GoogleSerperAPIWrapper(k=k, gl=gl, hl=hl)
     return search.run(query)
 
-
-def golden_query(query: str, golden_api_key: str, **kwargs) -> str:
+@fitable("langchain.tool.golden_query", "default")
+def golden_query(query: str, golden_api_key: str) -> str:
     os.environ["GOLDEN_API_KEY"] = golden_api_key
     golden_query_api = GoldenQueryAPIWrapper()
     return golden_query_api.run(query)
 
-
+@fitable("langchain.tool.pub_med", "default")
 def pub_med(query: str) -> str:
     pub_med_tool: PubmedQueryRun = PubmedQueryRun()
     return pub_med_tool.invoke(query)
 
-
+@fitable("langchain.tool.mojeek_query", "default")
 def mojeek_query(query: str, api_key: str) -> str:
     search = MojeekSearch.config(api_key=api_key)
     return search.run(query)
 
-
+@fitable("langchain.tool.reddit_search", "default")
 def reddit_search(query: str, sort: str, time_filter: str, subreddit: str, limit: str, client_id: str,
                   client_secret: str, user_agent: str) -> str:
-    search = RedditSearchRun(
-        api_wrapper=RedditSearchAPIWrapper(
-            reddit_client_id=client_id,
-            reddit_client_secret=client_secret,
-            reddit_user_agent=user_agent,
+    try:
+        search = RedditSearchRun(
+            api_wrapper=RedditSearchAPIWrapper(
+                reddit_client_id=client_id,
+                reddit_client_secret=client_secret,
+                reddit_user_agent=user_agent,
+            )
         )
-    )
-    search_params = RedditSearchSchema(query=query, sort=sort, time_filter=time_filter, subreddit=subreddit,
-                                       limit=limit)
-    result = search.run(tool_input=search_params.dict())
-    return result
+        search_params = RedditSearchSchema(query=query, sort=sort, time_filter=time_filter, subreddit=subreddit,
+                                           limit=limit)
+        result = search.run(tool_input=search_params.dict())
+        return result
+    except Exception as e:
+      return f"Error: {str(e)}"
 
-
+@fitable("langchain.tool.searxng_search", "default")
 def searxng_search(query: str, searx_host: str) -> str:
     search = SearxSearchWrapper(searx_host=searx_host)
     return search.run(query)
 
-
+@fitable("langchain.tool.serp_api", "default")
 def serp_api(query: str, serpapi_api_key: str) -> str:
     search = SerpAPIWrapper(serpapi_api_key=serpapi_api_key)
     return search.run(query)
 
-
+@fitable("langchain.tool.twilio", "default")
 def twilio(body: str, to: str, account_sid: str, auth_token: str, from_number: str) -> str:
     twilio_api = TwilioAPIWrapper(
         account_sid=account_sid,
@@ -132,52 +134,22 @@ def twilio(body: str, to: str, account_sid: str, auth_token: str, from_number: s
     )
     return twilio_api.run(body, to)
 
-
+@fitable("langchain.tool.wikidata", "default")
 def wikidata(query: str) -> str:
     wikidata_query = WikidataQueryRun(api_wrapper=WikidataAPIWrapper())
     return wikidata_query.run(query)
 
-
-def wikipedia(query: str, **kwargs) -> str:
+@fitable("langchain.tool.wikipedia", "default")
+def wikipedia(query: str) -> str:
     wikipedia_query_run = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
     return wikipedia_query_run.run(query)
 
-
+@fitable("langchain.tool.wolfram_alpha", "default")
 def wolfram_alpha(query: str, wolfram_alpha_appid: str) -> str:
     wolfram = WolframAlphaAPIWrapper(wolfram_alpha_appid=wolfram_alpha_appid)
     return wolfram.run(query)
 
-
-def youtube_search(query: str, **kwargs) -> str:
+@fitable("langchain.tool.youtube_search", "default")
+def youtube_search(query: str) -> str:
     youtube_search_tool = YouTubeSearchTool()
     return youtube_search_tool.run(query)
-
-
-# Tuple 结构： (tool_func, config_args, return_description)
-network_toolkit: List[Tuple[Callable[..., Any], List[str], str]] = [
-    (langchain_network, ["input"], "Youtube search."),
-    (arxiv, ["arxiv_id"], "ArXiv search."),
-    (bing_search, ["query", "bing_subscription_key", "bing_search_url"], "Bing search."),
-    (brave_search, ["query", "count", "api_key"], "Brave search."),
-    (duck_duck_go_search, ["query"], "DuckDuckGo Search."),
-    (google_jobs, ["query", "serapi_api_key"], "Google Jobs."),
-    (google_places, ["query", "gplaces_api_key"], "Google Places."),
-    (google_scholar, ["query", "serp_api_key"], "Google Scholar."),
-    (google_search, ["query", "google_api_key", "google_cse_id", "k", "siterestrict"], "Google Search."),
-    (google_serper, ["query", "serper_api_key", "k", "gl", "hl"], "Google Serper."),
-    (golden_query, ["query", "golden_api_key"], "Golden Query."),
-    (pub_med, ["query"], "PubMed."),
-    (mojeek_query, ["query", "api_key"], "Mojeek Search."),
-    (reddit_search, ["query", "sort", "time_filter", "subreddit", "limit", "client_id", "client_secret", "user_agent"],
-     "Reddit Search."),
-    (searxng_search, ["query", "searx_host"], "SearxNG Search."),
-    (serp_api, ["query", "serpapi_api_key"], "SerpAPI."),
-    (twilio, ["body", "to", "account_sid", "auth_token", "from_number"], "Twilio."),
-    (wikidata, ["query"], "Wikidata."),
-    (wikipedia, ["query"], "Wikipedia."),
-    (wolfram_alpha, ["query", "wolfram_alpha_appid"], "Wolfram Alpha."),
-    (youtube_search, ["query"], "Youtube Search."),
-]
-
-for tool in network_toolkit:
-    register_callable_tool(tool, langchain_network.__module__, "langchain.tool")
