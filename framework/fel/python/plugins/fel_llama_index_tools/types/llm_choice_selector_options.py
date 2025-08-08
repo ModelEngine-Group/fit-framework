@@ -7,13 +7,15 @@ import typing
 
 from .media import Media
 
-class Document(object):
+class LLMChoiceSelectorOptions(object):
 
-    def __init__(self, content: str, media: Media , metadata: typing.Dict[str, object] ):
-        self.content = content
-        self.media = media
-        self.metadata = metadata
-    
+    def __init__(self, api_key: str, model_name: str,api_base: str, prompt: str ,mode: str = 'single'):
+        self.api_key = api_key
+        self.model_name = model_name
+        self.api_base = api_base
+        self.prompt = prompt
+        self.mode = mode
+
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False

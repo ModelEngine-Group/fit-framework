@@ -6,14 +6,11 @@
 import typing
 
 from .media import Media
+class RetrieverOptions(object):
 
-class Document(object):
+    def __init__(self, similarity_cutoff: float):
+        self.similarity_cutoff = similarity_cutoff 
 
-    def __init__(self, content: str, media: Media , metadata: typing.Dict[str, object] ):
-        self.content = content
-        self.media = media
-        self.metadata = metadata
-    
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
