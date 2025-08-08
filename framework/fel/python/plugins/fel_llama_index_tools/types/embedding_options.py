@@ -7,12 +7,14 @@ import typing
 
 from .media import Media
 
-class Document(object):
+class EmbeddingOptions(object):
 
-    def __init__(self, content: str, media: Media , metadata: typing.Dict[str, object] ):
-        self.content = content
-        self.media = media
-        self.metadata = metadata
+    def __init__(self, model_name: str,api_key: str,api_base: str,percentile_cutoff: float,threshold_cutoff: float):
+        self.model_name = model_name
+        self.api_key = api_key
+        self.api_base = api_base
+        self.percentile_cutoff = percentile_cutoff
+        self.threshold_cutoff = threshold_cutoff
     
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

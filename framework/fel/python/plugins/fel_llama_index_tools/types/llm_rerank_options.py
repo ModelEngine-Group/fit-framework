@@ -7,12 +7,15 @@ import typing
 
 from .media import Media
 
-class Document(object):
+class LLMRerankOptions(object):
 
-    def __init__(self, content: str, media: Media , metadata: typing.Dict[str, object] ):
-        self.content = content
-        self.media = media
-        self.metadata = metadata
+    def __init__(self, model_name: str ,api_key: str ,api_base: str ,prompt: str ,choice_batch_size: int, top_n: int):
+        self.model_name = model_name
+        self.api_key = api_key
+        self.api_base = api_base
+        self.prompt = prompt
+        self.choice_batch_size = choice_batch_size
+        self.top_n = top_n
     
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
