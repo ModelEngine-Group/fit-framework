@@ -17,7 +17,7 @@ from llama_index.core.prompts import PromptType, PromptTemplate
 from llama_index.core.selectors import LLMSingleSelector, LLMMultiSelector
 from llama_index.core.selectors.prompts import DEFAULT_SINGLE_SELECT_PROMPT_TMPL, DEFAULT_MULTI_SELECT_PROMPT_TMPL
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI  # 新路径
+from llama_index.llms.openai import OpenAI
 
 from .types.document import Document
 from .types.llm_rerank_options import LLMRerankOptions
