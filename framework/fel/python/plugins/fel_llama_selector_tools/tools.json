@@ -1,91 +1,156 @@
 {
-  "tools": [
-    {
-      "tags": [
-          "LlamaIndex"
-      ],
-      "runnables": {
-        "LlamaIndex": {
-          "genericableId": "llama_index.rag.toolkit",
-          "fitableId": "embedding_choice_selector"
-        }
-      },
-      "schema": {
-        "name": "embedding_choice_selector",
-        "description": " Embedding selector that chooses one out of many options.",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "choice": {
-              "title": "Choice",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+  "version" : "1.0.0",
+  "definitionGroups" : [ {
+    "name" : "llm_selector_tools",
+    "summary" : "LLM选择器工具组",
+    "description" : "基于嵌入相似度的智能选择器工具，用于从多个选项中选择与查询最相关的选项。支持配置不同的嵌入模型和API端点。",
+    "extensions" : { },
+    "definitions" : [ {
+      "schema" : {
+        "name" : "EmbeddingChoiceSelectorTool",
+        "description" : "嵌入选择器，从多个选项中选择一个。输入选项列表和查询字符串，返回选择结果列表。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "choice" : {
+              "defaultValue" : "",
+              "description" : "可选项列表",
+              "name" : "choice",
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              },
+              "example" : ""
             },
-            "query_str": {
-              "title": "Query Str",
-              "type": "string"
+            "query_str" : {
+              "defaultValue" : "",
+              "description" : "查询字符串",
+              "name" : "query_str",
+              "type" : "string",
+              "example" : ""
             },
-            "model_name": {
-              "type": "string",
-              "description": "model_name"
-            },
-            "api_key": {
-              "type": "string",
-              "description": "api_key"
-            },
-            "api_base": {
-              "type": "string",
-              "description": "api_base"
-            },
-            "prompt": {
-              "type": "string",
-              "description": "prompt"
-            },
-            "mode": {
-              "type": "string",
-              "description": "mode"
+            "options" : {
+              "defaultValue" : "",
+              "description" : "嵌入选择器配置",
+              "name" : "options",
+              "type" : "object",
+              "properties" : {
+                "api_key" : {
+                  "type" : "string"
+                },
+                "model_name" : {
+                  "type" : "string"
+                },
+                "api_base" : {
+                  "type" : "string"
+                }
+              },
+              "example" : "",
+              "required" : [ "api_key", "model_name", "api_base" ]
             }
           },
-          "required": [
-            "choice",
-            "query_str"
-          ]
+          "required" : [ "choice", "query_str", "options" ]
         },
-        "return": {
-          "title": "The Selected Choice.",
-          "type": "array",
-          "items": {
-            "title": "SingleSelection",
-            "description": "A single selection of a choice.",
-            "type": "object",
-            "properties": {
-              "index": {
-                "title": "Index",
-                "type": "integer"
+        "order" : [ "choice", "query_str", "options" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "type" : "string"
               },
-              "reason": {
-                "title": "Reason",
-                "type": "string"
+              "score" : {
+                "type" : "number"
               }
-            },
-            "required": [
-              "index",
-              "reason"
-            ]
-          }
-        },
-        "parameterExtensions": {
-          "config": [
-            "model_name",
-            "api_key",
-            "api_base",
-            "prompt",
-            "mode"
-          ]
+            }
+          },
+          "convertor" : ""
         }
       }
-    }
-  ]
+    } ]
+  } ],
+  "toolGroups" : [ {
+    "name" : "default",
+    "summary" : "默认工具组",
+    "description" : "包含嵌入选择器工具的默认工具组，提供基于语义相似度的智能选择功能。",
+    "extensions" : { },
+    "definitionGroupName" : "llm_selector_tools",
+    "tools" : [ {
+      "namespace" : "embedding_choice_selector",
+      "schema" : {
+        "name" : "EmbeddingChoiceSelectorTool",
+        "description" : "基于嵌入相似度的智能选择器，通过计算查询字符串与选项列表的语义相似度，返回最相关的选项及其相似度分数。",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "choice" : {
+              "name" : "choice",
+              "description" : "待选择的选项列表，工具将计算每个选项与查询字符串的语义相似度",
+              "type" : "array",
+              "items" : {
+                "type" : "string"
+              }
+            },
+            "query_str" : {
+              "name" : "query_str",
+              "description" : "查询字符串，用于与选项列表进行语义相似度匹配",
+              "type" : "string"
+            },
+            "options" : {
+              "name" : "options",
+              "description" : "嵌入模型配置参数，包括API密钥、模型名称和API基础URL",
+              "type" : "object",
+              "properties" : {
+                "api_key" : {
+                  "description" : "用于访问嵌入模型的API密钥",
+                  "type" : "string"
+                },
+                "model_name" : {
+                  "description" : "要使用的嵌入模型名称",
+                  "type" : "string"
+                },
+                "api_base" : {
+                  "description" : "嵌入模型API的基础URL地址",
+                  "type" : "string"
+                }
+              },
+              "required" : [ "api_key", "model_name", "api_base" ]
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "choice", "query_str", "options" ],
+        "return" : {
+          "name" : "selection_results",
+          "description" : "返回选择结果列表，包含每个选项的内容和对应的相似度分数，按相似度降序排列",
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "content" : {
+                "description" : "选项的文本内容",
+                "type" : "string"
+              },
+              "score" : {
+                "description" : "该选项与查询字符串的语义相似度分数（0-1之间，分数越高表示越相似）",
+                "type" : "number"
+              }
+            }
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "llama.tools.embedding_choice_selector",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "llama" ]
+      },
+      "definitionName" : "EmbeddingChoiceSelectorTool"
+    } ]
+  } ]
 }
