@@ -1,5 +1,5 @@
 # -- encoding: utf-8 --
-# Copyright (c) 2024 Huawei Technologies Co., Ltd. All Rights Reserved.
+# Copyright (c) 2025 Huawei Technologies Co., Ltd. All Rights Reserved.
 # This file is a part of the ModelEngine Project.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # ======================================================================================================================
@@ -8,7 +8,6 @@ import typing
 from .media import Media
 
 class LLMChoiceSelectorOptions(object):
-
     def __init__(self, api_key: str, model_name: str,api_base: str, prompt: str ,mode: str = 'single'):
         self.api_key = api_key
         self.model_name = model_name
