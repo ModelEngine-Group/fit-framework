@@ -100,20 +100,17 @@ def mojeek_query(query: str, api_key: str) -> str:
 @fitable("langchain.tool.reddit_search", "default")
 def reddit_search(query: str, sort: str, time_filter: str, subreddit: str, limit: str, client_id: str,
                   client_secret: str, user_agent: str) -> str:
-    try:
-        search = RedditSearchRun(
-            api_wrapper=RedditSearchAPIWrapper(
-                reddit_client_id=client_id,
-                reddit_client_secret=client_secret,
-                reddit_user_agent=user_agent,
-            )
+    search = RedditSearchRun(
+        api_wrapper=RedditSearchAPIWrapper(
+            reddit_client_id=client_id,
+            reddit_client_secret=client_secret,
+            reddit_user_agent=user_agent,
         )
-        search_params = RedditSearchSchema(query=query, sort=sort, time_filter=time_filter, subreddit=subreddit,
-                                           limit=limit)
-        result = search.run(tool_input=search_params.dict())
-        return result
-    except Exception as e:
-      return f"Error: {str(e)}"
+    )
+    search_params = RedditSearchSchema(query=query, sort=sort, time_filter=time_filter, subreddit=subreddit,
+                                       limit=limit)
+    result = search.run(tool_input=search_params.dict())
+    return result
 
 @fitable("langchain.tool.searxng_search", "default")
 def searxng_search(query: str, searx_host: str) -> str:
