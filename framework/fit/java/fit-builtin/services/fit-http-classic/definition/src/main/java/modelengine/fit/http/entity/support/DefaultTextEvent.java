@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fit.http.entity.support;
 
@@ -88,7 +88,7 @@ public class DefaultTextEvent implements TextEvent {
 
     private static void appendData(StringBuilder sb, ObjectSerializer objectSerializer, Object data) {
         if (data == null) {
-            if (sb.length() == 0) {
+            if (sb.isEmpty()) {
                 sb.append(LF);
             }
             sb.append(LF);

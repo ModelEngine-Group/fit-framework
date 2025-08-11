@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fit.http.server.netty;
 
@@ -71,7 +71,7 @@ public class NettyHttpServerRequest implements ServerRequest, OnHttpContentRecei
         this.startLine = this.initStartLine();
         this.headers = this.initHeaders();
         this.body = this.isLargeBody() ? NettyReadableMessageBody.large() : NettyReadableMessageBody.common();
-        log.info("Netty http request initialized. [id={0}, request={1}]", ctx.name(), this.startLine());
+        log.debug("Netty http request initialized. [id={0}, request={1}]", ctx.name(), this.startLine());
     }
 
     private boolean isLargeBody() {
@@ -197,7 +197,7 @@ public class NettyHttpServerRequest implements ServerRequest, OnHttpContentRecei
             if (this.isClosed.get()) {
                 return;
             }
-            log.info("Netty http request closed. [id={}]", this.ctx.name());
+            log.debug("Netty http request closed. [id={}]", this.ctx.name());
             this.isClosed.set(true);
             this.body.close();
         } finally {

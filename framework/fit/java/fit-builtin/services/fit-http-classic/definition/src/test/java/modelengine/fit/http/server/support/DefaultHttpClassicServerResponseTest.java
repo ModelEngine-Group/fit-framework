@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fit.http.server.support;
 
@@ -99,7 +99,7 @@ class DefaultHttpClassicServerResponseTest {
         ServerResponse serverResponse = mock(ServerResponse.class);
         when(serverResponse.startLine()).thenReturn(mock(ConfigurableStatusLine.class));
         when(serverResponse.headers()).thenReturn(mock(ConfigurableMessageHeaders.class));
-        doThrow(new IOException("Error")).when(serverResponse).writeBody(new byte[1]);
+        doThrow(new IOException("Error")).when(serverResponse).flush();
         Choir<byte[]> mappedChoir = Choir.just(new byte[1], new byte[2]);
         Choir<TextEvent> stream = ObjectUtils.cast(mock(Choir.class));
         when(stream.map(Mockito.any())).thenReturn(ObjectUtils.cast(mappedChoir));
