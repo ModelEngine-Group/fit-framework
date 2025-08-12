@@ -5,18 +5,21 @@
 # ======================================================================================================================
 import typing
 
-from .serializable import Serializable
 from .media import Media
 
+class Document(object):
+    def __init__(self, content: str, media: Media , metadata: typing.Dict[str, object] ):
+        self.content = content
+        self.media = media
+        self.metadata = metadata
+    
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__dict__ == other.__dict__
 
-class Document(Serializable):
-    """
-    Document.
-    """
-    content: str
-    media: Media = None
-    metadata: typing.Dict[str, object]
+    def __hash__(self):
+        return hash(tuple(self.__dict__.values()))
 
-    class Config:
-        frozen = True
-        smart_union = True
+    def __repr__(self):
+        return str((self.__dict__.values()))

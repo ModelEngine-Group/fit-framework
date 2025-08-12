@@ -1,368 +1,208 @@
 {
-    "tools": [
-        {
-            "tags": [
-                "LlamaIndex"
-            ],
-            "runnables": {
-                "LlamaIndex": {
-                    "genericableId": "llama_index.rag.toolkit",
-                    "fitableId": "sentence_splitter"
-                }
+  "version" : "1.0.0",
+  "definitionGroups" : [ {
+    "name" : "llama_splitter_tools",
+    "summary" : "Llama文本分割工具定义组",
+    "description" : "提供多种文本分割策略的工具定义，包括句子分割和词令牌分割，用于将长文本分割成适合处理的较小块",
+    "extensions" : { },
+    "definitions" : [ {
+      "schema" : {
+        "name" : "SentenceSplitterTool",
+        "description" : "按句子分割文本，优先保持完整句子。该工具会将输入文本按照指定的分隔符和块大小进行分割，同时保持句子的完整性，避免在句子中间断开",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "text" : {
+              "defaultValue" : "",
+              "description" : "待分割的文本内容",
+              "name" : "text",
+              "type" : "string",
+              "example" : "这是一段需要分割的文本。它包含多个句子。每个句子都应该保持完整。"
             },
-            "schema": {
-                "name": "sentence_splitter",
-                "description": "Parse text with a preference for complete sentences.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "text": {
-                            "type": "string",
-                            "description": "text"
-                        },
-                        "separator": {
-                            "type": "string",
-                            "description": "separator"
-                        },
-                        "chunk_size": {
-                            "type": "string",
-                            "description": "chunk_size"
-                        },
-                        "chunk_overlap": {
-                            "type": "string",
-                            "description": "chunk_overlap"
-                        }
-                    },
-                    "required": [
-                        "text",
-                        "separator",
-                        "chunk_size",
-                        "chunk_overlap"
-                    ]
-                },
-                "return": {
-                    "title": "Split Sentences By Sentence.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "parameterExtensions": {
-                    "config": [
-                        "text",
-                        "separator",
-                        "chunk_size",
-                        "chunk_overlap"
-                    ]
-                }
+            "separator" : {
+              "defaultValue" : "",
+              "description" : "用于分割文本的分隔符，通常是句号、问号、感叹号等标点符号",
+              "name" : "separator",
+              "type" : "string",
+              "example" : "。"
+            },
+            "chunk_size" : {
+              "defaultValue" : "",
+              "description" : "每个文本块的目标大小（字符数），用于控制分割后的文本块长度",
+              "name" : "chunk_size",
+              "type" : "integer",
+              "example" : "100"
+            },
+            "chunk_overlap_size" : {
+              "defaultValue" : "",
+              "description" : "相邻文本块之间的重叠大小（字符数），用于保持上下文连贯性",
+              "name" : "chunk_overlap_size",
+              "type" : "integer",
+              "example" : "20"
             }
+          },
+          "required" : [ "text", "separator", "chunk_size", "chunk_overlap_size" ]
         },
-        {
-            "tags": [
-                "LlamaIndex"
-            ],
-            "runnables": {
-                "LlamaIndex": {
-                    "genericableId": "llama_index.rag.toolkit",
-                    "fitableId": "token_text_splitter"
-                }
-            },
-            "schema": {
-                "name": "token_text_splitter",
-                "description": "Splitting text that looks at word tokens.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "text": {
-                            "type": "string",
-                            "description": "text"
-                        },
-                        "separator": {
-                            "type": "string",
-                            "description": "separator"
-                        },
-                        "chunk_size": {
-                            "type": "string",
-                            "description": "chunk_size"
-                        },
-                        "chunk_overlap": {
-                            "type": "string",
-                            "description": "chunk_overlap"
-                        }
-                    },
-                    "required": [
-                        "text",
-                        "separator",
-                        "chunk_size",
-                        "chunk_overlap"
-                    ]
-                },
-                "return": {
-                    "title": "Split Sentences By Token.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "parameterExtensions": {
-                    "config": [
-                        "text",
-                        "separator",
-                        "chunk_size",
-                        "chunk_overlap"
-                    ]
-                }
-            }
-        },
-        {
-            "tags": [
-                "LlamaIndex"
-            ],
-            "runnables": {
-                "LlamaIndex": {
-                    "genericableId": "llama_index.rag.toolkit",
-                    "fitableId": "semantic_splitter"
-                }
-            },
-            "schema": {
-                "name": "semantic_splitter",
-                "description": "Splitting text that looks at word tokens.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "buffer_size": {
-                            "type": "string",
-                            "description": "buffer_size"
-                        },
-                        "breakpoint_percentile_threshold": {
-                            "type": "string",
-                            "description": "breakpoint_percentile_threshold"
-                        },
-                        "docs": {
-                            "type": "string",
-                            "description": "docs"
-                        },
-                        "chunk_overlap": {
-                            "type": "string",
-                            "description": "chunk_overlap"
-                        },
-                        "model_name": {
-                            "type": "string",
-                            "description": "model_name"
-                        },
-                        "api_key": {
-                            "type": "string",
-                            "description": "api_key"
-                        },
-                        "api_base": {
-                            "type": "string",
-                            "description": "api_base"
-                        }
-                    },
-                    "required": [
-                        "buffer_size",
-                        "breakpoint_percentile_threshold",
-                        "docs"
-                    ]
-                },
-                "return": {
-                    "title": "Split Sentences By Semantic.",
-                    "type": "array",
-                    "items": {
-                        "title": "BaseNode",
-                        "description": "Base node Object.\n\nGeneric abstract interface for retrievable nodes",
-                        "type": "object",
-                        "properties": {
-                            "id_": {
-                                "title": "Id ",
-                                "description": "Unique ID of the node.",
-                                "type": "string"
-                            },
-                            "embedding": {
-                                "title": "Embedding",
-                                "description": "Embedding of the node.",
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                }
-                            },
-                            "extra_info": {
-                                "title": "Extra Info",
-                                "description": "A flat dictionary of metadata fields",
-                                "type": "object"
-                            },
-                            "excluded_embed_metadata_keys": {
-                                "title": "Excluded Embed Metadata Keys",
-                                "description": "Metadata keys that are excluded from text for the embed model.",
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "excluded_llm_metadata_keys": {
-                                "title": "Excluded Llm Metadata Keys",
-                                "description": "Metadata keys that are excluded from text for the LLM.",
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "relationships": {
-                                "title": "Relationships",
-                                "description": "A mapping of relationships to other node information.",
-                                "type": "object",
-                                "additionalProperties": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/definitions/RelatedNodeInfo"
-                                        },
-                                        {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/RelatedNodeInfo"
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "class_name": {
-                                "title": "Class Name",
-                                "type": "string",
-                                "default": "base_component"
-                            }
-                        }
-                    }
-                },
-                "parameterExtensions": {
-                    "config": [
-                        "docs",
-                        "buffer_size",
-                        "breakpoint_percentile_threshold",
-                        "chunk_overlap",
-                        "model_name",
-                        "api_key",
-                        "api_base"
-                    ]
-                }
-            }
-        },
-        {
-            "tags": [
-                "LlamaIndex"
-            ],
-            "runnables": {
-                "LlamaIndex": {
-                    "genericableId": "llama_index.rag.toolkit",
-                    "fitableId": "sentence_window_node_parser"
-                }
-            },
-            "schema": {
-                "name": "sentence_window_node_parser",
-                "description": "Splitting text that looks at word tokens.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "window_size": {
-                            "type": "string",
-                            "description": "window_size"
-                        },
-                        "window_metadata_key": {
-                            "type": "string",
-                            "description": "window_metadata_key"
-                        },
-                        "original_text_metadata_key": {
-                            "type": "string",
-                            "description": "original_text_metadata_key"
-                        },
-                        "docs": {
-                            "type": "string",
-                            "description": "docs"
-                        }
-                    },
-                    "required": [
-                        "window_size",
-                        "window_metadata_key",
-                        "original_text_metadata_key",
-                        "docs"
-                    ]
-                },
-                "return": {
-                    "title": "Splits All Documents Into Individual Sentences",
-                    "type": "array",
-                    "items": {
-                        "title": "BaseNode",
-                        "description": "Base node Object.\n\nGeneric abstract interface for retrievable nodes",
-                        "type": "object",
-                        "properties": {
-                            "id_": {
-                                "title": "Id ",
-                                "description": "Unique ID of the node.",
-                                "type": "string"
-                            },
-                            "embedding": {
-                                "title": "Embedding",
-                                "description": "Embedding of the node.",
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                }
-                            },
-                            "extra_info": {
-                                "title": "Extra Info",
-                                "description": "A flat dictionary of metadata fields",
-                                "type": "object"
-                            },
-                            "excluded_embed_metadata_keys": {
-                                "title": "Excluded Embed Metadata Keys",
-                                "description": "Metadata keys that are excluded from text for the embed model.",
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "excluded_llm_metadata_keys": {
-                                "title": "Excluded Llm Metadata Keys",
-                                "description": "Metadata keys that are excluded from text for the LLM.",
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "relationships": {
-                                "title": "Relationships",
-                                "description": "A mapping of relationships to other node information.",
-                                "type": "object",
-                                "additionalProperties": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/definitions/RelatedNodeInfo"
-                                        },
-                                        {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/RelatedNodeInfo"
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "class_name": {
-                                "title": "Class Name",
-                                "type": "string",
-                                "default": "base_component"
-                            }
-                        }
-                    }
-                },
-                "parameterExtensions": {
-                    "config": [
-                        "docs",
-                        "window_size",
-                        "window_metadata_key",
-                        "original_text_metadata_key"
-                    ]
-                }
-            }
+        "order" : [ "text", "separator", "chunk_size", "chunk_overlap_size" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "convertor" : ""
         }
-    ]
+      }
+    }, {
+      "schema" : {
+        "name" : "TokenTextSplitterTool",
+        "description" : "基于词令牌分割文本。该工具使用词令牌（token）作为分割单位，确保分割后的文本块在语义上更加合理，适合用于语言模型处理",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "text" : {
+              "defaultValue" : "",
+              "description" : "待分割的文本内容",
+              "name" : "text",
+              "type" : "string",
+              "example" : "这是一段需要按词令牌分割的文本内容。"
+            },
+            "separator" : {
+              "defaultValue" : "",
+              "description" : "用于分割文本的分隔符，可以是空格、标点符号等",
+              "name" : "separator",
+              "type" : "string",
+              "example" : " "
+            },
+            "chunk_size" : {
+              "defaultValue" : "",
+              "description" : "每个文本块的目标大小（词令牌数量），用于控制分割后的文本块长度",
+              "name" : "chunk_size",
+              "type" : "integer",
+              "example" : "50"
+            },
+            "chunk_overlap_size" : {
+              "defaultValue" : "",
+              "description" : "相邻文本块之间的重叠大小（词令牌数量），用于保持上下文连贯性",
+              "name" : "chunk_overlap_size",
+              "type" : "integer",
+              "example" : "10"
+            }
+          },
+          "required" : [ "text", "separator", "chunk_size", "chunk_overlap_size" ]
+        },
+        "order" : [ "text", "separator", "chunk_size", "chunk_overlap_size" ],
+        "return" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "convertor" : ""
+        }
+      }
+    } ]
+  } ],
+  "toolGroups" : [ {
+    "name" : "llama_splitter_tools_impl",
+    "summary" : "Llama文本分割工具实现组",
+    "description" : "提供多种文本分割策略的具体实现，包括句子分割和词令牌分割，为Llama模型提供高效的文本预处理能力",
+    "extensions" : { },
+    "definitionGroupName" : "llama_splitter_tools",
+    "tools" : [ {
+      "namespace" : "sentence_splitter",
+      "schema" : {
+        "name" : "SentenceSplitterTool",
+        "description" : "按句子分割文本，优先保持完整句子。该工具会将输入文本按照指定的分隔符和块大小进行分割，同时保持句子的完整性，避免在句子中间断开，确保分割后的文本块在语义上保持连贯",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "text" : {
+              "name" : "text",
+              "type" : "string"
+            },
+            "separator" : {
+              "name" : "separator",
+              "type" : "string"
+            },
+            "chunk_size" : {
+              "name" : "chunk_size",
+              "type" : "integer"
+            },
+            "chunk_overlap_size" : {
+              "name" : "chunk_overlap_size",
+              "type" : "integer"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "text", "separator", "chunk_size", "chunk_overlap_size" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回按句子分割的文本列表，优先保持完整句子。每个文本块都尽可能保持句子的完整性，避免在句子中间断开",
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "llama.tools.sentence_splitter",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Llama" ]
+      },
+      "definitionName" : "SentenceSplitterTool"
+    }, {
+      "namespace" : "token_text_splitter",
+      "schema" : {
+        "name" : "TokenTextSplitterTool",
+        "description" : "基于词令牌分割文本。该工具使用词令牌（token）作为分割单位，确保分割后的文本块在语义上更加合理，适合用于语言模型处理，能够更好地保持文本的语义完整性",
+        "parameters" : {
+          "type" : "object",
+          "properties" : {
+            "text" : {
+              "name" : "text",
+              "type" : "string"
+            },
+            "separator" : {
+              "name" : "separator",
+              "type" : "string"
+            },
+            "chunk_size" : {
+              "name" : "chunk_size",
+              "type" : "integer"
+            },
+            "chunk_overlap_size" : {
+              "name" : "chunk_overlap_size",
+              "type" : "integer"
+            }
+          },
+          "required" : [ ]
+        },
+        "order" : [ "text", "separator", "chunk_size", "chunk_overlap_size" ],
+        "return" : {
+          "name" : "",
+          "description" : "返回基于词令牌分割的文本列表。每个文本块都基于词令牌进行分割，确保在语义上更加合理，适合语言模型处理",
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "convertor" : ""
+        }
+      },
+      "runnables" : {
+        "FIT" : {
+          "genericableId" : "llama.tools.token_text_splitter",
+          "fitableId" : "default"
+        }
+      },
+      "extensions" : {
+        "tags" : [ "Llama" ]
+      },
+      "definitionName" : "TokenTextSplitterTool"
+    } ]
+  } ]
 }
