@@ -14,6 +14,7 @@ import modelengine.fit.client.http.HttpsConstants;
 import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fit.http.protocol.util.SslUtils;
 import modelengine.fitframework.log.Logger;
+import modelengine.fitframework.util.ArrayUtils;
 import modelengine.fitframework.util.StringUtils;
 import okhttp3.OkHttpClient;
 
@@ -28,6 +29,17 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * 创建 OkHttpClient.Builder 实例工厂。
+ *
+ * <p><strong>安全配置说明：</strong></p>
+ * <p>本框架提供 {@link HttpsConstants#CLIENT_SECURE_IGNORE_TRUST} 配置项，允许忽略SSL证书验证。</p>
+ * <p><strong>警告：</strong>启用此选项将使应用程序容易受到中间人攻击！</p>
+ *
+ * <p>使用场景：</p>
+ * <ul>
+ *   <li>开发环境：使用自签名证书或内网测试</li>
+ *   <li>测试环境：快速原型验证</li>
+ *   <li><strong>生产环境：绝对不应启用此选项</strong></li>
+ * </ul>
  *
  * @author 杭潇
  * @since 2024-04-15
@@ -79,7 +91,7 @@ public class OkHttpClientBuilderFactory {
         TrustManager[] trustManagers = getTrustManagersConfig(config, isIgnoreTrust);
 
         SSLContext sslContext = SslUtils.getSslContext(keyManagers, trustManagers, isStrongRandom, secureProtocol);
-        if (isIgnoreTrust || isTrustManagerSet(trustManagers)) {
+        if (isTrustManagerSet(trustManagers)) {
             clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
         }
         if (isIgnoreTrust || isHostnameVerificationIgnored(trustManagers, config)) {
@@ -100,6 +112,15 @@ public class OkHttpClientBuilderFactory {
     private static TrustManager[] getTrustManagersConfig(HttpClassicClientFactory.Config config, boolean isIgnoreTrust)
             throws GeneralSecurityException {
         if (isIgnoreTrust) {
+            log.warn("========================================================");
+            log.warn("SECURITY WARNING: SSL/TLS Certificate Validation DISABLED!");
+            log.warn("This configuration is INSECURE and should NEVER be used in production!");
+            log.warn("Your application is vulnerable to man-in-the-middle attacks!");
+            log.warn("Current setting: {} = true", HttpsConstants.CLIENT_SECURE_IGNORE_TRUST);
+            log.warn("========================================================");
+            if (log.isDebugEnabled()) {
+                log.debug("Certificate validation disabled at:", new Exception("Stack trace for debugging"));
+            }
             return getTrustAllCerts();
         }
         String trustStoreFile = cast(config.custom().get(HttpsConstants.CLIENT_SECURE_TRUST_STORE_FILE));
@@ -120,13 +141,37 @@ public class OkHttpClientBuilderFactory {
                 .getOrDefault(HttpsConstants.CLIENT_SECURE_IGNORE_HOSTNAME, false)));
     }
 
+    /**
+     * 创建一个接受所有证书的 {@link TrustManager}{@code []}，其中仅有一个 {@link TrustManager}。
+     * <p>此方法是框架设计的一部分，用于支持开发环境的快速集成，安全风险已通过配置和日志机制向用户明确告知。</p>
+     * <p><strong>安全警告：</strong>此 {@link TrustManager}
+     * 不验证任何证书，会接受所有证书包括无效、过期或伪造的证书，仅应在开发环境中使用，生产环境使用将导致严重的安全风险。</p>
+     *
+     * @return 不验证任何证书的 {@link TrustManager}{@code []}。
+     */
     private static TrustManager[] getTrustAllCerts() {
         X509TrustManager x509TrustManager = new X509TrustManager() {
             @Override
-            public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+            public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                // 记录客户端证书验证被跳过
+                if (log.isDebugEnabled()) {
+                    log.debug("Bypassing client certificate validation (INSECURE MODE). [authType={}]", authType);
+                }
+            }
 
             @Override
-            public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                // 记录服务器证书验证被跳过，包含证书信息便于调试
+                if (log.isDebugEnabled() && ArrayUtils.isNotEmpty(chain)) {
+                    X509Certificate cert = chain[0];
+                    log.debug("Bypassing server certificate validation (INSECURE MODE):");
+                    log.debug("  - Subject: {}", cert.getSubjectX500Principal());
+                    log.debug("  - Issuer: {}", cert.getIssuerX500Principal());
+                    log.debug("  - Serial Number: {}", cert.getSerialNumber());
+                    log.debug("  - Valid from {} to {}", cert.getNotBefore(), cert.getNotAfter());
+                    log.debug("  - Auth Type: {}", authType);
+                }
+            }
 
             @Override
             public X509Certificate[] getAcceptedIssuers() {
