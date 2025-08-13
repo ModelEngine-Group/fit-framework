@@ -3,6 +3,7 @@
 # This file is a part of the ModelEngine Project.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # ======================================================================================================================
+
 class SemanticSplitterOptions(object):
     def __init__(self , model_name : str , api_base : str , api_key : str):
         self.model_name = model_name

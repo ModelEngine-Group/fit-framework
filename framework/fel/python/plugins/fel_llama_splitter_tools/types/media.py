@@ -3,6 +3,7 @@
 # This file is a part of the ModelEngine Project.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # ======================================================================================================================
+
 class Media(object):
     def __init__(self, mime: str, data: str):
         self.mime = mime
