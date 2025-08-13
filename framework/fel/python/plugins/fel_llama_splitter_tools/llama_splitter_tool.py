@@ -6,7 +6,8 @@
 import traceback
 from typing import Tuple, List, Any, Callable
 
-from fitframework import fit_logger, fitable
+from fitframework import fit_logger
+from fitframework.api.decorators import fitable
 from llama_index.core.node_parser import (
     SentenceSplitter,
     TokenTextSplitter,
