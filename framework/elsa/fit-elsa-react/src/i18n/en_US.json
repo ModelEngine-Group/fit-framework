@@ -427,5 +427,7 @@
   "noContent": "No data to display",
   "rerankConfig": "Rerank Config",
   "whetherRerank": "Whether to Rerank",
-  "topN": "topN"
+  "topN": "topN",
+  "add": "Add",
+  "value": "Value"
 }
