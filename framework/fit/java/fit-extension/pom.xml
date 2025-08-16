@@ -21,8 +21,6 @@
         <module>fit-retry</module>
         <module>fit-schedule</module>
         <module>fit-transaction</module>
-        <module>fit-validation</module>
-        <module>fit-validation-hibernate</module>
     </modules>
 
     <build>

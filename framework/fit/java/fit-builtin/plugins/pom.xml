@@ -43,6 +43,8 @@
         <module>fit-service-discovery</module>
         <module>fit-service-registry</module>
         <module>fit-value-fastjson</module>
+        <module>fit-validation-hibernate-jakarta</module>
+        <module>fit-validation-hibernate-javax</module>
     </modules>
 
     <dependencyManagement>
