@@ -356,7 +356,7 @@
   "codeCannotEmpty": "待翻译",
   "code": "待翻译",
   "editInIde": "待翻译",
-  "codePopover": "待翻译",
+  "codePopover": "<p><strong>1. Function editing description: </strong>Compile the structure of a function by referring to the code example. </p>\n<p>You can directly use the variables in the input parameters and return an object, array, or other basic types of data as the output result. </p>\n<p>The method name must be main. Additionally, multiple functions cannot be compiled. </p>\n<p>By default, the system introduces dependencies including <strong>asyncio</strong>, <strong>json</strong>, <strong>numpy</strong>, and <strong>typing</strong>.",
   "codeOutputPopover": "待翻译",
   "otherQuestion": "待翻译",
   "classification": "待翻译",
