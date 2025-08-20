@@ -610,7 +610,7 @@
   "codeCannotEmpty": "代码不能为空！",
   "code": "代码",
   "editInIde": "在IDE中编辑",
-  "codePopover": "<p><strong>1.函数编辑说明: </strong>参考代码示例。编写一个函数的结构，</p>\n<p>您可以直接使用输入参数中的变量，并通过return一个</p>\n<p>对象、数组或者其他基本类型的数据作为输出结果。</p>\n<p>方法名称必须是main，方法不能是异步方法，并且不</p>\n<p>支持编写多个函数。</p>\n<p>系统默认引入依赖包含asyncio, json, numpy, typing。</p>\n<p><strong>2.快捷键说明:</strong> 按键盘上的F1键打开快捷键说明弹窗。</p>",
+  "codePopover": "<p><strong>1.函数编辑说明: </strong>参考代码示例。编写一个函数的结构，</p>\n<p>您可以直接使用输入参数中的变量，并通过return一个</p>\n<p>对象、数组或者其他基本类型的数据作为输出结果。</p>\n<p>方法名称必须是main，并且不</p>\n<p>支持编写多个函数。</p>\n<p>系统默认引入依赖包含asyncio, json, numpy, typing。",
   "codeOutputPopover": "<p>代码运行完成后输出的变量，必须保证此处定义的变量名、</p>\n<p>变量类型与代码的return对象中完全一致</p>",
   "skill": "技能",
   "classificationInputPopover": "输入需要添加到提示词模板中的信息，可被提示词模板引用。",
