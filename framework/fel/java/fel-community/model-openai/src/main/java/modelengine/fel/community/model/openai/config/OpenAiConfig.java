@@ -18,7 +18,7 @@ import modelengine.fitframework.annotation.Component;
 @AcceptConfigValues("fel.openai")
 public class OpenAiConfig {
     private String apiBase = "https://api.openai.com/v1/";
-    private String apiKey = "EMPTY";
+    private String apiKey = "";
     private int connectTimeout = 30000;
     private int readTimeout = 30000;
 

@@ -132,7 +132,10 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankMod
         notBlank(option.model(), "The embed model name cannot be null.");
         HttpClassicClientRequest request = this.httpClient.get()
                 .createRequest(HttpRequestMethod.POST, UrlUtils.combine(this.baseUrl, OpenAiApi.EMBEDDING_ENDPOINT));
-        HttpUtils.setBearerAuth(request, StringUtils.blankIf(option.apiKey(), this.defaultApiKey));
+        String actualApiKey = StringUtils.blankIf(option.apiKey(), this.defaultApiKey);
+        if (StringUtils.isNotBlank(actualApiKey)) {
+            HttpUtils.setBearerAuth(request, actualApiKey);
+        }
         request.jsonEntity(new OpenAiEmbeddingRequest(inputs, option.model()));
         Class<OpenAiEmbeddingResponse> clazz = OpenAiEmbeddingResponse.class;
         try (HttpClassicClientResponse<OpenAiEmbeddingResponse> response = request.exchange(clazz)) {
@@ -151,7 +154,10 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankMod
         String modelSource = StringUtils.blankIf(chatOption.baseUrl(), this.baseUrl);
         HttpClassicClientRequest request = this.getHttpClient(chatOption.secureConfig())
                 .createRequest(HttpRequestMethod.POST, UrlUtils.combine(modelSource, OpenAiApi.CHAT_ENDPOINT));
-        HttpUtils.setBearerAuth(request, StringUtils.blankIf(chatOption.apiKey(), this.defaultApiKey));
+        String actualApiKey = StringUtils.blankIf(chatOption.apiKey(), this.defaultApiKey);
+        if (StringUtils.isNotBlank(actualApiKey)) {
+            HttpUtils.setBearerAuth(request, actualApiKey);
+        }
         request.jsonEntity(new OpenAiChatCompletionRequest(prompt, chatOption));
         return chatOption.stream() ? this.createChatStream(request) : this.createChatCompletion(request);
     }
@@ -163,7 +169,10 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankMod
         String modelSource = StringUtils.blankIf(option.baseUrl(), this.baseUrl);
         HttpClassicClientRequest request = this.httpClient.get()
                 .createRequest(HttpRequestMethod.POST, UrlUtils.combine(modelSource, OpenAiApi.IMAGE_ENDPOINT));
-        HttpUtils.setBearerAuth(request, StringUtils.blankIf(option.apiKey(), this.defaultApiKey));
+        String actualApiKey = StringUtils.blankIf(option.apiKey(), this.defaultApiKey);
+        if (StringUtils.isNotBlank(actualApiKey)) {
+            HttpUtils.setBearerAuth(request, actualApiKey);
+        }
         request.jsonEntity(new OpenAiImageRequest(option.model(), option.size(), prompt));
         Class<OpenAiImageResponse> clazz = OpenAiImageResponse.class;
         try (HttpClassicClientResponse<OpenAiImageResponse> response = request.exchange(clazz)) {
@@ -182,7 +191,10 @@ public class OpenAiModel implements EmbedModel, ChatModel, ImageModel, RerankMod
         String modelSource = StringUtils.blankIf(rerankOption.baseUri(), this.baseUrl);
         HttpClassicClientRequest request = this.getHttpClient(rerankOption.secureConfig())
                 .createRequest(HttpRequestMethod.POST, UrlUtils.combine(modelSource, OpenAiApi.RERANK_ENDPOINT));
-        HttpUtils.setBearerAuth(request, StringUtils.blankIf(rerankOption.apiKey(), this.defaultApiKey));
+        String actualApiKey = StringUtils.blankIf(rerankOption.apiKey(), this.defaultApiKey);
+        if (StringUtils.isNotBlank(actualApiKey)) {
+            HttpUtils.setBearerAuth(request, actualApiKey);
+        }
         List<String> docs = documents.stream().map(MeasurableDocument::text).collect(Collectors.toList());
         OpenAiRerankRequest fields = new OpenAiRerankRequest(rerankOption, docs);
         request.entity(Entity.createObject(request, fields));
