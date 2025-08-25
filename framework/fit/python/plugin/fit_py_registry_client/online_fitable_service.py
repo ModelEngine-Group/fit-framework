@@ -17,7 +17,7 @@ from fitframework import fitable, const, value, fit
 from fitframework.api.decorators import scheduled_executor
 from fitframework.api.logging import sys_plugin_logger
 from fitframework.core.network.enums import SerializingStructureEnum
-from .entity import Worker, FitableMeta, FitableInfo, Address as AddressRegistry, Endpoint, \
+from plugin.fit_py_nacos_registry.entity import Worker, FitableMeta, FitableInfo, Address as AddressRegistry, Endpoint, \
     Application, Address
 
 

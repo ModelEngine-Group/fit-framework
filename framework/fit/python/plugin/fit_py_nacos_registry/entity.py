@@ -219,4 +219,15 @@ class FitableMetaInstance(object):
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
 
+class HeartBeatInfo:
+    def __init__(self, sceneType: str, aliveTime: int, initDelay: int):
+        self.sceneType: str = sceneType
+        self.aliveTime: int = aliveTime
+        self.initDelay: int = initDelay
+
+
+class HeartBeatAddress:
+    def __init__(self, id_: str):
+        self.id = id_
+
 

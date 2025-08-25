@@ -71,7 +71,7 @@ def get_runtime_worker_id() -> str:
     pass
 
 
-@fit(const.HEART_BEAT_GEN_ID)
+@fit(const.SEND_HEART_BEAT_GEN_ID)
 def heartbeat(beat_info: List[HeartBeatInfo], address: HeartBeatAddress) -> bool:
     """ 可能返回 false，也可能抛出异常，也可能超时 """
     pass

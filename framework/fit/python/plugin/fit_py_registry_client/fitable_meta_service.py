@@ -10,7 +10,7 @@ from typing import List
 
 from fit_common_struct.core import Genericable
 from fitframework import fitable, const, fit
-from .entity import FitableMetaInstance, GenericableInfo
+from plugin.fit_py_nacos_registry.entity import FitableMetaInstance, GenericableInfo
 
 
 @fit(const.QUERY_FITABLE_METAS_GEN_ID)
