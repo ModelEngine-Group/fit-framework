@@ -8,6 +8,8 @@ package modelengine.fel.core.image;
 
 import modelengine.fitframework.pattern.builder.BuilderFactory;
 
+import java.util.Map;
+
 /**
  * 表示图像生成模型参数的实体。
  *
@@ -41,6 +43,13 @@ public interface ImageOption {
      * @return 表示服务密钥的 {@link String}。
      */
     String apiKey();
+
+    /**
+     * 获取扩展信息。
+     *
+     * @return 表示扩展信息的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     */
+    Map<String, Object> extensions();
 
     /**
      * 表示 {@link ImageOption} 的构建器。
@@ -77,6 +86,14 @@ public interface ImageOption {
          * @return 表示当前构建器的 {@link Builder}。
          */
         Builder baseUrl(String baseUrl);
+
+        /**
+         * 设置扩展信息。
+         *
+         * @param extensions 表示扩展信息的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+         * @return 表示当前构建器的 {@link Builder}。
+         */
+        Builder extensions(Map<String, Object> extensions);
 
         /**
          * 构建 {@link ImageOption} 实例。

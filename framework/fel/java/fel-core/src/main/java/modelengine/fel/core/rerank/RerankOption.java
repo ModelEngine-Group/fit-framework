@@ -9,6 +9,8 @@ package modelengine.fel.core.rerank;
 import modelengine.fel.core.model.http.SecureConfig;
 import modelengine.fitframework.pattern.builder.BuilderFactory;
 
+import java.util.Map;
+
 /**
  * 表示重排模型参数的实体。
  *
@@ -56,6 +58,13 @@ public interface RerankOption {
      * @return 表示调用重排模型服务安全配置的 {@link SecureConfig}。
      */
     SecureConfig secureConfig();
+
+    /**
+     * 获取扩展信息。
+     *
+     * @return 表示扩展信息的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     */
+    Map<String, Object> extensions();
 
     /**
      * {@link RerankOption} 的构建器。
@@ -108,6 +117,14 @@ public interface RerankOption {
          * @return 表示当前构建器的 {@link Builder}。
          */
         Builder secureConfig(SecureConfig secureConfig);
+
+        /**
+         * 设置扩展信息。
+         *
+         * @param extensions 表示扩展信息的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+         * @return 表示当前构建器的 {@link Builder}。
+         */
+        Builder extensions(Map<String, Object> extensions);
 
         /**
          * 构建对象。

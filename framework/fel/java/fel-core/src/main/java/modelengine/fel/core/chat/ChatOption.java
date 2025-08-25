@@ -6,11 +6,12 @@
 
 package modelengine.fel.core.chat;
 
-import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fel.core.model.http.SecureConfig;
+import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fitframework.pattern.builder.BuilderFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 表示聊天大模型参数的实体。
@@ -133,6 +134,13 @@ public interface ChatOption {
     SecureConfig secureConfig();
 
     /**
+     * 获取扩展信息。
+     *
+     * @return 表示扩展信息的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     */
+    Map<String, Object> extensions();
+
+    /**
      * {@link ChatOption} 的构建器。
      */
     interface Builder {
@@ -231,6 +239,14 @@ public interface ChatOption {
          * @return 表示当前构建器的 {@link Builder}。
          */
         Builder secureConfig(SecureConfig secureConfig);
+
+        /**
+         * 设置扩展信息。
+         *
+         * @param extensions 表示扩展信息的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+         * @return 表示当前构建器的 {@link Builder}。
+         */
+        Builder extensions(Map<String, Object> extensions);
 
         /**
          * 构建对象。
