@@ -164,8 +164,11 @@ public class HttpClassicRequestAssembler extends SimpleChannelInboundHandler<Htt
     private void doHttpRequest(ChannelHandlerContext ctx, NettyHttpServerRequest request) {
         request.setExecuteThread(Thread.currentThread());
         try (HttpClassicServerRequest classicRequest = HttpClassicServerRequest.create(this.server, request);
-             NettyHttpServerResponse response = new NettyHttpServerResponse(ctx, request);
-             HttpClassicServerResponse classicResponse = HttpClassicServerResponse.create(this.server, response)) {
+             // Inline Netty response creation to avoid it being managed as a separate
+             // try-with-resources variable. This prevents premature closure at the end
+             // of the try block, which would cause write failures when SSE sends data.
+             HttpClassicServerResponse classicResponse = HttpClassicServerResponse.create(this.server,
+                     new NettyHttpServerResponse(ctx, request))) {
             HttpHandler handler = this.server.httpDispatcher().dispatch(classicRequest, classicResponse);
             classicRequest.attributes().set(PATH_PATTERN.key(), handler.pathPattern());
             classicRequest.attributes().set(HTTP_HANDLER.key(), handler);
