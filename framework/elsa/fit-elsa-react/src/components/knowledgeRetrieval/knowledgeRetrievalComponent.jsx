@@ -7,7 +7,8 @@
 import {v4 as uuidv4} from 'uuid';
 import {KnowledgeRetrievalWrapper} from '@/components/knowledgeRetrieval/KnowledgeRetrievalWrapper.jsx';
 import {retrievalComponent} from '@/components/retrieval/retrievalComponent.jsx';
-import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP, DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID, FROM_TYPE} from '@/common/Consts.js';
+import {DATA_TYPES, DEFAULT_KNOWLEDGE_REPO_GROUP, DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID, FROM_TYPE,
+  DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS} from '@/common/Consts.js';
 import {
   UpdateGroupIdAndConfigIdReducer,
   UpdateInputParamReducer,
@@ -138,7 +139,8 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
             from: FROM_TYPE.INPUT,
             value: DEFAULT_KNOWLEDGE_REPO_GROUP,
           },
-          DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID
+          DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID,
+          DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS
         ],
       }],
       outputParams: [{

@@ -10,6 +10,7 @@ import {
   DATA_TYPES,
   DEFAULT_KNOWLEDGE_REPO_GROUP_STRUCT,
   DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID,
+  DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS,
   DEFAULT_LLM_KNOWLEDGE_BASES,
   DEFAULT_LLM_REFERENCE_OUTPUT,
   DEFAULT_ADD_TOOL_NODE_CONTEXT,
@@ -403,6 +404,10 @@ export const knowledgeRetrievalCompatibilityProcessor = (shapeData, graph, pageH
 
       if (Array.isArray(optionValue) && !optionValue.some(v => v.name === 'knowledgeConfigId')) {
         optionValue.push(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID);
+      }
+
+      if (Array.isArray(optionValue) && !optionValue.some(v => v.name === 'extensions')) {
+        optionValue.push(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS);
       }
     };
 
