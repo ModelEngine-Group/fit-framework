@@ -44,5 +44,12 @@ export const variableUpdateNodeState = (id, x, y, width, height, parent, drawer)
     });
   };
 
+  /**
+   * @override
+   */
+  self.isAllowReferenceSystemEnv = () => {
+    return false;
+  };
+
   return self;
 };
