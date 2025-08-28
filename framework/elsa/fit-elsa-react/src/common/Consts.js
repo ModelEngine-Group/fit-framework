@@ -251,3 +251,20 @@ export const DEFAULT_KNOWLEDGE_NODE_RERANK_TOP_N = {
   from: FROM_TYPE.INPUT,
   value: 3,
 };
+
+export const DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS = {
+    id: `knowledgeExtensions_${uuidv4()}`,
+    name: 'extensions',
+    type: DATA_TYPES.OBJECT,
+    from: FROM_TYPE.EXPAND,
+    value: [{
+        id: uuidv4(),
+        name: VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID,
+        type: DATA_TYPES.STRING,
+        from: FROM_TYPE.REFERENCE,
+        referenceId: VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID,
+        referenceKey: VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID,
+        referenceNode: VIRTUAL_CONTEXT_NODE.id,
+        value: [VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID],
+    }],
+};

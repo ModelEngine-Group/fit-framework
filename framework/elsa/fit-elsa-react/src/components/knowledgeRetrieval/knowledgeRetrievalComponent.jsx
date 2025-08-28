@@ -14,6 +14,7 @@ import {
   DEFAULT_KNOWLEDGE_REPO_GROUP,
   DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID,
   FROM_TYPE,
+  DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS,
 } from '@/common/Consts.js';
 import {
   ChangeAccessInfoReducer,
@@ -152,6 +153,7 @@ export const knowledgeRetrievalComponent = (jadeConfig, shape) => {
             value: DEFAULT_KNOWLEDGE_REPO_GROUP,
           },
           JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_KNOWLEDGE_CONFIG_ID)),
+          JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS)),
         ],
       }],
       outputParams: [{
