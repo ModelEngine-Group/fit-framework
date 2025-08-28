@@ -193,15 +193,17 @@ export const jadeNode = (id, x, y, width, height, parent, drawer) => {
 
     // 从当前节点开始启动递归
     explorePreShapesRecursive(self.id);
-    const systemEnv = self.page.getShapeById(VIRTUAL_CONTEXT_NODE.id);
-    systemEnv.runnable = true;
-    preNodeInfos.push({
-      id: systemEnv.id,
-      name: systemEnv.text,
-      node: systemEnv,
-      runnable: true,
-      observableList: self.page.getObservableList(systemEnv.id),
-    });
+    if (self.isAllowReferenceSystemEnv()) {
+      const systemEnv = self.page.getShapeById(VIRTUAL_CONTEXT_NODE.id);
+      systemEnv.runnable = true;
+      preNodeInfos.push({
+        id: systemEnv.id,
+        name: systemEnv.text,
+        node: systemEnv,
+        runnable: true,
+        observableList: self.page.getObservableList(systemEnv.id),
+      });
+    }
     preNodeInfos.shift();
     return preNodeInfos;
   };
@@ -365,6 +367,13 @@ export const jadeNode = (id, x, y, width, height, parent, drawer) => {
    */
   self.getNextRunnableEvents = () => {
     return self.page.getEvents().filter(l => l.fromShape === self.id && l.runnable);
+  };
+
+  /**
+   * 允许引用系统上下文节点.
+   */
+  self.isAllowReferenceSystemEnv = () => {
+    return true;
   };
 
   /**
