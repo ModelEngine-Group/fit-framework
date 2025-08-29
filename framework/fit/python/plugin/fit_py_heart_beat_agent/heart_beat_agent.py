@@ -115,7 +115,7 @@ def _heart_beat_task(queue: multiprocessing.Queue):
             sys_plugin_logger.info("heart beat task will terminated gracefully.")
             break
         except Empty:
-            if platform.system() != 'Windows' and not multiprocessing.parent_process().is_alive():
+            if platform.system() not in ('Windows', 'Darwin') and not multiprocessing.parent_process().is_alive():
                 sys_plugin_logger.info("heart beat task will terminated due to parent process died.")
                 break
             _try_heart_beat_once()
@@ -135,7 +135,7 @@ def _heart_beat_monitor(heart_beat_background_job):
 def online() -> None:
     """ Runtime向心跳代理申请启动本地心跳服务，心跳代理周期性触发heartbeat() """
     sys_plugin_logger.info(f"start heart beating with interval {_interval()} ms, alive time {_alive_time()} ms.")
-    if platform.system() == 'Windows':
+    if platform.system() in ('Windows', 'Darwin'):
         heart_beat_background_job = Thread(target=_heart_beat_task, args=(_HEART_BEAT_FINISH_QUEUE,),
                                            name='HeartBeatThread')
     else:
