@@ -13,7 +13,9 @@ import logging
 import asyncio
 import json
 import re
-from concurrent.futures import ThreadPoolExecutor
+import threading
+import queue
+from concurrent.futures import ThreadPoolExecutor, Future
 from typing import List, Dict, Set
 
 from v2.nacos import NacosNamingService, ClientConfigBuilder, RegisterInstanceParam, ListInstanceParam, \
@@ -121,26 +123,36 @@ async def call_create_naming_service(config: ClientConfig) -> 'NacosNamingServic
 
 
 async def call_list_instances(param: ListInstanceParam) -> List[Instance]:
-    return await _nacos_client.list_instances(param)
+    client = _async_executor.get_nacos_client()
+    return await client.list_instances(param)
 
 
 async def call_deregister_instance(param: DeregisterInstanceParam) -> bool:
-    return await _nacos_client.deregister_instance(param)
+    client = _async_executor.get_nacos_client()
+    return await client.deregister_instance(param)
 
 
 async def call_subscribe(param: SubscribeServiceParam) -> None:
-    await _nacos_client.subscribe(param)
+    client = _async_executor.get_nacos_client()
+    await client.subscribe(param)
 
 
 async def call_unsubscribe(param: SubscribeServiceParam) -> None:
-    await _nacos_client.unsubscribe(param)
+    client = _async_executor.get_nacos_client()
+    await client.unsubscribe(param)
 
 
 async def call_list_services(param: ListServiceParam) -> ServiceList:
-    return await _nacos_client.list_services(param)
+    client = _async_executor.get_nacos_client()
+    return await client.list_services(param)
 
 
-# 初始化 Nacos 客户端
+async def call_register_instance(param: RegisterInstanceParam) -> None:
+    client = _async_executor.get_nacos_client()
+    await client.register_instance(param)
+
+
+# 初始化 Nacos 客户端配置
 config = (ClientConfigBuilder()
           .server_address(_get_nacos_server_addr())
           .namespace_id(_get_nacos_namespace() or 'local')
@@ -150,7 +162,9 @@ config = (ClientConfigBuilder()
           .secret_key(_get_nacos_secret_key() or None)
           .build())
 
-_nacos_client = asyncio.run(call_create_naming_service(config))
+# 不在这里直接创建客户端，而是在需要时动态创建
+_nacos_client = None
+_nacos_config = config
 
 # 常量
 CLUSTER_DOMAIN_KEY = "cluster.domain"
@@ -163,6 +177,123 @@ SEPARATOR = "::"
 # 全局变量
 _service_subscriptions: Dict[str, any] = {}
 _executor = ThreadPoolExecutor(max_workers=10)
+
+
+# 线程池执行器，用于线程安全的异步调用
+_executor = ThreadPoolExecutor(max_workers=10)
+
+
+class AsyncExecutor:
+    """专门用于处理异步操作的执行器，在后台线程中维护事件循环"""
+    
+    def __init__(self):
+        self._loop = None
+        self._thread = None
+        self._started = False
+        self._shutdown = False
+        self._nacos_client = None
+        self._init_complete = threading.Event()
+    
+    def start(self):
+        """启动后台事件循环线程"""
+        if self._started:
+            return
+            
+        self._thread = threading.Thread(target=self._run_event_loop, daemon=True, name="NacosAsyncThread")
+        self._thread.start()
+        
+        # 等待初始化完成
+        if not self._init_complete.wait(timeout=10):  # 最多等待10秒
+            raise RuntimeError("Failed to initialize async executor within timeout")
+            
+        self._started = True
+    
+    def _run_event_loop(self):
+        """在后台线程中运行事件循环"""
+        try:
+            self._loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self._loop)
+            
+            # 在这个事件循环中创建 Nacos 客户端
+            async def init_nacos_client():
+                try:
+                    self._nacos_client = await NacosNamingService.create_naming_service(_nacos_config)
+                    plugin_logger.info("Nacos client initialized successfully")
+                except Exception as e:
+                    plugin_logger.error(f"Failed to initialize Nacos client: {e}")
+                    raise
+                finally:
+                    # 标记初始化完成
+                    self._init_complete.set()
+            
+            self._loop.run_until_complete(init_nacos_client())
+            
+            # 运行事件循环直到被关闭
+            self._loop.run_forever()
+        except Exception as e:
+            plugin_logger.error(f"Error in async executor event loop: {e}")
+            self._init_complete.set()  # 即使失败也要设置，避免无限等待
+        finally:
+            try:
+                if self._nacos_client:
+                    # 清理 Nacos 客户端
+                    pass
+                self._loop.close()
+            except:
+                pass
+    
+    def run_coroutine(self, coro):
+        """在后台事件循环中运行协程，返回结果"""
+        if not self._started:
+            self.start()
+        
+        if self._loop is None or self._nacos_client is None:
+            raise RuntimeError("Async executor not properly initialized")
+        
+        # 创建一个Future来获取结果
+        result_future = Future()
+        
+        async def wrapped_coro():
+            try:
+                result = await coro
+                result_future.set_result(result)
+            except Exception as e:
+                result_future.set_exception(e)
+        
+        # 在事件循环中调度协程
+        self._loop.call_soon_threadsafe(asyncio.create_task, wrapped_coro())
+        
+        # 等待结果
+        return result_future.result(timeout=30)  # 30秒超时
+    
+    def get_nacos_client(self):
+        """获取 Nacos 客户端实例"""
+        if not self._started:
+            self.start()
+        return self._nacos_client
+    
+    def shutdown(self):
+        """关闭异步执行器"""
+        if self._loop and not self._loop.is_closed():
+            self._loop.call_soon_threadsafe(self._loop.stop)
+        self._shutdown = True
+
+
+# 全局异步执行器
+_async_executor = AsyncExecutor()
+
+
+def _run_async_safely(coro):
+    """
+    线程安全地运行异步函数
+    使用专门的异步执行器在后台线程中处理
+    """
+    try:
+        return _async_executor.run_coroutine(coro)
+    except Exception as e:
+        plugin_logger.error(f"Error running async operation: {e}")
+        raise
+
 
 # 辅助函数
 def build_service_key(group_name: str, service_name: str) -> str:
@@ -256,8 +387,8 @@ def parse_fitable_meta(metadata: Dict) -> FitableMeta:
         plugin_logger.error(f"Failed to parse fitable meta for instance: {e}")
     
     # 返回默认值
-    meta = FitableMeta()
-    meta.fitable = FitableInfo()
+    default_fitable = FitableInfo("unknown", "1.0", "unknown", "1.0")
+    meta = FitableMeta(default_fitable, [], [])
     return meta
 
 
@@ -449,7 +580,7 @@ def register_fitables(fitable_metas: List[FitableMeta], worker: Worker, applicat
                     ephemeral=instance["ephemeral"],
                     metadata=instance["metadata"]
                 )
-                asyncio.run(_nacos_client.register_instance(param))
+                _run_async_safely(call_register_instance(param))
 
         plugin_logger.info(f"Successfully registered fitables for worker {worker.id}")
     except Exception as e:
@@ -482,7 +613,7 @@ def unregister_single_fitable(fitable: FitableInfo, worker_id: str) -> None:
             group_name=group_name,
             healthy_only=True
         )
-        instances = asyncio.run(call_list_instances(param))
+        instances = _run_async_safely(call_list_instances(param))
         unregister_matching_instances(instances, worker_id, service_name, group_name)
     except Exception as e:
         plugin_logger.error(f"Failed to unregister fitable due to registry error: {e}")
@@ -500,7 +631,7 @@ def unregister_matching_instances(instances: List[Instance], worker_id: str, ser
                     ip=instance.ip,
                     port=instance.port
                 )
-                asyncio.run(call_deregister_instance(param))
+                _run_async_safely(call_deregister_instance(param))
                 plugin_logger.debug(f"Successfully deregistered instance {instance.ip}:{instance.port}")
         except Exception as e:
             plugin_logger.error(f"Failed to deregister instance: {e}")
@@ -540,7 +671,7 @@ def query_instances(fitable: FitableInfo) -> List[Instance]:
         group_name=group_name,
         healthy_only=True
     )
-    return asyncio.run(call_list_instances(param))
+    return _run_async_safely(call_list_instances(param))
 
 
 def process_application_instances(result_map: Dict, fitable: FitableInfo, instances: List[Instance]) -> None:
@@ -603,7 +734,7 @@ def subscribe_fit_service(fitables: List[FitableInfo], worker_id: str, callback_
                 group_name=group_name,
                 subscribe_callback=event_listener
             )
-            asyncio.run(call_subscribe(param))
+            _run_async_safely(call_subscribe(param))
             plugin_logger.debug(f"Subscribed to service. [groupName={group_name}, serviceName={service_name}]")
             
         except Exception as e:
@@ -637,7 +768,7 @@ def unsubscribe_fitables(fitables: List[FitableInfo], worker_id: str, callback_f
                     group_name=group_name,
                     subscribe_callback=listener
                 )
-                asyncio.run(call_unsubscribe(param))
+                _run_async_safely(call_unsubscribe(param))
                 plugin_logger.debug(f"Unsubscribed from service. [groupName={group_name}, serviceName={service_name}]")
         except Exception as e:
             plugin_logger.error(f"Failed to unsubscribe from Nacos service: {e}")
@@ -672,9 +803,9 @@ def process_genericable_services(genericable: GenericableInfo, meta_environments
             page_no=1,
             page_size=1000  # 假设一次获取足够多的服务
         )
-        service_list = asyncio.run(call_list_services(param))
+        service_list = _run_async_safely(call_list_services(param))
         
-        for service_name in service_list.data:
+        for service_name in service_list.services:
             process_service_instances(service_name, group_name, meta_environments)
     except Exception as e:
         plugin_logger.error(f"Failed to query fitable metas: {e}")
@@ -689,7 +820,7 @@ def process_service_instances(service_name: str, group_name: str, meta_environme
             group_name=group_name,
             healthy_only=True
         )
-        instances = asyncio.run(call_list_instances(param))
+        instances = _run_async_safely(call_list_instances(param))
 
         if not instances:
             return
@@ -717,10 +848,22 @@ def build_fitable_meta_instances(meta_environments: Dict) -> List[FitableMetaIns
     """构建FitableMetaInstance列表"""
     results = []
     for meta, envs in meta_environments.items():
-        instance = FitableMetaInstance()
-        instance.meta = meta
-        instance.environments = list(envs)
+        instance = FitableMetaInstance(meta,list(envs))
         results.append(instance)
     return results
+
+
+# 模块清理函数
+import atexit
+
+def _cleanup_async_executor():
+    """清理异步执行器"""
+    try:
+        _async_executor.shutdown()
+    except:
+        pass
+
+# 注册清理函数
+atexit.register(_cleanup_async_executor)
 
 

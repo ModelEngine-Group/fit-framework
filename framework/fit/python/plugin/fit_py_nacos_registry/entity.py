@@ -12,6 +12,19 @@ from numpy import int32
 from fit_common_struct.core import Address as AddressInner
 
 
+def safe_hash_dict(obj_dict):
+    """安全地计算包含列表的字典的哈希值"""
+    hashable_values = []
+    for value in obj_dict.values():
+        if isinstance(value, list):
+            hashable_values.append(tuple(value))
+        elif isinstance(value, dict):
+            hashable_values.append(tuple(sorted(value.items())))
+        else:
+            hashable_values.append(value)
+    return hash(tuple(hashable_values))
+
+
 class FitableInfo(object):
 
     def __init__(self, genericableId: str, genericableVersion: str, fitableId: str, fitableVersion: str):
@@ -68,7 +81,8 @@ class FitableMeta(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        # 使用安全的哈希函数处理包含列表的对象
+        return safe_hash_dict(self.__dict__)
 
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
