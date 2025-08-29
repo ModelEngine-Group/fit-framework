@@ -6,13 +6,6 @@ registry-center:
     registry_fitable_frequency: 15
     registered-fitables-expire-interval: 30 #    expected expire interval used by server
     invalid_address_ttl: 60
-  server:
-    addresses:
-      - "localhost:8080"
-    protocol: 2
-    formats:
-      - 1
-    context-path: ""
   service_ids:
     - "modelengine.fit.registry.registry-service.register-fitables"
     - "modelengine.fit.registry.registry-service.query-fitables-addresses"

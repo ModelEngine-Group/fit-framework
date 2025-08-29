@@ -1,15 +1,5 @@
 server-thread-count: 8
-http:
-  server:
-    enabled: true
-    address:
-      use-random-port: false
-      port: 9666
-      port-to-register:
-      protocol: 2
-      formats:
-        - 1
-        - 2
+
 https:
   server:
     enabled: false
