@@ -127,7 +127,7 @@ def register_all_fit_services() -> None:
         fitable_aliases_infos = reduce(list.__add__, list(_plugin_fitable_dict.values()))
         local_fitable_aliases_infos = []
         for fitable_aliases_info in fitable_aliases_infos:
-            if not _local_only_invoke(fitable_aliases_info.fitable.genericable_id):
+            if not _local_only_invoke(fitable_aliases_info.fitable.genericableId):
                 local_fitable_aliases_infos.append(fitable_aliases_info)
         online_fit_services(local_fitable_aliases_infos)
     except FitException:

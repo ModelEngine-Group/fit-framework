@@ -21,8 +21,9 @@ from v2.nacos import NacosNamingService, ClientConfigBuilder, RegisterInstancePa
 from fitframework import fitable, const, value
 from fitframework.api.logging import plugin_logger
 from fitframework.utils.json_serialize_utils import json_serialize, json_deserialize
-from fit_common_struct.entity import Worker, FitableMeta, FitableInfo, Application, FitableAddressInstance, GenericableInfo, \
+from fit_common_struct.entity import Worker, FitableMeta, Application, FitableAddressInstance, \
     FitableMetaInstance, ApplicationInstance, Address, Endpoint
+from fit_common_struct.core import Fitable,Genericable
 
 @value('nacos.serverAddr', default_value=None)
 def _get_nacos_server_addr() -> str:
@@ -304,17 +305,17 @@ def build_service_key(group_name: str, service_name: str) -> str:
     return f"{group_name}{SEPARATOR}{service_name}"
 
 
-def get_service_name(fitable: FitableInfo) -> str:
+def get_service_name(fitable: Fitable) -> str:
     """获取服务名称"""
     return f"{fitable.fitableId}{SEPARATOR}{fitable.fitableVersion}"
 
 
-def get_group_name_from_fitable(fitable: FitableInfo) -> str:
+def get_group_name_from_fitable(fitable: Fitable) -> str:
     """从FitableInfo获取组名"""
     return f"{fitable.genericableId}{SEPARATOR}{fitable.genericableVersion}"
 
 
-def get_group_name_from_genericable(genericable: GenericableInfo) -> str:
+def get_group_name_from_genericable(genericable: Genericable) -> str:
     """从GenericableInfo获取组名"""
     return f"{genericable.genericableId}{SEPARATOR}{genericable.genericableVersion}"
 
@@ -384,7 +385,7 @@ def parse_fitable_meta(metadata: Dict) -> FitableMeta:
         plugin_logger.error(f"Failed to parse fitable meta for instance: {e}")
     
     # 返回默认值
-    default_fitable = FitableInfo("unknown", "1.0", "unknown", "1.0")
+    default_fitable = Fitable("unknown", "1.0", "unknown", "1.0")
     meta = FitableMeta(default_fitable, [], [])
     return meta
 
@@ -488,7 +489,7 @@ def build_endpoints(extensions: Dict[str, str]) -> List[Endpoint]:
     return endpoints
 
 
-def on_service_changed(fitable_info: FitableInfo, worker_id: str) -> None:
+def on_service_changed(fitable_info: Fitable, worker_id: str) -> None:
     """
     Handle service change events, query and notify updates to Fitables instance information.
     
@@ -571,7 +572,7 @@ def register_fitables(fitable_metas: List[FitableMeta], worker: Worker, applicat
         raise
 
 @fitable(const.UNREGISTER_FIT_SERVICE_GEN_ID, const.UNREGISTER_FIT_SERVICE_FIT_ID)
-def unregister_fitables(fitables: List[FitableInfo], worker_id: str) -> None:
+def unregister_fitables(fitables: List[Fitable], worker_id: str) -> None:
     """
     向注册中心服务端取消注册服务实现列表。
 
@@ -584,7 +585,7 @@ def unregister_fitables(fitables: List[FitableInfo], worker_id: str) -> None:
         unregister_single_fitable(fitable, worker_id)
 
 
-def unregister_single_fitable(fitable: FitableInfo, worker_id: str) -> None:
+def unregister_single_fitable(fitable: Fitable, worker_id: str) -> None:
     """取消注册单个Fitable"""
     group_name = get_group_name_from_fitable(fitable)
     service_name = get_service_name(fitable)
@@ -621,7 +622,7 @@ def unregister_matching_instances(instances: List[Instance], worker_id: str, ser
 
 
 @fitable(const.QUERY_FIT_SERVICE_GEN_ID, const.QUERY_FIT_SERVICE_FIT_ID)
-def query_fitable_addresses(fitables: List[FitableInfo], worker_id: str) -> List[FitableAddressInstance]:
+def query_fitable_addresses(fitables: List[Fitable], worker_id: str) -> List[FitableAddressInstance]:
     """
     注册中心所提供接口，用于查询某个泛服务实现的实例信息，在拉模式下使用。
 
@@ -644,7 +645,7 @@ def query_fitable_addresses(fitables: List[FitableInfo], worker_id: str) -> List
     return list(result_map.values())
 
 
-def query_instances(fitable: FitableInfo) -> List[Instance]:
+def query_instances(fitable: Fitable) -> List[Instance]:
     """查询实例"""
     group_name = get_group_name_from_fitable(fitable)
     service_name = get_service_name(fitable)
@@ -657,7 +658,7 @@ def query_instances(fitable: FitableInfo) -> List[Instance]:
     return _run_async_safely(call_list_instances(param))
 
 
-def process_application_instances(result_map: Dict, fitable: FitableInfo, instances: List[Instance]) -> None:
+def process_application_instances(result_map: Dict, fitable: Fitable, instances: List[Instance]) -> None:
     """处理应用实例"""
     app_instances_map = group_instances_by_application(instances)
     
@@ -675,7 +676,7 @@ def process_application_instances(result_map: Dict, fitable: FitableInfo, instan
 
 
 @fitable(const.SUBSCRIBE_FIT_SERVICE_GEN_ID, const.SUBSCRIBE_FIT_SERVICE_FIT_ID)
-def subscribe_fit_service(fitables: List[FitableInfo], worker_id: str, callback_fitable_id: str) -> List[FitableAddressInstance]:
+def subscribe_fit_service(fitables: List[Fitable], worker_id: str, callback_fitable_id: str) -> List[FitableAddressInstance]:
     """
     注册中心所提供接口，用于订阅某个泛服务实现的实例信息，并且也会返回查询到的实例信息，在推模式下使用。
 
@@ -698,7 +699,7 @@ def subscribe_fit_service(fitables: List[FitableInfo], worker_id: str, callback_
                 continue
             
             # 创建事件监听器
-            def create_event_listener(fitable_ref: FitableInfo, worker_id_ref: str):
+            def create_event_listener(fitable_ref: Fitable, worker_id_ref: str):
                 def event_listener(event):
                     _executor.submit(on_service_changed, fitable_ref, worker_id_ref)
                 return event_listener
@@ -722,7 +723,7 @@ def subscribe_fit_service(fitables: List[FitableInfo], worker_id: str, callback_
 
 
 @fitable(const.UNSUBSCRIBE_FIT_SERVICE_GEN_ID, const.UNSUBSCRIBE_FIT_SERVICE_FIT_ID)
-def unsubscribe_fitables(fitables: List[FitableInfo], worker_id: str, callback_fitable_id: str) -> None:
+def unsubscribe_fitables(fitables: List[Fitable], worker_id: str, callback_fitable_id: str) -> None:
     """
     向注册中心服务端取消订阅指定服务实现的实例信息。
 
@@ -753,7 +754,7 @@ def unsubscribe_fitables(fitables: List[FitableInfo], worker_id: str, callback_f
 
 
 @fitable(const.QUERY_FITABLE_METAS_GEN_ID, const.QUERY_FITABLE_METAS_FIT_ID)
-def query_fitable_metas(genericable_infos: List[GenericableInfo]) -> List[FitableMetaInstance]:
+def query_fitable_metas(genericable_infos: List[Genericable]) -> List[FitableMetaInstance]:
     """
     注册中心所提供接口，用于查询泛服务的元数据。
 
@@ -769,7 +770,7 @@ def query_fitable_metas(genericable_infos: List[GenericableInfo]) -> List[Fitabl
     return build_fitable_meta_instances(meta_environments)
 
 
-def process_genericable_services(genericable: GenericableInfo, meta_environments: Dict) -> None:
+def process_genericable_services(genericable: Genericable, meta_environments: Dict) -> None:
     """处理泛服务的服务列表"""
     group_name = get_group_name_from_genericable(genericable)
     

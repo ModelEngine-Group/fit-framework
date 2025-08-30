@@ -10,6 +10,7 @@ from typing import Dict, List
 from numpy import int32
 
 from fit_common_struct.core import Address as AddressInner
+from fit_common_struct.core import Fitable
 
 
 def safe_hash_dict(obj_dict):
@@ -25,47 +26,9 @@ def safe_hash_dict(obj_dict):
     return hash(tuple(hashable_values))
 
 
-class FitableInfo(object):
-
-    def __init__(self, genericableId: str, genericableVersion: str, fitableId: str, fitableVersion: str):
-        self.genericableId = genericableId
-        self.genericableVersion = genericableVersion
-        self.fitableId = fitableId
-        self.fitableVersion = fitableVersion
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        return self.__dict__ == other.__dict__
-
-    def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
-
-    def __repr__(self):
-        return str(tuple(self.__dict__.values()))
-
-
-class GenericableInfo:
-
-    def __init__(self, genericableId: str, genericableVersion: str):
-        self.genericableId = genericableId
-        self.genericableVersion = genericableVersion
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        return self.__dict__ == other.__dict__
-
-    def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
-
-    def __repr__(self):
-        return str(tuple(self.__dict__.values()))
-
-
 class FitableMeta(object):
 
-    def __init__(self, fitable: FitableInfo, aliases: List[str], formats: List[int32]):
+    def __init__(self, fitable: Fitable, aliases: List[str], formats: List[int32]):
         self.fitable = fitable
         self.aliases = aliases
 
@@ -200,7 +163,7 @@ class ApplicationInstance(object):
 
 class FitableAddressInstance(object):
 
-    def __init__(self, applicationInstances: List[ApplicationInstance], fitable: FitableInfo):
+    def __init__(self, applicationInstances: List[ApplicationInstance], fitable: Fitable):
         self.applicationInstances = applicationInstances
         self.fitable = fitable
 
