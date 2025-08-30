@@ -145,7 +145,7 @@ class Address(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        return safe_hash_dict(self.__dict__)
 
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
@@ -168,7 +168,7 @@ class Worker(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        return safe_hash_dict(self.__dict__)
 
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
@@ -192,7 +192,7 @@ class ApplicationInstance(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        return safe_hash_dict(self.__dict__)
 
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
@@ -210,7 +210,7 @@ class FitableAddressInstance(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        return safe_hash_dict(self.__dict__)
 
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
@@ -228,7 +228,7 @@ class FitableMetaInstance(object):
         return self.__dict__ == other.__dict__
 
     def __hash__(self):
-        return hash(tuple(self.__dict__.values()))
+        return safe_hash_dict(self.__dict__)
 
     def __repr__(self):
         return str(tuple(self.__dict__.values()))

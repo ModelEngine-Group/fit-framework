@@ -402,8 +402,7 @@ def parse_application(metadata: Dict) -> Application:
         plugin_logger.error(f"Failed to parse application metadata for instance: {e}")
     
     # 返回默认值
-    app = Application()
-    app.nameVersion = "unknown"
+    app = Application("unknown", "unknown")
     return app
 
 
@@ -427,53 +426,42 @@ def parse_worker(instance_or_metadata) -> Worker:
         plugin_logger.error(f"Failed to parse worker metadata for instance: {e}")
 
     # 降级处理 - 创建基本worker信息
-    worker = Worker()
-    worker.id = "unknown"
-    worker.environment = ""
-    worker.extensions = {}
+    worker = Worker([], "unknown", "", {})
     
     # 如果有IP和端口信息，创建基本地址
     if ip != 'unknown' and port != 0:
-        address = Address()
-        address.host = ip
-        
-        endpoint = Endpoint()
-        endpoint.port = port
-        endpoint.protocol = 1  # 默认协议
-        
-        address.endpoints = [endpoint]
+        endpoint = Endpoint(port, 1)  # 默认协议
+        address = Address(ip, [endpoint])
         worker.addresses = [address]
-    else:
-        worker.addresses = []
     
     return worker
 
 
-def replace_addresses(workers: Set[Worker], application: Application) -> None:
-    """
-    Extract all workers corresponding to instances and adjust addresses based on application extension information.
-    
-    @param workers: Set of workers to modify.
-    @param application: The application object.
-    """
-    if not application.extensions or CLUSTER_DOMAIN_KEY not in application.extensions:
-        return
-        
-    cluster_domain = application.extensions.get(CLUSTER_DOMAIN_KEY)
-    if not cluster_domain:
-        return
-
-    # 构建端点
-    endpoints = build_endpoints(application.extensions)
-    
-    # 创建统一地址
-    address = Address()
-    address.host = cluster_domain
-    address.endpoints = endpoints
-    
-    # 更新所有worker的地址
-    for worker in workers:
-        worker.addresses = [address]
+# def replace_addresses(workers: Set[Worker], application: Application) -> None:
+#     """
+#     Extract all workers corresponding to instances and adjust addresses based on application extension information.
+#
+#     @param workers: Set of workers to modify.
+#     @param application: The application object.
+#     """
+#     if not application.extensions or CLUSTER_DOMAIN_KEY not in application.extensions:
+#         return
+#
+#     cluster_domain = application.extensions.get(CLUSTER_DOMAIN_KEY)
+#     if not cluster_domain:
+#         return
+#
+#     # 构建端点
+#     endpoints = build_endpoints(application.extensions)
+#
+#     # 创建统一地址
+#     address = Address()
+#     address.host = cluster_domain
+#     address.endpoints = endpoints
+#
+#     # 更新所有worker的地址
+#     for worker in workers:
+#         worker.addresses = [address]
 
 
 def build_endpoints(extensions: Dict[str, str]) -> List[Endpoint]:
@@ -495,9 +483,7 @@ def build_endpoints(extensions: Dict[str, str]) -> List[Endpoint]:
         if match:
             protocol_name = match.group(1).lower()
             if protocol_name in protocol_code_map:
-                endpoint = Endpoint()
-                endpoint.port = int(value)
-                endpoint.protocol = protocol_code_map[protocol_name]
+                endpoint = Endpoint(int(value), protocol_code_map[protocol_name])
                 endpoints.append(endpoint)
             else:
                 plugin_logger.error(f"Unknown protocol: {protocol_name}")
@@ -546,8 +532,8 @@ def extract_workers(app_instances: List[Instance], application: Application) -> 
         workers.add(worker)
     
     # 如果应用有集群域名配置，替换地址
-    if application.extensions and CLUSTER_DOMAIN_KEY in application.extensions:
-        replace_addresses(workers, application)
+    # if application.extensions and CLUSTER_DOMAIN_KEY in application.extensions:
+    #     replace_addresses(workers, application)
     
     return workers
 
@@ -684,15 +670,10 @@ def process_application_instances(result_map: Dict, fitable: FitableInfo, instan
         
         fai = result_map.get(fitable)
         if fai is None:
-            fai = FitableAddressInstance()
-            fai.fitable = fitable
-            fai.applicationInstances = []
+            fai = FitableAddressInstance(applicationInstances=[], fitable=fitable)
             result_map[fitable] = fai
         
-        app_instance = ApplicationInstance()
-        app_instance.application = app
-        app_instance.formats = meta.formats if meta.formats else []
-        app_instance.workers = list(workers)
+        app_instance = ApplicationInstance(workers=list(workers), application=app, formats=meta.formats if meta.formats else [])
         fai.applicationInstances.append(app_instance)
 
 
