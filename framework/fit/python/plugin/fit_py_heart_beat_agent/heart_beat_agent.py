@@ -26,7 +26,7 @@ from fitframework.api.decorators import fit, fitable, value
 from fitframework.api.decorators import register_event
 from fitframework.api.enums import FrameworkEvent as Fit_Event
 from fitframework.api.logging import sys_plugin_logger
-from .heart_beat_utils import HeartBeatAddress, HeartBeatInfo
+from fit_common_struct.entity import HeartBeatInfo, HeartBeatAddress
 
 # 用于控制心跳任务退出的队列
 _HEART_BEAT_FINISH_QUEUE = multiprocessing.Queue()

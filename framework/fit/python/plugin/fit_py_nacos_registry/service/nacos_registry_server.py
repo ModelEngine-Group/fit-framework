@@ -9,12 +9,9 @@ Service for providing Nacos registry center functionality.
 @author 董智豪  
 @since 2025-06-04
 """
-import logging
 import asyncio
-import json
 import re
 import threading
-import queue
 from concurrent.futures import ThreadPoolExecutor, Future
 from typing import List, Dict, Set
 
@@ -24,7 +21,7 @@ from v2.nacos import NacosNamingService, ClientConfigBuilder, RegisterInstancePa
 from fitframework import fitable, const, value
 from fitframework.api.logging import plugin_logger
 from fitframework.utils.json_serialize_utils import json_serialize, json_deserialize
-from ..entity import Worker, FitableMeta, FitableInfo, Application, FitableAddressInstance, GenericableInfo, \
+from fit_common_struct.entity import Worker, FitableMeta, FitableInfo, Application, FitableAddressInstance, GenericableInfo, \
     FitableMetaInstance, ApplicationInstance, Address, Endpoint
 
 @value('nacos.serverAddr', default_value=None)

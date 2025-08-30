@@ -8,7 +8,7 @@
 """
 from typing import List
 from fitframework import fitable, const
-from ..entity import HeartBeatInfo, HeartBeatAddress
+from fit_common_struct.entity import HeartBeatInfo, HeartBeatAddress
 
 @fitable(const.SEND_HEART_BEAT_GEN_ID, const.SEND_HEART_BEAT_FIT_ID)
 def send_heartbeat(heartbeatInfo: List[HeartBeatInfo], address: HeartBeatAddress) -> bool:

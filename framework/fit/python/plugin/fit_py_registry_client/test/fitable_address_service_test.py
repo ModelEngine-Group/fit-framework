@@ -21,7 +21,7 @@ class FitableAddressServiceTest(FitTestSupport):
     def setUpClass(cls):
         super(FitableAddressServiceTest, cls).setUpClass()
         from plugin.fit_py_registry_client import fitable_address_service
-        from plugin.fit_py_nacos_registry import entity
+        from fit_common_struct import entity
         global fitable_address_service
         global entity
 

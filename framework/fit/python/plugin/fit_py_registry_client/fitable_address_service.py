@@ -14,7 +14,7 @@ from fitframework import const
 from fitframework.api.decorators import fitable, fit, scheduled_executor, value
 from fitframework.api.logging import sys_plugin_logger
 from fitframework.utils import tools
-from plugin.fit_py_nacos_registry.entity import FitableAddressInstance, FitableInfo
+from fit_common_struct.entity import FitableAddressInstance, FitableInfo
 from .registry_address_service import get_cache_aware_registry_address
 
 _PUSH_MODE = 'push'
