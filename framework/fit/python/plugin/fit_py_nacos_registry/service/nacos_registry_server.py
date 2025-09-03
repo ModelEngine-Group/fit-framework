@@ -24,13 +24,10 @@ from fitframework.utils.json_serialize_utils import json_serialize, json_deseria
 from fit_common_struct.entity import Worker, FitableMeta, Application, FitableAddressInstance, \
     FitableMetaInstance, ApplicationInstance, Address, Endpoint
 from fit_common_struct.core import Fitable,Genericable
+from fitframework.utils import tools
 
-@value('nacos.serverAddr', default_value=None)
-def _get_nacos_server_addr() -> str:
-    """
-    获取 Nacos 服务器地址。
-    :return: Nacos 服务器地址。
-    """
+@value('registry-center.server.addresses', converter=tools.to_list)
+def _get_registry_server_addresses() -> list:
     pass
 
 
@@ -152,7 +149,7 @@ async def call_register_instance(param: RegisterInstanceParam) -> None:
 
 # 初始化 Nacos 客户端配置
 config = (ClientConfigBuilder()
-          .server_address(_get_nacos_server_addr())
+          .server_address(_get_registry_server_addresses()[0])
           .namespace_id(_get_nacos_namespace() or 'local')
           .username(_get_nacos_username() or None)
           .password(_get_nacos_password() or None)

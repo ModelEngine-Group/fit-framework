@@ -249,7 +249,6 @@ SEND_HEART_BEAT_FIT_ID = 'send-heartbeat'
 STOP_HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.stop-heartbeat'
 STOP_HEART_BEAT_FIT_ID = 'stop-heartbeat'
 
-
 # debugger
 DEBUGGER_START_FIT_ID = 'debugger_start_fitable_id'
 DEBUGGER_START_GEN_ID = 'debugger_start_gen_id'

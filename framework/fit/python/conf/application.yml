@@ -40,12 +40,11 @@ https:
     key_file_encrypted: false # 私钥是否被加密，仅当 cert_enabled 为 true 时有意义
     key_file_password: "" # 私钥的密码，仅当 cert_enabled 和 key_file_encrypted 为 true 时有意义
     key_file_password_encrypted: false # 私钥的密码是否被加密，仅当 cert_enabled 和 key_file_encrypted 为 true 时有意义
-
 registry-center:
   server:
     mode: 'DIRECT'
     addresses:
-      - "localhost:8090"
+      - "localhost:8848"
     protocol: 2
     formats:
       - 1
