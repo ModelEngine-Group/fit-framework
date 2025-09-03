@@ -6,6 +6,7 @@
 """
 功 能：服务上线相关功能。
 """
+
 from typing import List
 from fitframework import fitable, const
 from fit_common_struct.entity import HeartBeatInfo, HeartBeatAddress

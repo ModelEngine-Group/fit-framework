@@ -1,5 +1,4 @@
 server-thread-count: 8
-
 https:
   server:
     enabled: false

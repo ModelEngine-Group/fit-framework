@@ -245,8 +245,8 @@ QUERY_FITABLE_METAS_FIT_ID = 'query-running-fitables'
 
 # heartbeat server
 SEND_HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.send-heartbeat'
-STOP_HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.stop-heartbeat'
 SEND_HEART_BEAT_FIT_ID = 'send-heartbeat'
+STOP_HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.stop-heartbeat'
 STOP_HEART_BEAT_FIT_ID = 'stop-heartbeat'
 
 
