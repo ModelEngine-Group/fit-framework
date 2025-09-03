@@ -22,7 +22,7 @@ import modelengine.fitframework.ioc.BeanFactory;
  */
 public class InfoBuilder implements EntityBuilder<Info> {
     private static final String FIT_VERSION = "3.5.1-SNAPSHOT";
-    private static final String SWAGGER_UI_VERSION = "v5.28.0";
+    private static final String SWAGGER_UI_VERSION = "v5.28.1";
 
     private final ApplicationConfig applicationConfig;
 
