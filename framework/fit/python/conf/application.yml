@@ -42,7 +42,7 @@ https:
     key_file_password_encrypted: false # 私钥的密码是否被加密，仅当 cert_enabled 和 key_file_encrypted 为 true 时有意义
 registry-center:
   server:
-    mode: 'DIRECT'
+    mode: 'DIRECT' # DIRECT 表示直连，直接连接内存注册中心；PROXY 表示代理模式，通过本地代理服务连接 Nacos 注册中心
     addresses:
       - "localhost:8848"
     protocol: 2
