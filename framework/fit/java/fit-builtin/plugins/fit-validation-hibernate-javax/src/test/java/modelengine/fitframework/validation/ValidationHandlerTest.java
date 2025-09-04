@@ -59,10 +59,10 @@ public class ValidationHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler.setLocale(Locale.CHINA);
-        when(validated.value()).thenReturn(new Class[0]);
-        when(fitRuntime.resolverOfAnnotations()).thenReturn(annotationMetadataResolver);
-        when(beanContainer.runtime()).thenReturn(fitRuntime);
+        this.handler.setLocale(Locale.CHINA);
+        when(this.validated.value()).thenReturn(new Class[0]);
+        when(this.fitRuntime.resolverOfAnnotations()).thenReturn(annotationMetadataResolver);
+        when(this.beanContainer.runtime()).thenReturn(fitRuntime);
     }
 
     private ConstraintViolationException invokeHandleMethod(Method targetMethod, Object[] args) {
