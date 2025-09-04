@@ -92,6 +92,10 @@ def _process_address_by_mode() -> list:
         else:
             port = ""
         return [_get_host() + port]
+    elif _get_registry_server_mode() == 'DIRECT':
+        return _get_registry_server_addresses()
+    else:
+        raise RuntimeError(f"unsupported registry server mode: {_get_registry_server_mode()}")
 
 
 
