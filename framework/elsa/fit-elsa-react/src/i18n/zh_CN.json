@@ -720,5 +720,7 @@
   "noContent": "暂无数据",
   "rerankConfig": "检索节点配置",
   "whetherRerank": "是否重排",
-  "topN": "topN"
+  "topN": "topN",
+  "add": "新增",
+  "value": "值"
 }
