@@ -2,12 +2,12 @@ from pathlib import Path
 
 TEMPLATE_PLUGIN = '''from fitframework.api.decorators import fitable # 引入 Fit for Python 框架核心接口
 
-# 修改 genericable_id_hello / fitable_id_hello 为唯一的 ID
-# - 建议和插件功能相关，例如：
-# - @fitable("genericable_id_concat", "fitable_id_concat")
-@fitable("genericable_id_hello", "fitable_id_hello") # 指定可供调用函数的 genericable id 和 fitable id
-def hello(name: str) -> str: # 定义可供调用的函数，特别注意需要提供函数类型签名，
-                             # 可参照文档https://www.modelengine-ai.com/#/docs/zh_CN/ai-framework/fit/python/function-signature
+# - 修改 ${genericable_id} / ${fitable_id} 为唯一的 ID
+# - 建议和插件功能相关，并且 GenericableId 必须全局唯一，通用的全局唯一方式可以采用域名的方式，例如：com.A.B
+@fitable("${genericable_id}", "${fitable_id}") # 指定可供调用函数的 genericable id 和 fitable id
+def hello(name: str) -> str: # 定义可供调用的函数，特别注意需要提供函数类型签名，可参照文档
+                             # - https://github.com/ModelEngine-Group/fit-framework/blob/main/docs/framework/fit/overview/00.%20%E6%A6%82%E8%BF%B0.md
+                             # - https://github.com/ModelEngine-Group/fit-framework/blob/main/docs/framework/fit/python/%E8%A2%AB%E6%B3%A8%E8%A7%A3%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D%E8%A7%84%E8%8C%83.md
     """
     一个简单的 FIT 插件示例函数
 
@@ -35,7 +35,6 @@ def create_file(path: Path, content: str = "", overwrite: bool = False):
         print(f"⚠️ 文件 {path} 已存在，未覆盖。")
         return
     path.write_text(content, encoding="utf-8") if content else path.touch()
-
 
 
 def generate_plugin_structure(plugin_name: str):

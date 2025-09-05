@@ -1,7 +1,6 @@
 import argparse
 from fit_cli.commands import init_cmd
 
-# , build_cmd, package_cmd)
 
 
 def main():
