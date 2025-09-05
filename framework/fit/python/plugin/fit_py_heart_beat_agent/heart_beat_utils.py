@@ -12,18 +12,6 @@ from concurrent.futures._base import TimeoutError as future_TimeoutError
 from fitframework.api.logging import sys_plugin_logger
 
 
-class HeartBeatInfo:
-    def __init__(self, sceneType: str, aliveTime: int, initDelay: int):
-        self.sceneType: str = sceneType
-        self.aliveTime: int = aliveTime
-        self.initDelay: int = initDelay
-
-
-class HeartBeatAddress:
-    def __init__(self, id_: str):
-        self.id = id_
-
-
 def timeout_or_exception_retry(timeout: int = 3, a_exception=Exception, max_retry: int = 1):
     """
 

@@ -21,16 +21,16 @@ class FitableAddressServiceTest(FitTestSupport):
     def setUpClass(cls):
         super(FitableAddressServiceTest, cls).setUpClass()
         from plugin.fit_py_registry_client import fitable_address_service
-        from plugin.fit_py_registry_client import entity
+        from fit_common_struct import entity
         global fitable_address_service
         global entity
 
-        def query_fitable_addresses_side_effect(fitables: List[entity.FitableInfo], worker_id: str):
+        def query_fitable_addresses_side_effect(fitables: List[entity.Fitable], worker_id: str):
             if fitables[0].genericableId == "gid_ut":
                 return [cls.build_fitable_address_instance("host_ut_1", 8000)]
             return []
 
-        def subscribe_fit_service_side_effect(fitables: List[entity.FitableInfo], worker_id: str,
+        def subscribe_fit_service_side_effect(fitables: List[entity.Fitable], worker_id: str,
                                               callback_fitable_id: str):
             if fitables[0].genericableId == "gid_ut":
                 return [cls.build_fitable_address_instance("host_ut_1", 8000)]
@@ -59,7 +59,7 @@ class FitableAddressServiceTest(FitTestSupport):
         worker = entity.Worker([address], "worker_ut", "env_ut", {"http.context-path": "context-path-ut"})
         application = entity.Application("name_ut", "name_version_ut")
         application_instance = entity.ApplicationInstance([worker], application, [1])
-        fitable_info = entity.FitableInfo("gid_ut", "1.0.0", "fid_ut", "1.0.0")
+        fitable_info = entity.Fitable("gid_ut", "1.0.0", "fid_ut", "1.0.0")
         fitable_address_instance = entity.FitableAddressInstance([application_instance], fitable_info)
         return fitable_address_instance
 

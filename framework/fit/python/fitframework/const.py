@@ -231,12 +231,23 @@ FIT_CONFIGURATION_SERVER_UPLOAD_FIT_ID = '2ae9d88f46894f7bb0fcd45cf544cb52'
 
 # registry server
 QUERY_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.query-fitables-addresses'
+QUERY_FIT_SERVICE_FIT_ID = 'query-fitables-addresses'
 SUBSCRIBE_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.subscribe-fitables'
+SUBSCRIBE_FIT_SERVICE_FIT_ID = 'subscribe-fitables'
+UNSUBSCRIBE_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.unsubscribe-fitables'
+UNSUBSCRIBE_FIT_SERVICE_FIT_ID = 'unsubscribe-fitables'
 REGISTER_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.register-fitables'
+REGISTER_FIT_SERVICE_FIT_ID = 'register-fitables'
+UNREGISTER_FIT_SERVICE_GEN_ID = 'modelengine.fit.registry.registry-service.unregister-fitables'
+UNREGISTER_FIT_SERVICE_FIT_ID = 'unregister-fitables'
 QUERY_FITABLE_METAS_GEN_ID = 'modelengine.fit.registry.registry-service.query-running-fitables'
+QUERY_FITABLE_METAS_FIT_ID = 'query-running-fitables'
 
 # heartbeat server
-HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.send-heartbeat'
+SEND_HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.send-heartbeat'
+SEND_HEART_BEAT_FIT_ID = 'send-heartbeat'
+STOP_HEART_BEAT_GEN_ID = 'modelengine.fit.heartbeat.stop-heartbeat'
+STOP_HEART_BEAT_FIT_ID = 'stop-heartbeat'
 
 # debugger
 DEBUGGER_START_FIT_ID = 'debugger_start_fitable_id'

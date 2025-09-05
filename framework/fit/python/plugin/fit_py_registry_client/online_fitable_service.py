@@ -17,8 +17,9 @@ from fitframework import fitable, const, value, fit
 from fitframework.api.decorators import scheduled_executor
 from fitframework.api.logging import sys_plugin_logger
 from fitframework.core.network.enums import SerializingStructureEnum
-from .entity import Worker, FitableMeta, FitableInfo, Address as AddressRegistry, Endpoint, \
+from fit_common_struct.entity import Worker, FitableMeta, Address as AddressRegistry, Endpoint, \
     Application, Address
+from fit_common_struct.core import Fitable
 
 
 @value('worker-environment.env')
@@ -81,10 +82,10 @@ def register_fitables(fitable_metas: List[FitableMeta], worker: Worker, applicat
 
 def _convert_fitable_aliases_info_to_fitable_meta(fitable_aliases_info: FitableAliasesInfo) -> FitableMeta:
     local_formats = [each_format.value for each_format in get_registered_formats()]
-    fitable_info = FitableInfo(fitable_aliases_info.fitable.genericable_id,
-                               fitable_aliases_info.fitable.genericable_version,
-                               fitable_aliases_info.fitable.fitable_id,
-                               fitable_aliases_info.fitable.fitable_version)
+    fitable_info = Fitable(fitable_aliases_info.fitable.genericableId,
+                           fitable_aliases_info.fitable.genericableVersion,
+                           fitable_aliases_info.fitable.fitableId,
+                           fitable_aliases_info.fitable.fitableVersion)
     return FitableMeta(fitable_info, fitable_aliases_info.aliases, local_formats)
 
 
@@ -100,7 +101,7 @@ def _fetch_all_addresses() -> List[AddressRegistry]:
 
 
 def _fetch_fitable_meta_info(fitable_meta: FitableMeta) -> tuple:
-    fitable_info: FitableInfo = fitable_meta.fitable
+    fitable_info: Fitable = fitable_meta.fitable
     return fitable_info.genericableId, fitable_info.fitableVersion, fitable_info.fitableId, fitable_info.fitableVersion
 
 

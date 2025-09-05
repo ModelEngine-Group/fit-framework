@@ -26,7 +26,7 @@ from fitframework.api.decorators import fit, fitable, value
 from fitframework.api.decorators import register_event
 from fitframework.api.enums import FrameworkEvent as Fit_Event
 from fitframework.api.logging import sys_plugin_logger
-from .heart_beat_utils import HeartBeatAddress, HeartBeatInfo
+from fit_common_struct.entity import HeartBeatInfo, HeartBeatAddress
 
 # 用于控制心跳任务退出的队列
 _HEART_BEAT_FINISH_QUEUE = multiprocessing.Queue()
@@ -71,7 +71,7 @@ def get_runtime_worker_id() -> str:
     pass
 
 
-@fit(const.HEART_BEAT_GEN_ID)
+@fit(const.SEND_HEART_BEAT_GEN_ID)
 def heartbeat(beat_info: List[HeartBeatInfo], address: HeartBeatAddress) -> bool:
     """ 可能返回 false，也可能抛出异常，也可能超时 """
     pass
