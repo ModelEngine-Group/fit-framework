@@ -1,8 +1,6 @@
 import argparse
 from fit_cli.commands import init_cmd
 
-
-
 def main():
     parser = argparse.ArgumentParser(description="FIT Framework CLI 插件开发工具")
     subparsers = parser.add_subparsers(dest="command")
