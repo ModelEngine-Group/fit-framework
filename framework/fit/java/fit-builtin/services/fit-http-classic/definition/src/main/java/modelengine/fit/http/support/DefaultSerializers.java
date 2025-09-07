@@ -10,7 +10,9 @@ import static modelengine.fit.http.protocol.MimeType.APPLICATION_JSON;
 import static modelengine.fit.http.protocol.MimeType.APPLICATION_X_WWW_FORM_URLENCODED;
 import static modelengine.fit.http.protocol.MimeType.MULTIPART_FORM_DATA;
 import static modelengine.fit.http.protocol.MimeType.MULTIPART_MIXED;
+import static modelengine.fit.http.protocol.MimeType.TEXT_CSS;
 import static modelengine.fit.http.protocol.MimeType.TEXT_EVENT_STREAM;
+import static modelengine.fit.http.protocol.MimeType.TEXT_HTML;
 import static modelengine.fit.http.protocol.MimeType.TEXT_PLAIN;
 
 import modelengine.fit.http.Serializers;
@@ -74,6 +76,8 @@ public class DefaultSerializers implements Serializers {
                 .put(MULTIPART_FORM_DATA, EntitySerializer.multiPartSerializer())
                 .put(MULTIPART_MIXED, EntitySerializer.multiPartSerializer())
                 .put(TEXT_PLAIN, EntitySerializer.textSerializer())
+                .put(TEXT_CSS, EntitySerializer.textSerializer())
+                .put(TEXT_HTML, EntitySerializer.textSerializer())
                 .build();
         this.json().ifPresent(serializer -> {
             curSerializers.put(APPLICATION_JSON, EntitySerializer.jsonSerializer(serializer));
