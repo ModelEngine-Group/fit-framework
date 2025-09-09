@@ -13,13 +13,16 @@ import asyncio
 import atexit
 import threading
 from concurrent.futures import Future
+from fitframework import value
 
 from v2.nacos import NacosNamingService, RegisterInstanceParam, ListInstanceParam, \
     DeregisterInstanceParam, SubscribeServiceParam, ListServiceParam
 
 from fitframework.api.logging import plugin_logger
 from .config import build_nacos_config
-
+@value("nacos.async.timeout",default_value=10, converter=int)
+def get_nacos_async_timeout():
+    pass
 
 class AsyncExecutor:
     """Executor for handling asynchronous operations in a background thread."""
@@ -119,7 +122,7 @@ class AsyncExecutor:
         self._loop.call_soon_threadsafe(asyncio.create_task, wrapped_coro())
 
         # Wait for result
-        return result_future.result(timeout=30)  # 30 second timeout
+        return result_future.result(timeout=get_nacos_async_timeout())  # 30 second timeout
 
     def get_nacos_client(self):
         """

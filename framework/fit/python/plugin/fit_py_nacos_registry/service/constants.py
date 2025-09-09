@@ -25,5 +25,5 @@ PROTOCOL_CODE_MAP = {
     "http": 2,
     "grpc": 3,
     "uc": 10,
-    "shareMemory": 11
+    "share_memory": 11
 }
