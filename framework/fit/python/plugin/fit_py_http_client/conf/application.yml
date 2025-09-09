@@ -1,0 +1,11 @@
+https:
+  client:
+    verify_enabled: false # 是否需要验证服务端身份
+    ca_path: "plugin/fit_py_http_client/resources/ca.crt"
+    assert_host_name: false # 是否在校验时校验主机名，仅当 verify_enabled 为 true 时有意义
+    cert_enabled: false # 是否服务端对自身身份校验
+    crt_path: "plugin/fit_py_http_client/resources/global.crt"
+    key_path: "plugin/fit_py_http_client/resources/global.key"
+    key_file_encrypted: false # 私钥是否被加密，仅当 cert_enabled 为 true 时有意义
+    key_file_password: "" # 私钥的密码，仅当 cert_enabled 和 key_file_encrypted 为 true 时有意义
+    key_file_password_encrypted: false # 私钥的密码是否被加密，仅当 cert_enabled 和 key_file_encrypted 为 true 时有意义
