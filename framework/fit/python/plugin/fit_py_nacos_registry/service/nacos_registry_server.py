@@ -13,7 +13,7 @@ from v2.nacos import RegisterInstanceParam, ListInstanceParam, \
     DeregisterInstanceParam, SubscribeServiceParam, Instance, ListServiceParam
 
 from fitframework import fitable, const
-from fitframework.api.logging import plugin_logger
+from fitframework.api.logging import sys_plugin_logger
 from fit_common_struct.entity import Worker, FitableMeta, Application, FitableAddressInstance, \
     FitableMetaInstance, ApplicationInstance
 from fit_common_struct.core import Fitable, Genericable
@@ -43,11 +43,11 @@ def on_service_changed(fitable_info: Fitable, worker_id: str) -> None:
         # Query current instances
         instances = query_fitable_addresses([fitable_info], worker_id)
         # notify_fitables(instances)
-        plugin_logger.debug(
+        sys_plugin_logger.debug(
             f"Service changed for fitable: {fitable_info}, instances: {len(instances)}"
         )
     except Exception as e:
-        plugin_logger.error(f"Service change handling failed: {e}")
+        sys_plugin_logger.error(f"Service change handling failed: {e}")
 
 
 def extract_workers(app_instances: List[Instance], application: Application) -> List[Worker]:
@@ -83,7 +83,7 @@ def register_fitables(fitable_metas: List[FitableMeta], worker: Worker, applicat
         Exception: If registration fails due to registry error.
     """
     try:
-        plugin_logger.debug(
+        sys_plugin_logger.debug(
             f"Registering fitables. [fitableMetas={fitable_metas}, "
             f"worker={worker.id}, application={application.nameVersion}]"
         )
@@ -106,9 +106,9 @@ def register_fitables(fitable_metas: List[FitableMeta], worker: Worker, applicat
                 )
                 run_async_safely(call_register_instance(param))
 
-        plugin_logger.info(f"Successfully registered fitables for worker {worker.id}")
+        sys_plugin_logger.info(f"Successfully registered fitables for worker {worker.id}")
     except Exception as e:
-        plugin_logger.error(f"Failed to register fitables due to registry error: {e}")
+        sys_plugin_logger.error(f"Failed to register fitables due to registry error: {e}")
         raise
 
 @fitable(const.UNREGISTER_FIT_SERVICE_GEN_ID, const.UNREGISTER_FIT_SERVICE_FIT_ID)
@@ -120,7 +120,7 @@ def unregister_fitables(fitables: List[Fitable], worker_id: str) -> None:
         fitables: List of Fitable implementations to unregister.
         worker_id: Unique identifier of the process where service implementations reside.
     """
-    plugin_logger.debug(
+    sys_plugin_logger.debug(
         f"Unregistering fitables for worker. [fitables={fitables}, workerId={worker_id}]"
     )
 
@@ -149,7 +149,7 @@ def unregister_single_fitable(fitable: Fitable, worker_id: str) -> None:
         instances = run_async_safely(call_list_instances(param))
         unregister_matching_instances(instances, worker_id, service_name, group_name)
     except Exception as e:
-        plugin_logger.error(f"Failed to unregister fitable due to registry error: {e}")
+        sys_plugin_logger.error(f"Failed to unregister fitable due to registry error: {e}")
 
 
 def unregister_matching_instances(instances: List[Instance], worker_id: str, service_name: str, group_name: str) -> None:
@@ -173,9 +173,9 @@ def unregister_matching_instances(instances: List[Instance], worker_id: str, ser
                     port=instance.port
                 )
                 run_async_safely(call_deregister_instance(param))
-                plugin_logger.debug(f"Successfully deregistered instance {instance.ip}:{instance.port}")
+                sys_plugin_logger.debug(f"Successfully deregistered instance {instance.ip}:{instance.port}")
         except Exception as e:
-            plugin_logger.error(f"Failed to deregister instance: {e}")
+            sys_plugin_logger.error(f"Failed to deregister instance: {e}")
 
 
 @fitable(const.QUERY_FIT_SERVICE_GEN_ID, const.QUERY_FIT_SERVICE_FIT_ID)
@@ -190,7 +190,7 @@ def query_fitable_addresses(fitables: List[Fitable], worker_id: str) -> List[Fit
     Returns:
         List of obtained instance information.
     """
-    plugin_logger.debug(
+    sys_plugin_logger.debug(
         f"Querying fitables for worker. [fitables={fitables}, workerId={worker_id}]"
     )
     result_map = {}
@@ -202,7 +202,7 @@ def query_fitable_addresses(fitables: List[Fitable], worker_id: str) -> List[Fit
                 continue
             process_application_instances(result_map, fitable, instances)
         except Exception as e:
-            plugin_logger.error(f"Failed to query fitables for genericableId: {e}")
+            sys_plugin_logger.error(f"Failed to query fitables for genericableId: {e}")
 
     return list(result_map.values())
 
@@ -265,7 +265,7 @@ def subscribe_fit_service(fitables: List[Fitable], worker_id: str, callback_fita
     Returns:
         Queried instance information.
     """
-    plugin_logger.debug(
+    sys_plugin_logger.debug(
         f"Subscribing to fitables for worker. [fitables={fitables}, "
         f"workerId={worker_id}, callbackFitableId={callback_fitable_id}]"
     )
@@ -278,7 +278,7 @@ def subscribe_fit_service(fitables: List[Fitable], worker_id: str, callback_fita
             service_key = build_service_key(group_name, service_name)
 
             if service_key in _service_subscriptions:
-                plugin_logger.debug(
+                sys_plugin_logger.debug(
                     f"Already subscribed to service. [groupName={group_name}, serviceName={service_name}]"
                 )
                 continue
@@ -299,12 +299,12 @@ def subscribe_fit_service(fitables: List[Fitable], worker_id: str, callback_fita
                 subscribe_callback=event_listener
             )
             run_async_safely(call_subscribe(param))
-            plugin_logger.debug(
+            sys_plugin_logger.debug(
                 f"Subscribed to service. [groupName={group_name}, serviceName={service_name}]"
             )
 
         except Exception as e:
-            plugin_logger.error(f"Failed to subscribe to Nacos service: {e}")
+            sys_plugin_logger.error(f"Failed to subscribe to Nacos service: {e}")
 
     return query_fitable_addresses(fitables, worker_id)
 
@@ -319,7 +319,7 @@ def unsubscribe_fitables(fitables: List[Fitable], worker_id: str, callback_fitab
         worker_id: Unique identifier of the specified process.
         callback_fitable_id: Unique identifier for unsubscribe callback Fitable implementation.
     """
-    plugin_logger.debug(f"Unsubscribing from fitables for worker. [fitables={fitables}, workerId={worker_id}, callbackFitableId={callback_fitable_id}]")
+    sys_plugin_logger.debug(f"Unsubscribing from fitables for worker. [fitables={fitables}, workerId={worker_id}, callbackFitableId={callback_fitable_id}]")
     
     for fitable in fitables:
         try:
@@ -336,9 +336,9 @@ def unsubscribe_fitables(fitables: List[Fitable], worker_id: str, callback_fitab
                     subscribe_callback=listener
                 )
                 run_async_safely(call_unsubscribe(param))
-                plugin_logger.debug(f"Unsubscribed from service. [groupName={group_name}, serviceName={service_name}]")
+                sys_plugin_logger.debug(f"Unsubscribed from service. [groupName={group_name}, serviceName={service_name}]")
         except Exception as e:
-            plugin_logger.error(f"Failed to unsubscribe from Nacos service: {e}")
+            sys_plugin_logger.error(f"Failed to unsubscribe from Nacos service: {e}")
 
 
 @fitable(const.QUERY_FITABLE_METAS_GEN_ID, const.QUERY_FITABLE_METAS_FIT_ID)
@@ -352,7 +352,7 @@ def query_fitable_metas(genericable_infos: List[Genericable]) -> List[FitableMet
     Returns:
         List of queried Fitable metadata.
     """
-    plugin_logger.debug(
+    sys_plugin_logger.debug(
         f"Querying fitable metas for genericables. [genericables={genericable_infos}]"
     )
     meta_environments = {}
@@ -386,7 +386,7 @@ def process_genericable_services(genericable: Genericable, meta_environments: Di
         for service_name in service_list.services:
             process_service_instances(service_name, group_name, meta_environments)
     except Exception as e:
-        plugin_logger.error(f"Failed to query fitable metas: {e}")
+        sys_plugin_logger.error(f"Failed to query fitable metas: {e}")
 
 
 def process_service_instances(service_name: str, group_name: str, meta_environments: Dict) -> None:
@@ -413,7 +413,7 @@ def process_service_instances(service_name: str, group_name: str, meta_environme
         meta = parse_fitable_meta(instances[0].metadata)
         collect_environments_from_instances(instances, meta, meta_environments)
     except Exception as e:
-        plugin_logger.error(f"Failed to select instances for service {service_name}: {e}")
+        sys_plugin_logger.error(f"Failed to select instances for service {service_name}: {e}")
 
 
 def collect_environments_from_instances(instances: List[Instance], meta: FitableMeta, meta_environments: Dict) -> None:
@@ -433,7 +433,7 @@ def collect_environments_from_instances(instances: List[Instance], meta: Fitable
                     meta_environments[meta] = set()
                 meta_environments[meta].add(worker.environment)
         except Exception as e:
-            plugin_logger.error(f"Failed to parse worker metadata: {e}")
+            sys_plugin_logger.error(f"Failed to parse worker metadata: {e}")
 
 
 def build_fitable_meta_instances(meta_environments: Dict) -> List[FitableMetaInstance]:

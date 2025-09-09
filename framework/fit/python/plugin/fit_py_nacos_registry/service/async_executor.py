@@ -18,7 +18,7 @@ from fitframework import value
 from v2.nacos import NacosNamingService, RegisterInstanceParam, ListInstanceParam, \
     DeregisterInstanceParam, SubscribeServiceParam, ListServiceParam
 
-from fitframework.api.logging import plugin_logger
+from fitframework.api.logging import sys_plugin_logger
 from .config import build_nacos_config
 @value("nacos.async.timeout",default_value=10, converter=int)
 def get_nacos_async_timeout():
@@ -64,9 +64,9 @@ class AsyncExecutor:
                 try:
                     config = build_nacos_config()
                     self._nacos_client = await NacosNamingService.create_naming_service(config)
-                    plugin_logger.info("Nacos client initialized successfully")
+                    sys_plugin_logger.info("Nacos client initialized successfully")
                 except Exception as e:
-                    plugin_logger.error(f"Failed to initialize Nacos client: {e}")
+                    sys_plugin_logger.error(f"Failed to initialize Nacos client: {e}")
                     raise
                 finally:
                     # Mark initialization complete
@@ -77,17 +77,22 @@ class AsyncExecutor:
             # Run event loop until shutdown
             self._loop.run_forever()
         except Exception as e:
-            plugin_logger.error(f"Error in async executor event loop: {e}")
+            sys_plugin_logger.error(f"Error in async executor event loop: {e}")
             self._init_complete.set()  # Set even on failure to avoid infinite wait
         finally:
             try:
                 if self._nacos_client:
-                    # Cleanup Nacos client if needed
-                    pass
-                if self._loop:
+                    # Try to close the client if it has a close method
+                    try:
+                        self._nacos_client.shutdown()
+                        sys_plugin_logger.info("Nacos client cleaned up")
+                    except Exception as cleanup_error:
+                        sys_plugin_logger.error(f"Error cleaning up Nacos client: {cleanup_error}")
+                        
+                if self._loop and not self._loop.is_closed():
                     self._loop.close()
             except Exception as e:
-                plugin_logger.error(f"Error during cleanup: {e}")
+                sys_plugin_logger.error(f"Error during cleanup: {e}")
 
     def run_coroutine(self, coro):
         """
@@ -122,7 +127,7 @@ class AsyncExecutor:
         self._loop.call_soon_threadsafe(asyncio.create_task, wrapped_coro())
 
         # Wait for result
-        return result_future.result(timeout=get_nacos_async_timeout())  # 30 second timeout
+        return result_future.result(timeout=get_nacos_async_timeout())
 
     def get_nacos_client(self):
         """
@@ -162,7 +167,7 @@ def run_async_safely(coro):
     try:
         return _async_executor.run_coroutine(coro)
     except Exception as e:
-        plugin_logger.error(f"Error running async operation: {e}")
+        sys_plugin_logger.error(f"Error running async operation: {e}")
         raise
 
 
@@ -208,7 +213,7 @@ def _cleanup_async_executor():
     try:
         _async_executor.shutdown()
     except Exception as e:
-        plugin_logger.error(f"Error during async executor cleanup: {e}")
+        sys_plugin_logger.error(f"Error during async executor cleanup: {e}")
 
 
 # Register cleanup function

@@ -11,7 +11,7 @@ from typing import List, Dict
 from fit_common_struct.core import Fitable, Genericable
 from fit_common_struct.entity import Worker, Application, FitableMeta, Endpoint
 
-from fitframework.api.logging import plugin_logger
+from fitframework.api.logging import sys_plugin_logger
 from fitframework.utils.json_serialize_utils import json_serialize
 
 from .constants import SEPARATOR, CLUSTER_PORT_PATTERN, PROTOCOL_CODE_MAP, \
@@ -85,7 +85,7 @@ def create_instances(worker: Worker, application: Application, meta: FitableMeta
     Returns:
         List of instance dictionaries.
     """
-    plugin_logger.debug(
+    sys_plugin_logger.debug(
         f"Creating instance for worker. [worker={worker.id}, "
         f"application={application.nameVersion}, meta={meta}]"
     )
@@ -132,7 +132,7 @@ def build_instance_metadata(worker: Worker, application: Application, meta: Fita
         metadata[APPLICATION_KEY] = json_serialize(application)
         metadata[FITABLE_META_KEY] = json_serialize(meta)
     except Exception as e:
-        plugin_logger.error(f"Failed to serialize metadata for worker: {e}")
+        sys_plugin_logger.error(f"Failed to serialize metadata for worker: {e}")
 
     return metadata
 
@@ -157,6 +157,6 @@ def build_endpoints(extensions: Dict[str, str]) -> List[Endpoint]:
                 endpoint = Endpoint(int(value), PROTOCOL_CODE_MAP[protocol_name])
                 endpoints.append(endpoint)
             else:
-                plugin_logger.error(f"Unknown protocol: {protocol_name}")
+                sys_plugin_logger.error(f"Unknown protocol: {protocol_name}")
 
     return endpoints

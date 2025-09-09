@@ -13,7 +13,7 @@ from v2.nacos import Instance
 from fit_common_struct.entity import Worker, Application, FitableMeta, Endpoint, Address
 from fit_common_struct.core import Fitable
 from fitframework.utils.json_serialize_utils import json_deserialize
-from fitframework.api.logging import plugin_logger
+from fitframework.api.logging import sys_plugin_logger
 
 from .constants import WORKER_KEY, APPLICATION_KEY, FITABLE_META_KEY
 
@@ -33,7 +33,7 @@ def parse_fitable_meta(metadata: Dict) -> FitableMeta:
         if meta_json:
             return json_deserialize(FitableMeta, meta_json)
     except Exception as e:
-        plugin_logger.error(f"Failed to parse fitable meta for instance: {e}")
+        sys_plugin_logger.error(f"Failed to parse fitable meta for instance: {e}")
 
     # Return default value
     default_fitable = Fitable("unknown", "1.0", "unknown", "1.0")
@@ -56,7 +56,7 @@ def parse_application(metadata: Dict) -> Application:
         if app_json:
             return json_deserialize(Application, app_json)
     except Exception as e:
-        plugin_logger.error(f"Failed to parse application metadata for instance: {e}")
+        sys_plugin_logger.error(f"Failed to parse application metadata for instance: {e}")
 
     # Return default value
     return Application("unknown", "unknown")
@@ -87,7 +87,7 @@ def parse_worker(instance_or_metadata) -> Worker:
         if worker_json:
             return json_deserialize(Worker, worker_json)
     except Exception as e:
-        plugin_logger.error(f"Failed to parse worker metadata for instance: {e}")
+        sys_plugin_logger.error(f"Failed to parse worker metadata for instance: {e}")
 
     # Fallback - create basic worker information
     worker = Worker([], "unknown", "", {})
