@@ -196,15 +196,38 @@ class FitableMetaInstance(object):
     def __repr__(self):
         return str(tuple(self.__dict__.values()))
 
-class HeartBeatInfo:
+class HeartBeatInfo(object):
+
     def __init__(self, sceneType: str, aliveTime: int, initDelay: int):
         self.sceneType: str = sceneType
         self.aliveTime: int = aliveTime
         self.initDelay: int = initDelay
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__dict__ == other.__dict__
 
-class HeartBeatAddress:
+    def __hash__(self):
+        return safe_hash_dict(self.__dict__)
+
+    def __repr__(self):
+        return str(tuple(self.__dict__.values()))
+
+
+class HeartBeatAddress(object):
     def __init__(self, id_: str):
         self.id = id_
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__dict__ == other.__dict__
+
+    def __hash__(self):
+        return safe_hash_dict(self.__dict__)
+
+    def __repr__(self):
+        return str(tuple(self.__dict__.values()))
 
 
