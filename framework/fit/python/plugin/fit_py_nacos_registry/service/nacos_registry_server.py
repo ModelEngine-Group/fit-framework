@@ -8,6 +8,8 @@ Service for providing Nacos registry center functionality.
 """
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict
+import weakref
+import atexit
 
 from v2.nacos import RegisterInstanceParam, ListInstanceParam, \
     DeregisterInstanceParam, SubscribeServiceParam, Instance, ListServiceParam
@@ -27,8 +29,22 @@ from .async_executor import run_async_safely, call_list_instances, call_deregist
     call_subscribe, call_unsubscribe, call_list_services, call_register_instance
 
 # Global variables
-_service_subscriptions: Dict[str, any] = {}
+_service_subscriptions: weakref.WeakValueDictionary = weakref.WeakValueDictionary()
 _executor = ThreadPoolExecutor(max_workers=10)
+
+
+def _cleanup_executor():
+    """Cleanup the thread pool executor."""
+    try:
+        if _executor:
+            _executor.shutdown(wait=True)
+            sys_plugin_logger.info("Thread pool executor shut down successfully")
+    except Exception as e:
+        sys_plugin_logger.error(f"Error shutting down thread pool executor: {e}")
+
+
+# Register cleanup function to ensure executor is properly closed
+atexit.register(_cleanup_executor)
 
 
 def on_service_changed(fitable_info: Fitable, worker_id: str) -> None:
@@ -327,9 +343,9 @@ def unsubscribe_fitables(fitables: List[Fitable], worker_id: str, callback_fitab
             service_name = get_service_name(fitable)
             service_key = build_service_key(group_name, service_name)
 
-            if service_key in _service_subscriptions:
-                listener = _service_subscriptions.pop(service_key)
-                
+            # Use pop with default to avoid KeyError if listener was garbage collected
+            listener = _service_subscriptions.pop(service_key, None)
+            if listener is not None:
                 param = SubscribeServiceParam(
                     service_name=service_name,
                     group_name=group_name,
@@ -337,6 +353,8 @@ def unsubscribe_fitables(fitables: List[Fitable], worker_id: str, callback_fitab
                 )
                 run_async_safely(call_unsubscribe(param))
                 sys_plugin_logger.debug(f"Unsubscribed from service. [groupName={group_name}, serviceName={service_name}]")
+            else:
+                sys_plugin_logger.debug(f"Listener already cleaned up for service. [groupName={group_name}, serviceName={service_name}]")
         except Exception as e:
             sys_plugin_logger.error(f"Failed to unsubscribe from Nacos service: {e}")
 
