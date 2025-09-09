@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
+    "dom-to-image": "^2.6.0",
     "i18next": "^21.6.0"
   },
   "devDependencies": {

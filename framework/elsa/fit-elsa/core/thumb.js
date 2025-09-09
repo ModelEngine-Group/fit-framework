@@ -4,7 +4,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {domtoimage} from "../common/dom2image.js";
 import {shape} from "./shape.js";
 import {canvasRectangleDrawer} from "./drawers/rectangleDrawer.js";
 
