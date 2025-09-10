@@ -40,7 +40,12 @@ public enum Method {
     /**
      * Represents the notification method indicating a change in the list of tools.
      */
-    NOTIFICATION_TOOLS_CHANGED("notifications/tools/list_changed");
+    NOTIFICATION_TOOLS_CHANGED("notifications/tools/list_changed"),
+
+    /**
+     * Represents the method to set logging level.
+     */
+    LOGGING_SET_LEVEL("logging/setLevel");
 
     private final String code;
 
