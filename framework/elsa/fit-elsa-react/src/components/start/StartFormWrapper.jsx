@@ -6,7 +6,7 @@
 
 import {useState} from 'react';
 import {Button, Collapse, Popover} from 'antd';
-import {DeleteOutlined, PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {StartInputForm} from './StartInputForm.jsx';
 import './style.css';
 import {useConfigContext, useDispatch, useShapeContext} from '@/components/DefaultRoot.jsx';
@@ -16,6 +16,7 @@ import PropTypes from 'prop-types';
 import {Trans, useTranslation} from 'react-i18next';
 import {AppConfiguration} from '@/components/start/AppConfiguration.jsx';
 import {JadeCollapse} from '@/components/common/JadeCollapse.jsx';
+import IconTrashBin from '../asserts/icon-delete-trash-bin.svg?react'; // 导入背景图片
 
 const {Panel} = Collapse;
 
@@ -87,7 +88,7 @@ export default function StartFormWrapper({data, shapeStatus}) {
           type="text"
           className="icon-button start-node-delete-icon-button"
           onClick={() => handleDelete(item.id)}>
-          <DeleteOutlined/>
+          <IconTrashBin/>
         </Button>
       </>);
     }
