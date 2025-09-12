@@ -9,6 +9,7 @@ package modelengine.fel.tool.mcp.entity;
 /**
  * Represents different logging level in MCP server, following the RFC-5424 severity scale.
  *
+ * @author 黄可欣
  * @see <a href="https://datatracker.ietf.org/doc/html/rfc5424#section-6.2.1">RFC 5424</a>
  * @since 2025-09-10
  */

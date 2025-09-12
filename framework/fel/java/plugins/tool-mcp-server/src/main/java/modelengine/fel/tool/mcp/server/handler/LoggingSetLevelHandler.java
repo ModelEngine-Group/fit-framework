@@ -17,6 +17,11 @@ import java.util.Map;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
+ *  A handler for processing logging set level requests in the MCP server.
+ *  This class extends {@link AbstractMessageHandler} and is responsible for handling
+ *  {@link LoggingSetLevelRequest} messages by setting the logging level of the associated {@link McpServerController}.
+ *
+ * @author 黄可欣
  * @since 2025-09-10
  */
 public class LoggingSetLevelHandler extends AbstractMessageHandler<LoggingSetLevelHandler.LoggingSetLevelRequest> {
