@@ -43,10 +43,10 @@ import java.util.Set;
 public class ValidationHandler implements AutoCloseable {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-    private final LocaleMessageInterpolator messageInterpolator;
+    private final LocaleContextMessageInterpolator messageInterpolator;
 
     public ValidationHandler() {
-        this.messageInterpolator = new LocaleMessageInterpolator();
+        this.messageInterpolator = new LocaleContextMessageInterpolator();
         this.validatorFactory = Validation.byProvider(HibernateValidator.class)
                 .configure()
                 .messageInterpolator(this.messageInterpolator)
@@ -58,7 +58,7 @@ public class ValidationHandler implements AutoCloseable {
     /**
      * 设置校验信息语言。
      *
-     * @param locale 校验语言 {@link Locale}。
+     * @param locale 表示校验语言的 {@link Locale}。
      */
     public void setLocale(Locale locale) {
         this.messageInterpolator.setLocale(locale);

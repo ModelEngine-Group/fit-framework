@@ -755,4 +755,21 @@ public class ValidationHandlerTest {
         ConstraintViolationException exception = invokeHandleMethod(method, new Object[] {new BigDecimal("5.5")});
         assertThat(exception.getMessage()).contains("需要在10和100之间");
     }
+
+    @Nested
+    @DisplayName("测试 Locale 默认值为 null 时的情况")
+    public class ValidationHandlerNullTest {
+        @BeforeEach
+        void setUp() {
+            ValidationHandlerTest.this.handler.setLocale(null);
+        }
+
+        @Test
+        @DisplayName("测试@Null注解")
+        void testNullValidation() {
+            Method method = ReflectionUtils.getDeclaredMethod(ValidateService.class, "testNull", String.class);
+            ConstraintViolationException exception = invokeHandleMethod(method, new Object[] {"not null"});
+            assertThat(exception.getMessage()).isNotNull();
+        }
+    }
 }

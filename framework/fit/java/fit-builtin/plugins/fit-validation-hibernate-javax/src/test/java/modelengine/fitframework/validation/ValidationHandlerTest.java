@@ -59,10 +59,10 @@ public class ValidationHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler.setLocale(Locale.CHINA);
-        when(validated.value()).thenReturn(new Class[0]);
-        when(fitRuntime.resolverOfAnnotations()).thenReturn(annotationMetadataResolver);
-        when(beanContainer.runtime()).thenReturn(fitRuntime);
+        this.handler.setLocale(Locale.CHINA);
+        when(this.validated.value()).thenReturn(new Class[0]);
+        when(this.fitRuntime.resolverOfAnnotations()).thenReturn(annotationMetadataResolver);
+        when(this.beanContainer.runtime()).thenReturn(fitRuntime);
     }
 
     private ConstraintViolationException invokeHandleMethod(Method targetMethod, Object[] args) {
@@ -756,5 +756,22 @@ public class ValidationHandlerTest {
                 ReflectionUtils.getDeclaredMethod(ValidateService.class, "testRangeBigDecimal", BigDecimal.class);
         ConstraintViolationException exception = invokeHandleMethod(method, new Object[] {new BigDecimal("5.5")});
         assertThat(exception.getMessage()).contains("需要在10和100之间");
+    }
+
+    @Nested
+    @DisplayName("测试 Locale 默认值为 null 时的情况")
+    public class ValidationHandlerNullTest {
+        @BeforeEach
+        void setUp() {
+            ValidationHandlerTest.this.handler.setLocale(null);
+        }
+
+        @Test
+        @DisplayName("测试@Null注解")
+        void testNullValidation() {
+            Method method = ReflectionUtils.getDeclaredMethod(ValidateService.class, "testNull", String.class);
+            ConstraintViolationException exception = invokeHandleMethod(method, new Object[] {"not null"});
+            assertThat(exception.getMessage()).isNotNull();
+        }
     }
 }
