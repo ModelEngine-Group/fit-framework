@@ -27,6 +27,7 @@ import static modelengine.fitframework.inspection.Validation.notNull;
 public class LoggingSetLevelHandler extends AbstractMessageHandler<LoggingSetLevelHandler.LoggingSetLevelRequest> {
     private final McpServerController mcpServerController;
     private static final Map<Object, Object> SET_LEVEL_RESULT = Collections.emptyMap();
+
     /**
      * Constructs a new instance of the LoggingSetLevelHandler class.
      *
