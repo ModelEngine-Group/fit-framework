@@ -17,53 +17,68 @@ public enum LoggingLevel {
     /**
      * Detailed debugging information (function entry/exit points).
      */
-    DEBUG("debug"),
+    DEBUG(0,"debug"),
 
     /**
      * General informational messages (operation progress updates).
      */
-    INFO("info"),
+    INFO(1,"info"),
 
     /**
      * Normal but significant events (configuration changes).
      */
-    NOTICE("notice"),
+    NOTICE(2,"notice"),
 
     /**
      * Warning conditions (deprecated feature usage).
      */
-    WARNING("warning"),
+    WARNING(3,"warning"),
 
     /**
      * Error conditions (operation failures).
      */
-    ERROR("error"),
+    ERROR(4,"error"),
 
     /**
      * Critical conditions (system component failures).
      */
-    CRITICAL("critical"),
+    CRITICAL(5,"critical"),
 
     /**
      * Action must be taken immediately (data corruption detected).
      */
-    ALERT("alert"),
+    ALERT(6,"alert"),
 
     /**
      * System is unusable (complete system failure).
      */
-    EMERGENCY("emergency");
+    EMERGENCY(7,"emergency");
 
+    private final int level;
     private final String code;
 
-    LoggingLevel(String code) { this.code = code; }
+    LoggingLevel(int level, String code) {
+        this.level = level;
+        this.code = code;
+    }
+
+    /**
+     * Returns the level number associated with the logging level.
+     *
+     * @return The number of the logging level.
+     */
+    public int level() {
+        return this.level;
+    }
 
     /**
      * Returns the code associated with the logging level.
      *
      * @return The code of the logging level.
      */
-    public String code() { return this.code; }
+    public String code() {
+        return this.code;
+    }
 
     /**
      * Reverse lookup by code (ignore case).
