@@ -34,16 +34,13 @@ public class LoggingSetLevelHandler extends AbstractMessageHandler<LoggingSetLev
     @Override
     public Object handle(LoggingSetLevelHandler.LoggingSetLevelRequest request) {
         if (request == null) {
-            throw new IllegalStateException("No logging setLevel request.");
+            throw new IllegalStateException("No logging set level request.");
         }
         if (StringUtils.isBlank(request.getLevel())) {
             throw new IllegalStateException("No logging level in request.");
         }
         String loggingLevelString =  request.getLevel();
         LoggingLevel loggingLevel = LoggingLevel.fromCode(loggingLevelString);
-        if (loggingLevel == null) {
-            throw new IllegalStateException("Error logging level in request.");
-        }
         // TODO change the logging level of corresponding session.
         return SET_LEVEL_RESULT;
     }

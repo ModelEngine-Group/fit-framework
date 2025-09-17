@@ -6,6 +6,8 @@
 
 package modelengine.fel.tool.mcp.entity;
 
+import modelengine.fitframework.inspection.Nonnull;
+
 /**
  * Represents different logging level in MCP server, following the RFC-5424 severity scale.
  *
@@ -65,7 +67,7 @@ public enum LoggingLevel {
     /**
      * Returns the level number associated with the logging level.
      *
-     * @return The number of the logging level.
+     * @return The number of the logging level as an int.
      */
     public int level() {
         return this.level;
@@ -74,25 +76,34 @@ public enum LoggingLevel {
     /**
      * Returns the code associated with the logging level.
      *
-     * @return The code of the logging level.
+     * @return The code of the logging level as a {@link String}.
      */
     public String code() {
         return this.code;
     }
 
     /**
-     * Reverse lookup by code (ignore case).
+     * Returns the default logging level which is INFO level.
      *
-     * @param code The external code
-     * @return Corresponding enum or {@code null}
+     * @return The default INFO logging level as a {@link LoggingLevel}.
      */
-    public static LoggingLevel fromCode(String code) {
-        if (code == null) return null;
+    public static LoggingLevel getDefault() {
+        return LoggingLevel.INFO;
+    }
+
+    /**
+     * Return the corresponding {@link LoggingLevel} from the logging level code.
+     * If there is no corresponding logging level, return the default logging level.
+     *
+     * @param code The code of logging level as a {@link String}.
+     * @return The corresponding or default logging level as a {@link LoggingLevel}.
+     */
+    public static LoggingLevel fromCode(@Nonnull String code) {
         for (LoggingLevel level : values()) {
             if (level.code.equalsIgnoreCase(code)) {
                 return level;
             }
         }
-        return null;
+        return LoggingLevel.getDefault();
     }
 }
