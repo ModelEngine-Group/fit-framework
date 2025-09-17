@@ -44,6 +44,7 @@ public enum Method {
 
     /**
      * Represents the method to set logging level.
+     * TODO The naming need to be standardized as snake_case.
      */
     LOGGING_SET_LEVEL("logging/setLevel");
 
