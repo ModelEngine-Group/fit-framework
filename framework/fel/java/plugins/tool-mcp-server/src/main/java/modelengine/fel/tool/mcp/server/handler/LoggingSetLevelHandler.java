@@ -7,14 +7,11 @@
 package modelengine.fel.tool.mcp.server.handler;
 
 import modelengine.fel.tool.mcp.entity.LoggingLevel;
-import modelengine.fel.tool.mcp.server.McpServerController;
 import modelengine.fel.tool.mcp.server.MessageRequest;
 import modelengine.fitframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Map;
-
-import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
  *  A handler for processing logging set level requests in the MCP server.
