@@ -11,7 +11,6 @@ import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fel.tool.mcp.entity.Event;
 import modelengine.fel.tool.mcp.entity.JsonRpc;
-import modelengine.fel.tool.mcp.entity.LoggingLevel;
 import modelengine.fel.tool.mcp.entity.Method;
 import modelengine.fel.tool.mcp.server.handler.InitializeHandler;
 import modelengine.fel.tool.mcp.server.handler.PingHandler;
@@ -62,8 +61,6 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
     private final MessageHandler unsupportedMethodHandler = new UnsupportedMethodHandler();
     private final ObjectSerializer serializer;
 
-    private LoggingLevel loggingLevel = LoggingLevel.INFO;
-
     /**
      * Constructs a new instance of the McpController class.
      *
@@ -81,7 +78,7 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
         this.methodHandlers.put(Method.PING.code(), new PingHandler());
         this.methodHandlers.put(Method.TOOLS_LIST.code(), new ToolListHandler(mcpServer));
         this.methodHandlers.put(Method.TOOLS_CALL.code(), new ToolCallHandler(mcpServer, this.serializer));
-        this.methodHandlers.put(Method.LOGGING_SET_LEVEL.code(), new LoggingSetLevelHandler(this));
+        this.methodHandlers.put(Method.LOGGING_SET_LEVEL.code(), new LoggingSetLevelHandler());
 
         ThreadPoolScheduler channelDetectorScheduler = ThreadPoolScheduler.custom()
                 .corePoolSize(1)
@@ -180,9 +177,5 @@ public class McpServerController implements McpServer.ToolsChangedObserver {
             emitter.emit(textEvent);
             log.info("Send MCP notification: tools changed. [sessionId={}]", sessionId);
         });
-    }
-
-    public void setLoggingLevel(LoggingLevel loggingLevel) {
-        this.loggingLevel = loggingLevel;
     }
 }

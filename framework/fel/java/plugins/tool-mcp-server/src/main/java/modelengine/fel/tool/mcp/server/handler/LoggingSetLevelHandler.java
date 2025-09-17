@@ -19,24 +19,19 @@ import static modelengine.fitframework.inspection.Validation.notNull;
 /**
  *  A handler for processing logging set level requests in the MCP server.
  *  This class extends {@link AbstractMessageHandler} and is responsible for handling
- *  {@link LoggingSetLevelRequest} messages by setting the logging level of the associated {@link McpServerController}.
+ *  {@link LoggingSetLevelRequest} messages.
  *
  * @author 黄可欣
  * @since 2025-09-10
  */
 public class LoggingSetLevelHandler extends AbstractMessageHandler<LoggingSetLevelHandler.LoggingSetLevelRequest> {
-    private final McpServerController mcpServerController;
     private static final Map<Object, Object> SET_LEVEL_RESULT = Collections.emptyMap();
 
     /**
      * Constructs a new instance of the LoggingSetLevelHandler class.
-     *
-     * @param mcpServerController The MCP server instance used to set logging level during request handling.
-     * @throws IllegalArgumentException If {@code mcpServer} is null.
      */
-    public LoggingSetLevelHandler(McpServerController mcpServerController) {
+    public LoggingSetLevelHandler() {
         super(LoggingSetLevelHandler.LoggingSetLevelRequest.class);
-        this.mcpServerController = notNull(mcpServerController, "The MCP server controller cannot be null.");
     }
 
     @Override
@@ -52,7 +47,7 @@ public class LoggingSetLevelHandler extends AbstractMessageHandler<LoggingSetLev
         if (loggingLevel == null) {
             throw new IllegalStateException("Error logging level in request.");
         }
-        mcpServerController.setLoggingLevel(loggingLevel);
+        // TODO change the logging level of corresponding session.
         return SET_LEVEL_RESULT;
     }
 
