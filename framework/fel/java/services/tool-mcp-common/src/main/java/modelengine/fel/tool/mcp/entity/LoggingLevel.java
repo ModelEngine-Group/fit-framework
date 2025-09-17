@@ -19,42 +19,42 @@ public enum LoggingLevel {
     /**
      * Detailed debugging information (function entry/exit points).
      */
-    DEBUG(0,"debug"),
+    DEBUG(0, "debug"),
 
     /**
      * General informational messages (operation progress updates).
      */
-    INFO(1,"info"),
+    INFO(1, "info"),
 
     /**
      * Normal but significant events (configuration changes).
      */
-    NOTICE(2,"notice"),
+    NOTICE(2, "notice"),
 
     /**
      * Warning conditions (deprecated feature usage).
      */
-    WARNING(3,"warning"),
+    WARNING(3, "warning"),
 
     /**
      * Error conditions (operation failures).
      */
-    ERROR(4,"error"),
+    ERROR(4, "error"),
 
     /**
      * Critical conditions (system component failures).
      */
-    CRITICAL(5,"critical"),
+    CRITICAL(5, "critical"),
 
     /**
      * Action must be taken immediately (data corruption detected).
      */
-    ALERT(6,"alert"),
+    ALERT(6, "alert"),
 
     /**
      * System is unusable (complete system failure).
      */
-    EMERGENCY(7,"emergency");
+    EMERGENCY(7, "emergency");
 
     private final int level;
     private final String code;
