@@ -98,7 +98,11 @@ public enum LoggingLevel {
      * @param code The code of logging level as a {@link String}.
      * @return The corresponding or default logging level as a {@link LoggingLevel}.
      */
-    public static LoggingLevel fromCode(@Nonnull String code) {
+    @Nonnull
+    public static LoggingLevel fromCode(String code) {
+        if (code == null) {
+            return LoggingLevel.getDefault();
+        }
         for (LoggingLevel level : values()) {
             if (level.code.equalsIgnoreCase(code)) {
                 return level;
