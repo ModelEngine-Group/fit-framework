@@ -67,7 +67,7 @@ public enum LoggingLevel {
     /**
      * Returns the level number associated with the logging level.
      *
-     * @return The number of the logging level as an int.
+     * @return The number of the logging level as an {@code int}.
      */
     public int level() {
         return this.level;
