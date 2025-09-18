@@ -39,7 +39,7 @@ def create_file(path: Path, content: str = "", overwrite: bool = False):
 def generate_plugin_structure(plugin_name: str):
     """生成插件目录和文件结构"""
     base_dir = Path("plugin") / plugin_name
-    src_dir = base_dir / "src"
+    src_dir = base_dir / plugin_name / "src"
 
     # 创建目录
     create_directory(base_dir)
