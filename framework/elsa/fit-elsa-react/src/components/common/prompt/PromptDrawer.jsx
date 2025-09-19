@@ -47,6 +47,7 @@ const _PromptDrawer = (
     allowAIGenerate,
     onAIGenerate,
     maxLength = 2000,
+    labelName
   }) => {
   const {t} = useTranslation();
   const form = useFormContext();
@@ -106,7 +107,7 @@ const _PromptDrawer = (
         className='jade-form-item'
         label={
           <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
-            <span>{t('promptName')}</span>
+            <span>{labelName}</span>
             {allowAIGenerate && <div className='jade-prompt-drawer-btn' onClick={onAIGenerate((promptText) => {
               if (promptText === '') {
                 return;
@@ -154,6 +155,7 @@ _PromptDrawer.propTypes = {
   allowAIGenerate: PropTypes.bool,
   onAIGenerate: PropTypes.func,
   maxLength: PropTypes.number,
+  labelName: PropTypes.string,
 };
 
 const areEqual = (prevProps, nextProps) => {

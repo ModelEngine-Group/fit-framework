@@ -720,5 +720,9 @@
   "noContent": "暂无数据",
   "rerankConfig": "检索节点配置",
   "whetherRerank": "是否重排",
-  "topN": "topN"
+  "topN": "topN",
+  "textConcatenationOutputPopover": "拼接后的文本。",
+  "templateInputPopover": "输入需要添加到文本模板中的信息，可被文本模板引用。",
+  "textConcatenateNodeTitle": "文本拼接",
+  "concatenatedTextLabel": "拼接文本"
 }

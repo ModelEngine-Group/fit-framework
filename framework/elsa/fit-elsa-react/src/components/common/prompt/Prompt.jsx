@@ -11,6 +11,7 @@ import './prompt.css';
 import PropTypes from 'prop-types';
 import {useFormContext, useShapeContext} from '@/components/DefaultRoot.jsx';
 import {PromptDrawer} from '@/components/common/prompt/PromptDrawer.jsx';
+import {useTranslation} from "react-i18next";
 
 const {TextArea} = Input;
 
@@ -39,6 +40,7 @@ export const Prompt = (
   }) => {
   const shape = useShapeContext();
   const form = useFormContext();
+  const {t} = useTranslation();
   const [promptContent, setPromptContent] = useState(prompt.value);
 
   const _onChange = (promptText) => {
@@ -120,7 +122,9 @@ export const Prompt = (
             onClose={() => setOpen(false)}
             onConfirm={(v) => _onChange(v)}
             allowAIGenerate={allowAIGenerate}
-            onAIGenerate={onAIGenerate}/>
+            onAIGenerate={onAIGenerate}
+            labelName={t('promptName')}
+          />
         </div>
       </Col>
     </Row>
