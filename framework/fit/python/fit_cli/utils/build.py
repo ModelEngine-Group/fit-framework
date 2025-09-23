@@ -3,28 +3,56 @@ import hashlib
 from pathlib import Path
 
 TYPE_MAP = {
+    # 基础类型
     "int": "integer",
     "float": "number",
     "str": "string",
     "bool": "boolean",
+    "bytes": "string",
+    # 容器类型
     "dict": "object",
+    "Dict": "object",
+    "Union": "object",
     "list": "array",
+    "List": "array",
     "tuple": "array",
+    "Tuple": "array",
     "set": "array",
+    "Set": "array",
+    # 特殊类型
+    "None": "null",
 }
+
+type_errors = []
 
 def parse_type(annotation):
     """解析参数类型"""
-    if isinstance(annotation, ast.Name):
-        return TYPE_MAP.get(annotation.id, "string"), None, True  # True=必填
+    global type_errors
+
+    if annotation is None:
+        type_errors.append("缺少类型注解（必须显式指定参数类型）")
+        return "invalid", None, True
+    
+    elif isinstance(annotation, ast.Name):
+        if annotation.id in TYPE_MAP:
+            return TYPE_MAP[annotation.id], None, True
+        else:
+            type_errors.append(f"不支持的类型: {annotation.id}")
+            return "invalid", None, True
+    
+    elif isinstance(annotation, ast.Constant) and annotation.value is None:
+        return "null", None, False
 
     elif isinstance(annotation, ast.Subscript):
         if isinstance(annotation.value, ast.Name):
             container = annotation.value.id
 
-            # List[int] / list[str]
+            # List[int] 
             if container in ("list", "List"):
                 item_type, _, _ = parse_type(annotation.slice)
+                if item_type == "invalid":
+                    type_errors.append(f"不支持的列表元素类型: {annotation.slice}")
+                    return "invalid", None, True
                 return "array", {"type": item_type}, True
 
             # Dict[str, int] → object
@@ -34,13 +62,48 @@ def parse_type(annotation):
             # Optional[int]
             elif container == "Optional":
                 inner_type, inner_items, _ = parse_type(annotation.slice)
+                if inner_type == "invalid":
+                    type_errors.append(f"不支持的Optional类型: {annotation.slice}")
+                    return "invalid", None, False
                 return inner_type, inner_items, False
-
-            # Union[str, int] → 简化为 string
+            
+            # Union[str, int]
             elif container == "Union":
-                return "string", None, True
-
-    return "string", None, True
+                return "object", None, True
+            
+            # Tuple[str]
+            elif container in ("tuple", "Tuple"):
+                items = []
+                if isinstance(annotation.slice, ast.Tuple):
+                    for elt in annotation.slice.elts:
+                        item_type, _, _ = parse_type(elt)
+                        if item_type == "invalid":
+                            type_errors.append(f"不支持的元组元素类型: {ast.dump(elt)}")
+                            return "invalid", None, True
+                        items.append({"type":item_type})
+                    return "array", f"{items}", True
+                else:
+                    item_type, _, _ = parse_type(annotation.slice)
+                    if item_type == "invalid":
+                        type_errors.append(f"不支持的元组元素类型: {ast.dump(annotation.slice)}")
+                        return "invalid", None, True
+                    return "array", {"type":item_type}, True 
+            
+            # Set[int]
+            elif container in ("set", "Set"):
+                item_type, _, _ = parse_type(annotation.slice)
+                if item_type == "invalid":
+                    type_errors.append(f"不支持的集合元素类型: {annotation.slice}")
+                    return "invalid", None, True
+                return "array", {"type": item_type}, True
+            
+            
+            else:
+                type_errors.append(f"不支持的容器类型: {container}")
+                return "invalid", None, True
+            
+    type_errors.append(f"无法识别的类型: {ast.dump(annotation)}")
+    return "invalid", None, True
 
 
 def parse_parameters(args):
@@ -52,11 +115,7 @@ def parse_parameters(args):
     for arg in args.args:
         arg_name = arg.arg
         order.append(arg_name)
-        arg_type = "string"
-        items = None
-        is_required = True
-        if arg.annotation:
-            arg_type, items, is_required = parse_type(arg.annotation)
+        arg_type, items, is_required = parse_type(arg.annotation)
         # 定义参数
         prop_def = {
             "defaultValue": "",
@@ -160,7 +219,7 @@ def parse_python_file(file_path: Path):
                 "order": order,
                 "return": {
                     "name": "",
-                    "description": description or f"{func_name} 的返回值",
+                    "description": f"{func_name} 函数的返回值",
                     "type": return_schema["type"],
                     **({"items": return_schema["items"]} if "items" in return_schema else {}),
                     "convertor": "",

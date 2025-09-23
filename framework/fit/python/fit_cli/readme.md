@@ -15,9 +15,15 @@ FIT CLI 支持 3 个核心子命令：init（初始化）、build（构建）、
 ```bash
 python -m fit_cli init %{your_plugin_name}
 ```
-· 参数：%{your_plugin_name} - 自定义插件名称
+· 参数：``%{your_plugin_name}``: 自定义插件名称
 
-会在 plugin 目录中创建 %{your_plugin_name} 目录，包含源代码目录、示例插件函数等。
+会在 ``plugin`` 目录中创建如下结构：
+
+    └── plugin/
+        └──%{your_plugin_name}/
+            └── src/
+                ├── __init__.py
+                └── plugin.py  # 插件源码模板
 
 ### build
 
@@ -25,11 +31,17 @@ python -m fit_cli init %{your_plugin_name}
 ```bash
 python -m fit_cli build %{your_plugin_name}
 ```
-· 参数：%{your_plugin_name} - 自定义插件名称
+· 参数：``%{your_plugin_name}``: 插件目录名称
 
-解析插件源代码，在 plugin 目录中生成 %{your_plugin_name}.tar 文件，包含插件的所有源代码,并生成 tools.json 和 plugin.json 文件。
+在 ``%{your_plugin_name}`` 目录生成:
 
-开发者可根据自己的需要，修改完善tools.json 和 plugin.json 文件。
+    └──%{your_plugin_name}/
+        └── build/
+            ├── %{your_plugin_name}.tar # 插件源码打包文件（工具包）。
+            ├── tools.json # 工具的元数据。
+            └── plugin.json # 插件的完整性校验与唯一性校验以及插件的基本信息。
+
+开发者可根据自己的需要，修改完善``tools.json`` 和 ``plugin.json`` 文件，比如修改 ``description`` 、 ``uniqueness``等条目。
 
 ### package
 
@@ -37,13 +49,13 @@ python -m fit_cli build %{your_plugin_name}
 ```bash
 python -m fit_cli package %{your_plugin_name}
 ```
-· 参数：%{your_plugin_name} - 自定义插件名称
+· 参数：``%{your_plugin_name}``: 插件目录名称
 
-将 %{your_plugin_name}.tar 文件、tools.json 和 plugin.json 文件打包为 zip 文件。
+在 ``plugin/%{your_plugin_name}/build/`` 目录生成最终打包文件: ``%{your_plugin_name}_package.zip``
 
 ---
 
 ## 注意事项
 
-1. 在运行 init, build 或 package 子命令前，请先切换至 framework/fit/python 项目根目录下。
+1. 运行命令前，请切换至 framework/fit/python 项目根目录。
 2. 更多详细信息和使用说明，可参考 https://github.com/ModelEngine-Group/fit-framework 官方仓库。
