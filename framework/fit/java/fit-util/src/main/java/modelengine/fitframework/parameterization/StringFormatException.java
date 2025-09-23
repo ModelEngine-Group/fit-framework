@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.parameterization;
 
@@ -10,7 +10,7 @@ package modelengine.fitframework.parameterization;
  * 当发现参数化字符串的格式错误，或参数未提供时引发的异常。
  *
  * @author 梁济时
- * @since 1.0
+ * @since 2020-07-24
  */
 public class StringFormatException extends IllegalArgumentException {
     /**

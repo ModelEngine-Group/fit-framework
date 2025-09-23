@@ -1,15 +1,16 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fel.core.template;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import modelengine.fel.core.template.support.DefaultBulkStringTemplate;
+import modelengine.fitframework.parameterization.StringFormatException;
 import modelengine.fitframework.util.MapBuilder;
 
 import org.junit.jupiter.api.DisplayName;
@@ -80,7 +81,8 @@ public class BulkStringTemplateTest {
         List<Map<String, String>> values = new ArrayList<>();
         values.add(MapBuilder.<String, String>get().put("adjective", "funny").build());
         values.add(MapBuilder.<String, String>get().put("content", "rabbits").build());
-        assertThatThrownBy(() -> new DefaultBulkStringTemplate(template, "\n").render(values)).isInstanceOf(
-                IllegalArgumentException.class);
+        StringFormatException cause = catchThrowableOfType(StringFormatException.class,
+                () -> new DefaultBulkStringTemplate(template, "\n").render(values));
+        assertThat(cause).hasMessage("Required parameters are missing.");
     }
 }

@@ -1,14 +1,15 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fel.core.template.support;
 
 import modelengine.fel.core.template.StringTemplate;
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.merge.ConflictResolutionPolicy;
+import modelengine.fitframework.parameterization.ParameterizationMode;
 import modelengine.fitframework.parameterization.ParameterizedString;
 import modelengine.fitframework.parameterization.ParameterizedStringResolver;
 import modelengine.fitframework.parameterization.ResolvedParameter;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultStringTemplate implements StringTemplate {
     private static final ParameterizedStringResolver FORMATTER =
-            ParameterizedStringResolver.create("{{", "}}", '\\', false);
+            ParameterizedStringResolver.create("{{", "}}", '\\', ParameterizationMode.LENIENT_STRICT_PARAMETERS);
 
     private final ParameterizedString parameterizedString;
 

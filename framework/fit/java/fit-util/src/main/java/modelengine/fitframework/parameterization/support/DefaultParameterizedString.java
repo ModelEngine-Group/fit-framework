@@ -1,11 +1,12 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.parameterization.support;
 
+import modelengine.fitframework.parameterization.ParameterizationMode;
 import modelengine.fitframework.parameterization.ParameterizedString;
 import modelengine.fitframework.parameterization.ParameterizedStringResolver;
 import modelengine.fitframework.parameterization.ResolvedParameter;
@@ -20,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -31,29 +31,25 @@ import java.util.stream.Collectors;
  * @since 2020-07-24
  */
 class DefaultParameterizedString implements ParameterizedString {
-    private static final BiFunction<Map<?, ?>, Long, Boolean> STRICT_CHECK =
-            (map, count) -> MapUtils.count(map) == count;
-    private static final BiFunction<Map<?, ?>, Long, Boolean> RELAXED_CHECK =
-            (map, count) -> MapUtils.count(map) >= count;
-
     private final ParameterizedStringResolver resolver;
     private final String originalString;
     private String escapedString;
     private final List<DefaultResolvedParameter> parameters;
-    private final boolean isStrict;
+    private final ParameterizationMode mode;
 
     /**
      * 使用源字符串及解析到的参数信息的集合初始化 {@link DefaultParameterizedString} 类的新实例。
      *
      * @param resolver 表示解析得到当前参数化字符串的解析器的 {@link DefaultParameterizedStringResolver}。
      * @param originalString 表示源字符串的 {@link String}。
-     * @param isStrict 表示是否采用严格校验模式的 {@code boolean}。
+     * @param mode 表示描述参数化字符串的解析模式的 {@link ParameterizationMode}。
      */
-    private DefaultParameterizedString(ParameterizedStringResolver resolver, String originalString, boolean isStrict) {
+    private DefaultParameterizedString(ParameterizedStringResolver resolver, String originalString,
+            ParameterizationMode mode) {
         this.resolver = resolver;
         this.originalString = originalString;
         this.parameters = new ArrayList<>();
-        this.isStrict = isStrict;
+        this.mode = mode;
     }
 
     @Override
@@ -73,24 +69,40 @@ class DefaultParameterizedString implements ParameterizedString {
 
     @Override
     public String format(Map<?, ?> args) {
+        return this.format(args, null);
+    }
+
+    @Override
+    public String format(Map<?, ?> args, String defaultValue) {
         Map<?, ?> actualArgs = ObjectUtils.nullIf(args, Collections.EMPTY_MAP);
         long count = this.getParameters().stream().map(ResolvedParameter::getName).distinct().count();
-        BiFunction<Map<?, ?>, Long, Boolean> countCheck = this.isStrict ? STRICT_CHECK : RELAXED_CHECK;
-        if (!countCheck.apply(actualArgs, count)) {
-            throw new StringFormatException("The provided args is not match the required args.");
+
+        // 根据模式检查参数数量。
+        if (this.mode.isRequireExactParameterCount()) {
+            if (MapUtils.count(actualArgs) != count) {
+                throw new StringFormatException("The provided args is not match the required args.");
+            }
+        } else {
+            if (MapUtils.count(actualArgs) < count) {
+                // 在非严格模式下，如果缺失参数策略是抛异常，仍然检查。
+                if (this.mode.getMissingParameterBehavior()
+                        == ParameterizationMode.MissingParameterBehavior.THROW_EXCEPTION) {
+                    throw new StringFormatException("Required parameters are missing.");
+                }
+            }
         }
+
         if (CollectionUtils.isEmpty(this.getParameters())) {
             return this.escapedString;
         } else {
-            List<DefaultResolvedParameter> sortedParameters = this.parameters.stream()
-                    .sorted(Comparator.comparingInt(ResolvedParameter::getPosition))
-                    .collect(Collectors.toList());
+            List<DefaultResolvedParameter> sortedParameters =
+                    this.parameters.stream().sorted(Comparator.comparingInt(ResolvedParameter::getPosition)).toList();
             int index = 0;
             int affixLength = this.measureAffix();
             StringBuilder builder = new StringBuilder(this.escapedString.length() << 1);
             for (DefaultResolvedParameter parameter : sortedParameters) {
                 builder.append(this.escapedString, index, parameter.getEscapedPosition());
-                builder.append(StringUtils.normalize(getParameterValue(actualArgs, parameter.getName())));
+                builder.append(StringUtils.normalize(getParameterValue(actualArgs, parameter.getName(), defaultValue)));
                 index = parameter.getEscapedPosition() + affixLength + measure(parameter.getName());
             }
             builder.append(this.escapedString.substring(index));
@@ -103,11 +115,20 @@ class DefaultParameterizedString implements ParameterizedString {
      *
      * @param args 表示参数映射的 {@link Map}。
      * @param name 表示所需参数的名称的 {@link String}。
+     * @param defaultValue 表示当参数缺失时使用的默认值的 {@link String}。
      * @return 表示参数的值的 {@link String}。
      */
-    private static String getParameterValue(Map<?, ?> args, String name) {
+    private String getParameterValue(Map<?, ?> args, String name, String defaultValue) {
         if (!args.containsKey(name)) {
-            throw new StringFormatException(StringUtils.format("Parameter '{0}' required but not supplied.", name));
+            return switch (this.mode.getMissingParameterBehavior()) {
+                case THROW_EXCEPTION -> throw new StringFormatException(StringUtils.format(
+                        "Parameter '{0}' required but not supplied.",
+                        name));
+                case USE_EMPTY_STRING -> StringUtils.EMPTY;
+                case USE_DEFAULT_VALUE -> StringUtils.normalize(defaultValue);
+                case KEEP_PLACEHOLDER ->
+                        this.getResolver().getParameterPrefix() + name + this.getResolver().getParameterSuffix();
+            };
         }
         return ObjectUtils.toString(args.get(name));
     }
@@ -143,15 +164,14 @@ class DefaultParameterizedString implements ParameterizedString {
      *
      * @param resolver 表示用以解析字符串的解析器的 {@link DefaultParameterizedStringResolver}。
      * @param originalString 表示待解析的字符串的 {@link String}。
-     * @param isStrict 表示是否采用严格校验模式的 {@code boolean}。
+     * @param mode 表示描述参数化字符串的解析模式的 {@link ParameterizationMode}。
      * @return 表示解析后得到的参数化字符串的 {@link ParameterizedString}。
      * @throws StringFormatException 当源字符串格式不满足解析器的要求时。
      */
     static DefaultParameterizedString resolve(DefaultParameterizedStringResolver resolver, String originalString,
-            boolean isStrict) {
-        DefaultParameterizedString parameterizedString =
-                new DefaultParameterizedString(resolver, originalString, isStrict);
-        parameterizedString.new Resolver(isStrict).resolve();
+            ParameterizationMode mode) {
+        DefaultParameterizedString parameterizedString = new DefaultParameterizedString(resolver, originalString, mode);
+        parameterizedString.new Resolver(mode).resolve();
         return parameterizedString;
     }
 
@@ -161,11 +181,11 @@ class DefaultParameterizedString implements ParameterizedString {
      * 方法时对所属的参数化字符串产生影响。</p>
      *
      * @author 梁济时
-     * @since 1.0
+     * @since 2020-07-24
      */
     private class Resolver {
         private final StringBuilder escaped;
-        private final boolean isStrict;
+        private final ParameterizationMode mode;
         private int position;
         private StringBuilder parameter;
         private int parameterEscapedCharacters;
@@ -173,11 +193,11 @@ class DefaultParameterizedString implements ParameterizedString {
         /**
          * 初始化一个 {@link Resolver} 类的新实例。
          *
-         * @param isStrict 表示是否采用严格校验模式的 {@code boolean}。
+         * @param mode 表示描述参数化字符串的解析模式的 {@link ParameterizationMode}。
          */
-        Resolver(boolean isStrict) {
+        Resolver(ParameterizationMode mode) {
             this.escaped = new StringBuilder(this.getOriginalString().length());
-            this.isStrict = isStrict;
+            this.mode = mode;
         }
 
         /**
@@ -304,7 +324,7 @@ class DefaultParameterizedString implements ParameterizedString {
          */
         private void resolveSuffix() {
             if (this.parameter == null) {
-                if (this.isStrict) {
+                if (this.mode.isStrictSyntax()) {
                     throw new StringFormatException(StringUtils.format(
                             "Invalid suffix position. [string={0}, position={1}]",
                             this.getOriginalString(),

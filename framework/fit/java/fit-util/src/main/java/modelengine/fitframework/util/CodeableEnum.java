@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.util;
 
@@ -21,7 +21,7 @@ import java.util.Objects;
  *
  * @param <T> 表示枚举的实际类型。
  * @author 梁济时
- * @since 1.0
+ * @since 2020-07-24
  */
 public interface CodeableEnum<T extends Enum<T> & CodeableEnum<T>> {
     /**

@@ -1,13 +1,15 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
+
+import modelengine.fitframework.parameterization.ParameterizationMode;
 
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
@@ -18,9 +20,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -31,7 +35,7 @@ import java.util.function.Supplier;
  *
  * @author 梁济时
  * @author 季聿阶
- * @since 1.0
+ * @since 2020-07-24
  */
 public class StringUtilsTest {
     /** 表示一个泛空格符。 */
@@ -477,6 +481,310 @@ public class StringUtilsTest {
         void givenFormatWithEscapeCharacterThenReturnStringWithoutEscapeCharacterOnly() {
             String actual = StringUtils.format("/{///}");
             assertThat(actual).isEqualTo("{/}");
+        }
+
+        @Nested
+        @DisplayName("测试带模式参数的format方法")
+        class TestFormatWithMode {
+            @Test
+            @DisplayName("使用严格模式格式化")
+            void shouldFormatWithStrictMode() {
+                String template = "Hello {0}, age is {1}";
+                Map<String, Object> params = Map.of("0", "Alice", "1", "25");
+
+                String result = StringUtils.format(template, ParameterizationMode.STRICT, params);
+
+                assertThat(result).isEqualTo("Hello Alice, age is 25");
+            }
+
+            @Test
+            @DisplayName("使用宽松空字符串模式格式化")
+            void shouldFormatWithLenientEmptyMode() {
+                String template = "Hello {name}, welcome to {city}!";
+                Map<String, Object> params = Map.of("name", "Bob");
+
+                String result = StringUtils.format(template, ParameterizationMode.LENIENT_EMPTY, params);
+
+                assertThat(result).isEqualTo("Hello Bob, welcome to !");
+            }
+
+            @Test
+            @DisplayName("使用宽松默认值模式格式化")
+            void shouldFormatWithLenientDefaultMode() {
+                String template = "User: {username}, Status: {status}, Role: {role}";
+                Map<String, Object> params = Map.of("username", "testUser", "status", "active");
+
+                String result = StringUtils.format(template, ParameterizationMode.LENIENT_DEFAULT, params, "guest");
+
+                assertThat(result).isEqualTo("User: testUser, Status: active, Role: guest");
+            }
+
+            @Test
+            @DisplayName("使用保持占位符模式格式化")
+            void shouldFormatWithKeepPlaceholderMode() {
+                String template = "Config: host={host}, port={port}, debug={debug}";
+                Map<String, Object> params = Map.of("host", "localhost", "port", "8080");
+
+                String result = StringUtils.format(template, ParameterizationMode.LENIENT_KEEP_PLACEHOLDER, params);
+
+                assertThat(result).isEqualTo("Config: host=localhost, port=8080, debug={debug}");
+            }
+        }
+
+        @Nested
+        @DisplayName("测试便捷方法")
+        class TestConvenienceMethods {
+            @Test
+            @DisplayName("formatLenient方法")
+            void shouldFormatLenient() {
+                String template = "Processing {item} of {total}";
+                Map<String, Object> params = Map.of("item", "5");
+
+                String result = StringUtils.formatLenient(template, params);
+
+                assertThat(result).isEqualTo("Processing 5 of ");
+            }
+
+            @Test
+            @DisplayName("formatLenientWithDefault方法")
+            void shouldFormatLenientWithDefault() {
+                String template = "File: {filename}, Size: {size}, Type: {type}";
+                Map<String, Object> params = Map.of("filename", "document.pdf", "size", "1.2MB");
+
+                String result = StringUtils.formatLenientWithDefault(template, params, "unknown");
+
+                assertThat(result).isEqualTo("File: document.pdf, Size: 1.2MB, Type: unknown");
+            }
+
+            @Test
+            @DisplayName("formatKeepPlaceholder方法")
+            void shouldFormatKeepPlaceholder() {
+                String template = "Database: {host}:{port}//{database}";
+                Map<String, Object> params = Map.of("host", "db.example.com", "database", "myapp");
+
+                String result = StringUtils.formatKeepPlaceholder(template, params);
+
+                assertThat(result).isEqualTo("Database: db.example.com:{port}/myapp");
+            }
+
+            @Test
+            @DisplayName("便捷方法应该处理null参数")
+            void convenienceMethodsShouldHandleNullParams() {
+                String template = "Hello {name}!";
+
+                String result1 = StringUtils.formatLenient(template, null);
+                String result2 = StringUtils.formatLenientWithDefault(template, null, "Guest");
+                String result3 = StringUtils.formatKeepPlaceholder(template, null);
+
+                assertThat(result1).isEqualTo("Hello !");
+                assertThat(result2).isEqualTo("Hello Guest!");
+                assertThat(result3).isEqualTo("Hello {name}!");
+            }
+        }
+
+        @Nested
+        @DisplayName("测试实际应用场景")
+        class TestRealWorldScenarios {
+            @Test
+            @DisplayName("SQL查询模板场景")
+            void shouldHandleSqlQueryTemplate() {
+                String sqlTemplate = "SELECT * FROM {table} WHERE {whereClause} ORDER BY {orderBy} LIMIT {limit}";
+                Map<String, Object> params = Map.of("table", "users", "whereClause", "status = 'active'");
+
+                String result = StringUtils.formatLenientWithDefault(sqlTemplate, params, "id");
+
+                assertThat(result).isEqualTo("SELECT * FROM users WHERE status = 'active' ORDER BY id LIMIT id");
+            }
+
+            @Test
+            @DisplayName("邮件模板场景")
+            void shouldHandleEmailTemplate() {
+                String emailTemplate = """
+                        Dear {customerName},
+                        
+                        Thank you for your order #{orderNumber}.
+                        Your order of {itemCount} items totaling ${totalAmount} has been {status}.
+                        
+                        Estimated delivery: {deliveryDate}
+                        Tracking number: {trackingNumber}
+                        
+                        Best regards,
+                        {companyName}
+                        """;
+
+                Map<String, Object> params = Map.of("customerName",
+                        "John Doe",
+                        "orderNumber",
+                        "ORD-2024-001",
+                        "itemCount",
+                        "3",
+                        "totalAmount",
+                        "99.99",
+                        "status",
+                        "confirmed",
+                        "companyName",
+                        "ACME Corp"
+                        // 缺少 deliveryDate 和 trackingNumber
+                );
+
+                String result = StringUtils.formatLenientWithDefault(emailTemplate, params, "TBD");
+
+                assertThat(result).contains("Dear John Doe,");
+                assertThat(result).contains("order #ORD-2024-001");
+                assertThat(result).contains("3 items totaling $99.99");
+                assertThat(result).contains("has been confirmed");
+                assertThat(result).contains("delivery: TBD");
+                assertThat(result).contains("Tracking number: TBD");
+                assertThat(result).contains("ACME Corp");
+            }
+
+            @Test
+            @DisplayName("API响应模板场景")
+            void shouldHandleApiResponseTemplate() {
+                String responseTemplate = """
+                        /{
+                          "status": "{status}",
+                          "data": /{
+                            "userId": "{userId}",
+                            "username": "{username}",
+                            "email": "{email}",
+                            "primaryRole": "{primaryRole}",
+                            "secondaryRole": "{secondaryRole}",
+                            "roles": ["{primaryRole}", "{secondaryRole}"]
+                          },
+                          "meta": /{
+                            "timestamp": "{timestamp}",
+                            "version": "{apiVersion}"
+                          }
+                        }""";
+
+                Map<String, Object> params = Map.of("status",
+                        "success",
+                        "userId",
+                        "12345",
+                        "username",
+                        "johndoe",
+                        "email",
+                        "john@example.com",
+                        "primaryRole",
+                        "user",
+                        "timestamp",
+                        "2024-01-15T10:30:00Z"
+                        // 缺少 secondaryRole 和 apiVersion
+                );
+
+                // 使用空字符串处理缺失字段，保持JSON结构有效
+                String result = StringUtils.formatLenient(responseTemplate, params);
+
+                assertThat(result).contains("\"status\": \"success\"");
+                assertThat(result).contains("\"userId\": \"12345\"");
+                assertThat(result).contains("\"username\": \"johndoe\"");
+                assertThat(result).contains("\"email\": \"john@example.com\"");
+                assertThat(result).contains("\"primaryRole\": \"user\"");
+                assertThat(result).contains("\"secondaryRole\": \"\""); // 空字符串
+                assertThat(result).contains("\"timestamp\": \"2024-01-15T10:30:00Z\"");
+                assertThat(result).contains("\"version\": \"\""); // 空字符串
+            }
+
+            @Test
+            @DisplayName("配置文件生成场景")
+            void shouldHandleConfigFileGeneration() {
+                String configTemplate = """
+                        # Application Configuration
+                        app.name={appName}
+                        app.version={appVersion}
+                        app.environment={environment}
+                        
+                        # Server Configuration  
+                        server.host={serverHost}
+                        server.port={serverPort}
+                        server.ssl.enabled={sslEnabled}
+                        
+                        # Database Configuration
+                        db.url={dbUrl}
+                        db.username={dbUser}
+                        db.password={dbPassword}
+                        db.pool.size={poolSize}
+                        
+                        # Cache Configuration
+                        cache.enabled={cacheEnabled}
+                        cache.ttl={cacheTtl}
+                        """;
+
+                Map<String, Object> params = Map.of("appName",
+                        "MyApplication",
+                        "appVersion",
+                        "1.0.0",
+                        "environment",
+                        "production",
+                        "serverHost",
+                        "0.0.0.0",
+                        "serverPort",
+                        "8080"
+                        // 其他配置项缺失，使用占位符保持可见性
+                );
+
+                String result = StringUtils.formatKeepPlaceholder(configTemplate, params);
+
+                assertThat(result).contains("app.name=MyApplication");
+                assertThat(result).contains("app.version=1.0.0");
+                assertThat(result).contains("app.environment=production");
+                assertThat(result).contains("server.host=0.0.0.0");
+                assertThat(result).contains("server.port=8080");
+                assertThat(result).contains("server.ssl.enabled={sslEnabled}");
+                assertThat(result).contains("db.url={dbUrl}");
+                assertThat(result).contains("cache.enabled={cacheEnabled}");
+            }
+        }
+
+        @Nested
+        @DisplayName("测试性能和边界情况")
+        class TestPerformanceAndEdgeCases {
+            @Test
+            @DisplayName("大量占位符性能测试")
+            void shouldHandleManyPlaceholders() {
+                StringBuilder templateBuilder = new StringBuilder();
+                Map<String, Object> params = new HashMap<>();
+
+                // 创建包含100个占位符的模板
+                for (int i = 0; i < 100; i++) {
+                    templateBuilder.append("Param").append(i).append(": {param").append(i).append("} ");
+                    if (i % 2 == 0) { // 只提供一半的参数
+                        params.put("param" + i, "value" + i);
+                    }
+                }
+
+                String template = templateBuilder.toString();
+                String result = StringUtils.formatLenientWithDefault(template, params, "DEFAULT");
+
+                // 验证结果包含预期的值和默认值
+                assertThat(result).contains("Param0: value0");
+                assertThat(result).contains("Param1: DEFAULT");
+                assertThat(result).contains("Param2: value2");
+                assertThat(result).contains("Param3: DEFAULT");
+            }
+
+            @Test
+            @DisplayName("特殊字符处理")
+            void shouldHandleSpecialCharacters() {
+                String template = "Message: {msg}, Unicode: {unicode}, Emoji: {emoji}";
+                Map<String, Object> params = Map.of("msg", "Hello\nWorld\t!", "unicode", "测试数据", "emoji", "🚀🎉");
+
+                String result = StringUtils.format(template, ParameterizationMode.STRICT, params);
+
+                assertThat(result).isEqualTo("Message: Hello\nWorld\t!, Unicode: 测试数据, Emoji: 🚀🎉");
+            }
+
+            @Test
+            @DisplayName("嵌套类似占位符语法")
+            void shouldHandleNestedPlaceholderLikeSyntax() {
+                String template = "Config: {config}, JSON: /{\"key\": \"{value}\"}, Placeholder: {real}";
+                Map<String, Object> params = Map.of("config", "prod", "real", "actualValue");
+
+                String result = StringUtils.formatKeepPlaceholder(template, params);
+
+                assertThat(result).isEqualTo("Config: prod, JSON: {\"key\": \"{value}\"}, Placeholder: actualValue");
+            }
         }
     }
 

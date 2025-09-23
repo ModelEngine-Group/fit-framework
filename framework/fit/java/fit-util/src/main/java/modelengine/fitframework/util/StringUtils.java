@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.util;
 
@@ -11,6 +11,7 @@ import static modelengine.fitframework.util.ObjectUtils.nullIf;
 
 import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.io.ByteReader;
+import modelengine.fitframework.parameterization.ParameterizationMode;
 import modelengine.fitframework.parameterization.ParameterizedString;
 import modelengine.fitframework.parameterization.ParameterizedStringResolver;
 import modelengine.fitframework.util.support.ArrayIterator;
@@ -38,7 +39,7 @@ import java.util.function.Supplier;
  *
  * @author 梁济时
  * @author 季聿阶
- * @since 1.0
+ * @since 2020-07-24
  */
 public final class StringUtils {
     /** 表示空字符串。 */
@@ -47,7 +48,8 @@ public final class StringUtils {
     /** 表示空的字符串数组。 */
     public static final String[] EMPTY_ARRAY = new String[0];
 
-    private static final ParameterizedStringResolver FORMATTER = ParameterizedStringResolver.create("{", "}", '/');
+    private static final ParameterizedStringResolver FORMATTER =
+            ParameterizedStringResolver.create("{", "}", '/', ParameterizationMode.STRICT);
     private static final ParameterizedStringResolver NON_STRICT_FORMATTER =
             ParameterizedStringResolver.create("{", "}", '/', false);
 
@@ -287,6 +289,87 @@ public final class StringUtils {
         ParameterizedStringResolver resolver = isStrict ? FORMATTER : NON_STRICT_FORMATTER;
         ParameterizedString parameterizedString = resolver.resolve(format);
         return parameterizedString.format(params);
+    }
+
+    /**
+     * 使用指定的格式化字符串对参数进行格式化，并返回格式化后的字符串。
+     *
+     * @param format 表示格式化字符串的 {@link String}。
+     * @param mode 表示参数化字符串的格式化模式的 {@link ParameterizationMode}。
+     * @param args 表示用以格式化字符串的参数的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。如果参数中存在
+     * {@code null}，其对应的格式化后会变成空字符串。
+     * @return 表示格式化得到的字符串的 {@link String}。
+     * @throws modelengine.fitframework.parameterization.StringFormatException 当所提供的格式化字符串与格式化参数不匹配时。
+     * @see #format(String, ParameterizationMode, Map, String)
+     */
+    public static String format(String format, ParameterizationMode mode, Map<String, Object> args) {
+        return format(format, mode, args, null);
+    }
+
+    /**
+     * 使用指定的格式化字符串对参数进行格式化，并返回格式化后的字符串。
+     * <p><b>注意：{@code format} 中如果含有如下特殊字符（{@code '\u007b'}，{@code '\u007d'}，{@code '/'}），需要在该字符前增加转义字符
+     * {@code '/'} 进行转义。</b></p>
+     *
+     * @param format 表示格式化字符串的 {@link String}。
+     * @param mode 表示参数化字符串的格式化模式的 {@link ParameterizationMode}。
+     * @param args 表示用以格式化字符串的参数的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     * @param defaultValue 占位符匹配模式为 {@link ParameterizationMode#LENIENT_DEFAULT} 时，如果参数中不存在对应的参数，则返回该值。
+     * @return 表示格式化得到的字符串的 {@link String}。
+     * @throws modelengine.fitframework.parameterization.StringFormatException 当所提供的格式化字符串与格式化参数不匹配时。
+     */
+    public static String format(String format, ParameterizationMode mode, Map<String, Object> args,
+            String defaultValue) {
+        if (isBlank(format)) {
+            return format;
+        }
+        Map<String, Object> params = nullIf(args, Collections.emptyMap());
+        ParameterizedStringResolver resolver = ParameterizedStringResolver.create("{", "}", '/', mode);
+        ParameterizedString parameterizedString = resolver.resolve(format);
+        return parameterizedString.format(params, defaultValue);
+    }
+
+    /**
+     * 使用指定的格式化字符串对参数进行格式化，并返回格式化后的字符串。
+     * <p>采用宽松校验模式 {@link ParameterizationMode#LENIENT_EMPTY}，同时不存在参数时使用 {@link StringUtils#EMPTY} 代替。</p>
+     *
+     * @param format 表示待格式化的字符串的 {@link String}。
+     * @param args 表示待格式化的参数的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     * @return 表示格式化得到的字符串的 {@link String}。
+     * @throws modelengine.fitframework.parameterization.StringFormatException 当所提供的格式化字符串与格式化参数不匹配时。
+     * @see #format(String, ParameterizationMode, Map, String)
+     */
+    public static String formatLenient(String format, Map<String, Object> args) {
+        return format(format, ParameterizationMode.LENIENT_EMPTY, args);
+    }
+
+    /**
+     * 使用指定的格式化字符串对参数进行格式化，并返回格式化后的字符串。
+     * <p>采用宽松校验模式 {@link ParameterizationMode#LENIENT_DEFAULT}，同时不存在参数时使用 {@code defaultValue} 代替。</p>
+     *
+     * @param format 表示待格式化的字符串的 {@link String}。
+     * @param args 表示待格式化的参数的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     * @param defaultValue 表示参数不存在时的默认值的 {@link String}。
+     * @return 表示格式化得到的字符串的 {@link String}。
+     * @throws modelengine.fitframework.parameterization.StringFormatException 当所提供的格式化字符串与格式化参数不匹配时。
+     * @see #format(String, ParameterizationMode, Map, String)
+     */
+    public static String formatLenientWithDefault(String format, Map<String, Object> args, String defaultValue) {
+        return format(format, ParameterizationMode.LENIENT_DEFAULT, args, defaultValue);
+    }
+
+    /**
+     * 使用指定的格式化字符串对参数进行格式化，并返回格式化后的字符串。
+     * <p>采用宽松校验模式 {@link ParameterizationMode#LENIENT_KEEP_PLACEHOLDER}，同时不存在参数时使用占位符代替。</p>
+     *
+     * @param format 表示待格式化的字符串的 {@link String}。
+     * @param args 表示待格式化的参数的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
+     * @return 表示格式化得到的字符串的 {@link String}。
+     * @throws modelengine.fitframework.parameterization.StringFormatException 当所提供的格式化字符串与格式化参数不匹配时。
+     * @see #format(String, ParameterizationMode, Map, String)
+     */
+    public static String formatKeepPlaceholder(String format, Map<String, Object> args) {
+        return format(format, ParameterizationMode.LENIENT_KEEP_PLACEHOLDER, args);
     }
 
     /**

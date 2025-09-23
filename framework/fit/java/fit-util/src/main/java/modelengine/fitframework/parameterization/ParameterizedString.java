@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.parameterization;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * 为参数解析提供结果。
  *
  * @author 梁济时
- * @since 1.0
+ * @since 2020-07-24
  */
 public interface ParameterizedString {
     /**
@@ -45,4 +45,14 @@ public interface ParameterizedString {
      * @throws StringFormatException 当需要但是未提供指定名称的参数时。
      */
     String format(Map<?, ?> args);
+
+    /**
+     * 使用指定的参数映射格式化字符串。
+     *
+     * @param args 表示参数映射的 {@link Map}{@code <?, ?>}。
+     * @param defaultValue 表示缺少对应参数时的默认值的 {@link String}。
+     * @return 表示格式化后的字符串的 {@link String}。
+     * @throws StringFormatException 当需要但是未提供指定名称的参数时。
+     */
+    String format(Map<?, ?> args, String defaultValue);
 }
