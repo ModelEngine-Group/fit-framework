@@ -173,10 +173,6 @@ def parse_python_file(file_path: Path):
                         if lines:  # 若有有效行，取第一行作为描述
                             description = lines[0]
 
-            # 解析参数和返回值
-            properties, order, required = parse_parameters(node.args)
-            return_schema = parse_return(node.returns)
-
             # 装饰器取 genericableId, fitableId
             genericable_id, fitable_id = "", ""
             for deco in node.decorator_list:
@@ -184,6 +180,13 @@ def parse_python_file(file_path: Path):
                     if len(deco.args) >= 2:
                         genericable_id = getattr(deco.args[0], "s", "")
                         fitable_id = getattr(deco.args[1], "s", "")
+
+            if not (genericable_id and fitable_id):
+                continue
+
+            # 解析参数和返回值
+            properties, order, required = parse_parameters(node.args)
+            return_schema = parse_return(node.returns)
 
             # definition schema
             definition_schema = {
@@ -247,8 +250,7 @@ def parse_python_file(file_path: Path):
                 "definitionGroupName": py_name,
                 "tools": [tool],
             }
-            if genericable_id and fitable_id:
-                tool_groups.append(tool_group)
+            tool_groups.append(tool_group)
 
     definition_group = {
                 "name": py_name,
