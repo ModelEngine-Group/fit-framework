@@ -61,6 +61,8 @@ export const VIRTUAL_CONTEXT_NODE_VARIABLES = {
   USER_ID: 'userId',
   FILE_URLS: 'fileUrls',
   CHAT_ID: 'chatId',
+  IS_GUEST: 'isGuest',
+  APP_CREATE_BY: 'appCreateBy'
 };
 
 export const CONNECTOR = {
@@ -266,5 +268,23 @@ export const DEFAULT_KNOWLEDGE_RETRIEVAL_NODE_EXTENSIONS = {
         referenceKey: VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID,
         referenceNode: VIRTUAL_CONTEXT_NODE.id,
         value: [VIRTUAL_CONTEXT_NODE_VARIABLES.USER_ID],
-    }],
+    }, {
+       id: uuidv4(),
+       name: VIRTUAL_CONTEXT_NODE_VARIABLES.IS_GUEST,
+       type: DATA_TYPES.BOOLEAN,
+       from: FROM_TYPE.REFERENCE,
+       referenceId: VIRTUAL_CONTEXT_NODE_VARIABLES.IS_GUEST,
+       referenceKey: VIRTUAL_CONTEXT_NODE_VARIABLES.IS_GUEST,
+       referenceNode: VIRTUAL_CONTEXT_NODE.id,
+       value: [VIRTUAL_CONTEXT_NODE_VARIABLES.IS_GUEST],
+    }, {
+       id: uuidv4(),
+       name: VIRTUAL_CONTEXT_NODE_VARIABLES.APP_CREATE_BY,
+       type: DATA_TYPES.STRING,
+       from: FROM_TYPE.REFERENCE,
+       referenceId: VIRTUAL_CONTEXT_NODE_VARIABLES.APP_CREATE_BY,
+       referenceKey: VIRTUAL_CONTEXT_NODE_VARIABLES.APP_CREATE_BY,
+       referenceNode: VIRTUAL_CONTEXT_NODE.id,
+       value: [VIRTUAL_CONTEXT_NODE_VARIABLES.APP_CREATE_BY],
+   }],
 };
