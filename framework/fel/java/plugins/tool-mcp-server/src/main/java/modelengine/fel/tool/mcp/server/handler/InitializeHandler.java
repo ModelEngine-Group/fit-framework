@@ -16,6 +16,7 @@ import modelengine.fel.tool.mcp.server.MessageRequest;
  * This class extends {@link AbstractMessageHandler} and is responsible for handling
  * {@link InitializeRequest} messages by retrieving server information via the associated {@link McpServer}.
  *
+ * @author 季聿阶
  * @since 2025-05-15
  */
 public class InitializeHandler extends AbstractMessageHandler<InitializeHandler.InitializeRequest> {
@@ -41,6 +42,7 @@ public class InitializeHandler extends AbstractMessageHandler<InitializeHandler.
      * Represents an initialization request in the MCP server.
      * This request is handled by {@link InitializeHandler} to retrieve server information.
      *
+     * @author 季聿阶
      * @since 2025-05-15
      */
     public static class InitializeRequest extends MessageRequest {}

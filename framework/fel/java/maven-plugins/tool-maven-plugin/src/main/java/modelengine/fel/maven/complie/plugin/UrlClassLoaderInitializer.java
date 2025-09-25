@@ -33,6 +33,8 @@ import java.util.stream.Stream;
 /**
  * 提供初始化类加载器和输出配置文件的能力。
  *
+ * @author 曹嘉美
+ * @author 杭潇
  * @since 2024-11-01
  */
 public class UrlClassLoaderInitializer {

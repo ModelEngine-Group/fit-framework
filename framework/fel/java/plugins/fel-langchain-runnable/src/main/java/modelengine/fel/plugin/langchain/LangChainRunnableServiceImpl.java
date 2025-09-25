@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * LangChain Runnable 算子服务的实现。
  *
+ * @author 刘信宏
  * @since 2024-06-12
  */
 @Component

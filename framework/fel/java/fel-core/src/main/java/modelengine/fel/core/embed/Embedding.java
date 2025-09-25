@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * 表示生成嵌入的实体。
  *
+ * @author 易文渊
  * @since 2024-04-13
  */
 public interface Embedding {

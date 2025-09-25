@@ -17,6 +17,7 @@ import java.util.Optional;
 /**
  * 表示聊天消息的接口。
  *
+ * @author 易文渊
  * @since 2024-04-16
  */
 public interface ChatMessage {

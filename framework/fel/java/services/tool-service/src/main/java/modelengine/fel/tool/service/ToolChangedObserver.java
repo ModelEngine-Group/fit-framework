@@ -11,6 +11,7 @@ import java.util.Map;
 /**
  * Represents an observer for tool change events.
  *
+ * @author 季聿阶
  * @since 2025-05-11
  */
 public interface ToolChangedObserver {

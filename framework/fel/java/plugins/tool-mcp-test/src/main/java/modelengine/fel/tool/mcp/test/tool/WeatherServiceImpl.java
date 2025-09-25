@@ -16,6 +16,8 @@ import modelengine.fitframework.annotation.Property;
 /**
  * 表示 {@link WeatherService} 的默认实现。
  *
+ * @author 易文渊
+ * @author 杭潇
  * @since 2024-09-02
  */
 @Component

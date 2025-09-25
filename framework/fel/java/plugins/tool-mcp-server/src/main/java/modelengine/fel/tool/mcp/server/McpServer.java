@@ -15,6 +15,7 @@ import java.util.Map;
 /**
  * Represents the MCP Server.
  *
+ * @author 季聿阶
  * @since 2025-05-15
  */
 public interface McpServer {

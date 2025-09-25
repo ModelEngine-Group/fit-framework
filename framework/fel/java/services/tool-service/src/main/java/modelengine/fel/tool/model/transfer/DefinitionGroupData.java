@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * 表示定义组的基本内容。
  *
+ * @author 王攀博
  * @since 2024-10-25
  */
 public class DefinitionGroupData extends GroupData {

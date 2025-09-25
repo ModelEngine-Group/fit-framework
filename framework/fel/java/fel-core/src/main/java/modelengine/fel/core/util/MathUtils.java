@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * 提供数学相关的工具方法。
  *
+ * @author 易文渊
  * @since 2024-08-06
  */
 public final class MathUtils {

@@ -17,6 +17,7 @@ import java.util.Map;
 /**
  * The abstract parent class of {@link MessageHandler}.
  *
+ * @author 季聿阶
  * @since 2025-05-15
  */
 public abstract class AbstractMessageHandler<Req extends MessageRequest> implements MessageHandler {

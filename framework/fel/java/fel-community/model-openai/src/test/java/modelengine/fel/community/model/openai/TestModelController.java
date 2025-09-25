@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 /**
  * 表示测试使用的聊天接口。
  *
+ * @author 易文渊
  * @since 2024-09-24
  */
 @Component

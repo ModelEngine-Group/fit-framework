@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  *
  * @param <I> 表示输入数据类型。
  * @param <O> 表示输出数据类型。
+ * @author 刘信宏
  * @since 2024-04-22
  */
 public class SimpleFlowPattern<I, O> implements FlowPattern<I, O> {

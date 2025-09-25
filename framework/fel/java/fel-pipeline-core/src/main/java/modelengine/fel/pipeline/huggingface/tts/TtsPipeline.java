@@ -13,6 +13,7 @@ import modelengine.fel.service.pipeline.HuggingFacePipelineService;
 /**
  * 表示 {@link PipelineTask#TEXT_TO_SPEECH} 任务的流水线。
  *
+ * @author 易文渊
  * @since 2024-06-05
  */
 public class TtsPipeline extends ExplicitPipeline<TtsInput, TtsOutput> {

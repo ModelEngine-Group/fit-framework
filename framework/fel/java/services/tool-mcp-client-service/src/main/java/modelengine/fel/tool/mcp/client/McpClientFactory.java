@@ -11,6 +11,7 @@ package modelengine.fel.tool.mcp.client;
  * <p>
  * Each {@link McpClient} instance created by this factory is designed to connect to a single specified MCP server.
  *
+ * @author 季聿阶
  * @since 2025-05-21
  */
 public interface McpClientFactory {

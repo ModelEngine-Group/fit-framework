@@ -13,6 +13,7 @@ import modelengine.fitframework.resource.web.Media;
 /**
  * 表示语音合成任务的输出参数。
  *
+ * @author 易文渊
  * @since 2024-06-05
  */
 @Data

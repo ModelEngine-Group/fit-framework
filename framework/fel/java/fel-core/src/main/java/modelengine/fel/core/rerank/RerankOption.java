@@ -14,6 +14,7 @@ import java.util.Map;
 /**
  * 表示重排模型参数的实体。
  *
+ * @author 马朝阳
  * @since 2024-09-23
  */
 public interface RerankOption {

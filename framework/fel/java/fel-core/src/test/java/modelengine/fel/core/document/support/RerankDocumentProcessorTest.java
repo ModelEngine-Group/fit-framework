@@ -28,6 +28,7 @@ import java.util.List;
 /**
  * ReRank 客户端服务测试。
  *
+ * @author 马朝阳
  * @since 2024-09-14
  */
 public class RerankDocumentProcessorTest {

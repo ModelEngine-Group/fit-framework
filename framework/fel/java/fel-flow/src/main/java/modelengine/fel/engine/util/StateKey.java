@@ -9,6 +9,7 @@ package modelengine.fel.engine.util;
 /**
  * 会话实例信息中内置状态的键。
  *
+ * @author 刘信宏
  * @since 2024-04-22
  */
 public interface StateKey {

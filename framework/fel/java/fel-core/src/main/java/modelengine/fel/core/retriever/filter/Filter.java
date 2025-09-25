@@ -13,6 +13,7 @@ import java.util.Collection;
 /**
  * 表示过滤器的 {@link Filter}。
  *
+ * @author 易文渊
  * @since 2024-08-10
  */
 public class Filter {

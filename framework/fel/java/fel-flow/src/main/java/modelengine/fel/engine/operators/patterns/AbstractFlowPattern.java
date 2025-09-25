@@ -22,6 +22,7 @@ import modelengine.fitframework.util.ObjectUtils;
 /**
  * 流程委托单元。
  *
+ * @author 刘信宏
  * @since 2024-06-04
  */
 public abstract class AbstractFlowPattern<I, O> implements FlowPattern<I, O> {

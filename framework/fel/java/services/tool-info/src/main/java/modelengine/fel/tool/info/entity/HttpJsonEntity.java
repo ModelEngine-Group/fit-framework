@@ -9,6 +9,7 @@ package modelengine.fel.tool.info.entity;
 /**
  * 表示 http 插件的 json 实体。
  *
+ * @author 李金绪
  * @since 2024-11-05
  */
 public class HttpJsonEntity extends ToolJsonEntity {

@@ -18,6 +18,7 @@ import java.util.Map;
 /**
  * 表示工具的基本数据内容。
  *
+ * @author 鲁为
  * @since 2024-04-18
  */
 public class ToolData {

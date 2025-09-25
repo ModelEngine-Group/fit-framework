@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * 表示工具组的数据。
  *
+ * @author 王攀博
  * @since 2024-10-25
  */
 public class ToolGroupData extends GroupData {

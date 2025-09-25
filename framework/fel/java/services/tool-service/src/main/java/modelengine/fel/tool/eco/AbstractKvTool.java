@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 表示入参为键值对结构工具的抽象实现。
  *
+ * @author 刘信宏
  * @since 2024-06-24
  */
 public abstract class AbstractKvTool extends AbstractTool {

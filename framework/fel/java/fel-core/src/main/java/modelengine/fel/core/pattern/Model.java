@@ -11,6 +11,7 @@ package modelengine.fel.core.pattern;
  *
  * @param <I> 表示模型算子的输入类型。
  * @param <O> 表示模型算子的输出类型。
+ * @author 刘信宏
  * @since 2024-06-11
  */
 public interface Model<I, O> extends Pattern<I, O> {}

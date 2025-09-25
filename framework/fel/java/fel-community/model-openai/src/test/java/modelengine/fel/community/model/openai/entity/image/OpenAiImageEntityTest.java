@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 /**
  * 测试 {@link modelengine.fel.community.model.openai.entity.image} 下对象的序列化和反序列化。
  *
+ * @author 何嘉斌
  * @since 2024-12-18
  */
 public class OpenAiImageEntityTest {

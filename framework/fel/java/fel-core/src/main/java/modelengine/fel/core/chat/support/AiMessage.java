@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * 表示大模型响应的 {@link modelengine.fel.core.chat.ChatMessage} 实现。
  *
+ * @author 刘信宏
  * @since 2024-4-12
  */
 public class AiMessage extends AbstractChatMessage {

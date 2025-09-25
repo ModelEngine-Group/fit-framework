@@ -38,6 +38,8 @@ import java.util.Objects;
 /**
  * 表示 {@link FitTool} 的测试集。
  *
+ * @author 易文渊
+ * @author 杭潇
  * @since 2024-08-16
  */
 @DisplayName("测试 FitTool")

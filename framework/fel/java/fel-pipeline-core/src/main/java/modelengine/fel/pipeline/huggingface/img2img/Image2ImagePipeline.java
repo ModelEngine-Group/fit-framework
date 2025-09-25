@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * 表示 {@link PipelineTask#IMAGE_TO_IMAGE} 任务的流水线。
  *
+ * @author 易文渊
  * @since 2024-06-06
  */
 public class Image2ImagePipeline extends ExplicitPipeline<Image2ImageInput, List<Media>> {

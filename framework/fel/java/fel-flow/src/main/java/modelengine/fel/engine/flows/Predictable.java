@@ -19,6 +19,7 @@ import java.util.Objects;
 /**
  * 流程对话级别的回调操作。
  *
+ * @author 刘信宏
  * @since 2024-04-10
  */
 public class Predictable<T> implements ConverseListener<T> {

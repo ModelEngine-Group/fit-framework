@@ -12,6 +12,7 @@ import java.util.Set;
 /**
  * 表示创建工具的工厂接口。
  *
+ * @author 王攀博
  * @since 2024-04-23
  */
 public interface ToolFactoryRepository {

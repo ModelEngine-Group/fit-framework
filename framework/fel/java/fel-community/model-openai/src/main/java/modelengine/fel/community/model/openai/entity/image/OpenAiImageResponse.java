@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 /**
  * 表示 OpenAi API 格式的图片生成响应。
  *
+ * @author 何嘉斌
  * @since 2024-12-17
  */
 public class OpenAiImageResponse {

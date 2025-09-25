@@ -9,6 +9,8 @@ package modelengine.fel.tool.info.schema;
 /**
  * 表示工具的字段集合。
  *
+ * @author 李金绪
+ * @author 杭潇
  * @since 2024-10-29
  */
 public interface ToolsSchema {

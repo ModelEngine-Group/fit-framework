@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * 表示 {@link MemoryVectorStore} 的单元测试。
  *
+ * @author 易文渊
  * @since 2024-08-08
  */
 @DisplayName("测试 MemoryVectorStore")

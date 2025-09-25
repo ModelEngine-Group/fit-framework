@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * 表示嵌入模型。
  *
+ * @author 易文渊
  * @since 2024-08-12
  */
 public interface DocumentEmbedModel {

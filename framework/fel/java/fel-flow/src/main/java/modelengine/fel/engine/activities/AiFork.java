@@ -23,6 +23,7 @@ import java.util.function.Supplier;
  * @param <I> 表示入参数据类型。
  * @param <RF> 表示内部的数据流程类型，是 {@link Flow}{@code <}{@link D}{@code >} 的扩展。
  * @param <F> AI 流程类型，是 {@link AiFlow}{@code <}{@link D}{@code , }{@link RF}{@code >} 的扩展。
+ * @author 刘信宏
  * @since 2024-04-28
  */
 public class AiFork<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> extends AiActivity<D, RF, F> {

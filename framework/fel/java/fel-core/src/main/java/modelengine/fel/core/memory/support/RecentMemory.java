@@ -25,6 +25,7 @@ import static modelengine.fitframework.inspection.Validation.notNull;
 /**
  * 表示使用最近一定次数历史记录的实现。
  *
+ * @author 宋永坦
  * @since 2025-07-04
  */
 public class RecentMemory implements Memory {

@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * 表示默认的向量检索器。
  *
+ * @author 易文渊
  * @since 2024-08-06
  */
 public class DefaultVectorRetriever implements Retriever<String, MeasurableDocument> {

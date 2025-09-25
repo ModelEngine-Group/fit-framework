@@ -11,6 +11,7 @@ import modelengine.fitframework.annotation.Genericable;
 /**
  * 表示工具输出转换器。
  *
+ * @author 易文渊
  * @since 2024-08-14
  */
 public interface ToolOutputConverter {

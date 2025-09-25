@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 表示 OpenAI API 格式的重排响应。
  *
+ * @author 马朝阳
  * @since 2024-09-27
  */
 @Data

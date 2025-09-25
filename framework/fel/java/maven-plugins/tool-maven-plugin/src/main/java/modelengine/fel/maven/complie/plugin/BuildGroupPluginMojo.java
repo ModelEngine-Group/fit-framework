@@ -19,6 +19,8 @@ import java.util.Objects;
 /**
  * 对 Jar 包进行编译处理。
  *
+ * @author 杭潇
+ * @author 曹嘉美
  * @since 2024-10-26
  */
 @Mojo(name = "build-tool", defaultPhase = LifecyclePhase.COMPILE,

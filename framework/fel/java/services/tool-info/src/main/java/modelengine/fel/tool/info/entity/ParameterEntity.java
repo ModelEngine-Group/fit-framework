@@ -12,6 +12,8 @@ import java.util.Map;
 /**
  * 表示参数的实体类。
  *
+ * @author 曹嘉美
+ * @author 李金绪
  * @since 2024-10-26
  */
 public class ParameterEntity {

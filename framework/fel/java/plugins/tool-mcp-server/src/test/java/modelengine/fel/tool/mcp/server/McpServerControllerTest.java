@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit test for {@link McpServerController}.
  *
+ * @author 季聿阶
  * @since 2025-05-20
  */
 @DisplayName("Unit tests for McpController")

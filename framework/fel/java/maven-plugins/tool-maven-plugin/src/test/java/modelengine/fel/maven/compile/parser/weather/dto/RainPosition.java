@@ -9,6 +9,7 @@ package modelengine.fel.maven.compile.parser.weather.dto;
 /**
  * 添加测试用的工具的自定义结构体。
  *
+ * @author 杭潇
  * @since 2025-07-21
  */
 public class RainPosition {

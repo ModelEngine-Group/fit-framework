@@ -23,6 +23,7 @@ import modelengine.fitframework.util.ObjectUtils;
 /**
  * 流式对话模型实现。
  *
+ * @author 刘信宏
  * @since 2024-05-16
  */
 public class ChatFlowModel implements FlowModel<Prompt, ChatMessage> {

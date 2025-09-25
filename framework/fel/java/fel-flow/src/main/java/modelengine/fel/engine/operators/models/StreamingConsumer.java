@@ -9,6 +9,7 @@ package modelengine.fel.engine.operators.models;
 /**
  * 流式响应信息消费者。
  *
+ * @author 刘信宏
  * @since 2024-05-17
  */
 @FunctionalInterface

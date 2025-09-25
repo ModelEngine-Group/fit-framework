@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * 表示 huggingface pipeline 的常量集合。
  *
+ * @author 易文渊
  * @since 2024-06-06
  */
 public interface Constant {

@@ -14,6 +14,8 @@ import java.util.Map;
 /**
  * 表示可调用工具的实体。
  *
+ * @author 易文渊
+ * @author 季聿阶
  * @since 2024-04-08
  */
 public interface ToolInfo {

@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
  * 表示默认的工具方法自动装配器。
  * <p>当插件加载和卸载时，会根据插件暴露的工具方法，进行工具的加载和卸载。</p>
  *
+ * @author 易文渊
+ * @author 杭潇
  * @since 2024-08-15
  */
 @Component

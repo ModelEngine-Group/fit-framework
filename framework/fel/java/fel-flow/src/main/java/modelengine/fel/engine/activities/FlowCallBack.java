@@ -15,6 +15,7 @@ import java.util.function.Consumer;
  * 流程回调对象。
  *
  * @param <O> 表示流程输出数据类型。
+ * @author 刘信宏
  * @since 2024-05-28
  */
 public class FlowCallBack<O> {

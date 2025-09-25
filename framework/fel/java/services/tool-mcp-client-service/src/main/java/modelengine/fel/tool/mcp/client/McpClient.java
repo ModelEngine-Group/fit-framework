@@ -18,6 +18,7 @@ import java.util.Map;
  * This interface is designed to facilitate communication between the client application and the MCP server,
  * enabling seamless integration and tool invocation.
  *
+ * @author 季聿阶
  * @since 2025-05-21
  */
 public interface McpClient extends Closeable {

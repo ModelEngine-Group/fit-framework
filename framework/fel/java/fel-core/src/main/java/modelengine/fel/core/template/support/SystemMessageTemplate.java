@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * 系统消息模板实现。
  *
+ * @author 易文渊
  * @since 2024-04-25
  */
 public class SystemMessageTemplate extends AbstractMessageTemplate {

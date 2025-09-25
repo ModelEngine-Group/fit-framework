@@ -13,6 +13,7 @@ import java.util.Map;
 /**
  * 表示定义的基本内容。
  *
+ * @author 王攀博
  * @since 2024-10-25
  */
 public class DefinitionData {

@@ -17,6 +17,7 @@ import modelengine.fitframework.inspection.Validation;
  *
  * @param <D> 表示流程注入的数据类型。
  * @param <F> 表示被装饰的流程类型，是 {@link Flow}{@code <}{@link D}{@code >} 的扩展。
+ * @author 刘信宏
  * @since 2024-04-28
  */
 public class AiFlow<D, F extends Flow<D>> extends IdGenerator {

@@ -11,6 +11,7 @@ package modelengine.fel.core.pattern;
  *
  * @param <I> 表示输入数据类型。
  * @param <O> 表示输出数据类型。
+ * @author 刘信宏
  * @since 2024-06-11
  */
 public interface Pattern<I, O> {

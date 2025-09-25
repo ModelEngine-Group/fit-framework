@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link DocumentEmbedModel} 的默认实现。
  *
+ * @author 易文渊
  * @since 2024-08-12
  */
 public class DefaultDocumentEmbedModel implements DocumentEmbedModel {

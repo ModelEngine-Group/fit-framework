@@ -19,6 +19,7 @@ import java.util.List;
 /**
  * 表示检索文档的后置重排序接口。
  *
+ * @author 马朝阳
  * @since 2024-09-14
  */
 public class RerankDocumentProcessor implements DocumentPostProcessor {

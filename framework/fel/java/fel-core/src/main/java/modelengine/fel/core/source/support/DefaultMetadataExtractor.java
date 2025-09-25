@@ -16,6 +16,7 @@ import java.util.Map;
 /**
  * 表示 {@link JsonMetadataExtractor} 的默认实现。
  *
+ * @author 易文渊
  * @since 2024-08-10
  */
 public class DefaultMetadataExtractor implements JsonMetadataExtractor {

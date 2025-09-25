@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
  * 表示 java bean 输出解析器。
  *
  * @param <O> 表示输出对象类型。
+ * @author 易文渊
  * @since 2024-04-28
  */
 public class BeanJsonOutputParser<O> extends AbstractJsonOutputParser<O> {

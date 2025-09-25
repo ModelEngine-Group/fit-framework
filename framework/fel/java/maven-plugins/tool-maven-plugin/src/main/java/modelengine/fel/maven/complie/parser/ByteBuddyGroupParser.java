@@ -30,6 +30,8 @@ import java.util.stream.Stream;
 /**
  * 提供对工具组信息的解析。
  *
+ * @author 曹嘉美
+ * @author 杭潇
  * @since 2024-10-26
  */
 public class ByteBuddyGroupParser implements GroupParser {

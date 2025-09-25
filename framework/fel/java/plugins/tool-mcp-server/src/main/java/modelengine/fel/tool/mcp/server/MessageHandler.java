@@ -13,6 +13,7 @@ import java.util.Map;
  * Implementations of this interface are responsible for processing incoming message requests
  * and returning an appropriate response object.
  *
+ * @author 季聿阶
  * @since 2025-05-15
  */
 public interface MessageHandler {

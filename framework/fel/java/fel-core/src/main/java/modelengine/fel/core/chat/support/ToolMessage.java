@@ -16,6 +16,8 @@ import java.util.Optional;
 /**
  * 表示工具消息的 {@link ChatMessage} 实现。
  *
+ * @author 刘信宏
+ * @author 易文渊
  * @since 2024-4-3
  */
 public class ToolMessage extends AbstractChatMessage {

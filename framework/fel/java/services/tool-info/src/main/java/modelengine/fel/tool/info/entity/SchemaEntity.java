@@ -14,6 +14,9 @@ import java.util.Map;
 /**
  * 表示定义组和实现组的结构类。
  *
+ * @author 曹嘉美
+ * @author 李金绪
+ * @author 杭潇
  * @since 2024-10-26
  */
 public class SchemaEntity {

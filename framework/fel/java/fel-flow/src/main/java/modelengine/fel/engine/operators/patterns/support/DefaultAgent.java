@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 /**
  * 表示智能体的默认实现。
  *
+ * @author 易文渊
  * @since 2024-09-02
  */
 public class DefaultAgent extends AbstractAgent {

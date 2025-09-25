@@ -9,6 +9,7 @@ package modelengine.fel.pipeline;
 /**
  * 流水线输入参数接口定义。
  *
+ * @author 易文渊
  * @since 2024-06-19
  */
 public interface PipelineInput {}

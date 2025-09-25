@@ -13,6 +13,7 @@ import java.util.Set;
  *
  * @param <I> 表示输入参数的类型。
  * @param <O> 表示渲染结果的类型。
+ * @author 易文渊
  * @since 2024-04-25
  */
 public interface GenericTemplate<I, O> {

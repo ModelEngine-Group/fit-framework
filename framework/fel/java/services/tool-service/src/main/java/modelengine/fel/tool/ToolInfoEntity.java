@@ -16,6 +16,8 @@ import java.util.Map;
 /**
  * 表示工具的实体类。
  *
+ * @author 易文渊
+ * @author 杭潇
  * @since 2024-08-14
  */
 public class ToolInfoEntity implements Tool.Info {

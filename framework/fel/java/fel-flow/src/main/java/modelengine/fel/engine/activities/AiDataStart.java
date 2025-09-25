@@ -21,6 +21,7 @@ import modelengine.fitframework.inspection.Validation;
  * @param <O> 表示返回数据类型。
  * @param <D> 表示流程的初始数据类型。
  * @param <I> 表示当前节点的输入数据类型。
+ * @author 刘信宏
  * @since 2024-05-20
  */
 public class AiDataStart<O, D, I> {

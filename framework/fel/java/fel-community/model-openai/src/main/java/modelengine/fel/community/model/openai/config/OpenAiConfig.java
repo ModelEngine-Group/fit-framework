@@ -12,6 +12,7 @@ import modelengine.fitframework.annotation.Component;
 /**
  * 表示 {@link OpenAiConfig} 的默认实现。
  *
+ * @author 易文渊
  * @since 2024-08-12
  */
 @Component

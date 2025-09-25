@@ -9,6 +9,7 @@ package modelengine.fel.community.model.openai.enums;
 /**
  * 模型内容生成状态枚举类。
  *
+ * @author 孙怡菲
  * @since 2025-04-29
  */
 public enum ModelProcessingState {

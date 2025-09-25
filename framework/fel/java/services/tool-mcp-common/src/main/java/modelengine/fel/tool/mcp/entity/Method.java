@@ -9,6 +9,7 @@ package modelengine.fel.tool.mcp.entity;
 /**
  * Represents different methods used in MCP, which are essential for communication and interaction.
  *
+ * @author 季聿阶
  * @since 2025-05-23
  */
 public enum Method {

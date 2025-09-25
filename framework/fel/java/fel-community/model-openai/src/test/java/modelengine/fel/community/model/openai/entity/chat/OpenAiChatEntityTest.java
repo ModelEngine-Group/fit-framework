@@ -33,6 +33,7 @@ import java.util.Optional;
 /**
  * 测试 {@link modelengine.fel.community.model.openai.entity.chat} 下对象的序列化和反序列化。
  *
+ * @author 易文渊
  * @since 2024-08-17
  */
 @DisplayName("测试 openai 聊天请求相关数据结构序列化与反序列化")

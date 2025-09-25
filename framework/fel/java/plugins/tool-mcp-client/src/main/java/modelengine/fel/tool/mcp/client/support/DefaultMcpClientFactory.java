@@ -22,6 +22,7 @@ import modelengine.fitframework.serialization.ObjectSerializer;
  * This class is responsible for initializing and configuring the HTTP client and JSON serializer
  * required by the DefaultMcpClient.
  *
+ * @author 季聿阶
  * @since 2025-05-21
  */
 @Component

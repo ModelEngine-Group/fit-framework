@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * {@link Conversation} 的核心机制的测试。
  *
+ * @author 刘信宏
  * @since 2024-04-29
  */
 @DisplayName("测试对话核心机制")

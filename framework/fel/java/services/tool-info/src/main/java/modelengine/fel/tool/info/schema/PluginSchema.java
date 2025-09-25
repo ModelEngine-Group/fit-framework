@@ -9,6 +9,7 @@ package modelengine.fel.tool.info.schema;
 /**
  * 表示插件的字段集合。
  *
+ * @author 李金绪
  * @since 2024-10-29
  */
 public interface PluginSchema {

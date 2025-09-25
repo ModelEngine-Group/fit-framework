@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 /**
  * OpenAi API 格式的会话补全请求。
  *
+ * @author 易文渊
+ * @author 张庭怿
  * @since 2024-4-30
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link ExpressionParser} 的抽象实现。
  *
+ * @author 易文渊
  * @since 2024-08-10
  */
 public abstract class AbstractExpressionParser implements ExpressionParser {

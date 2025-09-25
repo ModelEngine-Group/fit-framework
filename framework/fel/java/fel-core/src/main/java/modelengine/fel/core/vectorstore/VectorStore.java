@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * 表示向量数据库的接口。
  *
+ * @author 易文渊
  * @since 2024-08-06
  */
 public interface VectorStore extends DocumentStore {

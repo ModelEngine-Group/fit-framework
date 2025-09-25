@@ -13,6 +13,7 @@ import java.util.Map;
 /**
  * 表示嵌入模型参数的实体。
  *
+ * @author 易文渊
  * @since 2024-04-24
  */
 public interface EmbedOption {

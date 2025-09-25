@@ -61,6 +61,8 @@ import java.util.function.Supplier;
  * @param <I> 表示入参数据类型。
  * @param <RF> 表示内部数据流程类型，是 {@link Flow}{@code <}{@link D}{@code >} 的扩展。
  * @param <F> 表示 AI 流程的类型，是 {@link AiFlow}{@code <}{@link D}{@code , }{@link RF}{@code >} 的扩展。
+ * @author 刘信宏
+ * @author 易文渊
  * @since 2024-04-28
  */
 public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> extends AiActivity<D, RF, F> {

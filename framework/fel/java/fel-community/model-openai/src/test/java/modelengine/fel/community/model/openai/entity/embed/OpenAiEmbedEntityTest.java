@@ -20,6 +20,7 @@ import java.util.Collections;
 /**
  * 测试 {@link modelengine.fel.community.model.openai.entity.embed} 下对象的序列化和反序列化。
  *
+ * @author 易文渊
  * @since 2024-08-18
  */
 @DisplayName("测试 openai 嵌入请求相关数据结构序列化与反序列化")

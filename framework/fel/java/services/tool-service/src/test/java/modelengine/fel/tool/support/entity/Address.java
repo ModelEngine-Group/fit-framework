@@ -11,6 +11,7 @@ import modelengine.fitframework.annotation.Property;
 /**
  * 表示地址。
  *
+ * @author 何天放
  * @since 2024-06-15
  */
 public class Address {

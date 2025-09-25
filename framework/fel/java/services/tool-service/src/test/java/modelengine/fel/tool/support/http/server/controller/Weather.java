@@ -12,6 +12,7 @@ import modelengine.fitframework.annotation.Property;
 /**
  * 测试 Http 提供的天气的相关信息。
  *
+ * @author 王攀博
  * @since 2024-06-17
  */
 public class Weather {

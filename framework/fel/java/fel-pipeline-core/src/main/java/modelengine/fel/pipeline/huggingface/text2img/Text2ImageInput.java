@@ -13,6 +13,7 @@ import modelengine.fitframework.annotation.Property;
 /**
  * 表示文生图任务的输入参数。
  *
+ * @author 易文渊
  * @since 2024-06-06
  */
 @Data

@@ -153,6 +153,8 @@ import java.util.stream.DoubleStream;
  * Documentation</a>
  * @see <a href="https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf">Cormack et al. (2009) "Reciprocal Rank
  * Fusion Outperforms Condorcet and Individual Rank Learning Methods"</a>
+ *
+ * @author 马朝阳
  * @since 2024-09-29
  */
 public class RrfPostProcessor implements DocumentPostProcessor {

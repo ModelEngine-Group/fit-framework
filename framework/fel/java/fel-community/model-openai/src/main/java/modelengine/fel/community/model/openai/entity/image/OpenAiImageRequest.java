@@ -11,6 +11,7 @@ import static modelengine.fitframework.inspection.Validation.notBlank;
 /**
  * 表示 OpenAi Api 格式的图片生成请求。
  *
+ * @author 何嘉斌
  * @since 2024-12-17
  */
 public class OpenAiImageRequest {

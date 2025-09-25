@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * 表示 {@link Tokenizer} 的简单实现。
  *
+ * @author 易文渊
  * @since 2024-08-09
  */
 public class SimpleTokenizer implements Tokenizer {

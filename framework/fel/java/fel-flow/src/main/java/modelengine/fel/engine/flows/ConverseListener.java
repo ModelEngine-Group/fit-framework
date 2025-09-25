@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * 流程对话监听器。
  *
+ * @author 刘信宏
  * @since 2024-04-26
  */
 public interface ConverseListener<T> {

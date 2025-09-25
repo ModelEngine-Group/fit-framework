@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 表示 {@link Tokenizer} 的 hanlp 实现。
  *
+ * @author 易文渊
  * @since 2024-09-24
  */
 @Component

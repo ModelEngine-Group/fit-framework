@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * 表示 pipeline 工厂。
  *
+ * @author 易文渊
  * @since 2024-06-07
  */
 public class PipelineFactory {

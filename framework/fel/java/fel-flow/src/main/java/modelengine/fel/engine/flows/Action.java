@@ -11,6 +11,7 @@ import modelengine.fitframework.inspection.Validation;
 /**
  * 结束回调接口。
  *
+ * @author 刘信宏
  * @since 2024-04-23
  */
 @FunctionalInterface

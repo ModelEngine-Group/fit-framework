@@ -13,6 +13,8 @@ import java.util.List;
 /**
  * 表示参数属性的实体类。
  *
+ * @author 曹嘉美
+ * @author 李金绪
  * @since 2024-10-26
  */
 public class PropertyEntity {

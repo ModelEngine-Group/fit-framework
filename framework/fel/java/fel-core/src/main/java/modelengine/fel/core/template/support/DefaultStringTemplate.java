@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * 表示生成字符串的默认模版实现。
  *
+ * @author 易文渊
  * @since 2024-04-25
  */
 public class DefaultStringTemplate implements StringTemplate {

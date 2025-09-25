@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * 表示检索文档的后置处理器算子接口。
  *
+ * @author 易文渊
  * @since 2024-08-06
  */
 @FunctionalInterface

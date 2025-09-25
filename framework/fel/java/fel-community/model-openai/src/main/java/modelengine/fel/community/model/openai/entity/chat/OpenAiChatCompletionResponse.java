@@ -22,6 +22,8 @@ import java.util.function.Function;
 /**
  * OpenAi API 格式的会话补全响应。
  *
+ * @author 易文渊
+ * @author 张庭怿
  * @since 2024-4-30
  */
 public class OpenAiChatCompletionResponse {

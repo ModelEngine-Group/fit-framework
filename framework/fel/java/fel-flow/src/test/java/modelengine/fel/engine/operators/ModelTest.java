@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 模型算子测试。
  *
+ * @author 刘信宏
  * @since 2024-05-08
  */
 public class ModelTest {

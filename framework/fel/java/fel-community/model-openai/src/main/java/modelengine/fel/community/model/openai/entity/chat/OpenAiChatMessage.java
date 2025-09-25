@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 /**
  * 此类用于表示 OpenAI 的消息对象。
  *
+ * @author 易文渊
+ * @author 张庭怿
  * @since 2024-4-30
  */
 @SerializeStrategy(include = SerializeStrategy.Include.NON_NULL)

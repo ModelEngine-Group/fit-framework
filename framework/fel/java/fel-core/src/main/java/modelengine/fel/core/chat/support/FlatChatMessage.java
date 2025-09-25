@@ -21,6 +21,7 @@ import java.util.Optional;
 /**
  * 表示聊天消息的传输实现。
  *
+ * @author 易文渊
  * @since 2024-04-12
  */
 public class FlatChatMessage implements ChatMessage {

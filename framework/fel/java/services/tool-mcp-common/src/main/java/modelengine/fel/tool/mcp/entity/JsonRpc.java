@@ -12,6 +12,7 @@ import java.util.Map;
  * Represents a JSON RPC request entity, encapsulating information related to JSON RPC requests.
  * This class follows the JSON RPC specification, supporting the construction and parsing of JSON RPC request objects.
  *
+ * @author 季聿阶
  * @since 2025-05-15
  */
 public class JsonRpc {

@@ -9,6 +9,7 @@ package modelengine.fel.tool.mcp.entity;
 /**
  * Represents different types of events used in MCP.
  *
+ * @author 季聿阶
  * @since 2025-05-22
  */
 public enum Event {

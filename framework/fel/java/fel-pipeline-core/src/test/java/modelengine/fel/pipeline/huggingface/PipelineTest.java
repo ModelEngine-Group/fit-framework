@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 /**
  * 表示 huggingface pipeline 的单元测试。
  *
+ * @author 易文渊
  * @since 2024-06-07
  */
 @DisplayName("测试 huggingface pipeline")

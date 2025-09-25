@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * 表示 {@link StringTemplate} 的单元测试。
  *
+ * @author 易文渊
  * @since 2024-04-25
  */
 @DisplayName("测试 StringTemplate")

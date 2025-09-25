@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link MessageTemplate} 的抽象实现。
  *
+ * @author 易文渊
  * @since 2024-04-25
  */
 public abstract class AbstractMessageTemplate implements MessageTemplate {

@@ -12,6 +12,8 @@ import modelengine.fel.core.chat.MessageType;
 /**
  * 表现系统消息的 {@link ChatMessage} 实现。
  *
+ * @author 刘信宏
+ * @author 易文渊
  * @since 2024-4-12
  */
 public class SystemMessage extends AbstractChatMessage {

@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 工具消息模板实现。
  *
+ * @author 易文渊
  * @since 2024-04-25
  */
 public class ToolMessageTemplate extends AbstractMessageTemplate {

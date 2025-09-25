@@ -12,6 +12,7 @@ import modelengine.fel.core.document.Content;
  * 表示检索结果合成算子。
  *
  * @param <I> 表示合成结果的泛型。
+ * @author 易文渊
  * @since 2024-08-05
  */
 @FunctionalInterface

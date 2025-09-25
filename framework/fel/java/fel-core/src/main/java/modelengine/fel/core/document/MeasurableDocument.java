@@ -20,6 +20,7 @@ import java.util.Objects;
 /**
  * 表示可量化比较的 {@link Document}。
  *
+ * @author 易文渊
  * @since 2024-08-06
  */
 public class MeasurableDocument implements Document, Measurable {

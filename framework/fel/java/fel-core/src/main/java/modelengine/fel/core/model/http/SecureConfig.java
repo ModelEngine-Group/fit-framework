@@ -11,6 +11,7 @@ import modelengine.fitframework.pattern.builder.BuilderFactory;
 /**
  * 表示 http 请求的安全相关配置。
  *
+ * @author 宋永坦
  * @since 2025-03-30
  */
 public interface SecureConfig {

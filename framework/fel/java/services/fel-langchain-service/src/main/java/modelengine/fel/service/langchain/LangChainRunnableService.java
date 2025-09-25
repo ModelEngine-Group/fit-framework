@@ -11,6 +11,7 @@ import modelengine.fitframework.annotation.Genericable;
 /**
  * LangChain Runnable 算子服务。
  *
+ * @author 刘信宏
  * @since 2024-06-11
  */
 public interface LangChainRunnableService {

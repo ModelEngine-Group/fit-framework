@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 /**
  * 嵌入模型服务的打桩实现。
  *
+ * @author 易文渊
  * @since 2024-08-08
  */
 class EmbedModelStub implements EmbedModel {

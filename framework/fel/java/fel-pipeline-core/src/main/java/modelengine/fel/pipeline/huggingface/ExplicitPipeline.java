@@ -19,6 +19,7 @@ import java.util.Map;
  *
  * @param <I> 表示流水线输入参数类型的 {@link I}。
  * @param <O> 表示流水线输出参数类型的 {@link O}。
+ * @author 易文渊
  * @since 2024-06-04
  */
 public abstract class ExplicitPipeline<I extends PipelineInput, O> implements Pipeline<I, O> {

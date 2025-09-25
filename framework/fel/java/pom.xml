@@ -21,6 +21,13 @@
     </licenses>
 
     <developers>
+        <developer>
+            <name>Song Yongtan</name>
+            <email>271667068@qq.com</email>
+            <roles>
+                <role>Committer</role>
+            </roles>
+        </developer>
     </developers>
 
     <scm>

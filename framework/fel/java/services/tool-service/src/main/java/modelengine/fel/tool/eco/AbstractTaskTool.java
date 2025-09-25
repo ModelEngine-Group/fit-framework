@@ -16,6 +16,7 @@ import modelengine.fitframework.serialization.ObjectSerializer;
 /**
  * 表示 {@link TaskTool} 的抽象实现父类。
  *
+ * @author 季聿阶
  * @since 2024-06-04
  */
 public abstract class AbstractTaskTool extends AbstractTool implements TaskTool {

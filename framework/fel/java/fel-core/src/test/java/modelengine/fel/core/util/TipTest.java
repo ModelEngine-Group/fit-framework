@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * 表示 {@link Tip} 的单元测试。
  *
+ * @author 易文渊
  * @since 2024-04-27
  */
 @DisplayName("测试 Tip")

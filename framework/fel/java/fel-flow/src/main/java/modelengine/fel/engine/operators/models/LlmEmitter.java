@@ -21,6 +21,7 @@ import modelengine.fitframework.util.StringUtils;
 /**
  * 流式模型发射器。
  *
+ * @author 刘信宏
  * @since 2024-05-16
  */
 public class LlmEmitter<O extends ChatMessage> extends FitBoundedEmitter<O, ChatMessage> {

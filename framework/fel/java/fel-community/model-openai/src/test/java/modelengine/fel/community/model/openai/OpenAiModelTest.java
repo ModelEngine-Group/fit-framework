@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 /**
  * {@link OpenAiModel} 的模型测试。
  *
+ * @author 刘信宏
  * @since 2024-09-23
  */
 @MvcTest(classes = TestModelController.class)

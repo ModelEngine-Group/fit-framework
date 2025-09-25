@@ -24,6 +24,7 @@ import java.util.Objects;
 /**
  * 大模型流式响应内容片段。
  *
+ * @author 刘信宏
  * @since 2024-05-16
  */
 public class ChatChunk implements ChatMessage {

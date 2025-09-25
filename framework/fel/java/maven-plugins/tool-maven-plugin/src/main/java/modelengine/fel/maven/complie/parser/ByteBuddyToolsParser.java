@@ -33,6 +33,8 @@ import java.util.Optional;
 /**
  * 提供对工具信息的解析。
  *
+ * @author 杭潇
+ * @author 曹嘉美
  * @since 2024-10-30
  */
 public class ByteBuddyToolsParser {

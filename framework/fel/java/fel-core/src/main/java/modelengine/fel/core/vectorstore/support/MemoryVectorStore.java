@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 /**
  * 表示 {@link VectorStore} 的内存简易实现，不要在生产环境中使用。
  *
+ * @author 易文渊
  * @since 2024-08-06
  */
 public class MemoryVectorStore implements VectorStore {

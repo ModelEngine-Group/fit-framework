@@ -25,6 +25,7 @@ import java.util.Optional;
 /**
  * 阻塞对话模型实现。
  *
+ * @author 刘信宏
  * @since 2024-04-16
  */
 public class ChatBlockModel implements BlockModel<Prompt, ChatMessage> {

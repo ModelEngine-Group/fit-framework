@@ -17,6 +17,7 @@ import modelengine.fitframework.serialization.ObjectSerializer;
 /**
  * 表示创建参数工具的工厂。
  *
+ * @author 王攀博
  * @since 2024-04-23
  */
 public class FitToolFactory implements ToolFactory {

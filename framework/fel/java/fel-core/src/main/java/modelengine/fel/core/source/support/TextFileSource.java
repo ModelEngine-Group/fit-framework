@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * 表示文本文件加载器的实体。
  *
+ * @author 易文渊
  * @since 2024-08-07
  */
 public class TextFileSource extends AbstractFileSource {

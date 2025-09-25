@@ -13,6 +13,7 @@ import java.util.Map;
 /**
  * 表示图像生成模型参数的实体。
  *
+ * @author 何嘉斌
  * @since 2024-12-17
  */
 public interface ImageOption {
