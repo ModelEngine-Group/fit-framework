@@ -13,24 +13,23 @@ FIT Service Coordination Nacos 插件是 FIT Framework 的服务协调插件，�
 - **IDEA 启动方式和 `java -jar` 启动方式**：只需要按需引入依赖即可，无需额外配置。
 
 - **`fit start` 命令启动方式**：
-  - 默认只打包 `fit-service-coordination-simple` 插件到 `/build/plugins` 目录
-  - 如果需要使用 Nacos 版注册中心，需要：
-    1. **取消 `fit-service-coordination-nacos` 插件中 `pom.xml` 文件的注释**：
-       - 文件位置：`framework/fit/java/fit-builtin/plugins/fit-service-coordination-nacos/pom.xml`
-       - 找到 `<build>` 标签下的 `maven-antrun-plugin` 配置块
-       - 删除 `<!--` 和 `-->` 注释标记，使插件配置生效
-    2. **同时注释掉 `fit-service-coordination-simple` 插件中 `pom.xml` 文件的对应注释**：
-       - 文件位置：`framework/fit/java/fit-builtin/plugins/fit-service-coordination-simple/pom.xml`
-       - 找到 `<build>` 标签下的 `maven-antrun-plugin` 配置块
-       - 在配置块前后添加 `<!--` 和 `-->` 注释标记，使插件配置失效
-    3. 这样会让 `fit-service-coordination-nacos` 的插件 jar 包打包到 `/build/plugins` 目录
+  - 默认只有 `fit-service-coordination-simple` 插件在 `/build/plugins` 目录
+  - 如果需要使用 Nacos 版注册中心，操作步骤：
+    1. **整体编译项目**：
+       ```bash
+       cd framework/fit/java
+       mvn clean package
+       ```
+    2. **放入 build/plugins 目录**：
+       ```bash
+       cp fit-builtin/plugins/fit-service-coordination-nacos/target/fit-service-coordination-nacos-3.6.0-SNAPSHOT.jar ../../../build/plugins/
+       ```
+    3. **移除 Simple 插件**：
+       ```bash
+       rm ../../../build/plugins/fit-service-coordination-simple-3.6.0-SNAPSHOT.jar
+       ```
 
-#### 具体操作示例
-
-**需要修改的配置块**：找到 `maven-antrun-plugin` 插件配置，位于 `<build><plugins>` 标签内。
-
-- **启用 Nacos 插件**：删除 `fit-service-coordination-nacos/pom.xml` 中的 `<!--` 和 `-->`
-- **禁用 Simple 插件**：在 `fit-service-coordination-simple/pom.xml` 中添加 `<!--` 和 `-->`
+> **说明**：`build/plugins` 目录中只能有一个注册中心插件，Nacos 和 Simple 不能同时存在。
 
 ## 快速开始
 

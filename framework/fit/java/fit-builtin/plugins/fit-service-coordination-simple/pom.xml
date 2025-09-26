@@ -63,8 +63,6 @@
 
     <build>
         <plugins>
-            <!-- 注释掉 maven-antrun-plugin，不再复制 jar 包到 build/plugins 目录 -->
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -83,7 +81,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
         </plugins>
     </build>
 </project>
