@@ -15,34 +15,10 @@ import {variableUpdateDrawer} from '@/components/variableUpdate/variableUpdateDr
  */
 export const variableUpdateNodeState = (id, x, y, width, height, parent, drawer) => {
   const self = jadeNode(id, x, y, width, height, parent, drawer ? drawer : variableUpdateDrawer);
-  self.type = 'variableUpdateNodeState';
   self.text = '变量更新';
+  self.type = 'variableUpdateNodeState';
   self.componentName = 'variableUpdateComponent';
-  self.flowMeta = JSON.parse(DEFAULT_FLOW_META);
-
-  /**
-   * 处理传递的元数据
-   *
-   * @param metaData 元数据信息
-   */
-  self.processMetaData = (metaData) => {
-    if (metaData && metaData.name) {
-      self.text = metaData.name;
-    }
-    self.flowMeta.jober.entity.uniqueName = metaData.uniqueName;
-  };
-
-  /**
-   * 序列化
-   *
-   * @override
-   */
-  self.serializerJadeConfig = (jadeConfig) => {
-    self.flowMeta.jober.converter.entity = jadeConfig;
-    self.flowMeta.jober.entity.params = self.flowMeta.jober.converter.entity.inputParams.map(property => {
-      return {name: property.name};
-    });
-  };
+  self.flowMeta.jober.fitables.push("modelengine.fit.jade.aipp.variable.updater");
 
   /**
    * @override

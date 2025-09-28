@@ -37,7 +37,7 @@ export const variableUpdateComponent = (jadeConfig) => {
     newVariable.id = newVariable.id = `updateVariable_${newVariable.id}`;
     return jadeConfig ? jadeConfig : {
       inputParams: [{
-        id: `variables_${uuidv4()}`, name: 'updateVariables', type: DATA_TYPES.OBJECT, from: FROM_TYPE.EXPAND, value: [
+        id: `variables_${uuidv4()}`, name: 'updateVariables', type: DATA_TYPES.ARRAY, from: FROM_TYPE.EXPAND, value: [
           newVariable,
         ],
       }],
