@@ -11,6 +11,10 @@ worker:
 
 matata:
   registry:
+    host: 'localhost' # 默认连接的注册中心为本地
+    port: 8080 # 默认连接注册中心的端口为本地默认的 8080 端口
+    protocol: 2 # 注册中心默认使用 Http 的传输协议
+    mode: 'DIRECT' # 默认连接注册中心的模式为直连模式(内存版注册中心)
     environment: "local" # 默认注册中心的环境标和本地默认配置一致
     available-services: # 将注册中心和获取地址相关的服务进行配置，其他服务都可以通过以下服务进行地址获取
       # 订阅服务并获取所订阅服务地址的接口
