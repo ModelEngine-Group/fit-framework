@@ -4,9 +4,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {useState} from 'react';
-import {Button, Collapse, Popover} from 'antd';
-import {PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import React, {useEffect, useState} from 'react';
+import {Button, Collapse, Popover, Form} from 'antd';
+import {DeleteOutlined, EditOutlined, PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {StartInputForm} from './StartInputForm.jsx';
 import './style.css';
 import {useConfigContext, useDispatch, useShapeContext} from '@/components/DefaultRoot.jsx';
@@ -16,7 +16,6 @@ import PropTypes from 'prop-types';
 import {Trans, useTranslation} from 'react-i18next';
 import {AppConfiguration} from '@/components/start/AppConfiguration.jsx';
 import {JadeCollapse} from '@/components/common/JadeCollapse.jsx';
-import IconTrashBin from '../asserts/icon-delete-trash-bin.svg?react'; // 导入背景图片
 
 const {Panel} = Collapse;
 
@@ -51,6 +50,25 @@ export default function StartFormWrapper({data, shapeStatus}) {
     return isConfig ? items.map(item => item.id) : [];
   });
 
+  useEffect(() => {
+    items.map(item => {
+      shape.page.registerObservable({
+        nodeId: shape.id,
+        observableId: item.id,
+        value: item.name,
+        type: item.type,
+        parentId: undefined,
+      });
+    })
+
+    // 组件unmount时，删除observable.
+    return () => {
+      items.map(item => {
+        shape.page.removeObservable(shape.id, item.id);
+      })
+    };
+  }, []);
+
   // 添加新元素到 items 数组中，并将其 key 添加到当前展开的面板数组中
   const addItem = () => {
     // 开始节点入参最大数量为20
@@ -68,11 +86,14 @@ export default function StartFormWrapper({data, shapeStatus}) {
       ?.config
       ?.find(configItem => configItem.hasOwnProperty('allowAdd')); // 查找具有 "allowAdd" 属性的对象
     if (configObject ? configObject.allowAdd : false) {
+      const inputParams =  data.find(item => item.name === 'input')?.value;
       return (<>
         <Button disabled={shapeStatus.disabled}
                 type="text"
                 className="icon-button jade-start-add-icon"
-                onClick={addItem}>
+                onClick={(event) => {
+                  triggerAddInput(event, inputParams);
+                }}>
           <PlusOutlined/>
         </Button>
       </>);
@@ -80,15 +101,22 @@ export default function StartFormWrapper({data, shapeStatus}) {
     return null;
   };
 
-  const renderDeleteIcon = (item) => {
+  const renderIcons = (item) => {
     if (!item.disableModifiable) {
       return (<>
+        <Button
+            disabled={shape.status.disabled}
+            type="text"
+            className="icon-button start-node-edit-icon-button"
+            onClick={(event) =>triggerEditInput(event, item.id, item)}>
+          <EditOutlined/>
+        </Button>
         <Button
           disabled={shapeStatus.disabled}
           type="text"
           className="icon-button start-node-delete-icon-button"
           onClick={() => handleDelete(item.id)}>
-          <IconTrashBin/>
+          <DeleteOutlined/>
         </Button>
       </>);
     }
@@ -99,6 +127,7 @@ export default function StartFormWrapper({data, shapeStatus}) {
     const updatedOpenItems = openItems.filter((key) => key !== itemId);
     setOpenItems(updatedOpenItems);
     dispatch({actionType: 'deleteInputParam', id: itemId});
+    shape.page.removeObservable(shape.id, itemId)
   };
 
   const content = (<div className={'jade-font-size'} style={{lineHeight: '1.2'}}>
@@ -128,50 +157,117 @@ export default function StartFormWrapper({data, shapeStatus}) {
     dispatch({actionType: 'changeMemorySwitch', value: e});
   };
 
+  /**
+   * 添加增加开始节点自定义参数的回调函数
+   *
+   * @param event 事件
+   */
+  const triggerAddInput = (event, existParam) => {
+    event.preventDefault();
+    shape.page.triggerEvent({
+      type: 'ADD_START_INPUT',
+      value: {
+        existParam: items,
+        onAdd: (param) => {
+          dispatch({
+            actionType: 'addParam',
+            value: param,
+          });
+          shape.page.registerObservable({
+            nodeId: shape.id,
+            observableId: param.id,
+            value: param.name,
+            type: param.type,
+            parentId: undefined
+          });
+
+          if (isConfig) {
+            setOpenItems(prev => [...prev, param.id]);
+          }
+        },
+      },
+    });
+    event.stopPropagation();
+  };
+
+  /**
+   * 添加修改开始节点自定义参数的回调函数
+   *
+   * @param event 事件
+   */
+  const triggerEditInput = (event, id, selectedParam) => {
+    event.preventDefault();
+    shape.page.triggerEvent({
+      type: 'EDIT_START_INPUT',
+      value: {
+        id: id,
+        selectedParam: selectedParam,
+        onEdit: (param) => {
+          dispatch({
+            actionType: 'editParam',
+            value: param,
+            id: id,
+          });
+          shape.emit(id, {type: param.type, value: param.name});
+        },
+      },
+    });
+    event.stopPropagation();
+  };
+
+
   return (<>
     <div>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '8px',
-        paddingLeft: '8px',
-        paddingRight: '4px',
-        height: '32px',
-      }}>
-        <div className="jade-panel-header-font">{t('input')}</div>
-        <Popover
-          content={content}
-          align={{offset: [0, 3]}}
-          overlayClassName={'jade-custom-popover'}
-        >
-          <QuestionCircleOutlined className="jade-panel-header-popover-content"/>
-        </Popover>
-        {renderAddInputIcon()}
-      </div>
       <JadeCollapse
-        activeKey={openItems}
-        onChange={(keys) => setOpenItems(keys)}
-        style={{backgroundColor: 'transparent'}}>
-        {
-          items.map((item) => (
-            <Panel
-              key={item.id}
-              header={
-                <div className="panel-header">
-                  <span className="jade-panel-header-font">{item.name}</span> {/* 显示Name值的元素 */}
-                  {renderDeleteIcon(item)}
-                </div>
-              }
-              className="jade-panel"
-              style={{marginBottom: 8, borderRadius: '8px', width: '100%'}}
-              forceRender
+          defaultActiveKey={["startInput"]}
+      >
+        <Panel
+            key={"startInput"}
+            header={
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingRight: '4px',
+            height: '32px',
+          }}>
+            <div className="jade-panel-header-font">{t('input')}</div>
+            <Popover
+                content={content}
+                align={{offset: [0, 3]}}
+                overlayClassName={'jade-custom-popover'}
             >
-              <div className={'jade-custom-panel-content'}>
-                <StartInputForm item={item} items={items}/>
-              </div>
-            </Panel>
-          ))
+              <QuestionCircleOutlined className="jade-panel-header-popover-content"/>
+            </Popover>
+            {renderAddInputIcon()}
+          </div>
         }
+               className='jade-panel'
+        >
+          {items.map((item) => (
+              <Form.Item
+                  className='jade-input-item'
+                  name={`input-${item.id}`}
+                  key={item.id}
+              >
+                <div className="param-item">
+                  <div className="param-row">
+                    <div className="param-left">
+                      <div className="param-name">{item.name}</div>
+                      <div className="param-display-name">{item.displayName}</div>
+                    </div>
+                    <div className="param-right">
+                      <div className="param-type-wrapper">
+                        <div className="param-type">{item.type}</div>
+                      </div>
+                      <div className="param-icons">
+                        {renderIcons(item)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Form.Item>
+          ))}
+        </Panel>
       </JadeCollapse>
 
       <MultiConversation className="jade-multi-conversation"

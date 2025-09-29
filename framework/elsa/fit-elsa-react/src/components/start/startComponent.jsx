@@ -25,7 +25,6 @@ export const startComponent = (jadeConfig) => {
                     name: 'Question',
                     type: 'String',
                     from: 'Input',
-                    description: '这是用户输入的问题',
                     value: '',
                     disableModifiable: true,
                     isRequired: true,
@@ -99,6 +98,58 @@ export const startComponent = (jadeConfig) => {
                     return item;
                 }
             })
+        };
+
+        const addParam = () => {
+            let param = action.value;
+            return data.map(item => {
+                if (item.name === "input") {
+                    return {
+                        ...item,
+                        value: [
+                            ...item.value,
+                            {
+                                id: param.id,
+                                name: param.name,
+                                type: param.type,
+                                from: "Input",
+                                description: param.description,
+                                value: param.value,
+                                disableModifiable: param.disableModifiable,
+                                isRequired: param.isRequired,
+                                isVisible: param.isVisible,
+                                displayName: param.displayName,
+                                appearance: param.appearance,
+                            }
+                        ]
+                    }
+                } else {
+                    return item;
+                }
+            })
+        };
+
+        const updateInputParamById = () => {
+            const param = action.value;
+            return data.map(item => {
+                if (item.name === "input") {
+                    return {
+                        ...item,
+                        value: item.value.map(p => {
+                            if (p.id === action.id) {
+                                return {
+                                    ...p,
+                                    ...param,
+                                };
+                            } else {
+                                return p;
+                            }
+                        })
+                    };
+                } else {
+                    return item;
+                }
+            });
         };
 
         const changeInputParam = () => {
@@ -195,6 +246,12 @@ export const startComponent = (jadeConfig) => {
             }
             case 'changeInputParam': {
                 return changeInputParam();
+            }
+            case 'addParam': {
+                return addParam()
+            }
+            case 'editParam': {
+                return updateInputParamById();
             }
             case 'changeMemory': {
                 return changeMemory();

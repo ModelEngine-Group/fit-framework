@@ -324,6 +324,24 @@ const jadeFlowAgent = (graph) => {
   };
 
   /**
+   * 当需要触发增加开始节点自定义参数时的回调.
+   *
+   * @param callback 回调函数.
+   */
+  self.onAddInputParam = (callback) => {
+    addSelectEventListener('ADD_START_INPUT', callback);
+  };
+
+  /**
+   * 当需要触发修改开始节点自定义参数时的回调.
+   *
+   * @param callback 回调函数.
+   */
+  self.onEditInputParam = (callback) => {
+    addSelectEventListener('EDIT_START_INPUT', callback);
+  };
+
+  /**
    * 监听某个事件.
    *
    * @param event 事件类型.

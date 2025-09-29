@@ -11,6 +11,7 @@ import {Button} from 'antd';
 import {CodeDrawer} from '@/components/common/code/CodeDrawer.jsx';
 import 'antd/dist/antd.css';
 import {createGraphOperator} from '@/data/GraphOperator.js';
+import {v4 as uuidv4} from 'uuid';
 
 function App({i18n}) {
   const [open, setOpen] = useState(false);
@@ -118,6 +119,42 @@ function App({i18n}) {
             checked: true,
           },
         ]);
+      });
+      agent.onAddInputParam(({ onAdd, existParam }) => {
+        const mockParam = {
+          id: 'input_' + uuidv4(),
+          name: 'userAge',
+          type: 'Boolean',
+          value: '',
+          displayName: 'test',
+          isRequired: true,
+          isVisible: true,
+          disableModifiable: false,
+          appearance: {},
+        };
+
+        // 直接调用回调，模拟弹窗“确认”后的行为
+        onAdd(mockParam);
+        console.log(existParam);
+      });
+
+      agent.onEditInputParam(({id,  onEdit, selectedParam }) => {
+        const mockParam = {
+          id: id,
+          name: 'userAge',
+          type: 'String',
+          value: '',
+          displayName: 'test',
+          isRequired: true,
+          isVisible: true,
+          disableModifiable: false,
+          appearance: {},
+        };
+
+        // 直接调用回调，模拟弹窗“确认”后的行为
+        onEdit(mockParam);
+
+        console.log(selectedParam);
       });
       agent.listen('GENERATE_AI_PROMPT', (event) => {
         event.applyPrompt('123');
