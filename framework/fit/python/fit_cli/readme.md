@@ -55,6 +55,24 @@ python -m fit_cli package %{your_plugin_name}
 
 ---
 
+## pip 安装
+
+FIT CLI 工具可通过 pip 进行安装：
+```bash
+pip install fit-plugin-cli
+```
+安装后，可以简化命令为：
+```bash
+fit init %{your_plugin_name}
+fit_cli init %{your_plugin_name}
+
+fit build %{your_plugin_name}
+fit_cli build %{your_plugin_name}
+
+fit package %{your_plugin_name}
+fit_cli package %{your_plugin_name}
+```
+
 ## 注意事项
 
 1. 运行命令前，请切换至 framework/fit/python 项目根目录。
