@@ -25,7 +25,7 @@ TYPE_MAP = {
 
 type_errors = []
 
-def parse_type(annotation):
+def parse_type(annotation, custom_classes):
     """解析参数类型"""
     global type_errors
 
@@ -36,6 +36,8 @@ def parse_type(annotation):
     elif isinstance(annotation, ast.Name):
         if annotation.id in TYPE_MAP:
             return TYPE_MAP[annotation.id], None, True
+        elif annotation.id in custom_classes:
+            return "object", None, True
         else:
             type_errors.append(f"不支持的类型: {annotation.id}")
             return "invalid", None, True
@@ -49,7 +51,7 @@ def parse_type(annotation):
 
             # List[int] 
             if container in ("list", "List"):
-                item_type, _, _ = parse_type(annotation.slice)
+                item_type, _, _ = parse_type(annotation.slice, custom_classes)
                 if item_type == "invalid":
                     type_errors.append(f"不支持的列表元素类型: {annotation.slice}")
                     return "invalid", None, True
@@ -61,7 +63,7 @@ def parse_type(annotation):
 
             # Optional[int]
             elif container == "Optional":
-                inner_type, inner_items, _ = parse_type(annotation.slice)
+                inner_type, inner_items, _ = parse_type(annotation.slice, custom_classes)
                 if inner_type == "invalid":
                     type_errors.append(f"不支持的Optional类型: {annotation.slice}")
                     return "invalid", None, False
@@ -76,14 +78,14 @@ def parse_type(annotation):
                 items = []
                 if isinstance(annotation.slice, ast.Tuple):
                     for elt in annotation.slice.elts:
-                        item_type, _, _ = parse_type(elt)
+                        item_type, _, _ = parse_type(elt, custom_classes)
                         if item_type == "invalid":
                             type_errors.append(f"不支持的元组元素类型: {ast.dump(elt)}")
                             return "invalid", None, True
                         items.append({"type":item_type})
                     return "array", f"{items}", True
                 else:
-                    item_type, _, _ = parse_type(annotation.slice)
+                    item_type, _, _ = parse_type(annotation.slice, custom_classes)
                     if item_type == "invalid":
                         type_errors.append(f"不支持的元组元素类型: {ast.dump(annotation.slice)}")
                         return "invalid", None, True
@@ -91,7 +93,7 @@ def parse_type(annotation):
             
             # Set[int]
             elif container in ("set", "Set"):
-                item_type, _, _ = parse_type(annotation.slice)
+                item_type, _, _ = parse_type(annotation.slice, custom_classes)
                 if item_type == "invalid":
                     type_errors.append(f"不支持的集合元素类型: {annotation.slice}")
                     return "invalid", None, True
@@ -106,7 +108,7 @@ def parse_type(annotation):
     return "invalid", None, True
 
 
-def parse_parameters(args):
+def parse_parameters(args, custom_classes):
     """解析函数参数"""
     properties = {}
     order = []
@@ -115,7 +117,7 @@ def parse_parameters(args):
     for arg in args.args:
         arg_name = arg.arg
         order.append(arg_name)
-        arg_type, items, is_required = parse_type(arg.annotation)
+        arg_type, items, is_required = parse_type(arg.annotation, custom_classes)
         # 定义参数
         prop_def = {
             "defaultValue": "",
@@ -132,12 +134,12 @@ def parse_parameters(args):
     return properties, order, required
 
 
-def parse_return(annotation):
+def parse_return(annotation, custom_classes):
     """解析返回值类型"""
     if not annotation:
         return {"type": "string", "convertor": ""}
 
-    return_type, items, _ = parse_type(annotation)
+    return_type, items, _ = parse_type(annotation, custom_classes)
     ret = {
         "type": return_type,
         **({"items": items} if items else {}),
@@ -155,8 +157,12 @@ def parse_python_file(file_path: Path):
     py_name = file_path.stem
     definitions = []
     tool_groups = []
+    custom_classes = set()
 
     for node in tree.body:
+        if isinstance(node, ast.ClassDef):
+            custom_classes.add(node.name)
+
         if isinstance(node, ast.FunctionDef):
             func_name = node.name
             # 默认描述
@@ -185,8 +191,8 @@ def parse_python_file(file_path: Path):
                 continue
 
             # 解析参数和返回值
-            properties, order, required = parse_parameters(node.args)
-            return_schema = parse_return(node.returns)
+            properties, order, required = parse_parameters(node.args, custom_classes)
+            return_schema = parse_return(node.returns, custom_classes)
 
             # definition schema
             definition_schema = {
