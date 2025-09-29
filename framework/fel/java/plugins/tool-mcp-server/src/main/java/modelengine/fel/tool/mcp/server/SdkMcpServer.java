@@ -3,7 +3,6 @@ package modelengine.fel.tool.mcp.server;
 
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.spec.McpSchema;
-import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Component;
 import io.modelcontextprotocol.server.McpSyncServer;
 
@@ -13,7 +12,7 @@ import java.time.Duration;
 public class SdkMcpServer {
     private final McpSyncServer mcpSyncServer;
 
-    public SdkMcpServer(DefaultMcpStreamableServerTransportProvider transportProvider) {
+    public SdkMcpServer(FluxMcpStreamableServerTransportProvider transportProvider) {
         this.mcpSyncServer = McpServer.sync(transportProvider)
                 .serverInfo("hkx-server", "1.0.0")
                 .capabilities(McpSchema.ServerCapabilities.builder()
