@@ -63,6 +63,8 @@ import {textConcatenateNodeState} from "@/components/textConcatenationNode/textC
 import {textConcatenateNodeComponent} from "@/components/textConcatenationNode/textConcatenateNodeComponent.jsx";
 import {variableUpdateNodeState} from '@/components/variableUpdate/variableUpdateNodeState.jsx';
 import {variableUpdateComponent} from '@/components/variableUpdate/variableUpdateComponent.jsx';
+import {replyNodeState} from '@/components/replyNode/replyNodeState.jsx';
+import {replyNodeComponent} from '@/components/replyNode/replyNodeComponent.jsx';
 
 /**
  * jadeFlow的专用画布.
@@ -173,6 +175,8 @@ export const jadeFlowGraph = (div, title) => {
     self.registerPlugin('textConcatenateNodeComponent', textConcatenateNodeComponent);
     self.registerPlugin('variableUpdateNodeState', variableUpdateNodeState);
     self.registerPlugin('variableUpdateComponent', variableUpdateComponent);
+    self.registerPlugin('replyNodeState', replyNodeState);
+    self.registerPlugin('replyNodeComponent', replyNodeComponent);
     return initialize.apply(self);
   };
 
