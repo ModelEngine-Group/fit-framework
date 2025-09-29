@@ -6,6 +6,7 @@
 
 package modelengine.fit.example.controller;
 
+import modelengine.fit.example.client.TestAuthClient;
 import modelengine.fit.example.client.TestInterface;
 import modelengine.fit.example.client.TestRequestAddress;
 import modelengine.fit.example.client.TestRequestAddressClass;
@@ -33,6 +34,7 @@ public class TestClientController {
     private final TestRequestAddressClass t2;
     private final TestRequestAddressInClassMapping t3;
     private final TestRequestAddressInMethodMapping t4;
+    private final TestAuthClient authClient;
 
     /**
      * Constructs a TestClientController with the specified test interfaces.
@@ -41,13 +43,15 @@ public class TestClientController {
      * @param t2 The TestRequestAddressClass interface.
      * @param t3 The TestRequestAddressInClassMapping interface.
      * @param t4 The TestRequestAddressInMethodMapping interface.
+     * @param authClient The TestAuthClient interface for auth testing.
      */
     public TestClientController(TestRequestAddress t1, TestRequestAddressClass t2, TestRequestAddressInClassMapping t3,
-            TestRequestAddressInMethodMapping t4) {
+            TestRequestAddressInMethodMapping t4, TestAuthClient authClient) {
         this.t1 = t1;
         this.t2 = t2;
         this.t3 = t3;
         this.t4 = t4;
+        this.authClient = authClient;
     }
 
     /**
@@ -87,6 +91,43 @@ public class TestClientController {
                 return testClass.form("form");
             default:
                 throw new IllegalArgumentException("Invalid method: " + method);
+        }
+    }
+
+    /**
+     * Endpoint for running HTTP client auth tests.
+     * This method allows testing different authentication scenarios.
+     *
+     * @param method The auth test method to invoke.
+     * @param token Optional token parameter for dynamic auth tests.
+     * @return The result of the invoked auth method.
+     */
+    @GetMapping(path = "/auth-test")
+    public Object authTest(@RequestQuery("method") String method,
+                          @RequestQuery(value = "token", required = false) String token) {
+        switch (method) {
+            case "bearerStatic":
+                return authClient.testBearerStatic();
+            case "bearerDynamic":
+                return authClient.testBearerDynamic(token != null ? token : "dynamic-test-token");
+            case "basicStatic":
+                return authClient.testBasicStatic();
+            case "apiKeyHeaderStatic":
+                return authClient.testApiKeyHeaderStatic();
+            case "apiKeyQueryStatic":
+                return authClient.testApiKeyQueryStatic();
+            case "apiKeyDynamic":
+                return authClient.testApiKeyDynamic(token != null ? token : "dynamic-api-key");
+            case "dynamicProvider":
+                return authClient.testDynamicProvider();
+            case "customProvider":
+                return authClient.testCustomProvider();
+            case "methodOverride":
+                return authClient.testMethodOverride();
+            case "combinedAuth":
+                return authClient.testCombinedAuth(token != null ? token : "user-context-token");
+            default:
+                throw new IllegalArgumentException("Invalid auth method: " + method);
         }
     }
 }

@@ -22,6 +22,7 @@ import modelengine.fit.http.annotation.RequestForm;
 import modelengine.fit.http.annotation.RequestHeader;
 import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestQuery;
+import modelengine.fit.http.annotation.RequestAuth;
 import modelengine.fit.http.client.proxy.PropertyValueApplier;
 import modelengine.fit.http.client.proxy.scanner.entity.Address;
 import modelengine.fit.http.client.proxy.scanner.entity.HttpInfo;
@@ -31,7 +32,9 @@ import modelengine.fit.http.client.proxy.scanner.resolver.RequestCookieResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestFormResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestHeaderResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestQueryResolver;
+import modelengine.fit.http.client.proxy.scanner.resolver.RequestAuthResolver;
 import modelengine.fit.http.client.proxy.support.applier.MultiDestinationsPropertyValueApplier;
+import modelengine.fit.http.client.proxy.support.applier.StaticAuthApplier;
 import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
 import modelengine.fitframework.util.ArrayUtils;
 import modelengine.fitframework.util.ReflectionUtils;
@@ -74,6 +77,7 @@ public class AnnotationParser {
         annotationParsers.put(RequestBody.class, new RequestBodyResolver());
         annotationParsers.put(RequestForm.class, new RequestFormResolver());
         annotationParsers.put(PathVariable.class, new PathVariableResolver());
+        annotationParsers.put(RequestAuth.class, new RequestAuthResolver());
     }
 
     private final ValueFetcher valueFetcher;
@@ -98,9 +102,14 @@ public class AnnotationParser {
         if (clazz.isInterface()) {
             String pathPatternPrefix = this.getPathPatternPrefix(clazz);
             Address address = this.getAddress(clazz);
+            List<PropertyValueApplier> classLevelAuthAppliers = this.getClassLevelAuthAppliers(clazz);
             Arrays.stream(clazz.getMethods()).forEach(method -> {
                 HttpInfo httpInfo = this.parseMethod(method, pathPatternPrefix);
                 httpInfo.setAddress(address);
+                // 添加类级别的鉴权应用器
+                List<PropertyValueApplier> appliers = new ArrayList<>(classLevelAuthAppliers);
+                appliers.addAll(httpInfo.getAppliers());
+                httpInfo.setAppliers(appliers);
                 httpInfoMap.put(method, httpInfo);
             });
         }
@@ -111,6 +120,12 @@ public class AnnotationParser {
         HttpInfo httpInfo = new HttpInfo();
         this.parseHttpMethod(method, httpInfo, pathPatternPrefix);
         List<PropertyValueApplier> appliers = new ArrayList<>();
+
+        // 添加方法级别的鉴权应用器
+        List<PropertyValueApplier> methodLevelAuthAppliers = this.getMethodLevelAuthAppliers(method);
+        appliers.addAll(methodLevelAuthAppliers);
+
+        // 添加参数应用器
         Arrays.stream(method.getParameters()).forEach(parameter -> appliers.add(this.parseParam(parameter)));
         httpInfo.setAppliers(appliers);
         return httpInfo;
@@ -190,5 +205,23 @@ public class AnnotationParser {
             }
         }
         return setterInfos;
+    }
+
+    private List<PropertyValueApplier> getClassLevelAuthAppliers(Class<?> clazz) {
+        List<PropertyValueApplier> appliers = new ArrayList<>();
+        RequestAuth[] authAnnotations = clazz.getAnnotationsByType(RequestAuth.class);
+        for (RequestAuth auth : authAnnotations) {
+            appliers.add(new StaticAuthApplier(auth));
+        }
+        return appliers;
+    }
+
+    private List<PropertyValueApplier> getMethodLevelAuthAppliers(Method method) {
+        List<PropertyValueApplier> appliers = new ArrayList<>();
+        RequestAuth[] authAnnotations = method.getAnnotationsByType(RequestAuth.class);
+        for (RequestAuth auth : authAnnotations) {
+            appliers.add(new StaticAuthApplier(auth));
+        }
+        return appliers;
     }
 }
