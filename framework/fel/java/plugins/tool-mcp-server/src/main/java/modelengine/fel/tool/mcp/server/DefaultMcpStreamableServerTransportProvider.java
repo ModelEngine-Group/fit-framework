@@ -7,6 +7,8 @@ import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import io.modelcontextprotocol.spec.*;
 import io.modelcontextprotocol.util.Assert;
 import io.modelcontextprotocol.util.KeepAliveScheduler;
+import modelengine.fel.tool.mcp.entity.Event;
+import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.annotation.*;
 import modelengine.fit.http.entity.Entity;
 import modelengine.fit.http.protocol.HttpResponseStatus;
@@ -14,6 +16,8 @@ import modelengine.fit.http.protocol.MessageHeaderNames;
 import modelengine.fit.http.protocol.MimeType;
 import modelengine.fit.http.server.HttpClassicServerRequest;
 import modelengine.fit.http.server.HttpClassicServerResponse;
+import modelengine.fitframework.flowable.Choir;
+import modelengine.fitframework.flowable.Emitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -22,8 +26,6 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -171,18 +173,18 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
      * @param request The incoming server request
      */
     @GetMapping
-    private void handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response) {
+    private Choir<TextEvent> handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             response.entity(Entity.createText(response, "Server is shutting down"));
-            return;
+            return Choir.empty();
         }
 
         List<String> acceptHeaders = request.headers().all(MessageHeaderNames.ACCEPT);
         if (!acceptHeaders.contains(MimeType.TEXT_EVENT_STREAM.value())) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             response.entity(Entity.createText(response, "Invalid Accept header. Expected TEXT_EVENT_STREAM"));
-            return;
+            return Choir.empty();
         }
 
         McpTransportContext transportContext = this.contextExtractor.extract(request);
@@ -190,7 +192,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             response.entity(Entity.createText(response, "Session ID required in mcp-session-id header"));
-            return;
+            return Choir.empty();
         }
 
         String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
@@ -198,20 +200,20 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
         if (session == null) {
             response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-            return;
+            return Choir.empty();
         }
 
         logger.debug("Handling GET request for session: {}", sessionId);
 
         try {
-
-            return HttpClassicServerResponse.sse(sseBuilder -> {
-                sseBuilder.onTimeout(() -> {
-                    logger.debug("SSE connection timed out for session: {}", sessionId);
-                });
+            return Choir.create(emitter -> {
+                // TODO onTimeout()
+//                emitter.onTimeout(() -> {
+//                    logger.debug("SSE connection timed out for session: {}", sessionId);
+//                });
 
                 DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(
-                        sessionId, sseBuilder);
+                        sessionId, emitter);
 
                 // Check if this is a replay request
                 if (request.headers().contains(HttpHeaders.LAST_EVENT_ID)) {
@@ -229,13 +231,13 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                                     }
                                     catch (Exception e) {
                                         logger.error("Failed to replay message: {}", e.getMessage());
-                                        sseBuilder.error(e);
+                                        emitter.fail(e);
                                     }
                                 });
                     }
                     catch (Exception e) {
                         logger.error("Failed to replay messages: {}", e.getMessage());
-                        sseBuilder.error(e);
+                        emitter.fail(e);
                     }
                 }
                 else {
@@ -243,16 +245,30 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                     McpStreamableServerSession.McpStreamableServerSessionStream listeningStream = session
                             .listeningStream(sessionTransport);
 
-                    sseBuilder.onComplete(() -> {
-                        logger.debug("SSE connection completed for session: {}", sessionId);
-                        listeningStream.close();
+                    emitter.observe(new Emitter.Observer<TextEvent>() {
+                        @Override
+                        public void onEmittedData(TextEvent data) {
+                            // No action needed on emitted data
+                        }
+
+                        @Override
+                        public void onCompleted() {
+                            logger.debug("SSE connection completed for session: {}", sessionId);
+                            listeningStream.close();
+                        }
+
+                        @Override
+                        public void onFailed(Exception cause) {
+                            // Close the listening stream on failure
+                        }
                     });
                 }
-            }, Duration.ZERO);
+            });
         }
         catch (Exception e) {
             logger.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
+            return Choir.empty();
         }
     }
 
@@ -261,11 +277,11 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
      * @param request The incoming server request containing the JSON-RPC message
      */
     @PostMapping
-    private void handlePost(@RequestBody String body,HttpClassicServerRequest request, HttpClassicServerResponse response) {
+    private Choir<TextEvent> handlePost(@RequestBody String body,HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             response.entity(Entity.createText(response, "Server is shutting down"));
-            return;
+            return Choir.empty();
         }
 
         List<String> acceptHeaders = request.headers().all(MessageHeaderNames.ACCEPT);
@@ -273,7 +289,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                 || !acceptHeaders.contains(MimeType.APPLICATION_JSON.value())) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             response.entity(Entity.createObject(response, new McpError("Invalid Accept headers. Expected TEXT_EVENT_STREAM and APPLICATION_JSON")));
-            return;
+            return Choir.empty();
         }
 
         McpTransportContext transportContext = this.contextExtractor.extract(request);
@@ -299,13 +315,13 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                     response.headers().set(HttpHeaders.MCP_SESSION_ID, init.session().getId());
                     response.entity(Entity.createObject(response,
                             new McpSchema.JSONRPCResponse(McpSchema.JSONRPC_VERSION, jsonrpcRequest.id(), initResult, null)));
-                    return;
+                    return Choir.empty();
                 }
                 catch (Exception e) {
                     logger.error("Failed to initialize session: {}", e.getMessage());
                     response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
                     response.entity(Entity.createObject(response, new McpError(e.getMessage())));
-                    return;
+                    return Choir.empty();
                 }
             }
 
@@ -313,7 +329,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
             if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
                 response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
                 response.entity(Entity.createObject(response, new McpError("Session ID missing")));
-                return;
+                return Choir.empty();
             }
 
             String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
@@ -322,7 +338,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
             if (session == null) {
                 response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
                 response.entity(Entity.createObject(response, new McpError("Session not found: " + sessionId)));
-                return;
+                return Choir.empty();
             }
 
             if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
@@ -330,51 +346,56 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                         .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                         .block();
                 response.statusCode(HttpResponseStatus.ACCEPTED.statusCode());
+                return Choir.empty();
+
             }
             else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
                 session.accept(jsonrpcNotification)
                         .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                         .block();
                 response.statusCode(HttpResponseStatus.ACCEPTED.statusCode());
+                return Choir.empty();
             }
             else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
                 // For streaming responses, we need to return SSE
-                return HttpClassicServerResponse.sse(sseBuilder -> {
-                    sseBuilder.onComplete(() -> {
-                        logger.debug("Request response stream completed for session: {}", sessionId);
-                    });
-                    sseBuilder.onTimeout(() -> {
-                        logger.debug("Request response stream timed out for session: {}", sessionId);
-                    });
+                return Choir.create(emitter -> {
+                    // TODO onComplete() and onTimeout()
+//                    emitter.onComplete(() -> {
+//                        logger.debug("Request response stream completed for session: {}", sessionId);
+//                    });
+//                    emitter.onTimeout(() -> {
+//                        logger.debug("Request response stream timed out for session: {}", sessionId);
+//                    });
 
-                    DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(
-                            sessionId, sseBuilder);
+                    DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(sessionId, emitter);
 
                     try {
                         session.responseStream(jsonrpcRequest, sessionTransport)
                                 .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                                 .block();
-                    }
-                    catch (Exception e) {
+                        logger.debug("Request response stream completed for session: {}", sessionId);
+                    } catch (Exception e) {
                         logger.error("Failed to handle request stream: {}", e.getMessage());
-                        sseBuilder.error(e);
-                    }
-                }, Duration.ZERO);
+                        emitter.fail(e);
+                    }});
             }
             else {
                 response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
                 response.entity(Entity.createObject(response, new McpError("Unknown message type")));
+                return Choir.empty();
             }
         }
         catch (IllegalArgumentException | IOException e) {
             logger.error("Failed to deserialize message: {}", e.getMessage());
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             response.entity(Entity.createObject(response, new McpError("Invalid message format")));
+            return Choir.empty();
         }
         catch (Exception e) {
             logger.error("Error handling message: {}", e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             response.entity(Entity.createObject(response, new McpError(e.getMessage())));
+            return Choir.empty();
         }
     }
 
@@ -436,7 +457,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
         private final String sessionId;
 
-        private final SseBuilder sseBuilder;
+        private final Emitter<TextEvent> emitter;
 
         private final ReentrantLock lock = new ReentrantLock();
 
@@ -445,11 +466,10 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         /**
          * Creates a new session transport with the specified ID and SSE builder.
          * @param sessionId The unique identifier for this session
-         * @param sseBuilder The SSE builder for sending server events to the client
          */
-        DefaultStreamableMcpSessionTransport(String sessionId, SseBuilder sseBuilder) {
+        DefaultStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter) {
             this.sessionId = sessionId;
-            this.sseBuilder = sseBuilder;
+            this.emitter = emitter;
             logger.debug("Streamable session transport {} initialized with SSE builder", sessionId);
         }
 
@@ -486,15 +506,15 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                     }
 
                     String jsonText = objectMapper.writeValueAsString(message);
-                    this.sseBuilder.id(messageId != null ? messageId : this.sessionId)
-                            .event(MESSAGE_EVENT_TYPE)
-                            .data(jsonText);
+                    TextEvent textEvent = TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
+                    this.emitter.emit(textEvent);
+
                     logger.debug("Message sent to session {} with ID {}", this.sessionId, messageId);
                 }
                 catch (Exception e) {
                     logger.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage());
                     try {
-                        this.sseBuilder.error(e);
+                        this.emitter.fail(e);
                     }
                     catch (Exception errorException) {
                         logger.error("Failed to send error to SSE builder for session {}: {}", this.sessionId,
@@ -544,7 +564,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
                 this.closed = true;
 
-                this.sseBuilder.complete();
+                this.emitter.complete();
                 logger.debug("Successfully completed SSE builder for session {}", sessionId);
             }
             catch (Exception e) {
