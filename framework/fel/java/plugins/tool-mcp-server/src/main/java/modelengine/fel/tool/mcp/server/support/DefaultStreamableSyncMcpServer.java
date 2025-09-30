@@ -4,21 +4,26 @@ package modelengine.fel.tool.mcp.server.support;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.spec.McpSchema;
+import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
 import io.modelcontextprotocol.server.McpSyncServer;
+import modelengine.fitframework.annotation.ImportConfigs;
 
 import java.time.Duration;
 
 @Component
 public class DefaultStreamableSyncMcpServer {
-    private final McpSyncServer mcpSyncServer;
-
-    public DefaultStreamableSyncMcpServer(ObjectMapper mapper) {
-        DefaultMcpStreamableServerTransportProvider transportProvider = DefaultMcpStreamableServerTransportProvider.builder()
-                .objectMapper(mapper)
+    @Bean
+    public DefaultMcpStreamableServerTransportProvider defaultMcpStreamableServerTransportProvider() {
+        return DefaultMcpStreamableServerTransportProvider.builder()
+                .objectMapper(new ObjectMapper())
                 .build();
-        this.mcpSyncServer = McpServer.sync(transportProvider)
-                .serverInfo("hkx-server", "1.0.0")
+    }
+
+    @Bean
+    public McpSyncServer mcpSyncServer(DefaultMcpStreamableServerTransportProvider transportProvider) {
+        return McpServer.sync(transportProvider)
+                .serverInfo("fit-mcp-streamable-server", "1.0.0")
                 .capabilities(McpSchema.ServerCapabilities.builder()
                         .resources(false, true)  // Enable resource support
                         .tools(true)             // Enable tool support

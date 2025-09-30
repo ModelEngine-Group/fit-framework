@@ -8,6 +8,7 @@ import io.modelcontextprotocol.spec.*;
 import io.modelcontextprotocol.util.Assert;
 import io.modelcontextprotocol.util.KeepAliveScheduler;
 import modelengine.fel.tool.mcp.entity.Event;
+import modelengine.fel.tool.mcp.server.McpServerController;
 import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.annotation.*;
 import modelengine.fit.http.entity.Entity;
@@ -18,21 +19,22 @@ import modelengine.fit.http.server.HttpClassicServerRequest;
 import modelengine.fit.http.server.HttpClassicServerResponse;
 import modelengine.fitframework.flowable.Choir;
 import modelengine.fitframework.flowable.Emitter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import modelengine.fitframework.log.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-@RequestMapping("/mcp/streamable")
 public class DefaultMcpStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultMcpStreamableServerTransportProvider.class);
+    private static final Logger logger = Logger.get(McpServerController.class);
+
+    private static final String MESSAGE_ENDPOINT = "/mcp/streamable";
 
     /**
      * Event type for JSON-RPC messages sent through the SSE connection.
@@ -172,8 +174,8 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
      * Setup the listening SSE connections and message replay.
      * @param request The incoming server request
      */
-    @GetMapping
-    private Choir<TextEvent> handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response) {
+    @GetMapping(path = MESSAGE_ENDPOINT)
+    public Choir<TextEvent> handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             response.entity(Entity.createText(response, "Server is shutting down"));
@@ -276,9 +278,12 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
      * Handles POST requests for incoming JSON-RPC messages from clients.
      * @param request The incoming server request containing the JSON-RPC message
      */
-    @PostMapping
-    private Choir<TextEvent> handlePost(@RequestBody String body,HttpClassicServerRequest request, HttpClassicServerResponse response) {
+    @PostMapping(path = MESSAGE_ENDPOINT)
+    public Choir<TextEvent> handlePost(HttpClassicServerRequest request, HttpClassicServerResponse response) {
+        String body = response.entity().toString();
+        System.out.println("111111111111111111: "+ body);
         if (this.isClosing) {
+            System.out.println("2");
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             response.entity(Entity.createText(response, "Server is shutting down"));
             return Choir.empty();
@@ -287,15 +292,17 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         List<String> acceptHeaders = request.headers().all(MessageHeaderNames.ACCEPT);
         if (!acceptHeaders.contains(MimeType.TEXT_EVENT_STREAM.value())
                 || !acceptHeaders.contains(MimeType.APPLICATION_JSON.value())) {
+            System.out.println("3");
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             response.entity(Entity.createObject(response, new McpError("Invalid Accept headers. Expected TEXT_EVENT_STREAM and APPLICATION_JSON")));
             return Choir.empty();
         }
 
         McpTransportContext transportContext = this.contextExtractor.extract(request);
-
+        System.out.println("4");
         try {
 
+            System.out.println("5");
             McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(objectMapper, body);
 
             // Handle initialization request
@@ -403,8 +410,8 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
      * Handles DELETE requests for session deletion.
      * @param request The incoming server request
      */
-    @DeleteMapping
-    private void handleDelete(HttpClassicServerRequest request, HttpClassicServerResponse response) {
+    @DeleteMapping(path = MESSAGE_ENDPOINT)
+    public void handleDelete(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             response.entity(Entity.createText(response, "Server is shutting down"));
