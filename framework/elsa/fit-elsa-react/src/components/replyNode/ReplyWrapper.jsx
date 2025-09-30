@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {JadeInputForm} from '../common/JadeInputForm.jsx';
 import {useDispatch, useShapeContext} from '@/components/DefaultRoot.jsx';
 import {TemplatePanel} from "@/components/common/TemplatePanel.jsx";
+import {Trans, useTranslation} from "react-i18next";
 
 ReplyWrapper.propTypes = {
     data: PropTypes.object.isRequired,
@@ -12,6 +13,7 @@ ReplyWrapper.propTypes = {
 export default function ReplyWrapper({data, shapeStatus}) {
     const dispatch = useDispatch();
     const shape = useShapeContext();
+    const {t} = useTranslation();
     const template =  data.inputParams.find(item => item.name === 'template');
 
     /**
@@ -62,19 +64,22 @@ export default function ReplyWrapper({data, shapeStatus}) {
                 addItem={addItem}
                 updateItem={updateItem}
                 deleteItem={deleteItem}
-                content={<div>请输入变量</div>}
+                content={
+                    (<div className={'jade-font-size'} style={{lineHeight: '1.2'}}>
+                        <Trans i18nKey='templateInputPopover' components={{p: <p/>}}/>
+                    </div>)}
                 maxInputLength={1000}
             />
             <TemplatePanel
                 disabled={shapeStatus.disabled}
                 template={template}
-                title={"直接回复"}
-                placeHolder={"aaa"}
+                title={t("replyTextLabel")}
+                placeHolder={t("promptPlaceHolder")}
                 name={"reply"}
                 onChange={(templateText) => {
                     dispatch({type: 'changeTemplate', id: template.id, value: templateText});
                 }}
-                labelName={"回复内容"}
+                labelName={t("replyTextLabel")}
             />
         </div>
     );

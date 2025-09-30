@@ -433,5 +433,6 @@
   "textConcatenateNodeTitle": "Text Joiner",
   "concatenatedTextLabel": "Template",
   "add": "Add",
-  "value": "Value"
+  "value": "Value",
+  "replyTextLabel": "Reply Template"
 }

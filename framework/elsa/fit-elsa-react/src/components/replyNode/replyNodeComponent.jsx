@@ -15,7 +15,7 @@ import {
 } from "@/components/replyNode/reducers/reducer.js";
 
 /**
- * 大模型节点组件
+ * 直接回复节点组件
  *
  * @param jadeConfig
  * @param shape 图形对象.

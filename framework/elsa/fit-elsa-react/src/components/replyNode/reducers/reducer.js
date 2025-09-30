@@ -77,6 +77,9 @@ export const AddInputParamReducer = () => {
                                     type: 'String',
                                     from: 'Reference',
                                     value: '',
+                                    referenceNode: '',
+                                    referenceId: '',
+                                    referenceKey: '',
                                 }
                             ]
                         };
