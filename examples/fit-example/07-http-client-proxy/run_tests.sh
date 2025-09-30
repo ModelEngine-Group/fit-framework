@@ -98,18 +98,10 @@ log_warning() {
     echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
-# 检查服务器是否运行
-check_server() {
-    log_info "检查服务器连接..."
-    # 使用一个实际存在的端点来检查服务器
-    local test_endpoint="$BASE_URL/bearer-static"
-    if curl -s --connect-timeout 5 -I "$test_endpoint" > /dev/null 2>&1; then
-        log_success "服务器连接正常"
-    else
-        log_error "无法连接到服务器 $BASE_URL"
-        log_info "请确保服务器已启动：mvn spring-boot:run -pl plugin-http-server"
-        exit 1
-    fi
+# 显示服务器信息（不进行连接检查）
+show_server_info() {
+    log_info "目标服务器: $BASE_URL"
+    log_info "如果测试失败，请确保服务器已启动：mvn spring-boot:run -pl plugin-http-server"
 }
 
 # 执行单个测试
@@ -249,8 +241,8 @@ main() {
     echo "详细模式: $VERBOSE"
     echo "=========================================="
 
-    # 检查服务器
-    check_server
+    # 显示服务器信息
+    show_server_info
 
     # 统计变量
     local total_tests=0
