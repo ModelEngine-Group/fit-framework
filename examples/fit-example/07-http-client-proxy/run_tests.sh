@@ -101,7 +101,9 @@ log_warning() {
 # 检查服务器是否运行
 check_server() {
     log_info "检查服务器连接..."
-    if curl -s --connect-timeout 5 "$BASE_URL" > /dev/null 2>&1; then
+    # 使用一个实际存在的端点来检查服务器
+    local test_endpoint="$BASE_URL/bearer-static"
+    if curl -s --connect-timeout 5 -I "$test_endpoint" > /dev/null 2>&1; then
         log_success "服务器连接正常"
     else
         log_error "无法连接到服务器 $BASE_URL"
