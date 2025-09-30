@@ -19,13 +19,12 @@ import java.lang.annotation.Annotation;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * RequestAuthResolver的单元测试。
+ * RequestAuthResolver 的单元测试。
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 class RequestAuthResolverTest {
-
     private RequestAuthResolver resolver;
 
     @BeforeEach

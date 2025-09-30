@@ -18,50 +18,49 @@ import java.lang.annotation.Annotation;
 import static org.mockito.Mockito.*;
 
 /**
- * AuthDestinationSetter的单元测试。
+ * AuthDestinationSetter 的单元测试。
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 class AuthDestinationSetterTest {
-
     @Test
     void testSetBearerTokenStatic() {
-        // 创建Bearer Token注解
+        // 创建 Bearer Token 注解
         RequestAuth authAnnotation = createRequestAuth(AuthType.BEARER, "test-bearer-token", "",
-                Source.HEADER, "", "", null);
+            Source.HEADER, "", "", null);
 
         AuthDestinationSetter setter = new AuthDestinationSetter(authAnnotation);
         RequestBuilder mockBuilder = Mockito.mock(RequestBuilder.class);
 
-        // 执行设置（静态token，value应该为null）
+        // 执行设置（静态 token，value 应该为 null）
         setter.set(mockBuilder, null);
 
-        // 验证是否调用了正确的header方法
+        // 验证是否调用了正确的 header 方法
         verify(mockBuilder).header("Authorization", "Bearer test-bearer-token");
     }
 
     @Test
     void testSetBearerTokenDynamic() {
-        // 创建Bearer Token注解（没有静态值）
+        // 创建 Bearer Token 注解（没有静态值）
         RequestAuth authAnnotation = createRequestAuth(AuthType.BEARER, "", "",
-                Source.HEADER, "", "", null);
+            Source.HEADER, "", "", null);
 
         AuthDestinationSetter setter = new AuthDestinationSetter(authAnnotation);
         RequestBuilder mockBuilder = Mockito.mock(RequestBuilder.class);
 
-        // 执行设置（动态token）
+        // 执行设置（动态 token）
         setter.set(mockBuilder, "dynamic-bearer-token");
 
-        // 验证是否调用了正确的header方法
+        // 验证是否调用了正确的 header 方法
         verify(mockBuilder).header("Authorization", "Bearer dynamic-bearer-token");
     }
 
     @Test
     void testSetBasicAuth() {
-        // 创建Basic Auth注解
+        // 创建 Basic Auth 注解
         RequestAuth authAnnotation = createRequestAuth(AuthType.BASIC, "", "",
-                Source.HEADER, "admin", "secret", null);
+            Source.HEADER, "admin", "secret", null);
 
         AuthDestinationSetter setter = new AuthDestinationSetter(authAnnotation);
         RequestBuilder mockBuilder = Mockito.mock(RequestBuilder.class);
@@ -69,16 +68,16 @@ class AuthDestinationSetterTest {
         // 执行设置
         setter.set(mockBuilder, null);
 
-        // 验证是否调用了正确的header方法（Basic Auth的base64编码）
+        // 验证是否调用了正确的 header 方法（Basic Auth 的 base64 编码）
         verify(mockBuilder).header(eq("Authorization"), argThat(value ->
                 value.toString().startsWith("Basic ")));
     }
 
     @Test
     void testSetApiKeyHeader() {
-        // 创建API Key Header注解
+        // 创建 API Key Header 注解
         RequestAuth authAnnotation = createRequestAuth(AuthType.API_KEY, "test-api-key", "X-API-Key",
-                Source.HEADER, "", "", null);
+            Source.HEADER, "", "", null);
 
         AuthDestinationSetter setter = new AuthDestinationSetter(authAnnotation);
         RequestBuilder mockBuilder = Mockito.mock(RequestBuilder.class);
@@ -86,15 +85,15 @@ class AuthDestinationSetterTest {
         // 执行设置
         setter.set(mockBuilder, null);
 
-        // 验证是否调用了正确的header方法
+        // 验证是否调用了正确的 header 方法
         verify(mockBuilder).header("X-API-Key", "test-api-key");
     }
 
     @Test
     void testSetApiKeyQuery() {
-        // 创建API Key Query注解
+        // 创建 API Key Query 注解
         RequestAuth authAnnotation = createRequestAuth(AuthType.API_KEY, "test-api-key", "api_key",
-                Source.QUERY, "", "", null);
+            Source.QUERY, "", "", null);
 
         AuthDestinationSetter setter = new AuthDestinationSetter(authAnnotation);
         RequestBuilder mockBuilder = Mockito.mock(RequestBuilder.class);
@@ -102,13 +101,13 @@ class AuthDestinationSetterTest {
         // 执行设置
         setter.set(mockBuilder, null);
 
-        // 验证是否调用了正确的query方法
+        // 验证是否调用了正确的 query 方法
         verify(mockBuilder).query("api_key", "test-api-key");
     }
 
-    // 辅助方法：创建RequestAuth注解的模拟对象
+    // 辅助方法：创建 RequestAuth 注解的模拟对象
     private RequestAuth createRequestAuth(AuthType type, String value, String name, Source location,
-                                         String username, String password, Class<?> provider) {
+        String username, String password, Class<?> provider) {
         return new RequestAuth() {
             @Override
             public AuthType type() {

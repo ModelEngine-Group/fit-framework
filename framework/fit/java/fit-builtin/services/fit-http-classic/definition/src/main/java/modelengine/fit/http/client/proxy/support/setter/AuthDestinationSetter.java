@@ -17,11 +17,11 @@ import modelengine.fitframework.ioc.BeanContainer;
 import modelengine.fitframework.util.StringUtils;
 
 /**
- * 表示向HTTP请求设置鉴权信息的 {@link DestinationSetter}。
- * 支持多种鉴权类型和动态Provider。
+ * 表示向 HTTP 请求设置鉴权信息的 {@link DestinationSetter}。
+ * <p>支持多种鉴权类型和动态 Provider。</p>
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 public class AuthDestinationSetter implements DestinationSetter {
     private final RequestAuth authAnnotation;
@@ -37,10 +37,10 @@ public class AuthDestinationSetter implements DestinationSetter {
     }
 
     /**
-     * 使用指定的鉴权注解和Bean容器初始化 {@link AuthDestinationSetter} 的新实例。
+     * 使用指定的鉴权注解和 Bean 容器初始化 {@link AuthDestinationSetter} 的新实例。
      *
      * @param authAnnotation 表示鉴权注解的 {@link RequestAuth}。
-     * @param beanContainer 表示Bean容器的 {@link BeanContainer}。
+     * @param beanContainer 表示 Bean 容器的 {@link BeanContainer}。
      */
     public AuthDestinationSetter(RequestAuth authAnnotation, BeanContainer beanContainer) {
         this.authAnnotation = authAnnotation;
@@ -56,7 +56,7 @@ public class AuthDestinationSetter implements DestinationSetter {
     }
 
     private Authorization createAuthorization(Object value) {
-        // 如果指定了Provider，优先使用Provider
+        // 如果指定了 Provider，优先使用 Provider
         if (authAnnotation.provider() != AuthProvider.class) {
             if (beanContainer != null) {
                 AuthProvider provider = beanContainer.beans().get(authAnnotation.provider());
@@ -66,12 +66,12 @@ public class AuthDestinationSetter implements DestinationSetter {
                     throw new IllegalStateException("AuthProvider " + authAnnotation.provider().getName() + " not found in container");
                 }
             } else {
-                // TODO: MVP版本暂时不支持Provider，后续版本再实现
+                // TODO: MVP 版本暂时不支持 Provider，后续版本再实现
                 throw new UnsupportedOperationException("AuthProvider support is not implemented in this version");
             }
         }
 
-        // 基于注解类型创建Authorization
+        // 基于注解类型创建 Authorization
         AuthType type = authAnnotation.type();
         switch (type) {
             case BEARER:
@@ -96,7 +96,7 @@ public class AuthDestinationSetter implements DestinationSetter {
                 }
                 break;
             case CUSTOM:
-                // CUSTOM类型必须使用Provider
+                // CUSTOM 类型必须使用 Provider
                 throw new IllegalArgumentException("CUSTOM auth type requires a provider");
         }
 

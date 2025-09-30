@@ -11,18 +11,17 @@ import modelengine.fit.http.client.proxy.auth.AuthProvider;
 import modelengine.fitframework.annotation.Component;
 
 /**
- * 动态Token提供器示例。
- * 模拟从某个Token管理器获取动态Token的场景。
+ * 动态 Token 提供器示例。
+ * <p>模拟从某个 Token 管理器获取动态 Token 的场景。
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 @Component
 public class DynamicTokenProvider implements AuthProvider {
-
     @Override
     public Authorization provide() {
-        // 模拟动态获取token
+        // 模拟动态获取 token
         String dynamicToken = "dynamic-token-" + System.currentTimeMillis();
         return Authorization.createBearer(dynamicToken);
     }

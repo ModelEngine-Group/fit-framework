@@ -18,14 +18,13 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * 自定义签名鉴权提供器示例。
- * 演示如何实现复杂的自定义鉴权逻辑，如签名算法。
+ * <p>演示如何实现复杂的自定义鉴权逻辑，如签名算法。
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 @Component
 public class CustomSignatureProvider implements AuthProvider {
-
     @Override
     public Authorization provide() {
         return new CustomSignatureAuthorization();

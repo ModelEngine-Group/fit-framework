@@ -13,10 +13,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 容器注解，用于支持多个{@link RequestAuth}注解的组合使用。
+ * 容器注解，用于支持多个 {@link RequestAuth} 注解的组合使用。
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

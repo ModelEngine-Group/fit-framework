@@ -13,13 +13,12 @@ import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
 
 /**
  * 解析 {@link RequestAuth} 注解的解析器。
- * 负责将 {@link RequestAuth} 注解转换为可用于设置HTTP请求鉴权信息的 {@link DestinationSetterInfo} 对象。
+ * <p>负责将 {@link RequestAuth} 注解转换为可用于设置 HTTP 请求鉴权信息的 {@link DestinationSetterInfo} 对象。</p>
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 public class RequestAuthResolver implements ParamResolver<RequestAuth> {
-
     @Override
     public DestinationSetterInfo resolve(RequestAuth annotation, String jsonPath) {
         return new DestinationSetterInfo(new AuthDestinationSetter(annotation), jsonPath);

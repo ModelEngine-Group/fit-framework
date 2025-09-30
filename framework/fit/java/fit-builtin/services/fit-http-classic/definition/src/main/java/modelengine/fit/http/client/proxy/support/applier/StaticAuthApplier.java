@@ -13,10 +13,10 @@ import modelengine.fit.http.client.proxy.support.setter.AuthDestinationSetter;
 
 /**
  * 静态鉴权信息应用器。
- * 用于处理类级别和方法级别的@RequestAuth注解，将静态鉴权信息应用到HTTP请求中。
+ * <p>用于处理类级别和方法级别的 @RequestAuth 注解，将静态鉴权信息应用到 HTTP 请求中。</p>
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 public class StaticAuthApplier implements PropertyValueApplier {
     private final AuthDestinationSetter authSetter;
@@ -32,7 +32,7 @@ public class StaticAuthApplier implements PropertyValueApplier {
 
     @Override
     public void apply(RequestBuilder requestBuilder, Object value) {
-        // 静态鉴权不需要参数值，传入null即可
+        // 静态鉴权不需要参数值，传入 null 即可
         authSetter.set(requestBuilder, null);
     }
 }

@@ -12,18 +12,17 @@ import modelengine.fit.http.server.handler.Source;
 import modelengine.fitframework.annotation.Component;
 
 /**
- * API Key提供器示例。
- * 提供动态的API Key鉴权。
+ * API Key 提供器示例。
+ * <p>提供动态的 API Key 鉴权。
  *
  * @author 季聿阶
- * @since 2025-01-01
+ * @since 2025-09-30
  */
 @Component
 public class ApiKeyProvider implements AuthProvider {
-
     @Override
     public Authorization provide() {
-        // 模拟从配置或环境变量获取API Key
+        // 模拟从配置或环境变量获取 API Key
         String apiKey = "api-key-" + System.currentTimeMillis();
         return Authorization.createApiKey("X-API-Key", apiKey, Source.HEADER);
     }
