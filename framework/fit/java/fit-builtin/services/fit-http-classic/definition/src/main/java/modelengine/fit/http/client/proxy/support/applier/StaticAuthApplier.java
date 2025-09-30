@@ -33,6 +33,6 @@ public class StaticAuthApplier implements PropertyValueApplier {
     @Override
     public void apply(RequestBuilder requestBuilder, Object value) {
         // 静态鉴权不需要参数值，传入 null 即可
-        authSetter.set(requestBuilder, null);
+        this.authSetter.set(requestBuilder, null);
     }
 }

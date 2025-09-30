@@ -57,13 +57,13 @@ public class AuthDestinationSetter implements DestinationSetter {
 
     private Authorization createAuthorization(Object value) {
         // 如果指定了 Provider，优先使用 Provider
-        if (authAnnotation.provider() != AuthProvider.class) {
-            if (beanContainer != null) {
-                AuthProvider provider = beanContainer.beans().get(authAnnotation.provider());
+        if (this.authAnnotation.provider() != AuthProvider.class) {
+            if (this.beanContainer != null) {
+                AuthProvider provider = this.beanContainer.beans().get(this.authAnnotation.provider());
                 if (provider != null) {
                     return provider.provide();
                 } else {
-                    throw new IllegalStateException("AuthProvider " + authAnnotation.provider().getName() + " not found in container");
+                    throw new IllegalStateException("AuthProvider " + this.authAnnotation.provider().getName() + " not found in container");
                 }
             } else {
                 // TODO: MVP 版本暂时不支持 Provider，后续版本再实现
@@ -72,7 +72,7 @@ public class AuthDestinationSetter implements DestinationSetter {
         }
 
         // 基于注解类型创建 Authorization
-        AuthType type = authAnnotation.type();
+        AuthType type = this.authAnnotation.type();
         switch (type) {
             case BEARER:
                 String token = getBearerToken(value);
@@ -90,7 +90,7 @@ public class AuthDestinationSetter implements DestinationSetter {
             case API_KEY:
                 String keyName = getApiKeyName();
                 String keyValue = getApiKeyValue(value);
-                Source location = authAnnotation.location();
+                Source location = this.authAnnotation.location();
                 if (StringUtils.isNotEmpty(keyName) && StringUtils.isNotEmpty(keyValue)) {
                     return Authorization.createApiKey(keyName, keyValue, location);
                 }
@@ -109,19 +109,19 @@ public class AuthDestinationSetter implements DestinationSetter {
             return (String) value;
         }
         // 否则使用注解中的静态值
-        return StringUtils.isNotEmpty(authAnnotation.value()) ? authAnnotation.value() : null;
+        return StringUtils.isNotEmpty(this.authAnnotation.value()) ? this.authAnnotation.value() : null;
     }
 
     private String getBasicUsername() {
-        return StringUtils.isNotEmpty(authAnnotation.username()) ? authAnnotation.username() : null;
+        return StringUtils.isNotEmpty(this.authAnnotation.username()) ? this.authAnnotation.username() : null;
     }
 
     private String getBasicPassword() {
-        return StringUtils.isNotEmpty(authAnnotation.password()) ? authAnnotation.password() : null;
+        return StringUtils.isNotEmpty(this.authAnnotation.password()) ? this.authAnnotation.password() : null;
     }
 
     private String getApiKeyName() {
-        return StringUtils.isNotEmpty(authAnnotation.name()) ? authAnnotation.name() : null;
+        return StringUtils.isNotEmpty(this.authAnnotation.name()) ? this.authAnnotation.name() : null;
     }
 
     private String getApiKeyValue(Object value) {
@@ -130,6 +130,6 @@ public class AuthDestinationSetter implements DestinationSetter {
             return (String) value;
         }
         // 否则使用注解中的静态值
-        return StringUtils.isNotEmpty(authAnnotation.value()) ? authAnnotation.value() : null;
+        return StringUtils.isNotEmpty(this.authAnnotation.value()) ? this.authAnnotation.value() : null;
     }
 }

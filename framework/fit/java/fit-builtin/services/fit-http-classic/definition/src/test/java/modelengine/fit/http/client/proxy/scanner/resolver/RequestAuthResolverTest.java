@@ -29,7 +29,7 @@ class RequestAuthResolverTest {
 
     @BeforeEach
     void setUp() {
-        resolver = new RequestAuthResolver();
+        this.resolver = new RequestAuthResolver();
     }
 
     @Test
@@ -39,7 +39,7 @@ class RequestAuthResolverTest {
         String jsonPath = "$.token";
 
         // 解析注解
-        DestinationSetterInfo setterInfo = resolver.resolve(authAnnotation, jsonPath);
+        DestinationSetterInfo setterInfo = this.resolver.resolve(authAnnotation, jsonPath);
 
         // 验证结果
         assertNotNull(setterInfo);
@@ -55,7 +55,7 @@ class RequestAuthResolverTest {
         String jsonPath = "$.apiKey";
 
         // 解析注解
-        DestinationSetterInfo setterInfo = resolver.resolve(authAnnotation, jsonPath);
+        DestinationSetterInfo setterInfo = this.resolver.resolve(authAnnotation, jsonPath);
 
         // 验证结果
         assertNotNull(setterInfo);
@@ -71,7 +71,7 @@ class RequestAuthResolverTest {
         String jsonPath = "$";
 
         // 解析注解
-        DestinationSetterInfo setterInfo = resolver.resolve(authAnnotation, jsonPath);
+        DestinationSetterInfo setterInfo = this.resolver.resolve(authAnnotation, jsonPath);
 
         // 验证结果
         assertNotNull(setterInfo);
