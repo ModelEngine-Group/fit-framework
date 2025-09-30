@@ -1,4 +1,4 @@
-package modelengine.fel.tool.mcp.server;
+package modelengine.fel.tool.mcp.server.support;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
