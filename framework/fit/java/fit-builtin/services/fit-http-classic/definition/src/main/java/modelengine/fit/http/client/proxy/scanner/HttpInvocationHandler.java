@@ -65,10 +65,19 @@ public class HttpInvocationHandler implements InvocationHandler {
         if (httpInfo == null) {
             throw new HttpClientException("No method http info.");
         }
-        List<PropertyValueApplier> appliers = httpInfo.getAppliers();
-        if (args.length != appliers.size()) {
-            throw new HttpClientException("Args length not equals to appliers size.");
+
+        // 处理 args 为 null 的情况
+        Object[] actualArgs = args != null ? args : new Object[0];
+
+        // 获取分离的应用器列表
+        List<PropertyValueApplier> staticAppliers = httpInfo.getStaticAppliers();
+        List<PropertyValueApplier> paramAppliers = httpInfo.getParamAppliers();
+
+        // 检查参数数量与参数应用器数量是否匹配
+        if (actualArgs.length != paramAppliers.size()) {
+            throw new HttpClientException("Args length not equals to param appliers size.");
         }
+
         HttpClassicClient client = this.factory.create();
         RequestBuilder requestBuilder = RequestBuilder.create()
                 .client(client)
@@ -78,8 +87,15 @@ public class HttpInvocationHandler implements InvocationHandler {
         if (address != null) {
             requestBuilder.protocol(address.getProtocol()).host(address.getHost()).port(address.getPort());
         }
-        for (int i = 0; i < appliers.size(); i++) {
-            appliers.get(i).apply(requestBuilder, args[i]);
+
+        // 先应用静态应用器（不需要参数）
+        for (PropertyValueApplier staticApplier : staticAppliers) {
+            staticApplier.apply(requestBuilder, null);
+        }
+
+        // 再应用参数应用器（需要对应参数）
+        for (int i = 0; i < paramAppliers.size(); i++) {
+            paramAppliers.get(i).apply(requestBuilder, actualArgs[i]);
         }
         HttpClassicClientRequest request = requestBuilder.build();
         try (HttpClassicClientResponse<?> response = client.exchange(request, method.getReturnType())) {

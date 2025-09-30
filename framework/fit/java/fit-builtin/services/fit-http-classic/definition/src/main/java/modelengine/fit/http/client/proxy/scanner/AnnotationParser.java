@@ -106,10 +106,20 @@ public class AnnotationParser {
             Arrays.stream(clazz.getMethods()).forEach(method -> {
                 HttpInfo httpInfo = this.parseMethod(method, pathPatternPrefix);
                 httpInfo.setAddress(address);
-                // 添加类级别的鉴权应用器
-                List<PropertyValueApplier> appliers = new ArrayList<>(classLevelAuthAppliers);
-                appliers.addAll(httpInfo.getAppliers());
-                httpInfo.setAppliers(appliers);
+
+                // 构建静态应用器列表（类级别 + 方法级别）
+                List<PropertyValueApplier> staticAppliers = new ArrayList<>(classLevelAuthAppliers);
+                staticAppliers.addAll(this.getMethodLevelAuthAppliers(method));
+                httpInfo.setStaticAppliers(staticAppliers);
+
+                // 设置参数应用器列表
+                httpInfo.setParamAppliers(httpInfo.getAppliers());
+
+                // 保持向后兼容：合并所有应用器到原字段
+                List<PropertyValueApplier> allAppliers = new ArrayList<>(staticAppliers);
+                allAppliers.addAll(httpInfo.getAppliers());
+                httpInfo.setAppliers(allAppliers);
+
                 httpInfoMap.put(method, httpInfo);
             });
         }
@@ -121,11 +131,7 @@ public class AnnotationParser {
         this.parseHttpMethod(method, httpInfo, pathPatternPrefix);
         List<PropertyValueApplier> appliers = new ArrayList<>();
 
-        // 添加方法级别的鉴权应用器
-        List<PropertyValueApplier> methodLevelAuthAppliers = this.getMethodLevelAuthAppliers(method);
-        appliers.addAll(methodLevelAuthAppliers);
-
-        // 添加参数应用器
+        // 只添加参数应用器（方法级别鉴权在parseInterface中处理）
         Arrays.stream(method.getParameters()).forEach(parameter -> appliers.add(this.parseParam(parameter)));
         httpInfo.setAppliers(appliers);
         return httpInfo;
