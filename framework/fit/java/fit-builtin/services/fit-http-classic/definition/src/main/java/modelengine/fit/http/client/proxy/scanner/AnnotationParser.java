@@ -7,6 +7,7 @@
 package modelengine.fit.http.client.proxy.scanner;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
+import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fit.http.annotation.DeleteMapping;
 import modelengine.fit.http.annotation.GetMapping;
@@ -15,6 +16,7 @@ import modelengine.fit.http.annotation.PathVariable;
 import modelengine.fit.http.annotation.PostMapping;
 import modelengine.fit.http.annotation.PutMapping;
 import modelengine.fit.http.annotation.RequestAddress;
+import modelengine.fit.http.annotation.RequestAuth;
 import modelengine.fit.http.annotation.RequestBean;
 import modelengine.fit.http.annotation.RequestBody;
 import modelengine.fit.http.annotation.RequestCookie;
@@ -22,17 +24,16 @@ import modelengine.fit.http.annotation.RequestForm;
 import modelengine.fit.http.annotation.RequestHeader;
 import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestQuery;
-import modelengine.fit.http.annotation.RequestAuth;
 import modelengine.fit.http.client.proxy.PropertyValueApplier;
 import modelengine.fit.http.client.proxy.scanner.entity.Address;
 import modelengine.fit.http.client.proxy.scanner.entity.HttpInfo;
 import modelengine.fit.http.client.proxy.scanner.resolver.PathVariableResolver;
+import modelengine.fit.http.client.proxy.scanner.resolver.RequestAuthResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestBodyResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestCookieResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestFormResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestHeaderResolver;
 import modelengine.fit.http.client.proxy.scanner.resolver.RequestQueryResolver;
-import modelengine.fit.http.client.proxy.scanner.resolver.RequestAuthResolver;
 import modelengine.fit.http.client.proxy.support.applier.MultiDestinationsPropertyValueApplier;
 import modelengine.fit.http.client.proxy.support.applier.StaticAuthApplier;
 import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
@@ -68,7 +69,7 @@ public class AnnotationParser {
     private static final Set<Class<? extends Annotation>> mappingMethodAnnotations =
             Stream.of(PostMapping.class, PutMapping.class, GetMapping.class, DeleteMapping.class, PatchMapping.class)
                     .collect(Collectors.toSet());
-    private static final Map<Class<? extends Annotation>, ParamResolver> annotationParsers = new HashMap<>();
+    private static final Map<Class<? extends Annotation>, ParamResolver<?>> annotationParsers = new HashMap<>();
 
     static {
         annotationParsers.put(RequestQuery.class, new RequestQueryResolver());
@@ -182,7 +183,7 @@ public class AnnotationParser {
     private PropertyValueApplier parseParam(Parameter parameter) {
         Annotation[] annotations = parameter.getAnnotations();
         Class<?> type = parameter.getType();
-        List<DestinationSetterInfo> setterInfos = getSetterInfos(annotations, type.getDeclaredFields(), "$");
+        List<DestinationSetterInfo> setterInfos = this.getSetterInfos(annotations, type.getDeclaredFields(), "$");
         return new MultiDestinationsPropertyValueApplier(setterInfos, this.valueFetcher);
     }
 
@@ -196,9 +197,9 @@ public class AnnotationParser {
                                 prefix + "." + field.getName())));
                 return setterInfos;
             } else {
-                ParamResolver resolver = annotationParsers.get(annotation.annotationType());
+                ParamResolver<?> resolver = annotationParsers.get(annotation.annotationType());
                 if (resolver != null) {
-                    setterInfos.add(resolver.resolve(annotation, prefix));
+                    setterInfos.add(resolver.resolve(cast(annotation), prefix));
                     return setterInfos;
                 }
             }

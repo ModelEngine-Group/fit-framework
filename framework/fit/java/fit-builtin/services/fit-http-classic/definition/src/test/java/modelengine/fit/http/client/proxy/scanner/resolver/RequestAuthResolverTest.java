@@ -8,7 +8,7 @@ package modelengine.fit.http.client.proxy.scanner.resolver;
 
 import modelengine.fit.http.annotation.RequestAuth;
 import modelengine.fit.http.client.proxy.auth.AuthType;
-import modelengine.fit.http.client.proxy.support.setter.AuthDestinationSetter;
+import modelengine.fit.http.client.proxy.support.setter.AuthorizationDestinationSetter;
 import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
 import modelengine.fit.http.server.handler.Source;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +41,9 @@ class RequestAuthResolverTest {
         // 解析注解
         DestinationSetterInfo setterInfo = this.resolver.resolve(authAnnotation, jsonPath);
 
-        // 验证结果
+        // 验证结果 - 现在使用 AuthorizationDestinationSetter
         assertNotNull(setterInfo);
-        assertInstanceOf(AuthDestinationSetter.class, setterInfo.destinationSetter());
+        assertInstanceOf(AuthorizationDestinationSetter.class, setterInfo.destinationSetter());
         assertEquals(jsonPath, setterInfo.sourcePath());
     }
 
@@ -57,9 +57,9 @@ class RequestAuthResolverTest {
         // 解析注解
         DestinationSetterInfo setterInfo = this.resolver.resolve(authAnnotation, jsonPath);
 
-        // 验证结果
+        // 验证结果 - 现在使用 AuthorizationDestinationSetter
         assertNotNull(setterInfo);
-        assertInstanceOf(AuthDestinationSetter.class, setterInfo.destinationSetter());
+        assertInstanceOf(AuthorizationDestinationSetter.class, setterInfo.destinationSetter());
         assertEquals(jsonPath, setterInfo.sourcePath());
     }
 
@@ -73,9 +73,9 @@ class RequestAuthResolverTest {
         // 解析注解
         DestinationSetterInfo setterInfo = this.resolver.resolve(authAnnotation, jsonPath);
 
-        // 验证结果
+        // 验证结果 - 现在使用 AuthorizationDestinationSetter
         assertNotNull(setterInfo);
-        assertInstanceOf(AuthDestinationSetter.class, setterInfo.destinationSetter());
+        assertInstanceOf(AuthorizationDestinationSetter.class, setterInfo.destinationSetter());
         assertEquals(jsonPath, setterInfo.sourcePath());
     }
 
