@@ -7,7 +7,6 @@
 package modelengine.fit.http.client.proxy.scanner.resolver;
 
 import modelengine.fit.http.annotation.RequestAuth;
-import modelengine.fit.http.client.proxy.auth.AuthType;
 import modelengine.fit.http.client.proxy.scanner.ParamResolver;
 import modelengine.fit.http.client.proxy.support.setter.AuthorizationDestinationSetter;
 import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
@@ -17,42 +16,32 @@ import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
  * <p>负责将 {@link RequestAuth} 注解转换为可用于设置 HTTP 请求鉴权信息的 {@link DestinationSetterInfo} 对象。</p>
  * <p>复用底层的 {@link AuthorizationDestinationSetter} 机制，确保与 FEL Tool 系统架构一致。</p>
  *
+ * <h3>工作原理</h3>
+ * <p>参数级别的鉴权通过 {@link AuthorizationDestinationSetter} 动态更新已存在的 Authorization 对象。
+ * 使用 {@link AuthFieldMapper} 确定应该更新 Authorization 对象的哪个字段。</p>
+ *
+ * <h3>使用示例</h3>
+ * <pre>{@code
+ * // Bearer Token
+ * String api(@RequestAuth(type = BEARER) String token);
+ * // → 更新 BearerAuthorization.token 字段
+ *
+ * // API Key
+ * String search(@RequestAuth(type = API_KEY, name = "X-API-Key") String apiKey);
+ * // → 更新 ApiKeyAuthorization.value 字段
+ * // → ApiKeyAuthorization.key 从注解的 name 属性获取
+ * }</pre>
+ *
  * @author 季聿阶
  * @since 2025-09-30
+ * @see AuthFieldMapper
  */
 public class RequestAuthResolver implements ParamResolver<RequestAuth> {
     @Override
     public DestinationSetterInfo resolve(RequestAuth annotation, String jsonPath) {
-        // 根据鉴权类型确定对应的 Authorization 字段 key
-        String authKey = this.getAuthorizationKey(annotation);
-        return new DestinationSetterInfo(new AuthorizationDestinationSetter(authKey), jsonPath);
-    }
-
-    /**
-     * 根据鉴权注解确定 Authorization 对象中对应的字段 key。
-     *
-     * @param annotation 鉴权注解
-     * @return Authorization 对象中的字段 key
-     */
-    private String getAuthorizationKey(RequestAuth annotation) {
-        AuthType type = annotation.type();
-        switch (type) {
-            case BEARER:
-                // BearerAuthorization.AUTH_TOKEN = "token"
-                return "token";
-
-            case BASIC:
-                // BasicAuthorization 有 username 和 password 两个字段
-                // 这里返回第一个字段，实际上参数级别的 Basic Auth 比较复杂
-                // 建议使用静态配置或者拆分为两个参数
-                return "username";
-
-            case API_KEY:
-                // ApiKeyAuthorization 使用注解中指定的 key name
-                return annotation.name();
-
-            default:
-                throw new IllegalArgumentException("Unsupported auth type for parameter-level auth: " + type);
-        }
+        // 使用 AuthFieldMapper 获取应该更新的 Authorization 字段名
+        // 这确保了与 FEL Tool 系统的一致性
+        String authField = AuthFieldMapper.getParameterAuthField(annotation.type());
+        return new DestinationSetterInfo(new AuthorizationDestinationSetter(authField), jsonPath);
     }
 }

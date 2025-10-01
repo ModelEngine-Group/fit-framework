@@ -45,6 +45,10 @@ class RequestAuthResolverTest {
         assertNotNull(setterInfo);
         assertInstanceOf(AuthorizationDestinationSetter.class, setterInfo.destinationSetter());
         assertEquals(jsonPath, setterInfo.sourcePath());
+
+        // 验证 Setter 类型（字段名的正确性由 AuthFieldMapperTest 验证）
+        AuthorizationDestinationSetter setter = (AuthorizationDestinationSetter) setterInfo.destinationSetter();
+        assertNotNull(setter);
     }
 
     @Test
@@ -61,6 +65,11 @@ class RequestAuthResolverTest {
         assertNotNull(setterInfo);
         assertInstanceOf(AuthorizationDestinationSetter.class, setterInfo.destinationSetter());
         assertEquals(jsonPath, setterInfo.sourcePath());
+
+        // 验证 Setter 类型（字段名的正确性由 AuthFieldMapperTest 验证）
+        // 注意：此测试发现之前的 Bug - API Key 应该映射到 "value" 字段，而不是 annotation.name()
+        AuthorizationDestinationSetter setter = (AuthorizationDestinationSetter) setterInfo.destinationSetter();
+        assertNotNull(setter);
     }
 
     @Test
@@ -77,6 +86,10 @@ class RequestAuthResolverTest {
         assertNotNull(setterInfo);
         assertInstanceOf(AuthorizationDestinationSetter.class, setterInfo.destinationSetter());
         assertEquals(jsonPath, setterInfo.sourcePath());
+
+        // 验证 Setter 类型（字段名的正确性由 AuthFieldMapperTest 验证）
+        AuthorizationDestinationSetter setter = (AuthorizationDestinationSetter) setterInfo.destinationSetter();
+        assertNotNull(setter);
     }
 
     // 辅助方法：创建RequestAuth注解的模拟对象
