@@ -107,18 +107,10 @@ public class AnnotationParser {
                 HttpInfo httpInfo = this.parseMethod(method, pathPatternPrefix);
                 httpInfo.setAddress(address);
 
-                // 构建静态应用器列表（类级别 + 方法级别）
+                // 构建静态应用器列表（类级别鉴权 + 方法级别鉴权）
                 List<PropertyValueApplier> staticAppliers = new ArrayList<>(classLevelAuthAppliers);
                 staticAppliers.addAll(this.getMethodLevelAuthAppliers(method));
                 httpInfo.setStaticAppliers(staticAppliers);
-
-                // 设置参数应用器列表
-                httpInfo.setParamAppliers(httpInfo.getAppliers());
-
-                // 保持向后兼容：合并所有应用器到原字段
-                List<PropertyValueApplier> allAppliers = new ArrayList<>(staticAppliers);
-                allAppliers.addAll(httpInfo.getAppliers());
-                httpInfo.setAppliers(allAppliers);
 
                 httpInfoMap.put(method, httpInfo);
             });
@@ -129,11 +121,12 @@ public class AnnotationParser {
     private HttpInfo parseMethod(Method method, String pathPatternPrefix) {
         HttpInfo httpInfo = new HttpInfo();
         this.parseHttpMethod(method, httpInfo, pathPatternPrefix);
-        List<PropertyValueApplier> appliers = new ArrayList<>();
 
-        // 只添加参数应用器（方法级别鉴权在parseInterface中处理）
-        Arrays.stream(method.getParameters()).forEach(parameter -> appliers.add(this.parseParam(parameter)));
-        httpInfo.setAppliers(appliers);
+        // 构建参数应用器列表
+        List<PropertyValueApplier> paramAppliers = new ArrayList<>();
+        Arrays.stream(method.getParameters()).forEach(parameter -> paramAppliers.add(this.parseParam(parameter)));
+        httpInfo.setParamAppliers(paramAppliers);
+
         return httpInfo;
     }
 

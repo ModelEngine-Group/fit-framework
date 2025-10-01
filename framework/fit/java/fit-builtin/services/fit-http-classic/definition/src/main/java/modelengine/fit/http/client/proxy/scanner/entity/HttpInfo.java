@@ -22,7 +22,6 @@ public class HttpInfo {
     private Address address;
     private HttpRequestMethod method;
     private String pathPattern;
-    private List<PropertyValueApplier> appliers = new ArrayList<>();
     private List<PropertyValueApplier> staticAppliers = new ArrayList<>();
     private List<PropertyValueApplier> paramAppliers = new ArrayList<>();
 
@@ -78,24 +77,6 @@ public class HttpInfo {
      */
     public void setPathPattern(String pathPattern) {
         this.pathPattern = pathPattern;
-    }
-
-    /**
-     * Gets the list of property value appliers for the HTTP request.
-     *
-     * @return The list of property value appliers.
-     */
-    public List<PropertyValueApplier> getAppliers() {
-        return this.appliers;
-    }
-
-    /**
-     * Sets the list of property value appliers for the HTTP request.
-     *
-     * @param appliers The list of property value appliers to set.
-     */
-    public void setAppliers(List<PropertyValueApplier> appliers) {
-        this.appliers = appliers;
     }
 
     /**

@@ -248,7 +248,6 @@ class HttpInvocationHandlerTest {
         httpInfo.setMethod(HttpRequestMethod.GET);
         httpInfo.setPathPattern("/test");
         httpInfo.setAddress(new Address());
-        httpInfo.setAppliers(new ArrayList<>());
         httpInfo.setStaticAppliers(new ArrayList<>());
         httpInfo.setParamAppliers(new ArrayList<>());
         return httpInfo;
