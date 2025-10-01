@@ -12,6 +12,7 @@ import modelengine.fit.http.client.proxy.PropertyValueApplier;
 import modelengine.fit.http.client.proxy.RequestBuilder;
 import modelengine.fit.http.client.proxy.auth.AuthProvider;
 import modelengine.fit.http.client.proxy.auth.AuthType;
+import modelengine.fitframework.ioc.BeanContainer;
 import modelengine.fitframework.util.StringUtils;
 
 /**
@@ -23,7 +24,8 @@ import modelengine.fitframework.util.StringUtils;
  * @since 2025-09-30
  */
 public class StaticAuthApplier implements PropertyValueApplier {
-    private final Authorization authorization;
+    private final RequestAuth authAnnotation;
+    private Authorization cachedAuthorization;
 
     /**
      * 使用指定的鉴权注解初始化 {@link StaticAuthApplier} 的新实例。
@@ -31,20 +33,40 @@ public class StaticAuthApplier implements PropertyValueApplier {
      * @param authAnnotation 表示鉴权注解的 {@link RequestAuth}。
      */
     public StaticAuthApplier(RequestAuth authAnnotation) {
-        this.authorization = this.createAuthorizationFromAnnotation(authAnnotation);
+        this.authAnnotation = authAnnotation;
+        // 如果不使用 Provider，可以提前创建 Authorization
+        if (authAnnotation.provider() == AuthProvider.class) {
+            this.cachedAuthorization = this.createAuthorizationFromAnnotation(authAnnotation, null);
+        }
     }
 
     @Override
     public void apply(RequestBuilder requestBuilder, Object value) {
+        // 如果还未创建 Authorization（使用了 Provider 但还未调用 setBeanContainer）
+        if (this.cachedAuthorization == null) {
+            throw new IllegalStateException(
+                    "Authorization has not been created. " +
+                    "If using AuthProvider, ensure setBeanContainer() is called before apply().");
+        }
+
         // 静态鉴权不需要参数值，直接将 Authorization 对象设置到 RequestBuilder
-        requestBuilder.authorization(this.authorization);
+        requestBuilder.authorization(this.cachedAuthorization);
     }
 
-    private Authorization createAuthorizationFromAnnotation(RequestAuth annotation) {
-        // 如果指定了 Provider，暂不支持（需要 BeanContainer）
+    private Authorization createAuthorizationFromAnnotation(RequestAuth annotation, BeanContainer beanContainer) {
+        // 如果指定了 Provider，需要 BeanContainer
         if (annotation.provider() != AuthProvider.class) {
-            throw new UnsupportedOperationException(
-                    "AuthProvider is not supported in static auth applier. Use parameter-level auth instead.");
+            if (beanContainer == null) {
+                throw new IllegalStateException(
+                        "BeanContainer is required for AuthProvider, but not available. " +
+                        "Provider: " + annotation.provider().getName());
+            }
+            AuthProvider provider = beanContainer.beans().get(annotation.provider());
+            if (provider == null) {
+                throw new IllegalStateException(
+                        "AuthProvider not found in BeanContainer: " + annotation.provider().getName());
+            }
+            return provider.provide();
         }
 
         // 基于注解类型创建 Authorization
@@ -78,6 +100,19 @@ public class StaticAuthApplier implements PropertyValueApplier {
 
             default:
                 throw new IllegalArgumentException("Unsupported auth type: " + type);
+        }
+    }
+
+    /**
+     * 设置 BeanContainer 以支持 AuthProvider。
+     * 在运行时由 HttpInvocationHandler 调用。
+     *
+     * @param beanContainer Bean 容器
+     */
+    public void setBeanContainer(BeanContainer beanContainer) {
+        // 如果使用了 Provider 且还未创建 Authorization，现在创建
+        if (this.cachedAuthorization == null && this.authAnnotation.provider() != AuthProvider.class) {
+            this.cachedAuthorization = this.createAuthorizationFromAnnotation(this.authAnnotation, beanContainer);
         }
     }
 }

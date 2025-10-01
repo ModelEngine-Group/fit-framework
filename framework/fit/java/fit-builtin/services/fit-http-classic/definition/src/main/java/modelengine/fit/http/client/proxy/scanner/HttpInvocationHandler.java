@@ -90,6 +90,11 @@ public class HttpInvocationHandler implements InvocationHandler {
 
         // 先应用静态应用器（不需要参数）
         for (PropertyValueApplier staticApplier : staticAppliers) {
+            // 如果是 StaticAuthApplier 且使用了 Provider，设置 BeanContainer
+            if (staticApplier instanceof modelengine.fit.http.client.proxy.support.applier.StaticAuthApplier) {
+                ((modelengine.fit.http.client.proxy.support.applier.StaticAuthApplier) staticApplier)
+                        .setBeanContainer(this.container);
+            }
             staticApplier.apply(requestBuilder, null);
         }
 
