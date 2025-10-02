@@ -6,6 +6,8 @@
 
 package modelengine.fit.http.client.proxy.support.applier;
 
+import static modelengine.fitframework.inspection.Validation.notNull;
+
 import modelengine.fit.http.annotation.RequestAuth;
 import modelengine.fit.http.client.proxy.Authorization;
 import modelengine.fit.http.client.proxy.PropertyValueApplier;
@@ -30,9 +32,10 @@ public class StaticAuthApplier implements PropertyValueApplier {
      * 使用指定的鉴权注解和 BeanContainer 初始化 {@link StaticAuthApplier} 的新实例。
      *
      * @param authAnnotation 表示鉴权注解的 {@link RequestAuth}。
-     * @param beanContainer Bean 容器，用于获取 AuthProvider（可能为 null，如果不使用 Provider）。
+     * @param beanContainer 表示 Bean 容器，用于获取 AuthProvider。
      */
     public StaticAuthApplier(RequestAuth authAnnotation, BeanContainer beanContainer) {
+        notNull(beanContainer, "The bean container cannot be null.");
         this.authorization = this.createAuthorizationFromAnnotation(authAnnotation, beanContainer);
     }
 
@@ -45,11 +48,6 @@ public class StaticAuthApplier implements PropertyValueApplier {
     private Authorization createAuthorizationFromAnnotation(RequestAuth annotation, BeanContainer beanContainer) {
         // 如果指定了 Provider，需要 BeanContainer
         if (annotation.provider() != AuthProvider.class) {
-            if (beanContainer == null) {
-                throw new IllegalStateException(
-                        "BeanContainer is required for AuthProvider, but not available. " +
-                        "Provider: " + annotation.provider().getName());
-            }
             AuthProvider provider = beanContainer.beans().get(annotation.provider());
             if (provider == null) {
                 throw new IllegalStateException(
