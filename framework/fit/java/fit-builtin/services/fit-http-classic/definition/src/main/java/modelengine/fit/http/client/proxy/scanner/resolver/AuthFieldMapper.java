@@ -15,14 +15,15 @@ import modelengine.fit.http.client.proxy.support.authorization.BearerAuthorizati
  * 鉴权字段映射工具类。
  * <p>用于确定参数级别鉴权应该更新 {@link modelengine.fit.http.client.proxy.Authorization} 对象的哪个字段。</p>
  *
- * <h3>设计背景</h3>
+ * <p><b>设计背景</b></p>
  * <p>参数级别的鉴权（如 {@code @RequestAuth(type = BEARER) String token}）需要通过
  * {@code authorizationInfo(key, value)} 方法动态更新已存在的 Authorization 对象。
  * 这个 "key" 必须与 Authorization 实现类中 {@code setValue(String key, Object value)}
  * 方法能识别的字段名一致。</p>
  *
- * <h3>字段映射关系</h3>
+ * <p><b>字段映射关系</b></p>
  * <table border="1">
+ *   <caption>鉴权类型字段映射表</caption>
  *   <tr>
  *     <th>鉴权类型</th>
  *     <th>Authorization 实现</th>
@@ -53,7 +54,7 @@ import modelengine.fit.http.client.proxy.support.authorization.BearerAuthorizati
  *   </tr>
  * </table>
  *
- * <h3>使用示例</h3>
+ * <p><b>使用示例</b></p>
  * <pre>{@code
  * // 参数级别 Bearer Token
  * String api(@RequestAuth(type = BEARER) String token);
@@ -65,7 +66,7 @@ import modelengine.fit.http.client.proxy.support.authorization.BearerAuthorizati
  * // → ApiKeyAuthorization.key 从注解的 name 属性获取（"X-API-Key"）
  * }</pre>
  *
- * <h3>与 FEL Tool 系统的一致性</h3>
+ * <p><b>与 FEL Tool 系统的一致性</b></p>
  * <p>此类的设计与 FEL Tool 系统中的 JSON 配置保持一致。例如：</p>
  * <pre>{@code
  * // FEL Tool JSON 配置

@@ -16,11 +16,11 @@ import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
  * <p>负责将 {@link RequestAuth} 注解转换为可用于设置 HTTP 请求鉴权信息的 {@link DestinationSetterInfo} 对象。</p>
  * <p>复用底层的 {@link AuthorizationDestinationSetter} 机制，确保与 FEL Tool 系统架构一致。</p>
  *
- * <h3>工作原理</h3>
+ * <p><b>工作原理</b></p>
  * <p>参数级别的鉴权通过 {@link AuthorizationDestinationSetter} 动态更新已存在的 Authorization 对象。
  * 使用 {@link AuthFieldMapper} 确定应该更新 Authorization 对象的哪个字段。</p>
  *
- * <h3>使用示例</h3>
+ * <p><b>使用示例</b></p>
  * <pre>{@code
  * // Bearer Token
  * String api(@RequestAuth(type = BEARER) String token);
