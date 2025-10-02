@@ -106,4 +106,14 @@ public class TestAuthServerController {
         }
         return result;
     }
+
+    @GetMapping(path = "/basic-dynamic-username")
+    public String testBasicDynamicUsername(@RequestHeader(name = "Authorization") String authorization) {
+        return "Basic Dynamic Username: " + authorization;
+    }
+
+    @GetMapping(path = "/basic-dynamic-both")
+    public String testBasicDynamicBoth(@RequestHeader(name = "Authorization") String authorization) {
+        return "Basic Dynamic Both: " + authorization;
+    }
 }

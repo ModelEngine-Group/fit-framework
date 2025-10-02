@@ -107,4 +107,25 @@ public interface TestAuthClient extends TestAuthInterface {
     @GetMapping(path = "/combined-auth")
     @RequestAuth(type = AuthType.BEARER, provider = DynamicTokenProvider.class)
     String testCombinedAuth(@RequestAuth(type = AuthType.API_KEY, name = "X-User-Context") String userToken);
+
+    /**
+     * 参数级别的 Basic Auth - 使用参数覆盖静态配置的 username
+     * <p>演示：方法级别提供完整的 BASIC 认证（username + password），
+     * 参数级别动态覆盖 username 字段（不指定 name 时默认更新 username）</p>
+     */
+    @Override
+    @GetMapping(path = "/basic-dynamic-username")
+    @RequestAuth(type = AuthType.BASIC, username = "static-user", password = "static-password")
+    String testBasicDynamicUsername(@RequestAuth(type = AuthType.BASIC) String username);
+
+    /**
+     * 参数级别的 Basic Auth - 使用参数分别覆盖 username 和 password
+     * <p>演示：方法级别提供完整的 BASIC 认证作为基础，
+     * 参数级别使用 name 属性明确指定要覆盖的字段（username 或 password）</p>
+     */
+    @Override
+    @GetMapping(path = "/basic-dynamic-both")
+    @RequestAuth(type = AuthType.BASIC, username = "base-user", password = "base-password")
+    String testBasicDynamicBoth(@RequestAuth(type = AuthType.BASIC, name = "username") String username,
+            @RequestAuth(type = AuthType.BASIC, name = "password") String password);
 }

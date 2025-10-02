@@ -86,4 +86,21 @@ public interface TestAuthInterface {
      * @return 鉴权测试结果
      */
     String testCombinedAuth(String userToken);
+
+    /**
+     * 测试参数级别的 Basic Auth - 单参数更新 username（向后兼容）。
+     *
+     * @param username 用户名
+     * @return 鉴权测试结果
+     */
+    String testBasicDynamicUsername(String username);
+
+    /**
+     * 测试参数级别的 Basic Auth - 双参数分别更新 username 和 password。
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return 鉴权测试结果
+     */
+    String testBasicDynamicBoth(String username, String password);
 }

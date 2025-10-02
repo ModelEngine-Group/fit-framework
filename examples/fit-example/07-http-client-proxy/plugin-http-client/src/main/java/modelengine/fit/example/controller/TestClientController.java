@@ -104,7 +104,9 @@ public class TestClientController {
      */
     @GetMapping(path = "/auth-test")
     public Object authTest(@RequestQuery("method") String method,
-                          @RequestQuery(value = "token", required = false) String token) {
+            @RequestQuery(value = "token", required = false) String token,
+            @RequestQuery(value = "username", required = false) String username,
+            @RequestQuery(value = "password", required = false) String password) {
         switch (method) {
             case "bearerStatic":
                 return authClient.testBearerStatic();
@@ -112,6 +114,11 @@ public class TestClientController {
                 return authClient.testBearerDynamic(token != null ? token : "dynamic-test-token");
             case "basicStatic":
                 return authClient.testBasicStatic();
+            case "basicDynamicUsername":
+                return authClient.testBasicDynamicUsername(username != null ? username : "testuser");
+            case "basicDynamicBoth":
+                return authClient.testBasicDynamicBoth(username != null ? username : "testuser",
+                        password != null ? password : "testpass");
             case "apiKeyHeaderStatic":
                 return authClient.testApiKeyHeaderStatic();
             case "apiKeyQueryStatic":

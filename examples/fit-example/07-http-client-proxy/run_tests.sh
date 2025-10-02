@@ -174,6 +174,18 @@ run_basic_tests() {
     run_test "Basic Static Auth" \
         "curl -s --max-time $TIMEOUT -X GET \"$BASE_URL/basic-static\" -H \"Authorization: Basic YWRtaW46c2VjcmV0MTIz\" -H \"X-Service-Key: service-default-key\"" \
         "Basic Static Auth: Basic YWRtaW46c2VjcmV0MTIz"
+
+    # testuser:static-password 的 base64 编码 (dGVzdHVzZXI6c3RhdGljLXBhc3N3b3Jk)
+    # 参数覆盖 username: testuser，保留方法级别的 password: static-password
+    run_test "Basic Dynamic Username" \
+        "curl -s --max-time $TIMEOUT -X GET \"$BASE_URL/basic-dynamic-username\" -H \"Authorization: Basic dGVzdHVzZXI6c3RhdGljLXBhc3N3b3Jk\"" \
+        "Basic Dynamic Username: Basic dGVzdHVzZXI6c3RhdGljLXBhc3N3b3Jk"
+
+    # testuser:testpass 的 base64 编码 (dGVzdHVzZXI6dGVzdHBhc3M=)
+    # 参数分别覆盖 username 和 password
+    run_test "Basic Dynamic Both" \
+        "curl -s --max-time $TIMEOUT -X GET \"$BASE_URL/basic-dynamic-both\" -H \"Authorization: Basic dGVzdHVzZXI6dGVzdHBhc3M=\"" \
+        "Basic Dynamic Both: Basic dGVzdHVzZXI6dGVzdHBhc3M="
 }
 
 # API Key 测试

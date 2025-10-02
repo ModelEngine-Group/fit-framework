@@ -10,10 +10,12 @@ import modelengine.fit.http.client.proxy.auth.AuthType;
 import modelengine.fit.http.client.proxy.support.authorization.ApiKeyAuthorization;
 import modelengine.fit.http.client.proxy.support.authorization.BasicAuthorization;
 import modelengine.fit.http.client.proxy.support.authorization.BearerAuthorization;
+import modelengine.fitframework.util.StringUtils;
 
 /**
  * 鉴权字段映射工具类。
- * <p>用于确定参数级别鉴权应该更新 {@link modelengine.fit.http.client.proxy.Authorization} 对象的哪个字段。</p>
+ * <p>用于确定参数级别鉴权应该更新 {@link modelengine.fit.http.client.proxy.Authorization}
+ * 对象的哪个字段。</p>
  *
  * <p><b>设计背景</b></p>
  * <p>参数级别的鉴权（如 {@code @RequestAuth(type = BEARER) String token}）需要通过
@@ -111,12 +113,26 @@ public final class AuthFieldMapper {
      * <ul>
      * <li><b>BEARER</b>: 返回 {@code "token"}，更新 Bearer Token 值。
      *     <br/>示例：{@code @RequestAuth(type = BEARER) String token}
-     *     <br/>效果：更新 {@code BearerAuthorization.token} 字段</li>
+     *     <br/>效果：更新 {@code BearerAuthorization.token} 字段
+     *     <br/>注意：{@code name} 属性对 BEARER 无效</li>
      *
-     * <li><b>BASIC</b>: 返回 {@code "username"}，只能更新用户名。
-     *     <br/>注意：如需同时设置用户名和密码，建议使用静态配置（方法或类级别的 @RequestAuth）
-     *     <br/>示例：{@code @RequestAuth(type = BASIC) String username}
-     *     <br/>效果：更新 {@code BasicAuthorization.username} 字段</li>
+     * <li><b>BASIC</b>: 根据 {@code name} 属性决定更新哪个字段。
+     *     <br/><b>name 属性行为：</b>
+     *     <ul>
+     *       <li>{@code name = "username"}: 更新 {@code BasicAuthorization.username} 字段</li>
+     *       <li>{@code name = "password"}: 更新 {@code BasicAuthorization.password} 字段</li>
+     *       <li>{@code name} 未指定或为空: 默认更新 {@code username} 字段（向后兼容）</li>
+     *     </ul>
+     *     <br/>单字段示例：{@code @RequestAuth(type = BASIC) String username}
+     *     <br/>效果：更新 {@code BasicAuthorization.username} 字段
+     *     <br/><br/>双字段示例（推荐）：
+     *     <pre>{@code
+     * String login(
+     *     @RequestAuth(type = BASIC, name = "username") String user,
+     *     @RequestAuth(type = BASIC, name = "password") String pwd
+     * );
+     *     }</pre>
+     *     效果：同时更新 {@code username} 和 {@code password} 字段</li>
      *
      * <li><b>API_KEY</b>: 返回 {@code "value"}，更新 API Key 的值（而非名称）。
      *     <br/>关键理解：API Key 有两个概念：
@@ -133,24 +149,53 @@ public final class AuthFieldMapper {
      *       <li>{@code ApiKeyAuthorization.value} = apiKeyValue （从参数，本方法返回的字段）</li>
      *       <li>最终 HTTP Header: {@code X-API-Key: apiKeyValue}</li>
      *     </ul>
-     * </li>
+     *     注意：对于 API_KEY，{@code name} 属性必须指定 HTTP Header/Query 名称，
+     *     不能用于字段选择</li>
      * </ul>
      *
-     * @param type 鉴权类型
-     * @return Authorization 对象的字段名，用于 {@code authorization.set(fieldName, value)} 调用
-     * @throws IllegalArgumentException 如果鉴权类型不支持参数级别动态更新
+     * <p><b>name 属性的语义重载：</b></p>
+     * <p>{@code name} 属性在不同鉴权类型下有不同含义：</p>
+     * <ul>
+     *   <li><b>BASIC</b>: 指定要更新的字段名（"username" 或 "password"）</li>
+     *   <li><b>API_KEY</b>: 指定 HTTP Header/Query 的名称（如 "X-API-Key"）</li>
+     *   <li><b>BEARER</b>: 无效，被忽略</li>
+     * </ul>
+     *
+     * @param type 表示鉴权类型的 {@link AuthType}。
+     * @param nameAttribute 注解的 {@code name} 属性值，可能为 {@code null} 或空字符串。
+     * @return Authorization 对象的字段名，用于 {@code authorization.set(fieldName, value)} 调用。
+     * @throws IllegalArgumentException 如果鉴权类型不支持参数级别动态更新，或 BASIC 类型的
+     *                                  {@code name} 属性值无效（不是 "username" 或 "password"）。
      */
-    public static String getParameterAuthField(AuthType type) {
+    public static String getParameterAuthField(AuthType type, String nameAttribute) {
         switch (type) {
             case BEARER:
                 // 参考 BearerAuthorization.AUTH_TOKEN = "token"
                 // setValue() 方法: if (key.equals("token")) { this.token = value; }
+                // name 属性对 BEARER 无效，直接忽略
                 return "token";
 
             case BASIC:
-                // 参考 BasicAuthorization.AUTH_USER_NAME = "username"
-                // setValue() 方法: if (key.equals("username")) { this.username = value; }
-                // 注意：只返回 username，password 需要静态配置或单独处理
+                // 参考 BasicAuthorization.AUTH_USER_NAME = "username", AUTH_USER_PWD = "password"
+                // setValue() 方法:
+                //   if (key.equals("username")) { this.username = value; }
+                //   if (key.equals("password")) { this.password = value; }
+                //
+                // name 属性用于指定要更新的字段：
+                // - name = "username": 更新 username 字段
+                // - name = "password": 更新 password 字段
+                // - name 未指定或为空: 默认更新 username（向后兼容）
+                if (StringUtils.isNotBlank(nameAttribute)) {
+                    if (StringUtils.equals("username", nameAttribute)) {
+                        return "username";
+                    } else if (StringUtils.equals("password", nameAttribute)) {
+                        return "password";
+                    } else {
+                        throw new IllegalArgumentException(
+                            "For BASIC auth, name attribute must be 'username' or 'password', got: " + nameAttribute);
+                    }
+                }
+                // 默认行为：更新 username（向后兼容）
                 return "username";
 
             case API_KEY:
@@ -162,6 +207,10 @@ public final class AuthFieldMapper {
                 //   这个值来自注解的 name 属性，在静态鉴权时设置
                 // - ApiKeyAuthorization.value 字段存储的是实际的 API Key 值
                 //   这个值来自参数传入，是参数级别需要动态更新的字段
+                //
+                // 注意：对于 API_KEY，name 属性的含义与 BASIC 不同
+                // - API_KEY 的 name: HTTP Header/Query 的名称（不影响此方法返回值）
+                // - BASIC 的 name: 要更新的字段名（影响此方法返回值）
                 return "value";
 
             case CUSTOM:

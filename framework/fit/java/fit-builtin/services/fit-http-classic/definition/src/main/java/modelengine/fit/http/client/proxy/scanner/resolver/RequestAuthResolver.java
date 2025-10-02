@@ -40,8 +40,9 @@ public class RequestAuthResolver implements ParamResolver<RequestAuth> {
     @Override
     public DestinationSetterInfo resolve(RequestAuth annotation, String jsonPath) {
         // 使用 AuthFieldMapper 获取应该更新的 Authorization 字段名
+        // 传入 name 属性以支持 BASIC 类型的字段选择（username 或 password）
         // 这确保了与 FEL Tool 系统的一致性
-        String authField = AuthFieldMapper.getParameterAuthField(annotation.type());
+        String authField = AuthFieldMapper.getParameterAuthField(annotation.type(), annotation.name());
         return new DestinationSetterInfo(new AuthorizationDestinationSetter(authField), jsonPath);
     }
 }
