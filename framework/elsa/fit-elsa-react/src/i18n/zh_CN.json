@@ -726,5 +726,6 @@
   "textConcatenateNodeTitle": "文本拼接",
   "concatenatedTextLabel": "拼接文本",
   "add": "新增",
-  "value": "值"
+  "value": "值",
+  "replyTextLabel": "回复内容"
 }
