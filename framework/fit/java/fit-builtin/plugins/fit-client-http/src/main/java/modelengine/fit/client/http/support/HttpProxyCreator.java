@@ -67,7 +67,7 @@ public class HttpProxyCreator implements BeanContainerInitializedObserver {
         }
         List<Class<?>> classes = this.scan(container, packages);
         for (Class<?> clazz : classes) {
-            AnnotationParser annotationParser = new AnnotationParser(this.valueFetcher);
+            AnnotationParser annotationParser = new AnnotationParser(this.valueFetcher, container);
             Map<Method, HttpInfo> httpInfoMap = annotationParser.parseInterface(clazz);
             // Scan all interfaces, create proxy objects for each, and register them in the container.
             container.registry()

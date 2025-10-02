@@ -37,6 +37,7 @@ import modelengine.fit.http.client.proxy.scanner.resolver.RequestQueryResolver;
 import modelengine.fit.http.client.proxy.support.applier.MultiDestinationsPropertyValueApplier;
 import modelengine.fit.http.client.proxy.support.applier.StaticAuthApplier;
 import modelengine.fit.http.client.proxy.support.setter.DestinationSetterInfo;
+import modelengine.fitframework.ioc.BeanContainer;
 import modelengine.fitframework.util.ArrayUtils;
 import modelengine.fitframework.util.ReflectionUtils;
 import modelengine.fitframework.util.StringUtils;
@@ -82,14 +83,17 @@ public class AnnotationParser {
     }
 
     private final ValueFetcher valueFetcher;
+    private final BeanContainer beanContainer;
 
     /**
      * Constructs an AnnotationParser with the specified ValueFetcher.
      *
-     * @param valueFetcher The ValueFetcher used to fetch values for property setters.
+     * @param valueFetcher The {@link ValueFetcher} used to fetch values for property setters.
+     * @param beanContainer The {@link BeanContainer} used to retrieve beans.
      */
-    public AnnotationParser(ValueFetcher valueFetcher) {
+    public AnnotationParser(ValueFetcher valueFetcher, BeanContainer beanContainer) {
         this.valueFetcher = notNull(valueFetcher, "The value fetcher cannot be null.");
+        this.beanContainer = notNull(beanContainer, "The bean container cannot be null.");
     }
 
     /**
@@ -211,7 +215,7 @@ public class AnnotationParser {
         List<PropertyValueApplier> appliers = new ArrayList<>();
         RequestAuth[] authAnnotations = clazz.getAnnotationsByType(RequestAuth.class);
         for (RequestAuth auth : authAnnotations) {
-            appliers.add(new StaticAuthApplier(auth));
+            appliers.add(new StaticAuthApplier(auth, this.beanContainer));
         }
         return appliers;
     }
@@ -220,7 +224,7 @@ public class AnnotationParser {
         List<PropertyValueApplier> appliers = new ArrayList<>();
         RequestAuth[] authAnnotations = method.getAnnotationsByType(RequestAuth.class);
         for (RequestAuth auth : authAnnotations) {
-            appliers.add(new StaticAuthApplier(auth));
+            appliers.add(new StaticAuthApplier(auth, this.beanContainer));
         }
         return appliers;
     }

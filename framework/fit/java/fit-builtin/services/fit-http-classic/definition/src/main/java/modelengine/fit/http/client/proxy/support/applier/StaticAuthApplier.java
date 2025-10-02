@@ -24,33 +24,22 @@ import modelengine.fitframework.util.StringUtils;
  * @since 2025-09-30
  */
 public class StaticAuthApplier implements PropertyValueApplier {
-    private final RequestAuth authAnnotation;
-    private Authorization cachedAuthorization;
+    private final Authorization authorization;
 
     /**
-     * 使用指定的鉴权注解初始化 {@link StaticAuthApplier} 的新实例。
+     * 使用指定的鉴权注解和 BeanContainer 初始化 {@link StaticAuthApplier} 的新实例。
      *
      * @param authAnnotation 表示鉴权注解的 {@link RequestAuth}。
+     * @param beanContainer Bean 容器，用于获取 AuthProvider（可能为 null，如果不使用 Provider）。
      */
-    public StaticAuthApplier(RequestAuth authAnnotation) {
-        this.authAnnotation = authAnnotation;
-        // 如果不使用 Provider，可以提前创建 Authorization
-        if (authAnnotation.provider() == AuthProvider.class) {
-            this.cachedAuthorization = this.createAuthorizationFromAnnotation(authAnnotation, null);
-        }
+    public StaticAuthApplier(RequestAuth authAnnotation, BeanContainer beanContainer) {
+        this.authorization = this.createAuthorizationFromAnnotation(authAnnotation, beanContainer);
     }
 
     @Override
     public void apply(RequestBuilder requestBuilder, Object value) {
-        // 如果还未创建 Authorization（使用了 Provider 但还未调用 setBeanContainer）
-        if (this.cachedAuthorization == null) {
-            throw new IllegalStateException(
-                    "Authorization has not been created. " +
-                    "If using AuthProvider, ensure setBeanContainer() is called before apply().");
-        }
-
         // 静态鉴权不需要参数值，直接将 Authorization 对象设置到 RequestBuilder
-        requestBuilder.authorization(this.cachedAuthorization);
+        requestBuilder.authorization(this.authorization);
     }
 
     private Authorization createAuthorizationFromAnnotation(RequestAuth annotation, BeanContainer beanContainer) {
@@ -103,16 +92,4 @@ public class StaticAuthApplier implements PropertyValueApplier {
         }
     }
 
-    /**
-     * 设置 BeanContainer 以支持 AuthProvider。
-     * 在运行时由 HttpInvocationHandler 调用。
-     *
-     * @param beanContainer Bean 容器
-     */
-    public void setBeanContainer(BeanContainer beanContainer) {
-        // 如果使用了 Provider 且还未创建 Authorization，现在创建
-        if (this.cachedAuthorization == null && this.authAnnotation.provider() != AuthProvider.class) {
-            this.cachedAuthorization = this.createAuthorizationFromAnnotation(this.authAnnotation, beanContainer);
-        }
-    }
 }

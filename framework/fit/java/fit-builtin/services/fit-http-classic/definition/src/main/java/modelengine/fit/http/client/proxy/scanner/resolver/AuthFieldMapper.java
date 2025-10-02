@@ -68,10 +68,10 @@ import modelengine.fitframework.util.StringUtils;
  * // → ApiKeyAuthorization.key 从注解的 name 属性获取（"X-API-Key"）
  * }</pre>
  *
- * <p><b>与 FEL Tool 系统的一致性</b></p>
- * <p>此类的设计与 FEL Tool 系统中的 JSON 配置保持一致。例如：</p>
+ * <p><b>与 Tool 系统的一致性</b></p>
+ * <p>此类的设计与 Tool 系统中的 JSON 配置保持一致。例如：</p>
  * <pre>{@code
- * // FEL Tool JSON 配置
+ * // Tool JSON 配置
  * {
  *   "mappings": {
  *     "people": {
@@ -90,15 +90,14 @@ import modelengine.fitframework.util.StringUtils;
  * }</pre>
  *
  * @author 季聿阶
- * @since 2025-10-01
  * @see modelengine.fit.http.client.proxy.Authorization
  * @see modelengine.fit.http.client.proxy.support.setter.AuthorizationDestinationSetter
  * @see BearerAuthorization
  * @see BasicAuthorization
  * @see ApiKeyAuthorization
+ * @since 2025-10-01
  */
 public final class AuthFieldMapper {
-
     private AuthFieldMapper() {
         // 工具类，禁止实例化
     }
@@ -165,17 +164,16 @@ public final class AuthFieldMapper {
      * @param nameAttribute 注解的 {@code name} 属性值，可能为 {@code null} 或空字符串。
      * @return Authorization 对象的字段名，用于 {@code authorization.set(fieldName, value)} 调用。
      * @throws IllegalArgumentException 如果鉴权类型不支持参数级别动态更新，或 BASIC 类型的
-     *                                  {@code name} 属性值无效（不是 "username" 或 "password"）。
+     * {@code name} 属性值无效（不是 "username" 或 "password"）。
      */
     public static String getParameterAuthField(AuthType type, String nameAttribute) {
-        switch (type) {
-            case BEARER:
+        return switch (type) {
+            case BEARER ->
                 // 参考 BearerAuthorization.AUTH_TOKEN = "token"
                 // setValue() 方法: if (key.equals("token")) { this.token = value; }
                 // name 属性对 BEARER 无效，直接忽略
-                return "token";
-
-            case BASIC:
+                    "token";
+            case BASIC -> {
                 // 参考 BasicAuthorization.AUTH_USER_NAME = "username", AUTH_USER_PWD = "password"
                 // setValue() 方法:
                 //   if (key.equals("username")) { this.username = value; }
@@ -187,18 +185,20 @@ public final class AuthFieldMapper {
                 // - name 未指定或为空: 默认更新 username（向后兼容）
                 if (StringUtils.isNotBlank(nameAttribute)) {
                     if (StringUtils.equals("username", nameAttribute)) {
-                        return "username";
+                        yield "username";
                     } else if (StringUtils.equals("password", nameAttribute)) {
-                        return "password";
+                        yield "password";
                     } else {
                         throw new IllegalArgumentException(
-                            "For BASIC auth, name attribute must be 'username' or 'password', got: " + nameAttribute);
+                                "For BASIC auth, name attribute must be 'username' or 'password', got: "
+                                        + nameAttribute);
                     }
                 }
                 // 默认行为：更新 username（向后兼容）
-                return "username";
-
-            case API_KEY:
+                yield "username";
+                // 默认行为：更新 username（向后兼容）
+            }
+            case API_KEY ->
                 // 参考 ApiKeyAuthorization.AUTH_VALUE = "value"
                 // setValue() 方法: if (key.equals("value")) { this.value = value; }
                 //
@@ -211,15 +211,9 @@ public final class AuthFieldMapper {
                 // 注意：对于 API_KEY，name 属性的含义与 BASIC 不同
                 // - API_KEY 的 name: HTTP Header/Query 的名称（不影响此方法返回值）
                 // - BASIC 的 name: 要更新的字段名（影响此方法返回值）
-                return "value";
-
-            case CUSTOM:
-                throw new IllegalArgumentException(
+                    "value";
+            case CUSTOM -> throw new IllegalArgumentException(
                     "CUSTOM auth type must use AuthProvider, not supported for parameter-level auth");
-
-            default:
-                throw new IllegalArgumentException(
-                    "Unsupported auth type for parameter-level auth: " + type);
-        }
+        };
     }
 }
