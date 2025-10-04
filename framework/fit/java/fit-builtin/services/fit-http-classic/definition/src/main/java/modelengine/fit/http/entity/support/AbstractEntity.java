@@ -12,6 +12,8 @@ import modelengine.fit.http.HttpMessage;
 import modelengine.fit.http.entity.Entity;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * 表示 {@link Entity} 的抽象实现。
@@ -36,6 +38,11 @@ public abstract class AbstractEntity implements Entity {
     @Override
     public HttpMessage belongTo() {
         return this.httpMessage;
+    }
+
+    @Override
+    public Map<String, String> resolvedParameters() {
+        return Collections.emptyMap();
     }
 
     @Override

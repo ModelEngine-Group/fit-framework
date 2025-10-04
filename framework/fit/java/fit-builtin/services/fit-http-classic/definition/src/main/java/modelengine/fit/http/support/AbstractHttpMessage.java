@@ -118,8 +118,13 @@ public abstract class AbstractHttpMessage implements HttpMessage {
         if (isPresent) {
             return;
         }
+        ParameterCollection mergedParameters = ParameterCollection.create();
+        for (String key : this.parameters.keys()) {
+            this.parameters.get(key).ifPresent(value -> mergedParameters.set(key, value));
+        }
+        entity.resolvedParameters().forEach(mergedParameters::set);
         ContentType contentType =
-                HeaderValue.create(entity.resolvedMimeType().value(), this.parameters).toContentType();
+                HeaderValue.create(entity.resolvedMimeType().value(), mergedParameters).toContentType();
         notNull(contentType,
                 () -> new UnsupportedOperationException(StringUtils.format(
                         "Not supported entity type. " + "[entityType={0}]", entity.getClass().getName())));

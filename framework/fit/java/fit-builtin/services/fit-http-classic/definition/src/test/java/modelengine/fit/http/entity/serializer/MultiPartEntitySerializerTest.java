@@ -18,13 +18,17 @@ import modelengine.fit.http.entity.EntityWriteException;
 import modelengine.fit.http.entity.FileEntity;
 import modelengine.fit.http.entity.NamedEntity;
 import modelengine.fit.http.entity.PartitionedEntity;
+import modelengine.fit.http.entity.TextEntity;
+import modelengine.fit.http.entity.support.DefaultNamedEntity;
 import modelengine.fit.http.entity.support.DefaultPartitionedEntity;
+import modelengine.fit.http.entity.support.DefaultTextEntity;
 import modelengine.fit.http.header.ContentType;
 import modelengine.fit.http.header.HeaderValue;
 import modelengine.fit.http.header.ParameterCollection;
 import modelengine.fit.http.header.support.DefaultContentType;
 import modelengine.fit.http.header.support.DefaultHeaderValue;
 import modelengine.fit.http.header.support.DefaultParameterCollection;
+import modelengine.fit.http.util.HttpUtils;
 import modelengine.fitframework.util.IoUtils;
 import modelengine.fitframework.util.StringUtils;
 
@@ -62,14 +66,147 @@ public class MultiPartEntitySerializerTest {
         }
     }
 
-    @Test
-    @DisplayName("调用 serializeEntity() 方法，抛出异常")
-    void invokeSerializeEntityMethodThenThrowException() {
-        List<NamedEntity> list = new ArrayList<>();
-        this.entity = new DefaultPartitionedEntity(this.httpMessage, list);
-        EntityWriteException entityWriteException = catchThrowableOfType(EntityWriteException.class,
-                () -> this.multiPartEntitySerializer.serializeEntity(this.entity, this.charset));
-        assertThat(entityWriteException).hasMessage("Unsupported to serialize entity of Content-Type 'multipart/*'.");
+    @Nested
+    @DisplayName("测试 serializeEntity() 方法")
+    class TestSerialize {
+        private EntitySerializer<PartitionedEntity> getSerializer() {
+            return MultiPartEntitySerializerTest.this.multiPartEntitySerializer;
+        }
+
+        @Test
+        @DisplayName("没有设置 Content-Type 时，抛出异常")
+        void givenNoContentTypeThenThrowException() {
+            List<NamedEntity> list = new ArrayList<>();
+            MultiPartEntitySerializerTest.this.entity = new DefaultPartitionedEntity(
+                    MultiPartEntitySerializerTest.this.httpMessage, list);
+            EntityWriteException entityWriteException = catchThrowableOfType(EntityWriteException.class,
+                    () -> this.getSerializer().serializeEntity(MultiPartEntitySerializerTest.this.entity,
+                            MultiPartEntitySerializerTest.this.charset));
+            assertThat(entityWriteException).hasMessage("The boundary is not present in Content-Type.");
+        }
+
+        @Test
+        @DisplayName("序列化空的分块实体，返回终止分隔符")
+        void givenEmptyEntitiesThenReturnEndBoundary() {
+            List<NamedEntity> list = new ArrayList<>();
+            MultiPartEntitySerializerTest.this.entity = new DefaultPartitionedEntity(
+                    MultiPartEntitySerializerTest.this.httpMessage, list);
+            // Mock Content-Type with boundary
+            when(MultiPartEntitySerializerTest.this.httpMessage.contentType())
+                    .thenReturn(Optional.of(new DefaultContentType(
+                            HttpUtils.parseHeaderValue("multipart/form-data; boundary=test-boundary"))));
+
+            byte[] result = this.getSerializer()
+                    .serializeEntity(MultiPartEntitySerializerTest.this.entity, MultiPartEntitySerializerTest.this.charset);
+            String resultStr = new String(result, MultiPartEntitySerializerTest.this.charset);
+            assertThat(resultStr).isEqualTo("----test-boundary--\r\n");
+        }
+
+        @Test
+        @DisplayName("序列化包含文本字段的分块实体")
+        void givenTextFieldThenSerialize() {
+            List<NamedEntity> list = new ArrayList<>();
+            TextEntity textEntity = new DefaultTextEntity(MultiPartEntitySerializerTest.this.httpMessage, "test-content");
+            NamedEntity namedEntity = new DefaultNamedEntity(MultiPartEntitySerializerTest.this.httpMessage,
+                    "field-name", textEntity);
+            list.add(namedEntity);
+            MultiPartEntitySerializerTest.this.entity = new DefaultPartitionedEntity(
+                    MultiPartEntitySerializerTest.this.httpMessage, list);
+
+            when(MultiPartEntitySerializerTest.this.httpMessage.contentType())
+                    .thenReturn(Optional.of(new DefaultContentType(
+                            HttpUtils.parseHeaderValue("multipart/form-data; boundary=test-boundary"))));
+
+            byte[] result = this.getSerializer()
+                    .serializeEntity(MultiPartEntitySerializerTest.this.entity, MultiPartEntitySerializerTest.this.charset);
+            String resultStr = new String(result, MultiPartEntitySerializerTest.this.charset);
+
+            String expected = """
+                    ----test-boundary\r
+                    Content-Disposition: form-data; name="field-name"\r
+                    \r
+                    test-content\r
+                    ----test-boundary--\r
+                    """;
+            assertThat(resultStr).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("序列化包含文件的分块实体")
+        void givenFileFieldThenSerialize() throws IOException {
+            List<NamedEntity> list = new ArrayList<>();
+            byte[] fileContent = "file content".getBytes(MultiPartEntitySerializerTest.this.charset);
+            FileEntity fileEntity = FileEntity.createInline(MultiPartEntitySerializerTest.this.httpMessage,
+                    "test.txt", new java.io.ByteArrayInputStream(fileContent), fileContent.length);
+            NamedEntity namedEntity = new DefaultNamedEntity(MultiPartEntitySerializerTest.this.httpMessage,
+                    "file-field", fileEntity);
+            list.add(namedEntity);
+            MultiPartEntitySerializerTest.this.entity = new DefaultPartitionedEntity(
+                    MultiPartEntitySerializerTest.this.httpMessage, list);
+
+            when(MultiPartEntitySerializerTest.this.httpMessage.contentType())
+                    .thenReturn(Optional.of(new DefaultContentType(
+                            HttpUtils.parseHeaderValue("multipart/form-data; boundary=test-boundary"))));
+
+            byte[] result = this.getSerializer()
+                    .serializeEntity(MultiPartEntitySerializerTest.this.entity, MultiPartEntitySerializerTest.this.charset);
+            String resultStr = new String(result, MultiPartEntitySerializerTest.this.charset);
+
+            String expected = """
+                    ----test-boundary\r
+                    Content-Disposition: form-data; name="file-field"; filename="test.txt"\r
+                    Content-Type: text/plain\r
+                    \r
+                    file content\r
+                    ----test-boundary--\r
+                    """;
+            assertThat(resultStr).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("序列化混合文本和文件的分块实体")
+        void givenMixedFieldsThenSerialize() throws IOException {
+            List<NamedEntity> list = new ArrayList<>();
+
+            // Add text field
+            TextEntity textEntity = new DefaultTextEntity(MultiPartEntitySerializerTest.this.httpMessage, "text-value");
+            NamedEntity textNamedEntity = new DefaultNamedEntity(MultiPartEntitySerializerTest.this.httpMessage,
+                    "text-field", textEntity);
+            list.add(textNamedEntity);
+
+            // Add file field
+            byte[] fileContent = "file data".getBytes(MultiPartEntitySerializerTest.this.charset);
+            FileEntity fileEntity = FileEntity.createInline(MultiPartEntitySerializerTest.this.httpMessage,
+                    "document.pdf", new java.io.ByteArrayInputStream(fileContent), fileContent.length);
+            NamedEntity fileNamedEntity = new DefaultNamedEntity(MultiPartEntitySerializerTest.this.httpMessage,
+                    "file-field", fileEntity);
+            list.add(fileNamedEntity);
+
+            MultiPartEntitySerializerTest.this.entity = new DefaultPartitionedEntity(
+                    MultiPartEntitySerializerTest.this.httpMessage, list);
+
+            when(MultiPartEntitySerializerTest.this.httpMessage.contentType())
+                    .thenReturn(Optional.of(new DefaultContentType(
+                            HttpUtils.parseHeaderValue("multipart/form-data; boundary=test-boundary"))));
+
+            byte[] result = this.getSerializer()
+                    .serializeEntity(MultiPartEntitySerializerTest.this.entity, MultiPartEntitySerializerTest.this.charset);
+            String resultStr = new String(result, MultiPartEntitySerializerTest.this.charset);
+
+            String expected = """
+                    ----test-boundary\r
+                    Content-Disposition: form-data; name="text-field"\r
+                    \r
+                    text-value\r
+                    ----test-boundary\r
+                    Content-Disposition: form-data; name="file-field"; filename="document.pdf"\r
+                    Content-Type: application/octet-stream\r
+                    \r
+                    file data\r
+                    ----test-boundary--\r
+                    """;
+            assertThat(resultStr).isEqualTo(expected);
+        }
     }
 
     @Nested

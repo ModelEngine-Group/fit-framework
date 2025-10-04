@@ -18,6 +18,7 @@ import modelengine.fit.http.entity.EntityWriteException;
 import modelengine.fit.http.entity.FileEntity;
 import modelengine.fit.http.entity.NamedEntity;
 import modelengine.fit.http.entity.PartitionedEntity;
+import modelengine.fit.http.entity.TextEntity;
 import modelengine.fit.http.entity.support.DefaultNamedEntity;
 import modelengine.fit.http.entity.support.DefaultPartitionedEntity;
 import modelengine.fit.http.entity.support.DefaultTextEntity;
@@ -82,7 +83,111 @@ public class MultiPartEntitySerializer implements EntitySerializer<PartitionedEn
 
     @Override
     public void serializeEntity(@Nonnull PartitionedEntity entity, Charset charset, OutputStream out) {
-        throw new EntityWriteException("Unsupported to serialize entity of Content-Type 'multipart/*'.");
+        String boundary = this.getBoundary(entity);
+        try {
+            for (NamedEntity namedEntity : entity.entities()) {
+                this.writeBoundary(out, boundary, charset, false);
+                this.writeHeaders(out, namedEntity, charset);
+                this.writeEntityContent(out, namedEntity, charset);
+            }
+            this.writeBoundary(out, boundary, charset, true);
+        } catch (IOException e) {
+            throw new EntityWriteException("Failed to serialize entity of Content-Type 'multipart/*'.", e);
+        }
+    }
+
+    /**
+     * 获取 boundary 分隔符。
+     *
+     * @param entity 表示分块的消息体数据的 {@link PartitionedEntity}。
+     * @return 表示 boundary 分隔符的 {@link String}。
+     */
+    private String getBoundary(PartitionedEntity entity) {
+        String boundary = entity.belongTo()
+                .contentType()
+                .flatMap(ContentType::boundary)
+                .orElseThrow(() -> new EntityWriteException("The boundary is not present in Content-Type."));
+        return BOUNDARY_SURROUND + boundary;
+    }
+
+    /**
+     * 写入分隔符。
+     *
+     * @param out 表示输出流的 {@link OutputStream}。
+     * @param boundary 表示 boundary 分隔符的 {@link String}。
+     * @param charset 表示字符集的 {@link Charset}。
+     * @param isEnd 表示是否是终止分隔符的 {@code boolean}。
+     * @throws IOException 当发生 I/O 异常时。
+     */
+    private void writeBoundary(OutputStream out, String boundary, Charset charset, boolean isEnd) throws IOException {
+        out.write(BOUNDARY_SURROUND.getBytes(charset));
+        out.write(boundary.getBytes(charset));
+        if (isEnd) {
+            out.write(BOUNDARY_SURROUND.getBytes(charset));
+        }
+        out.write(CR);
+        out.write(LF);
+    }
+
+    /**
+     * 写入消息头。
+     *
+     * @param out 表示输出流的 {@link OutputStream}。
+     * @param namedEntity 表示带名字的消息体数据的 {@link NamedEntity}。
+     * @param charset 表示字符集的 {@link Charset}。
+     * @throws IOException 当发生 I/O 异常时。
+     */
+    private void writeHeaders(OutputStream out, NamedEntity namedEntity, Charset charset) throws IOException {
+        // Write Content-Disposition header
+        StringBuilder disposition = new StringBuilder("Content-Disposition: form-data");
+        if (!StringUtils.isEmpty(namedEntity.name())) {
+            disposition.append("; name=\"").append(namedEntity.name()).append("\"");
+        }
+        if (namedEntity.isFile()) {
+            FileEntity fileEntity = namedEntity.asFile();
+            disposition.append("; filename=\"").append(fileEntity.filename()).append("\"");
+        }
+        out.write(disposition.toString().getBytes(charset));
+        out.write(CR);
+        out.write(LF);
+
+        // Write Content-Type header if it's a file
+        if (namedEntity.isFile()) {
+            Entity innerEntity = namedEntity.entity();
+            String contentType = "Content-Type: " + innerEntity.resolvedMimeType().value();
+            out.write(contentType.getBytes(charset));
+            out.write(CR);
+            out.write(LF);
+        }
+
+        // Write empty line
+        out.write(CR);
+        out.write(LF);
+    }
+
+    /**
+     * 写入实体内容。
+     *
+     * @param out 表示输出流的 {@link OutputStream}。
+     * @param namedEntity 表示带名字的消息体数据的 {@link NamedEntity}。
+     * @param charset 表示字符集的 {@link Charset}。
+     * @throws IOException 当发生 I/O 异常时。
+     */
+    private void writeEntityContent(OutputStream out, NamedEntity namedEntity, Charset charset) throws IOException {
+        Entity innerEntity = namedEntity.entity();
+        if (namedEntity.isText()) {
+            TextEntity textEntity = cast(innerEntity);
+            out.write(textEntity.content().getBytes(charset));
+        } else if (namedEntity.isFile()) {
+            FileEntity fileEntity = cast(innerEntity);
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = fileEntity.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+        out.write(CR);
+        out.write(LF);
     }
 
     @Override

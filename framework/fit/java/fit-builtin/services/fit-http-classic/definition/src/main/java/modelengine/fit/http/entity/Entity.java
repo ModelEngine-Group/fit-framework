@@ -14,6 +14,7 @@ import modelengine.fitframework.model.MultiValueMap;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * 表示消息体内的数据。
@@ -36,6 +37,15 @@ public interface Entity extends Closeable {
      */
     @Nonnull
     MimeType resolvedMimeType();
+
+    /**
+     * 获取实体的 Content-Type 额外参数。
+     * <p>例如，对于 multipart/form-data，需要返回包含 boundary 参数的 Map。</p>
+     *
+     * @return 表示实体的 Content-Type 额外参数的 {@link Map}{@code <}{@link String}{@code , }{@link String}{@code >}。
+     */
+    @Nonnull
+    Map<String, String> resolvedParameters();
 
     /**
      * 通过指定的字节数组，按照 {@link java.nio.charset.StandardCharsets#UTF_8} 创建文本消息体数据。
