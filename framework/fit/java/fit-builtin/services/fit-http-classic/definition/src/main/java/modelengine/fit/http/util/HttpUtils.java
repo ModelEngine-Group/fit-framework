@@ -6,8 +6,15 @@
 
 package modelengine.fit.http.util;
 
+import static modelengine.fit.http.protocol.CookieAttributeNames.DOMAIN;
+import static modelengine.fit.http.protocol.CookieAttributeNames.HTTP_ONLY;
+import static modelengine.fit.http.protocol.CookieAttributeNames.MAX_AGE;
+import static modelengine.fit.http.protocol.CookieAttributeNames.PATH;
+import static modelengine.fit.http.protocol.CookieAttributeNames.SAME_SITE;
+import static modelengine.fit.http.protocol.CookieAttributeNames.SECURE;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
+import modelengine.fit.http.Cookie;
 import modelengine.fit.http.header.HeaderValue;
 import modelengine.fit.http.header.ParameterCollection;
 import modelengine.fit.http.header.support.DefaultHeaderValue;
@@ -21,9 +28,16 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Http 协议相关的工具类。
@@ -35,6 +49,155 @@ import java.util.List;
 public class HttpUtils {
 
     private static final char STRING_VALUE_SURROUNDED = '\"';
+
+    /**
+     * 将给定的 {@link Cookie} 对象格式化为符合 HTTP 协议的 {@code Set-Cookie} 头部字符串。
+     * <p>生成结果遵循 RFC 6265 规范，如果 cookie 对象为空，则返回空字符串</p>
+     *
+     * @param cookie 表示待格式化的 {@link Cookie} 对象。
+     * @return 表示生成的 {@code Set-Cookie} 头部字符串的 {@link String}。
+     */
+    public static String formatSetCookie(Cookie cookie) {
+        if (cookie == null || StringUtils.isBlank(cookie.name())) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(cookie.name()).append("=").append(cookie.value() != null ? cookie.value() : "");
+        if (cookie.path() != null && !cookie.path().isEmpty()) {
+            sb.append("; ").append(PATH).append("=").append(cookie.path());
+        }
+        if (cookie.domain() != null && !cookie.domain().isEmpty()) {
+            sb.append("; ").append(DOMAIN).append("=").append(cookie.domain());
+        }
+        if (cookie.maxAge() >= 0) {
+            sb.append("; ").append(MAX_AGE).append("=").append(cookie.maxAge());
+        }
+        if (cookie.secure()) {
+            sb.append("; ").append(SECURE);
+        }
+        if (cookie.httpOnly()) {
+            sb.append("; ").append(HTTP_ONLY);
+        }
+        if (cookie.sameSite() != null && !cookie.sameSite().isEmpty()) {
+            sb.append("; ").append(SAME_SITE).append("=").append(cookie.sameSite());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 从消息头 Set-Cookie 的字符串值中解析 Cookie 的值以及属性。
+     * <p>若包含 Expires 属性，则会自动换算为 Max-Age。</p>
+     *
+     * @param rawCookie 表示待解析的 Set-Cookie 字符串值的 {@link String}。
+     * @return 表示解析后的 {@link Cookie}。
+     */
+    public static Cookie parseSetCookie(String rawCookie) {
+        if (StringUtils.isBlank(rawCookie)) {
+            return Cookie.builder().build();
+        }
+
+        Cookie.Builder builder = Cookie.builder();
+
+        String[] parts = rawCookie.split(";");
+
+        String[] nameValue = parts[0].split("=", 2);
+        builder.name(nameValue[0].trim());
+        builder.value(nameValue.length > 1 ? nameValue[1].trim() : "");
+
+        for (int i = 1; i < parts.length; i++) {
+            String part = parts[i].trim();
+            if (part.isEmpty()) {
+                continue;
+            }
+            String[] kv = part.split("=", 2);
+            String key = kv[0].trim().toLowerCase(Locale.ROOT);
+            String val = kv.length > 1 ? kv[1].trim() : "";
+
+            switch (key) {
+                case "path":
+                    builder.path(val);
+                    break;
+                case "domain":
+                    builder.domain(val);
+                    break;
+                case "max-age":
+                    try {
+                        builder.maxAge(Integer.parseInt(val));
+                    } catch (NumberFormatException ignore) {
+                    }
+                    break;
+                case "expires":
+                    int maxAge = convertExpiresToMaxAge(val);
+                    builder.maxAge(maxAge);
+                    break;
+                case "secure":
+                    builder.secure(true);
+                    break;
+                case "httponly":
+                    builder.httpOnly(true);
+                    break;
+                case "samesite":
+                    builder.sameSite(val);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return builder.build();
+    }
+
+    /**
+     * 从 Cookie 头部字符串解析多个 Cookie。
+     * <p>示例：{@code "a=1; b=2; c=3"} → List[Cookie(a=1), Cookie(b=2), Cookie(c=3)]</p>
+     *
+     * @param rawCookie 表示原始 Cookie 头的字符串的 {@link String}（例如 "a=1; b=2; c=3"）。
+     * @return 表示解析得到的 Cookie 列表的 {@link List}{@code <}{@link Cookie}{@code >}。
+     */
+    public static List<Cookie> parseCookies(String rawCookie) {
+        if (rawCookie == null || rawCookie.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String[] pairs = rawCookie.split(";");
+        List<Cookie> cookies = new ArrayList<>();
+
+        for (String pair : pairs) {
+            String trimmed = pair.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+
+            int eqIndex = trimmed.indexOf('=');
+            if (eqIndex <= 0) {
+                continue;
+            }
+
+            String name = trimmed.substring(0, eqIndex).trim();
+            String value = trimmed.substring(eqIndex + 1).trim();
+
+            if (value.startsWith("\"") && value.endsWith("\"") && value.length() >= 2) {
+                value = value.substring(1, value.length() - 1);
+            }
+
+            cookies.add(Cookie.builder().name(name).value(value).build());
+        }
+
+        return cookies;
+    }
+
+    private static int convertExpiresToMaxAge(String expiresString) {
+        if (StringUtils.isBlank(expiresString)) {
+            return -1;
+        }
+
+        try {
+            ZonedDateTime expires =
+                    ZonedDateTime.parse(expiresString, DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US));
+            long seconds = Duration.between(ZonedDateTime.now(ZoneOffset.UTC), expires).getSeconds();
+            return (int) Math.max(seconds, 0);
+        } catch (DateTimeParseException e) {
+            return -1;
+        }
+    }
 
     /**
      * 从消息头的字符串值中解析消息头的值。
