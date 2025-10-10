@@ -21,6 +21,7 @@ import modelengine.fit.http.entity.FileEntity;
 import modelengine.fit.http.entity.ReadableBinaryEntity;
 import modelengine.fit.http.entity.support.DefaultMultiValueEntity;
 import modelengine.fit.http.entity.support.DefaultObjectEntity;
+import modelengine.fit.http.header.ConfigurableCookieCollection;
 import modelengine.fit.http.header.ContentType;
 import modelengine.fit.http.protocol.ClientRequest;
 import modelengine.fit.http.protocol.ClientResponse;
@@ -155,7 +156,7 @@ public class DefaultHttpClassicClientRequest extends AbstractHttpClassicRequest 
         if (this.isCommitted()) {
             return;
         }
-        this.headers().set(COOKIE, this.cookies().toString());
+        this.headers().set(COOKIE, this.cookies().toRequestHeader());
         super.commit();
     }
 
@@ -169,5 +170,10 @@ public class DefaultHttpClassicClientRequest extends AbstractHttpClassicRequest 
         } catch (IOException e) {
             // Ignore
         }
+    }
+
+    @Override
+    public ConfigurableCookieCollection cookies() {
+        return (ConfigurableCookieCollection) super.cookies();
     }
 }

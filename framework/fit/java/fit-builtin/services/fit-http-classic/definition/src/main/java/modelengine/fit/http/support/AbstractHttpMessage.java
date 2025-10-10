@@ -47,14 +47,11 @@ import java.util.Optional;
  * @since 2022-08-03
  */
 public abstract class AbstractHttpMessage implements HttpMessage {
-    private static final String COOKIE_DELIMITER = ";";
-
     private final ParameterCollection parameters =
             ParameterCollection.create().set(DefaultContentType.CHARSET, StandardCharsets.UTF_8.name());
     private final HttpResource httpResource;
     private final StartLine startLine;
     private final MessageHeaders headers;
-    private final ConfigurableCookieCollection cookies;
     private final Map<MimeType, EntitySerializer<? extends Entity>> customEntitySerializers = new HashMap<>();
     private ObjectSerializer customJsonSerializer;
     private boolean isCommitted;
@@ -70,8 +67,6 @@ public abstract class AbstractHttpMessage implements HttpMessage {
         this.httpResource = notNull(httpResource, "The http resource cannot be null.");
         this.startLine = notNull(startLine, "The start line cannot be null.");
         this.headers = notNull(headers, "The message headers cannot be null.");
-        String actualCookie = String.join(COOKIE_DELIMITER, this.headers.all(COOKIE));
-        this.cookies = ConfigurableCookieCollection.create(HttpUtils.parseHeaderValue(actualCookie));
     }
 
     @Override
@@ -138,11 +133,6 @@ public abstract class AbstractHttpMessage implements HttpMessage {
             return -1;
         }
         return Integer.parseInt(value);
-    }
-
-    @Override
-    public ConfigurableCookieCollection cookies() {
-        return this.cookies;
     }
 
     /**

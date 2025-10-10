@@ -10,7 +10,7 @@ import static modelengine.fit.http.protocol.MessageHeaderNames.CACHE_CONTROL;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONNECTION;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONTENT_DISPOSITION;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONTENT_LENGTH;
-import static modelengine.fit.http.protocol.MessageHeaderNames.COOKIE;
+import static modelengine.fit.http.protocol.MessageHeaderNames.SET_COOKIE;
 import static modelengine.fit.http.protocol.MessageHeaderNames.TRANSFER_ENCODING;
 import static modelengine.fit.http.protocol.MessageHeaderValues.CHUNKED;
 import static modelengine.fit.http.protocol.MessageHeaderValues.KEEP_ALIVE;
@@ -26,6 +26,7 @@ import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.entity.TextEventStreamEntity;
 import modelengine.fit.http.entity.WritableBinaryEntity;
 import modelengine.fit.http.entity.support.DefaultWritableBinaryEntity;
+import modelengine.fit.http.header.ConfigurableCookieCollection;
 import modelengine.fit.http.header.ContentDisposition;
 import modelengine.fit.http.header.ContentType;
 import modelengine.fit.http.header.HeaderValue;
@@ -255,7 +256,7 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
         if (this.isCommitted()) {
             return;
         }
-        this.headers().set(COOKIE, this.cookies().toString());
+        this.headers().set(SET_COOKIE, this.cookies().toResponseHeaders());
         if (this.entity != null) {
             this.setContentTypeByEntity(this.headers(), this.entity);
             if (this.entity instanceof FileEntity) {
@@ -279,5 +280,10 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
             this.entity.close();
             this.entity = null;
         }
+    }
+
+    @Override
+    public ConfigurableCookieCollection cookies() {
+        return (ConfigurableCookieCollection) super.cookies();
     }
 }
