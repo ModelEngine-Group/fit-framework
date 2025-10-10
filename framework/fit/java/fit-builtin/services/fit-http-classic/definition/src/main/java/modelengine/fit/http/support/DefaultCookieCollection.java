@@ -14,10 +14,15 @@ import modelengine.fit.http.header.CookieCollection;
 import modelengine.fit.http.header.HeaderValue;
 import modelengine.fit.http.header.support.DefaultHeaderValue;
 import modelengine.fit.http.header.support.DefaultParameterCollection;
+import modelengine.fit.http.util.HttpUtils;
 import modelengine.fitframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +33,8 @@ import java.util.stream.Collectors;
  * @since 2022-07-06
  */
 public class DefaultCookieCollection extends DefaultHeaderValue implements ConfigurableCookieCollection {
+    private final Map<String, List<Cookie>> store = new LinkedHashMap<>();
+
     /**
      * 初始化 {@link DefaultCookieCollection} 的新实例。
      */
@@ -43,33 +50,61 @@ public class DefaultCookieCollection extends DefaultHeaderValue implements Confi
      */
     public DefaultCookieCollection(HeaderValue headerValue) {
         super(notNull(headerValue, "The header value cannot be null.").value(), headerValue.parameters());
+        HttpUtils.parseCookies(headerValue.value()).forEach(this::add);
     }
 
     @Override
     public Optional<Cookie> get(String name) {
-        return this.parameters().get(name).map(value -> Cookie.builder().name(name).value(value).build());
+        List<Cookie> cookies = store.get(name);
+        if (cookies == null || cookies.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(cookies.get(0));
+    }
+
+    @Override
+    public List<Cookie> findByName(String name) {
+        return store.getOrDefault(name, Collections.emptyList());
     }
 
     @Override
     public List<Cookie> all() {
-        return Collections.unmodifiableList(this.parameters()
-                .keys()
+        return store.values()
                 .stream()
-                .map(this::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()));
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 
     @Override
     public int size() {
-        return this.parameters().size();
+        return store.values()
+                .stream()
+                .mapToInt(List::size)
+                .sum();
     }
 
     @Override
     public void add(Cookie cookie) {
-        if (cookie != null) {
-            this.parameters().set(cookie.name(), cookie.value());
-        }
+        store.computeIfAbsent(cookie.name(), k -> new ArrayList<>());
+        List<Cookie> list = store.get(cookie.name());
+        list.removeIf(c ->
+                Objects.equals(c.path(), cookie.path()) &&
+                        Objects.equals(c.domain(), cookie.domain())
+        );
+        list.add(cookie);
+    }
+
+    @Override
+    public String toRequestHeader() {
+        return all().stream()
+                .map(c -> c.name() + "=" + c.value())
+                .collect(Collectors.joining("; "));
+    }
+
+    @Override
+    public List<String> toResponseHeaders() {
+        return all().stream()
+                .map(HttpUtils::formatSetCookie)
+                .collect(Collectors.toList());
     }
 }

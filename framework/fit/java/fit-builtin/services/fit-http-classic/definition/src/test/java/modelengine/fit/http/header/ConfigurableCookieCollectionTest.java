@@ -53,4 +53,68 @@ class ConfigurableCookieCollectionTest {
         final List<Cookie> cookies = cookieCollection.all();
         assertThat(cookies).hasSize(1);
     }
+
+    @Test
+    @DisplayName("同名 Cookie 不同路径可共存")
+    void shouldAllowMultipleCookiesWithDifferentPath() {
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();
+        collection.add(Cookie.builder().name("user").value("A").path("/a").build());
+        collection.add(Cookie.builder().name("user").value("B").path("/b").build());
+
+        List<Cookie> sameNameCookies = collection.findByName("user");
+        assertThat(sameNameCookies).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("同名同 path/domain 的 Cookie 应被替换")
+    void shouldReplaceCookieWithSamePathAndDomain() {
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();
+
+        Cookie c1 = Cookie.builder().name("id").value("1").path("/").domain("a.com").build();
+        Cookie c2 = Cookie.builder().name("id").value("2").path("/").domain("a.com").build();
+
+        collection.add(c1);
+        collection.add(c2);
+
+        List<Cookie> cookies = collection.findByName("id");
+        assertThat(cookies).hasSize(1);
+        assertThat(cookies.get(0).value()).isEqualTo("2");
+    }
+
+    @Test
+    @DisplayName("toRequestHeader 生成单行请求头")
+    void shouldGenerateRequestHeader() {
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();
+        collection.add(Cookie.builder().name("a").value("1").build());
+        collection.add(Cookie.builder().name("b").value("2").build());
+
+        String header = collection.toRequestHeader();
+        assertThat(header).isEqualTo("a=1; b=2");
+    }
+
+    @Test
+    @DisplayName("toResponseHeaders 生成多个 Set-Cookie 响应头")
+    void shouldGenerateMultipleResponseHeaders() {
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();
+        collection.add(Cookie.builder().name("token").value("xyz").secure(true).httpOnly(true).build());
+        collection.add(Cookie.builder().name("lang").value("zh-CN").sameSite("Lax").build());
+
+        List<String> headers = collection.toResponseHeaders();
+
+        assertThat(headers).hasSize(2);
+        assertThat(headers.get(0)).contains("token=xyz");
+        assertThat(headers.get(1)).contains("lang=zh-CN");
+        assertThat(headers.get(1)).contains("SameSite=Lax");
+    }
+
+    @Test
+    @DisplayName("从 HeaderValue 初始化应正确解析多个 Cookie")
+    void shouldInitializeFromHeaderValue() {
+        String header = "a=1; b=2; c=3";
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create(HeaderValue.create(header));
+
+        assertThat(collection.size()).isEqualTo(3);
+        assertThat(collection.get("b")).isPresent();
+        assertThat(collection.get("b").get().value()).isEqualTo("2");
+    }
 }

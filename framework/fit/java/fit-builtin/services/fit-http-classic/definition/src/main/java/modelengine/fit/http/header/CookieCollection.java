@@ -20,6 +20,7 @@ import java.util.Optional;
 public interface CookieCollection extends HeaderValue {
     /**
      * 获取指定名字的 {@link Cookie}。
+     * <p>如果存在多个同名 Cookie，返回第一个匹配的 Cookie。</p>
      *
      * @param name 表示 Cookie 名字的 {@link Optional}{@code <}{@link String}{@code >}。
      * @return 表示指定名字的 {@link Cookie}。
@@ -27,7 +28,15 @@ public interface CookieCollection extends HeaderValue {
     Optional<Cookie> get(String name);
 
     /**
-     * 获取所有的 {@link Cookie}。
+     * 根据名字查找所有匹配的 {@link Cookie}。
+     *
+     * @param name 表示 Cookie 名字的 {@link String}。
+     * @return 返回所有匹配名字的 {@link Cookie} 列表。
+     */
+    List<Cookie> findByName(String name);
+
+    /**
+     * 获取集合中所有的 {@link Cookie}。
      *
      * @return 表示所有 {@link Cookie} 列表的 {@link List}{@code <}{@link Cookie}{@code >}。
      */
@@ -39,4 +48,20 @@ public interface CookieCollection extends HeaderValue {
      * @return 表示所有 {@link Cookie} 的数量的 {@code int}。
      */
     int size();
+
+    /**
+     * 将集合转换为 HTTP 请求头中 Cookie 形式的字符串。
+     * <p>格式为 {@code name1=value1; name2=value2; ...}。</p>
+     *
+     * @return 表示请求头的字符串。
+     */
+    String toRequestHeader();
+
+    /**
+     * 将集合转换为 HTTP 响应头形式的字符串列表。
+     * <p>每个 Cookie 对应一个 {@code Set-Cookie: ...} 头。</p>
+     *
+     * @return 表示响应头列表的 {@link List}{@code <}{@link String}{@code >}。
+     */
+    List<String> toResponseHeaders();
 }
