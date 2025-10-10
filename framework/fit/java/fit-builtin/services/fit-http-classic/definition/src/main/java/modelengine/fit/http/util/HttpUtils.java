@@ -7,6 +7,7 @@
 package modelengine.fit.http.util;
 
 import static modelengine.fit.http.protocol.CookieAttributeNames.DOMAIN;
+import static modelengine.fit.http.protocol.CookieAttributeNames.EXPIRES;
 import static modelengine.fit.http.protocol.CookieAttributeNames.HTTP_ONLY;
 import static modelengine.fit.http.protocol.CookieAttributeNames.MAX_AGE;
 import static modelengine.fit.http.protocol.CookieAttributeNames.PATH;
@@ -49,6 +50,17 @@ import java.util.Locale;
 public class HttpUtils {
 
     private static final char STRING_VALUE_SURROUNDED = '\"';
+    private static final String COOKIES_FORMAT_SEPARATOR = "; ";
+    private static final String COOKIES_PARSE_SEPARATOR = ";";
+    private static final String COOKIE_PAIR_SEPARATOR = "=";
+
+    private static final String PATH_KEY = PATH.toLowerCase(Locale.ROOT);
+    private static final String DOMAIN_KEY = DOMAIN.toLowerCase(Locale.ROOT);
+    private static final String MAX_AGE_KEY = MAX_AGE.toLowerCase(Locale.ROOT);
+    private static final String EXPIRES_KEY = EXPIRES.toLowerCase(Locale.ROOT);
+    private static final String SECURE_KEY = SECURE.toLowerCase(Locale.ROOT);
+    private static final String HTTP_ONLY_KEY = HTTP_ONLY.toLowerCase(Locale.ROOT);
+    private static final String SAME_SITE_KEY = SAME_SITE.toLowerCase(Locale.ROOT);
 
     /**
      * 将给定的 {@link Cookie} 对象格式化为符合 HTTP 协议的 {@code Set-Cookie} 头部字符串。
@@ -59,27 +71,33 @@ public class HttpUtils {
      */
     public static String formatSetCookie(Cookie cookie) {
         if (cookie == null || StringUtils.isBlank(cookie.name())) {
-            return "";
+            return StringUtils.EMPTY;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append(cookie.name()).append("=").append(cookie.value() != null ? cookie.value() : "");
-        if (cookie.path() != null && !cookie.path().isEmpty()) {
-            sb.append("; ").append(PATH).append("=").append(cookie.path());
+
+        StringBuilder sb = new StringBuilder().append(cookie.name())
+                .append(COOKIE_PAIR_SEPARATOR)
+                .append(cookie.value() != null ? cookie.value() : StringUtils.EMPTY);
+
+        if (StringUtils.isNotBlank(cookie.path())) {
+            sb.append(COOKIES_FORMAT_SEPARATOR).append(PATH).append(COOKIE_PAIR_SEPARATOR).append(cookie.path());
         }
-        if (cookie.domain() != null && !cookie.domain().isEmpty()) {
-            sb.append("; ").append(DOMAIN).append("=").append(cookie.domain());
+        if (StringUtils.isNotBlank(cookie.domain())) {
+            sb.append(COOKIES_FORMAT_SEPARATOR).append(DOMAIN).append(COOKIE_PAIR_SEPARATOR).append(cookie.domain());
         }
         if (cookie.maxAge() >= 0) {
-            sb.append("; ").append(MAX_AGE).append("=").append(cookie.maxAge());
+            sb.append(COOKIES_FORMAT_SEPARATOR).append(MAX_AGE).append(COOKIE_PAIR_SEPARATOR).append(cookie.maxAge());
         }
         if (cookie.secure()) {
-            sb.append("; ").append(SECURE);
+            sb.append(COOKIES_FORMAT_SEPARATOR).append(SECURE);
         }
         if (cookie.httpOnly()) {
-            sb.append("; ").append(HTTP_ONLY);
+            sb.append(COOKIES_FORMAT_SEPARATOR).append(HTTP_ONLY);
         }
-        if (cookie.sameSite() != null && !cookie.sameSite().isEmpty()) {
-            sb.append("; ").append(SAME_SITE).append("=").append(cookie.sameSite());
+        if (StringUtils.isNotBlank(cookie.sameSite())) {
+            sb.append(COOKIES_FORMAT_SEPARATOR)
+                    .append(SAME_SITE)
+                    .append(COOKIE_PAIR_SEPARATOR)
+                    .append(cookie.sameSite());
         }
         return sb.toString();
     }
@@ -98,52 +116,60 @@ public class HttpUtils {
 
         Cookie.Builder builder = Cookie.builder();
 
-        String[] parts = rawCookie.split(";");
-
-        String[] nameValue = parts[0].split("=", 2);
+        String[] parts = rawCookie.split(COOKIES_PARSE_SEPARATOR);
+        String[] nameValue = parts[0].split(COOKIE_PAIR_SEPARATOR, 2);
         builder.name(nameValue[0].trim());
-        builder.value(nameValue.length > 1 ? nameValue[1].trim() : "");
+        builder.value(nameValue.length > 1 ? nameValue[1].trim() : StringUtils.EMPTY);
 
         for (int i = 1; i < parts.length; i++) {
             String part = parts[i].trim();
             if (part.isEmpty()) {
                 continue;
             }
-            String[] kv = part.split("=", 2);
-            String key = kv[0].trim().toLowerCase(Locale.ROOT);
-            String val = kv.length > 1 ? kv[1].trim() : "";
 
-            switch (key) {
-                case "path":
-                    builder.path(val);
-                    break;
-                case "domain":
-                    builder.domain(val);
-                    break;
-                case "max-age":
-                    try {
-                        builder.maxAge(Integer.parseInt(val));
-                    } catch (NumberFormatException ignore) {
-                    }
-                    break;
-                case "expires":
-                    int maxAge = convertExpiresToMaxAge(val);
-                    builder.maxAge(maxAge);
-                    break;
-                case "secure":
-                    builder.secure(true);
-                    break;
-                case "httponly":
-                    builder.httpOnly(true);
-                    break;
-                case "samesite":
-                    builder.sameSite(val);
-                    break;
-                default:
-                    break;
+            String[] kv = part.split(COOKIE_PAIR_SEPARATOR, 2);
+            String key = kv[0].trim().toLowerCase(Locale.ROOT);
+            String val = kv.length > 1 ? kv[1].trim() : StringUtils.EMPTY;
+
+            if (PATH_KEY.equals(key)) {
+                builder.path(val);
+            } else if (DOMAIN_KEY.equals(key)) {
+                builder.domain(val);
+            } else if (MAX_AGE_KEY.equals(key)) {
+                builder.maxAge(safeParseInt(val));
+            } else if (EXPIRES_KEY.equals(key)) {
+                builder.maxAge(convertExpiresToMaxAge(val));
+            } else if (SECURE_KEY.equals(key)) {
+                builder.secure(true);
+            } else if (HTTP_ONLY_KEY.equals(key)) {
+                builder.httpOnly(true);
+            } else if (SAME_SITE_KEY.equals(key)) {
+                builder.sameSite(val);
             }
         }
         return builder.build();
+    }
+
+    private static int safeParseInt(String val) {
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private static int convertExpiresToMaxAge(String expiresString) {
+        if (StringUtils.isBlank(expiresString)) {
+            return -1;
+        }
+        try {
+            ZonedDateTime expires =
+                    ZonedDateTime.parse(expiresString, DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US));
+            long seconds = Duration.between(ZonedDateTime.now(ZoneOffset.UTC), expires).getSeconds();
+            return (int) Math.max(seconds, 0);
+        } catch (DateTimeParseException e) {
+            return -1;
+        }
     }
 
     /**
@@ -154,49 +180,30 @@ public class HttpUtils {
      * @return 表示解析得到的 Cookie 列表的 {@link List}{@code <}{@link Cookie}{@code >}。
      */
     public static List<Cookie> parseCookies(String rawCookie) {
-        if (rawCookie == null || rawCookie.isEmpty()) {
+        if (StringUtils.isBlank(rawCookie)) {
             return Collections.emptyList();
         }
-        String[] pairs = rawCookie.split(";");
-        List<Cookie> cookies = new ArrayList<>();
 
-        for (String pair : pairs) {
+        List<Cookie> cookies = new ArrayList<>();
+        for (String pair : rawCookie.split(COOKIES_PARSE_SEPARATOR)) {
             String trimmed = pair.trim();
             if (trimmed.isEmpty()) {
                 continue;
             }
 
-            int eqIndex = trimmed.indexOf('=');
+            int eqIndex = trimmed.indexOf(COOKIE_PAIR_SEPARATOR);
             if (eqIndex <= 0) {
                 continue;
             }
 
             String name = trimmed.substring(0, eqIndex).trim();
             String value = trimmed.substring(eqIndex + 1).trim();
-
-            if (value.startsWith("\"") && value.endsWith("\"") && value.length() >= 2) {
+            if (isValueSurrounded(value)) {
                 value = value.substring(1, value.length() - 1);
             }
-
             cookies.add(Cookie.builder().name(name).value(value).build());
         }
-
         return cookies;
-    }
-
-    private static int convertExpiresToMaxAge(String expiresString) {
-        if (StringUtils.isBlank(expiresString)) {
-            return -1;
-        }
-
-        try {
-            ZonedDateTime expires =
-                    ZonedDateTime.parse(expiresString, DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US));
-            long seconds = Duration.between(ZonedDateTime.now(ZoneOffset.UTC), expires).getSeconds();
-            return (int) Math.max(seconds, 0);
-        } catch (DateTimeParseException e) {
-            return -1;
-        }
     }
 
     /**
