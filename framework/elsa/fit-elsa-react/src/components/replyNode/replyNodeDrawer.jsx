@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {jadeNodeDrawer} from "@/components/base/jadeNodeDrawer.jsx";
-import NodeIcon from "../asserts/icon-end.svg?react"; // 导入背景图片
+import NodeIcon from "../asserts/icon-reply.svg?react"; // 导入背景图片
 
 /**
  * 直接回复节点绘制器
