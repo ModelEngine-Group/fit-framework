@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fitframework.util.support;
 
@@ -195,20 +195,134 @@ public class UnZipTest {
         @Test
         @DisplayName("给定压缩包中存在遍历路径文件，解压失败。")
         public void givenPathTraversalThenCatchException() throws IOException {
-            File testZipFile = new File("test-archive.zip");
-            File targetDir = new File("target-dir");
-            try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(testZipFile.toPath()))) {
-                ZipEntry entry = new ZipEntry("../unauthorized-file.txt");
-                zos.putNextEntry(entry);
-                zos.write("Malicious content".getBytes(StandardCharsets.UTF_8));
-                zos.closeEntry();
-            }
+            File testZipFile = new File("src/test/resources/zip-slip-test/test-archive.zip");
+            File targetDir = new File("src/test/resources/zip-slip-test/target-dir");
+            try {
+                // 确保父目录存在
+                FileUtils.ensureDirectory(testZipFile.getParentFile());
+                // 动态创建包含恶意路径的ZIP文件
+                try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(testZipFile.toPath()))) {
+                    ZipEntry entry = new ZipEntry("../unauthorized-file.txt");
+                    zos.putNextEntry(entry);
+                    zos.write("Malicious content".getBytes(StandardCharsets.UTF_8));
+                    zos.closeEntry();
+                }
 
-            Unzip unzip = FileUtils.unzip(testZipFile).secure(new Unzip.Security(100, 1024, false)).target(targetDir);
-            SecurityException securityException = catchThrowableOfType(SecurityException.class, unzip::start);
-            assertThat(securityException.getMessage()).startsWith("Detected a potential path traversal attack. ");
-            FileUtils.delete(testZipFile);
-            FileUtils.delete(targetDir);
+                Unzip unzip =
+                        FileUtils.unzip(testZipFile).secure(new Unzip.Security(100, 1024, false)).target(targetDir);
+                SecurityException securityException = catchThrowableOfType(SecurityException.class, unzip::start);
+                assertThat(securityException.getMessage()).startsWith("Detected a potential path traversal attack. ");
+            } finally {
+                FileUtils.delete(testZipFile);
+                FileUtils.delete(targetDir);
+            }
+        }
+
+        @Test
+        @DisplayName("Given zip entry with multiple parent path traversals then throw SecurityException")
+        public void givenMultipleParentPathTraversalsThenThrowSecurityException() throws IOException {
+            File testZipFile = new File("src/test/resources/zip-slip-test/test-archive-multi.zip");
+            File targetDir = new File("src/test/resources/zip-slip-test/target-dir-multi");
+            try {
+                // 确保父目录存在
+                FileUtils.ensureDirectory(testZipFile.getParentFile());
+                // 动态创建包含多级路径遍历的ZIP文件
+                try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(testZipFile.toPath()))) {
+                    ZipEntry entry = new ZipEntry("../../../../../../etc/passwd");
+                    zos.putNextEntry(entry);
+                    zos.write("Malicious content".getBytes(StandardCharsets.UTF_8));
+                    zos.closeEntry();
+                }
+
+                Unzip unzip =
+                        FileUtils.unzip(testZipFile).secure(new Unzip.Security(100, 1024, false)).target(targetDir);
+                SecurityException securityException = catchThrowableOfType(SecurityException.class, unzip::start);
+                assertThat(securityException.getMessage()).contains("Detected a potential path traversal attack");
+            } finally {
+                FileUtils.delete(testZipFile);
+                FileUtils.delete(targetDir);
+            }
+        }
+
+        @Test
+        @DisplayName("Given zip entry with absolute path then throw SecurityException")
+        public void givenAbsolutePathEntryThenThrowSecurityException() throws IOException {
+            File testZipFile = new File("src/test/resources/zip-slip-test/test-archive-absolute.zip");
+            File targetDir = new File("src/test/resources/zip-slip-test/target-dir-absolute");
+            try {
+                // 确保父目录存在
+                FileUtils.ensureDirectory(testZipFile.getParentFile());
+                // 动态创建包含绝对路径的ZIP文件
+                try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(testZipFile.toPath()))) {
+                    ZipEntry entry = new ZipEntry("/tmp/unauthorized-file.txt");
+                    zos.putNextEntry(entry);
+                    zos.write("Malicious content".getBytes(StandardCharsets.UTF_8));
+                    zos.closeEntry();
+                }
+
+                Unzip unzip =
+                        FileUtils.unzip(testZipFile).secure(new Unzip.Security(100, 1024, false)).target(targetDir);
+                SecurityException securityException = catchThrowableOfType(SecurityException.class, unzip::start);
+                assertThat(securityException.getMessage()).contains("Detected a potential path traversal attack");
+            } finally {
+                FileUtils.delete(testZipFile);
+                FileUtils.delete(targetDir);
+            }
+        }
+
+        @Test
+        @DisplayName("Given zip entry with path traversal in middle then throw SecurityException")
+        public void givenPathTraversalInMiddleThenThrowSecurityException() throws IOException {
+            File testZipFile = new File("src/test/resources/zip-slip-test/test-archive-middle.zip");
+            File targetDir = new File("src/test/resources/zip-slip-test/target-dir-middle");
+            try {
+                // 确保父目录存在
+                FileUtils.ensureDirectory(testZipFile.getParentFile());
+                // 动态创建包含中间路径遍历的ZIP文件
+                try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(testZipFile.toPath()))) {
+                    ZipEntry entry = new ZipEntry("subdir/../../../unauthorized.txt");
+                    zos.putNextEntry(entry);
+                    zos.write("Malicious content".getBytes(StandardCharsets.UTF_8));
+                    zos.closeEntry();
+                }
+
+                Unzip unzip =
+                        FileUtils.unzip(testZipFile).secure(new Unzip.Security(100, 1024, false)).target(targetDir);
+                SecurityException securityException = catchThrowableOfType(SecurityException.class, unzip::start);
+                assertThat(securityException.getMessage()).contains("Detected a potential path traversal attack");
+            } finally {
+                FileUtils.delete(testZipFile);
+                FileUtils.delete(targetDir);
+            }
+        }
+
+        @Test
+        @DisplayName("Given zip entry with safe nested path then unzip successfully")
+        public void givenSafeNestedPathThenUnzipSuccessfully() throws IOException {
+            File testZipFile = new File("src/test/resources/zip-slip-test/test-archive-safe.zip");
+            File targetDir = new File("src/test/resources/zip-slip-test/target-dir-safe");
+            try {
+                // 确保父目录存在
+                FileUtils.ensureDirectory(testZipFile.getParentFile());
+                // 动态创建包含安全嵌套路径的ZIP文件
+                try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(testZipFile.toPath()))) {
+                    ZipEntry entry = new ZipEntry("subdir/nested/safe-file.txt");
+                    zos.putNextEntry(entry);
+                    zos.write("Safe content".getBytes(StandardCharsets.UTF_8));
+                    zos.closeEntry();
+                }
+
+                Unzip unzip =
+                        FileUtils.unzip(testZipFile).secure(new Unzip.Security(100, 1024, false)).target(targetDir);
+                assertThatNoException().isThrownBy(unzip::start);
+
+                File safeFile = new File(targetDir, "subdir/nested/safe-file.txt");
+                assertThat(safeFile).exists();
+                assertThat(Files.readString(safeFile.toPath())).isEqualTo("Safe content");
+            } finally {
+                FileUtils.delete(testZipFile);
+                FileUtils.delete(targetDir);
+            }
         }
 
         @Test
