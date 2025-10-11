@@ -35,6 +35,7 @@ public interface Cookie {
      *
      * @return 表示 Cookie 版本号的 {@code int}。
      */
+    @Deprecated
     int version();
 
     /**
@@ -43,6 +44,7 @@ public interface Cookie {
      *
      * @return 表示 Cookie 注释的 {@link String}。
      */
+    @Deprecated
     String comment();
 
     /**
@@ -79,11 +81,19 @@ public interface Cookie {
 
     /**
      * 判断 Cookie 是否仅允许在服务端获取。
-     * <p>该属性并不是 Cookie 的标准，但是被浏览器支持。</p>
+     * <p>其 HttpOnly 属性的格式为 {@code ;HttpOnly ...}，如果存在则表示仅服务端可访问。</p>
      *
-     * @return 如果 Cookie 仅允许在服务端获取，返回 {@code true}，否则，返回 {@code false}。
+     * @return 如果 Cookie 仅允许在服务端访问，则返回 {@code true}，否则返回 {@code false}。
      */
     boolean httpOnly();
+
+    /**
+     * 获取 Cookie 的 SameSite 属性。
+     * <p>其 SameSite 属性的格式为 {@code ;SameSite=VALUE ...}，表示跨站请求策略。</p>
+     *
+     * @return SameSite 值，如 {@code "Strict"}、{@code "Lax"}、{@code "None"}。
+     */
+    String sameSite();
 
     /**
      * {@link Cookie} 的构建器。
@@ -111,6 +121,7 @@ public interface Cookie {
          * @param version 表示待设置的 Cookie 版本的 {@code int}。
          * @return 表示当前构建器的 {@link Builder}。
          */
+        @Deprecated
         Builder version(int version);
 
         /**
@@ -119,6 +130,7 @@ public interface Cookie {
          * @param comment 表示待设置的 Cookie 注释的 {@link String}。
          * @return 表示当前构建器的 {@link Builder}。
          */
+        @Deprecated
         Builder comment(String comment);
 
         /**
@@ -160,6 +172,14 @@ public interface Cookie {
          * @return 表示当前构建器的 {@link Builder}。
          */
         Builder httpOnly(boolean httpOnly);
+
+        /**
+         * 向当前构建器中设置 Cookie 限制跨站请求时发送行为安全级别。
+         *
+         * @param sameSite SameSite 值，如 "Strict", "Lax", "None"。
+         * @return 表示当前构建器的 {@link Builder}。
+         */
+        Builder sameSite(String sameSite);
 
         /**
          * 构建对象。

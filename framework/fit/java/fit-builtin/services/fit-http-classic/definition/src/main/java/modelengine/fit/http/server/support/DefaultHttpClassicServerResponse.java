@@ -10,7 +10,7 @@ import static modelengine.fit.http.protocol.MessageHeaderNames.CACHE_CONTROL;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONNECTION;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONTENT_DISPOSITION;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONTENT_LENGTH;
-import static modelengine.fit.http.protocol.MessageHeaderNames.COOKIE;
+import static modelengine.fit.http.protocol.MessageHeaderNames.SET_COOKIE;
 import static modelengine.fit.http.protocol.MessageHeaderNames.TRANSFER_ENCODING;
 import static modelengine.fit.http.protocol.MessageHeaderValues.CHUNKED;
 import static modelengine.fit.http.protocol.MessageHeaderValues.KEEP_ALIVE;
@@ -255,7 +255,7 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
         if (this.isCommitted()) {
             return;
         }
-        this.headers().set(COOKIE, this.cookies().toString());
+        this.headers().set(SET_COOKIE, this.cookies().toResponseHeadersValues());
         if (this.entity != null) {
             this.setContentTypeByEntity(this.headers(), this.entity);
             if (this.entity instanceof FileEntity) {
