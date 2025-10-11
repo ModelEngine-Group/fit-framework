@@ -85,6 +85,9 @@ public class DefaultCookieCollection extends DefaultHeaderValue implements Confi
 
     @Override
     public void add(Cookie cookie) {
+        if (cookie == null || StringUtils.isBlank(cookie.name())) {
+            return;
+        }
         store.computeIfAbsent(cookie.name(), k -> new ArrayList<>());
         List<Cookie> list = store.get(cookie.name());
         list.removeIf(c ->
