@@ -86,6 +86,25 @@ public class HttpUtilsTest {
     }
 
     @Test
+    @DisplayName("解析异常或不完整的 Cookie 值时，应忽略非法项并不抛异常")
+    void givenMalformedCookiesThenHandleGracefully() {
+        String rawCookie1 = "a=\"incomplete; b=2";
+        List<Cookie> cookies1 = HttpUtils.parseCookies(rawCookie1);
+        assertThat(cookies1).extracting(Cookie::name).contains("b");
+        assertThat(cookies1).extracting(Cookie::name).doesNotContain("a");
+
+        String rawCookie2 = "x=1;; ; y=2;";
+        List<Cookie> cookies2 = HttpUtils.parseCookies(rawCookie2);
+        assertThat(cookies2).hasSize(2);
+        assertThat(cookies2.get(0).name()).isEqualTo("x");
+        assertThat(cookies2.get(1).name()).isEqualTo("y");
+
+        String rawCookie4 = ";;;";
+        List<Cookie> cookies4 = HttpUtils.parseCookies(rawCookie4);
+        assertThat(cookies4).isEmpty();
+    }
+
+    @Test
     @DisplayName("解析带 Expires 属性的 Set-Cookie，自动换算为 Max-Age")
     void givenExpiresAttributeThenConvertToMaxAge() {
         ZonedDateTime expiresTime = ZonedDateTime.now(ZoneOffset.UTC).plusHours(1);

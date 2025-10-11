@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Http 协议相关的工具类。
@@ -53,6 +54,8 @@ public class HttpUtils {
     private static final String COOKIES_FORMAT_SEPARATOR = "; ";
     private static final String COOKIES_PARSE_SEPARATOR = ";";
     private static final String COOKIE_PAIR_SEPARATOR = "=";
+
+    private static final Pattern TOKEN_PATTERN = Pattern.compile("^[!#$%&'*+\\-.^_`|~0-9a-zA-Z]+$");
 
     private static final String PATH_KEY = PATH.toLowerCase(Locale.ROOT);
     private static final String DOMAIN_KEY = DOMAIN.toLowerCase(Locale.ROOT);
@@ -118,8 +121,19 @@ public class HttpUtils {
 
         String[] parts = rawCookie.split(COOKIES_PARSE_SEPARATOR);
         String[] nameValue = parts[0].split(COOKIE_PAIR_SEPARATOR, 2);
-        builder.name(nameValue[0].trim());
-        builder.value(nameValue.length > 1 ? nameValue[1].trim() : StringUtils.EMPTY);
+
+        String name = nameValue[0].trim();
+        String value = nameValue.length > 1 ? nameValue[1].trim() : StringUtils.EMPTY;
+
+        if (isValueSurrounded(value)) {
+            value = value.substring(1, value.length() - 1);
+        }
+        if (!isValidCookiePair(name, value)) {
+            return Cookie.builder().build();
+        }
+
+        builder.name(name);
+        builder.value(value);
 
         for (int i = 1; i < parts.length; i++) {
             String part = parts[i].trim();
@@ -163,10 +177,8 @@ public class HttpUtils {
             return -1;
         }
         try {
-            ZonedDateTime expires = ZonedDateTime.parse(
-                    expiresString,
-                    DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US)
-            );
+            ZonedDateTime expires =
+                    ZonedDateTime.parse(expiresString, DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US));
             long seconds = Duration.between(ZonedDateTime.now(ZoneOffset.UTC), expires).getSeconds();
             if (seconds <= 0) {
                 return 0;
@@ -209,9 +221,31 @@ public class HttpUtils {
             if (isValueSurrounded(value)) {
                 value = value.substring(1, value.length() - 1);
             }
-            cookies.add(Cookie.builder().name(name).value(value).build());
+            if (isValidCookiePair(name, value)) {
+                cookies.add(Cookie.builder().name(name).value(value).build());
+            }
         }
         return cookies;
+    }
+
+    /**
+     * 验证给定的 Cookie 名称和值是否合法。
+     *
+     * @param name 表示 Cookie 的名称 {@link String}。
+     * @param value 表示 Cookie 的值 {@link String}，允许为空但不允许为 {@code null}，可带双引号。
+     * @return 如果 name 和 value 都合法返回 {@code true}，否则返回 {@code false}。
+     */
+    public static boolean isValidCookiePair(String name, String value) {
+        if (name == null || name.isEmpty() || !TOKEN_PATTERN.matcher(name).matches()) {
+            return false;
+        }
+        if (value == null) {
+            return false;
+        }
+        if (isValueSurrounded(value)) {
+            value = value.substring(1, value.length() - 1);
+        }
+        return value.isEmpty() || TOKEN_PATTERN.matcher(value).matches();
     }
 
     /**
