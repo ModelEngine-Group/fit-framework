@@ -55,6 +55,32 @@ class ConfigurableCookieCollectionTest {
     }
 
     @Test
+    @DisplayName("添加非法 Cookie 应抛异常")
+    void shouldThrowExceptionForInvalidCookie() {
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();
+
+        Cookie invalidNameCookie = Cookie.builder().name("inva;lid").value("123").build();
+        assertThatThrownBy(() -> collection.add(invalidNameCookie)).isInstanceOf(IllegalArgumentException.class);
+
+        Cookie invalidValueCookie = Cookie.builder().name("validName").value("v@lue;").build();
+        assertThatThrownBy(() -> collection.add(invalidValueCookie)).isInstanceOf(IllegalArgumentException.class);
+
+        Cookie nullValueCookie = Cookie.builder().name("someName").value(null).build();
+        assertThatThrownBy(() -> collection.add(nullValueCookie)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("允许空字符串 value")
+    void shouldHandleEmptyAndNullValue() {
+        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();
+
+        // 空字符串 value 是允许的
+        Cookie emptyValueCookie = Cookie.builder().name("token").value("").build();
+        collection.add(emptyValueCookie);
+        assertThat(collection.get("token")).isPresent().get().extracting(Cookie::value).isEqualTo("");
+    }
+
+    @Test
     @DisplayName("同名 Cookie 不同路径可共存")
     void shouldAllowMultipleCookiesWithDifferentPath() {
         ConfigurableCookieCollection collection = ConfigurableCookieCollection.create();

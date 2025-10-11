@@ -88,6 +88,9 @@ public class DefaultCookieCollection extends DefaultHeaderValue implements Confi
         if (cookie == null || StringUtils.isBlank(cookie.name())) {
             return;
         }
+        if (!HttpUtils.isValidCookiePair(cookie.name(), cookie.value())) {
+            throw new IllegalArgumentException("Invalid cookie: name or value is not allowed");
+        }
         store.computeIfAbsent(cookie.name(), k -> new ArrayList<>());
         List<Cookie> list = store.get(cookie.name());
         list.removeIf(c ->
