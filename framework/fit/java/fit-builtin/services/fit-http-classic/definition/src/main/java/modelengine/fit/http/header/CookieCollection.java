@@ -33,7 +33,7 @@ public interface CookieCollection extends HeaderValue {
      * @param name 表示 Cookie 名字的 {@link String}。
      * @return 返回所有匹配名字的 {@link Cookie} 列表。
      */
-    List<Cookie> findByName(String name);
+    List<Cookie> all(String name);
 
     /**
      * 获取集合中所有的 {@link Cookie}。
@@ -55,7 +55,7 @@ public interface CookieCollection extends HeaderValue {
      *
      * @return 表示请求头的字符串。
      */
-    String toRequestHeader();
+    String toRequestHeaderValue();
 
     /**
      * 将集合转换为 HTTP 响应头形式的字符串列表。
@@ -63,5 +63,5 @@ public interface CookieCollection extends HeaderValue {
      *
      * @return 表示响应头列表的 {@link List}{@code <}{@link String}{@code >}。
      */
-    List<String> toResponseHeaders();
+    List<String> toResponseHeadersValues();
 }

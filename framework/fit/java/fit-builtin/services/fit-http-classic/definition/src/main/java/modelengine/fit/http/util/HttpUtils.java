@@ -49,10 +49,9 @@ import java.util.regex.Pattern;
  * @since 2022-07-22
  */
 public class HttpUtils {
-
     private static final char STRING_VALUE_SURROUNDED = '\"';
-    private static final String COOKIES_FORMAT_SEPARATOR = "; ";
     private static final String COOKIES_PARSE_SEPARATOR = ";";
+    private static final String COOKIES_FORMAT_SEPARATOR = COOKIES_PARSE_SEPARATOR + " ";
     private static final String COOKIE_PAIR_SEPARATOR = "=";
 
     private static final Pattern TOKEN_PATTERN = Pattern.compile("^[!#$%&'*+\\-.^_`|~0-9a-zA-Z]+$");

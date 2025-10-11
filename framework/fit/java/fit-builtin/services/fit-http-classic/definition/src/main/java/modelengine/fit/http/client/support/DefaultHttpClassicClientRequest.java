@@ -156,7 +156,7 @@ public class DefaultHttpClassicClientRequest extends AbstractHttpClassicRequest 
         if (this.isCommitted()) {
             return;
         }
-        this.headers().set(COOKIE, this.cookies().toRequestHeader());
+        this.headers().set(COOKIE, this.cookies().toRequestHeaderValue());
         super.commit();
     }
 

@@ -63,7 +63,7 @@ public class DefaultCookieCollection extends DefaultHeaderValue implements Confi
     }
 
     @Override
-    public List<Cookie> findByName(String name) {
+    public List<Cookie> all(String name) {
         return store.getOrDefault(name, Collections.emptyList());
     }
 
@@ -101,14 +101,14 @@ public class DefaultCookieCollection extends DefaultHeaderValue implements Confi
     }
 
     @Override
-    public String toRequestHeader() {
+    public String toRequestHeaderValue() {
         return all().stream()
                 .map(c -> c.name() + "=" + c.value())
                 .collect(Collectors.joining("; "));
     }
 
     @Override
-    public List<String> toResponseHeaders() {
+    public List<String> toResponseHeadersValues() {
         return all().stream()
                 .map(HttpUtils::formatSetCookie)
                 .collect(Collectors.toList());

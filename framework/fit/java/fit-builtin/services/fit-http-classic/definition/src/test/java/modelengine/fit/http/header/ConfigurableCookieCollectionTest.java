@@ -87,7 +87,7 @@ class ConfigurableCookieCollectionTest {
         collection.add(Cookie.builder().name("user").value("A").path("/a").build());
         collection.add(Cookie.builder().name("user").value("B").path("/b").build());
 
-        List<Cookie> sameNameCookies = collection.findByName("user");
+        List<Cookie> sameNameCookies = collection.all("user");
         assertThat(sameNameCookies).hasSize(2);
     }
 
@@ -102,7 +102,7 @@ class ConfigurableCookieCollectionTest {
         collection.add(c1);
         collection.add(c2);
 
-        List<Cookie> cookies = collection.findByName("id");
+        List<Cookie> cookies = collection.all("id");
         assertThat(cookies).hasSize(1);
         assertThat(cookies.get(0).value()).isEqualTo("2");
     }
@@ -114,7 +114,7 @@ class ConfigurableCookieCollectionTest {
         collection.add(Cookie.builder().name("a").value("1").build());
         collection.add(Cookie.builder().name("b").value("2").build());
 
-        String header = collection.toRequestHeader();
+        String header = collection.toRequestHeaderValue();
         assertThat(header).isEqualTo("a=1; b=2");
     }
 
@@ -125,7 +125,7 @@ class ConfigurableCookieCollectionTest {
         collection.add(Cookie.builder().name("token").value("xyz").secure(true).httpOnly(true).build());
         collection.add(Cookie.builder().name("lang").value("zh-CN").sameSite("Lax").build());
 
-        List<String> headers = collection.toResponseHeaders();
+        List<String> headers = collection.toResponseHeadersValues();
 
         assertThat(headers).hasSize(2);
         assertThat(headers.get(0)).contains("token=xyz");

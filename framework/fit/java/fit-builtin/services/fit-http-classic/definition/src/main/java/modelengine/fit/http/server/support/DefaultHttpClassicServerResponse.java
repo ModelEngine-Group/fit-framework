@@ -256,7 +256,7 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
         if (this.isCommitted()) {
             return;
         }
-        this.headers().set(SET_COOKIE, this.cookies().toResponseHeaders());
+        this.headers().set(SET_COOKIE, this.cookies().toResponseHeadersValues());
         if (this.entity != null) {
             this.setContentTypeByEntity(this.headers(), this.entity);
             if (this.entity instanceof FileEntity) {
