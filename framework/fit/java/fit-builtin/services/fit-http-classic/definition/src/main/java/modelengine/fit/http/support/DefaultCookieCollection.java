@@ -6,6 +6,8 @@
 
 package modelengine.fit.http.support;
 
+import static modelengine.fit.http.util.HttpUtils.COOKIES_FORMAT_SEPARATOR;
+import static modelengine.fit.http.util.HttpUtils.COOKIE_PAIR_SEPARATOR;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fit.http.Cookie;
@@ -103,8 +105,8 @@ public class DefaultCookieCollection extends DefaultHeaderValue implements Confi
     @Override
     public String toRequestHeaderValue() {
         return all().stream()
-                .map(c -> c.name() + "=" + c.value())
-                .collect(Collectors.joining("; "));
+                .map(c -> c.name() + COOKIE_PAIR_SEPARATOR + c.value())
+                .collect(Collectors.joining(COOKIES_FORMAT_SEPARATOR));
     }
 
     @Override

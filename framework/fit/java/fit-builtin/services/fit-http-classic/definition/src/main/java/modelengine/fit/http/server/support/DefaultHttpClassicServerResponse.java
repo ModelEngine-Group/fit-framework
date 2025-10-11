@@ -26,7 +26,6 @@ import modelengine.fit.http.entity.TextEvent;
 import modelengine.fit.http.entity.TextEventStreamEntity;
 import modelengine.fit.http.entity.WritableBinaryEntity;
 import modelengine.fit.http.entity.support.DefaultWritableBinaryEntity;
-import modelengine.fit.http.header.ConfigurableCookieCollection;
 import modelengine.fit.http.header.ContentDisposition;
 import modelengine.fit.http.header.ContentType;
 import modelengine.fit.http.header.HeaderValue;
@@ -280,10 +279,5 @@ public class DefaultHttpClassicServerResponse extends AbstractHttpClassicRespons
             this.entity.close();
             this.entity = null;
         }
-    }
-
-    @Override
-    public ConfigurableCookieCollection cookies() {
-        return (ConfigurableCookieCollection) super.cookies();
     }
 }

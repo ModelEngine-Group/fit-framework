@@ -51,8 +51,8 @@ import java.util.regex.Pattern;
 public class HttpUtils {
     private static final char STRING_VALUE_SURROUNDED = '\"';
     private static final String COOKIES_PARSE_SEPARATOR = ";";
-    private static final String COOKIES_FORMAT_SEPARATOR = COOKIES_PARSE_SEPARATOR + " ";
-    private static final String COOKIE_PAIR_SEPARATOR = "=";
+    public static final String COOKIES_FORMAT_SEPARATOR = COOKIES_PARSE_SEPARATOR + " ";
+    public static final String COOKIE_PAIR_SEPARATOR = "=";
 
     private static final Pattern TOKEN_PATTERN = Pattern.compile("^[!#$%&'*+\\-.^_`|~0-9a-zA-Z]+$");
 

@@ -13,7 +13,6 @@ import static modelengine.fitframework.inspection.Validation.notNull;
 import modelengine.fit.http.HttpClassicRequest;
 import modelengine.fit.http.HttpResource;
 import modelengine.fit.http.header.ConfigurableCookieCollection;
-import modelengine.fit.http.header.CookieCollection;
 import modelengine.fit.http.header.HeaderValue;
 import modelengine.fit.http.protocol.HttpRequestMethod;
 import modelengine.fit.http.protocol.MessageHeaderNames;
@@ -77,7 +76,7 @@ public abstract class AbstractHttpClassicRequest extends AbstractHttpMessage imp
     }
 
     @Override
-    public CookieCollection cookies() {
+    public ConfigurableCookieCollection cookies() {
         return this.cookies;
     }
 }
