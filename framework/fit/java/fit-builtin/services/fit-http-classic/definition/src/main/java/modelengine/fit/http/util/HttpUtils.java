@@ -163,10 +163,18 @@ public class HttpUtils {
             return -1;
         }
         try {
-            ZonedDateTime expires =
-                    ZonedDateTime.parse(expiresString, DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US));
+            ZonedDateTime expires = ZonedDateTime.parse(
+                    expiresString,
+                    DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.US)
+            );
             long seconds = Duration.between(ZonedDateTime.now(ZoneOffset.UTC), expires).getSeconds();
-            return (int) Math.max(seconds, 0);
+            if (seconds <= 0) {
+                return 0;
+            }
+            if (seconds > Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE;
+            }
+            return (int) seconds;
         } catch (DateTimeParseException e) {
             return -1;
         }
