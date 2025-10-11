@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -169,8 +170,8 @@ public class Unzip extends AbstractZip<Unzip> {
             int part;
             while ((part = in.read(buffer, 0, buffer.length)) >= 0) {
                 if ((compressed += part) > maxSize) {
-                    throw new SecurityException(StringUtils.format("The file to unzip is too large. [file={0}, "
-                                    + "max={1}]",
+                    String template = "The file to unzip is too large. [file={0}, max={1}]";
+                    throw new SecurityException(StringUtils.format(template,
                             this.file().getName(),
                             this.security.getCompressedTotalSize()));
                 }
@@ -202,26 +203,47 @@ public class Unzip extends AbstractZip<Unzip> {
                 return this.getActualTarget(redirect.redirectedFile);
             }
         }
+
         String name = entry.getName();
-        File actualTarget = new File(name);
-        return this.getActualTarget(actualTarget);
+
+        // 检查是否包含绝对路径字符(以'/'或驱动器字母开头)
+        if (name.startsWith("/") || name.startsWith("\\") || (name.length() > 1 && name.charAt(1) == ':')) {
+            if (!this.security.isCrossPath()) {
+                throw new SecurityException(StringUtils.format("Detected a potential path traversal attack. [path={0}]",
+                        name));
+            }
+        }
+
+        Path targetDir = this.getTargetDirectory().toPath().normalize();
+        Path targetPath = targetDir.resolve(name).normalize();
+
+        // 使用Path.startsWith进行前缀检查(比String.startsWith更安全)
+        if (!this.security.isCrossPath() && !targetPath.startsWith(targetDir)) {
+            throw new SecurityException(StringUtils.format("Detected a potential path traversal attack. [path={0}]",
+                    name));
+        }
+
+        return targetPath.toFile();
     }
 
     private File getActualTarget(File target) {
-        File actual = target;
-        if (!target.isAbsolute()) {
-            actual = new File(this.getTargetDirectory(), target.getPath());
+        // 如果是绝对路径,redirector明确指定,直接返回(redirector的职责)
+        if (target.isAbsolute()) {
+            return FileUtils.canonicalize(target);
         }
-        actual = FileUtils.canonicalize(actual);
+
+        Path targetDir = this.getTargetDirectory().toPath().normalize();
+        Path actual = targetDir.resolve(target.toPath()).normalize();
+
         if (this.security.isCrossPath()) {
-            return actual;
+            return actual.toFile();
         }
-        File targetDirectory = FileUtils.canonicalize(this.getTargetDirectory());
-        if (!actual.getPath().startsWith(targetDirectory.getPath())) {
-            throw new SecurityException(
-                    StringUtils.format("Detected a potential path traversal attack. [path={0}]", target.getPath()));
+
+        if (!actual.startsWith(targetDir)) {
+            throw new SecurityException(StringUtils.format("Detected a potential path traversal attack. [path={0}]",
+                    target.getPath()));
         }
-        return actual;
+        return actual.toFile();
     }
 
     private File getTargetDirectory() {
