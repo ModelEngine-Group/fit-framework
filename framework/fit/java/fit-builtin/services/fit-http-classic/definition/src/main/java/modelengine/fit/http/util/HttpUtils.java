@@ -236,7 +236,7 @@ public class HttpUtils {
      * @return 如果 name 和 value 都合法返回 {@code true}，否则返回 {@code false}。
      */
     public static boolean isInvalidCookiePair(String name, String value) {
-        if (name == null || name.isEmpty() || !TOKEN_PATTERN.matcher(name).matches()) {
+        if (StringUtils.isEmpty(name) || !TOKEN_PATTERN.matcher(name).matches()) {
             return true;
         }
         if (value == null) {

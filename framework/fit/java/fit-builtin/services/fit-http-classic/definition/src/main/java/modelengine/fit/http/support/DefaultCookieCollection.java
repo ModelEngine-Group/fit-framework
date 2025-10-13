@@ -13,6 +13,7 @@ import modelengine.fit.http.Cookie;
 import modelengine.fit.http.header.ConfigurableCookieCollection;
 import modelengine.fit.http.header.CookieCollection;
 import modelengine.fit.http.util.HttpUtils;
+import modelengine.fitframework.util.CollectionUtils;
 import modelengine.fitframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -35,8 +36,8 @@ public class DefaultCookieCollection implements ConfigurableCookieCollection {
 
     @Override
     public Optional<Cookie> get(String name) {
-        List<Cookie> cookies = store.get(name);
-        if (cookies == null || cookies.isEmpty()) {
+        List<Cookie> cookies = this.store.get(name);
+        if (CollectionUtils.isEmpty(cookies)) {
             return Optional.empty();
         }
         return Optional.of(cookies.get(0));
@@ -44,17 +45,17 @@ public class DefaultCookieCollection implements ConfigurableCookieCollection {
 
     @Override
     public List<Cookie> all(String name) {
-        return store.getOrDefault(name, Collections.emptyList());
+        return this.store.getOrDefault(name, Collections.emptyList());
     }
 
     @Override
     public List<Cookie> all() {
-        return store.values().stream().flatMap(List::stream).collect(Collectors.toList());
+        return this.store.values().stream().flatMap(List::stream).collect(Collectors.toList());
     }
 
     @Override
     public int size() {
-        return store.values().stream().mapToInt(List::size).sum();
+        return this.store.values().stream().mapToInt(List::size).sum();
     }
 
     @Override
@@ -63,10 +64,10 @@ public class DefaultCookieCollection implements ConfigurableCookieCollection {
             return;
         }
         if (HttpUtils.isInvalidCookiePair(cookie.name(), cookie.value())) {
-            throw new IllegalArgumentException("Invalid cookie: name or value is not allowed");
+            throw new IllegalArgumentException("Invalid cookie: name or value is not allowed.");
         }
-        store.computeIfAbsent(cookie.name(), k -> new ArrayList<>());
-        List<Cookie> list = store.get(cookie.name());
+        this.store.computeIfAbsent(cookie.name(), k -> new ArrayList<>());
+        List<Cookie> list = this.store.get(cookie.name());
         list.removeIf(c -> Objects.equals(c.path(), cookie.path()) && Objects.equals(c.domain(), cookie.domain()));
         list.add(cookie);
     }
