@@ -31,15 +31,4 @@ public interface ConfigurableCookieCollection extends CookieCollection {
     static ConfigurableCookieCollection create() {
         return new DefaultCookieCollection();
     }
-
-    /**
-     * 根据指定的消息头创建一个可读可写的 Cookie 集合。
-     *
-     * @param headerValue 表示指定消息头的 {@link HeaderValue}。
-     * @return 表示创建出来的可读可写的 Cookie 集合的 {@link ConfigurableCookieCollection}。
-     * @throws IllegalArgumentException 当 {@code headerValue} 为 {@code null} 时。
-     */
-    static ConfigurableCookieCollection create(HeaderValue headerValue) {
-        return new DefaultCookieCollection(headerValue);
-    }
 }

@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author 季聿阶
  * @since 2022-07-06
  */
-public interface CookieCollection extends HeaderValue {
+public interface CookieCollection {
     /**
      * 获取指定名字的 {@link Cookie}。
      * <p>如果存在多个同名 Cookie，返回第一个匹配的 Cookie。</p>

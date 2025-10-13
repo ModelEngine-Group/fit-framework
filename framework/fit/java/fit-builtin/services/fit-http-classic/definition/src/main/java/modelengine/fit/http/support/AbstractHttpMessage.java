@@ -8,7 +8,6 @@ package modelengine.fit.http.support;
 
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONTENT_LENGTH;
 import static modelengine.fit.http.protocol.MessageHeaderNames.CONTENT_TYPE;
-import static modelengine.fit.http.protocol.MessageHeaderNames.COOKIE;
 import static modelengine.fit.http.protocol.MessageHeaderNames.TRANSFER_ENCODING;
 import static modelengine.fit.http.protocol.MessageHeaderValues.CHUNKED;
 import static modelengine.fitframework.inspection.Validation.notNull;
@@ -52,6 +51,7 @@ public abstract class AbstractHttpMessage implements HttpMessage {
     private final HttpResource httpResource;
     private final StartLine startLine;
     private final MessageHeaders headers;
+    private final ConfigurableCookieCollection cookies;
     private final Map<MimeType, EntitySerializer<? extends Entity>> customEntitySerializers = new HashMap<>();
     private ObjectSerializer customJsonSerializer;
     private boolean isCommitted;
@@ -67,6 +67,7 @@ public abstract class AbstractHttpMessage implements HttpMessage {
         this.httpResource = notNull(httpResource, "The http resource cannot be null.");
         this.startLine = notNull(startLine, "The start line cannot be null.");
         this.headers = notNull(headers, "The message headers cannot be null.");
+        this.cookies = ConfigurableCookieCollection.create();
     }
 
     @Override
@@ -133,6 +134,11 @@ public abstract class AbstractHttpMessage implements HttpMessage {
             return -1;
         }
         return Integer.parseInt(value);
+    }
+
+    @Override
+    public ConfigurableCookieCollection cookies() {
+        return this.cookies;
     }
 
     /**

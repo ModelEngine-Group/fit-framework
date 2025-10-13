@@ -11,7 +11,6 @@ import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fit.http.HttpClassicResponse;
 import modelengine.fit.http.HttpResource;
-import modelengine.fit.http.header.ConfigurableCookieCollection;
 import modelengine.fit.http.protocol.MessageHeaders;
 import modelengine.fit.http.protocol.RequestLine;
 import modelengine.fit.http.protocol.StatusLine;
@@ -27,7 +26,6 @@ import java.util.List;
  */
 public abstract class AbstractHttpClassicResponse extends AbstractHttpMessage implements HttpClassicResponse {
     private final StatusLine startLine;
-    private final ConfigurableCookieCollection cookies;
 
     /**
      * 创建经典的 Http 响应对象。
@@ -41,8 +39,7 @@ public abstract class AbstractHttpClassicResponse extends AbstractHttpMessage im
         this.startLine = notNull(startLine, "The status line cannot be null.");
         notNull(headers, "The headers cannot be null.");
         List<String> actualCookies = headers.all(SET_COOKIE);
-        this.cookies = ConfigurableCookieCollection.create();
-        actualCookies.stream().map(HttpUtils::parseSetCookie).forEach(cookies::add);
+        actualCookies.stream().map(HttpUtils::parseSetCookie).forEach(this.cookies()::add);
     }
 
     @Override
@@ -53,10 +50,5 @@ public abstract class AbstractHttpClassicResponse extends AbstractHttpMessage im
     @Override
     public String reasonPhrase() {
         return this.startLine.reasonPhrase();
-    }
-
-    @Override
-    public ConfigurableCookieCollection cookies() {
-        return this.cookies;
     }
 }

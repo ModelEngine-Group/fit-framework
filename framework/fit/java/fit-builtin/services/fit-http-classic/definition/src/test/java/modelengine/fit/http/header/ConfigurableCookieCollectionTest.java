@@ -25,23 +25,11 @@ import java.util.List;
 @DisplayName("测试 ConfigurableCookieCollection 类")
 class ConfigurableCookieCollectionTest {
     @Test
-    @DisplayName("当构建 Cookie 集合的参数为 null 时，抛出异常")
-    void givenNullThenThrowException() {
-        assertThatThrownBy(this::buildNullCookieCollection).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    private void buildNullCookieCollection() {
-        ConfigurableCookieCollection.create(null);
-    }
-
-    @Test
     @DisplayName("返回所有的 Cookie")
     void shouldReturnAllCookie() {
         final Cookie cookie = Cookie.builder()
                 .name("idea")
                 .value("00ae-u98i")
-                .version(1)
-                .comment("")
                 .domain("localhost")
                 .maxAge(10)
                 .path("/")
@@ -131,16 +119,5 @@ class ConfigurableCookieCollectionTest {
         assertThat(headers.get(0)).contains("token=xyz");
         assertThat(headers.get(1)).contains("lang=zh-CN");
         assertThat(headers.get(1)).contains("SameSite=Lax");
-    }
-
-    @Test
-    @DisplayName("从 HeaderValue 初始化应正确解析多个 Cookie")
-    void shouldInitializeFromHeaderValue() {
-        String header = "a=1; b=2; c=3";
-        ConfigurableCookieCollection collection = ConfigurableCookieCollection.create(HeaderValue.create(header));
-
-        assertThat(collection.size()).isEqualTo(3);
-        assertThat(collection.get("b")).isPresent();
-        assertThat(collection.get("b").get().value()).isEqualTo("2");
     }
 }
