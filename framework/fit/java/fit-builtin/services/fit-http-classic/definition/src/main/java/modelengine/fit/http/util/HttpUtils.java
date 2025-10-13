@@ -116,50 +116,13 @@ public class HttpUtils {
             return Cookie.builder().build();
         }
 
-        Cookie.Builder builder = Cookie.builder();
-
-        String[] parts = rawCookie.split(COOKIES_PARSE_SEPARATOR);
-        String[] nameValue = parts[0].split(COOKIE_PAIR_SEPARATOR, 2);
-
-        String name = nameValue[0].trim();
-        String value = nameValue.length > 1 ? nameValue[1].trim() : StringUtils.EMPTY;
-
-        if (isValueSurrounded(value)) {
-            value = value.substring(1, value.length() - 1);
-        }
-        if (!isValidCookiePair(name, value)) {
+        var parts = rawCookie.split(COOKIES_PARSE_SEPARATOR);
+        var builder = parseCookieNameValue(parts[0]);
+        if (builder == null) {
             return Cookie.builder().build();
         }
 
-        builder.name(name);
-        builder.value(value);
-
-        for (int i = 1; i < parts.length; i++) {
-            String part = parts[i].trim();
-            if (part.isEmpty()) {
-                continue;
-            }
-
-            String[] kv = part.split(COOKIE_PAIR_SEPARATOR, 2);
-            String key = kv[0].trim().toLowerCase(Locale.ROOT);
-            String val = kv.length > 1 ? kv[1].trim() : StringUtils.EMPTY;
-
-            if (PATH_KEY.equals(key)) {
-                builder.path(val);
-            } else if (DOMAIN_KEY.equals(key)) {
-                builder.domain(val);
-            } else if (MAX_AGE_KEY.equals(key)) {
-                builder.maxAge(safeParseInt(val));
-            } else if (EXPIRES_KEY.equals(key)) {
-                builder.maxAge(convertExpiresToMaxAge(val));
-            } else if (SECURE_KEY.equals(key)) {
-                builder.secure(true);
-            } else if (HTTP_ONLY_KEY.equals(key)) {
-                builder.httpOnly(true);
-            } else if (SAME_SITE_KEY.equals(key)) {
-                builder.sameSite(val);
-            }
-        }
+        parseCookieAttributes(parts, builder);
         return builder.build();
     }
 
@@ -204,27 +167,65 @@ public class HttpUtils {
         }
 
         List<Cookie> cookies = new ArrayList<>();
-        for (String pair : rawCookie.split(COOKIES_PARSE_SEPARATOR)) {
-            String trimmed = pair.trim();
-            if (trimmed.isEmpty()) {
-                continue;
-            }
-
-            int eqIndex = trimmed.indexOf(COOKIE_PAIR_SEPARATOR);
-            if (eqIndex <= 0) {
-                continue;
-            }
-
-            String name = trimmed.substring(0, eqIndex).trim();
-            String value = trimmed.substring(eqIndex + 1).trim();
-            if (isValueSurrounded(value)) {
-                value = value.substring(1, value.length() - 1);
-            }
-            if (isValidCookiePair(name, value)) {
-                cookies.add(Cookie.builder().name(name).value(value).build());
+        for (String part : rawCookie.split(COOKIES_PARSE_SEPARATOR)) {
+            Cookie.Builder builder = parseCookieNameValue(part.trim());
+            if (builder != null) {
+                cookies.add(builder.build());
             }
         }
         return cookies;
+    }
+
+    private static Cookie.Builder parseCookieNameValue(String part) {
+        String trimmed = part.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        int eqIndex = trimmed.indexOf(COOKIE_PAIR_SEPARATOR);
+        if (eqIndex <= 0) {
+            return null;
+        }
+
+        String name = trimmed.substring(0, eqIndex).trim();
+        String value = trimmed.substring(eqIndex + 1).trim();
+        if (isValueSurrounded(value)) {
+            value = value.substring(1, value.length() - 1);
+        }
+
+        if (isInvalidCookiePair(name, value)) {
+            return null;
+        }
+        return Cookie.builder().name(name).value(value);
+    }
+
+    private static void parseCookieAttributes(String[] parts, Cookie.Builder builder) {
+        for (int i = 1; i < parts.length; i++) {
+            var part = parts[i].trim();
+            if (part.isEmpty()) {
+                continue;
+            }
+
+            var kv = part.split(COOKIE_PAIR_SEPARATOR, 2);
+            var key = kv[0].trim().toLowerCase(Locale.ROOT);
+            var val = kv.length > 1 ? kv[1].trim() : StringUtils.EMPTY;
+
+            if (PATH_KEY.equals(key)) {
+                builder.path(val);
+            } else if (DOMAIN_KEY.equals(key)) {
+                builder.domain(val);
+            } else if (MAX_AGE_KEY.equals(key)) {
+                builder.maxAge(safeParseInt(val));
+            } else if (EXPIRES_KEY.equals(key)) {
+                builder.maxAge(convertExpiresToMaxAge(val));
+            } else if (SECURE_KEY.equals(key)) {
+                builder.secure(true);
+            } else if (HTTP_ONLY_KEY.equals(key)) {
+                builder.httpOnly(true);
+            } else if (SAME_SITE_KEY.equals(key)) {
+                builder.sameSite(val);
+            }
+        }
     }
 
     /**
@@ -234,17 +235,17 @@ public class HttpUtils {
      * @param value 表示 Cookie 的值 {@link String}，允许为空但不允许为 {@code null}，可带双引号。
      * @return 如果 name 和 value 都合法返回 {@code true}，否则返回 {@code false}。
      */
-    public static boolean isValidCookiePair(String name, String value) {
+    public static boolean isInvalidCookiePair(String name, String value) {
         if (name == null || name.isEmpty() || !TOKEN_PATTERN.matcher(name).matches()) {
-            return false;
+            return true;
         }
         if (value == null) {
-            return false;
+            return true;
         }
         if (isValueSurrounded(value)) {
             value = value.substring(1, value.length() - 1);
         }
-        return value.isEmpty() || TOKEN_PATTERN.matcher(value).matches();
+        return !value.isEmpty() && !TOKEN_PATTERN.matcher(value).matches();
     }
 
     /**

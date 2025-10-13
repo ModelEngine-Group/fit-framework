@@ -39,8 +39,8 @@ public abstract class AbstractHttpClassicResponse extends AbstractHttpMessage im
     public AbstractHttpClassicResponse(HttpResource httpResource, StatusLine startLine, MessageHeaders headers) {
         super(httpResource, startLine, headers);
         this.startLine = notNull(startLine, "The status line cannot be null.");
-        MessageHeaders headers1 = notNull(headers, "The headers cannot be null.");
-        List<String> actualCookies = headers1.all(SET_COOKIE);
+        notNull(headers, "The headers cannot be null.");
+        List<String> actualCookies = headers.all(SET_COOKIE);
         this.cookies = ConfigurableCookieCollection.create();
         actualCookies.stream().map(HttpUtils::parseSetCookie).forEach(cookies::add);
     }

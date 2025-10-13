@@ -117,6 +117,11 @@ public interface Cookie {
 
         /**
          * 向当前构建器中设置 Cookie 的版本。
+         * <p>
+         * 此属性源自 <a href="https://datatracker.ietf.org/doc/html/rfc2965">RFC 2965</a>，
+         * 但已在 <a href="https://datatracker.ietf.org/doc/html/rfc6265#section-4.1.2">RFC 6265</a>
+         * 中移出标准定义。现代浏览器会忽略该属性。
+         * </p>
          *
          * @param version 表示待设置的 Cookie 版本的 {@code int}。
          * @return 表示当前构建器的 {@link Builder}。
@@ -126,6 +131,11 @@ public interface Cookie {
 
         /**
          * 向当前构建器中设置 Cookie 的注释。
+         * <p>
+         * 此属性源自 <a href="https://datatracker.ietf.org/doc/html/rfc2965">RFC 2965</a>，
+         * 但已在 <a href="https://datatracker.ietf.org/doc/html/rfc6265#section-4.1.2">RFC 6265</a>
+         * 中移出标准定义。现代浏览器会忽略该属性。
+         * </p>
          *
          * @param comment 表示待设置的 Cookie 注释的 {@link String}。
          * @return 表示当前构建器的 {@link Builder}。
@@ -175,6 +185,11 @@ public interface Cookie {
 
         /**
          * 向当前构建器中设置 Cookie 限制跨站请求时发送行为安全级别。
+         * <p>
+         * 该属性定义于 <a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis#section-4.1.2.7">
+         * RFC 6265bis 草案第 4.1.2.7 节</a>，用于控制跨站请求时是否发送 Cookie。
+         * 尽管该规范尚处于草案阶段，但已被主流浏览器（如 Chrome、Firefox、Safari、Edge）广泛支持。
+         * </p>
          *
          * @param sameSite SameSite 值，如 "Strict", "Lax", "None"。
          * @return 表示当前构建器的 {@link Builder}。
