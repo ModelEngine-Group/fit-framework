@@ -5,7 +5,7 @@ set -euo pipefail
 # 用于测试完整的构建、推送、拉取流程
 
 # 配置
-REGISTRY_PORT="${REGISTRY_PORT:-5000}"
+REGISTRY_PORT="${REGISTRY_PORT:-5001}"  # 默认使用 5001，因为 macOS 的 5000 通常被占用
 REGISTRY_URL="localhost:${REGISTRY_PORT}"
 FIT_VERSION="${FIT_VERSION:-3.5.3}"
 TEST_OS="${1:-ubuntu}"
@@ -41,7 +41,8 @@ FIT Framework 本地镜像仓库测试脚本
              可选: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
 
 环境变量:
-  REGISTRY_PORT    本地仓库端口 [默认: 5000]
+  REGISTRY_PORT    本地仓库端口 [默认: 5001]
+                   注意: macOS 上 5000 端口通常被系统占用
   FIT_VERSION      FIT Framework 版本 [默认: 3.5.3]
 
 示例:

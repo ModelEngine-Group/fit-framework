@@ -5,7 +5,7 @@ set -euo pipefail
 # 用于快速验证基础镜像是否可以正常构建和运行
 
 OS_NAME="${1:-ubuntu}"
-FIT_VERSION="3.5.1"
+FIT_VERSION="${FIT_VERSION:-3.5.3}"
 
 echo "=============================================="
 echo "🧪 FIT Framework 基础镜像测试"
