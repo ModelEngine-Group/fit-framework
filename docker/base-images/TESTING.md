@@ -21,6 +21,7 @@
 
 **使用方法**:
 ```bash
+# 必须在 base-images 目录下运行
 cd docker/base-images
 
 # 测试 Ubuntu 镜像
@@ -32,6 +33,8 @@ cd docker/base-images
 # 指定版本
 FIT_VERSION=3.5.4 ./test-build.sh ubuntu
 ```
+
+**注意**: 脚本必须在 `docker/base-images` 目录下运行，因为需要访问 `common/` 目录中的脚本文件。
 
 **执行流程**:
 ```
@@ -65,6 +68,7 @@ FIT_VERSION=3.5.4 ./test-build.sh ubuntu
 
 **使用方法**:
 ```bash
+# 必须在 base-images 目录下运行
 cd docker/base-images
 
 # 使用默认端口 5001
@@ -80,6 +84,8 @@ REGISTRY_PORT=5002 ./test-local-registry.sh ubuntu
 # 指定版本
 FIT_VERSION=3.5.4 ./test-local-registry.sh ubuntu
 ```
+
+**注意**: 脚本必须在 `docker/base-images` 目录下运行，因为需要访问 `common/` 目录和各 OS 子目录。
 
 **执行流程**:
 ```

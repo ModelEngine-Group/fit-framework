@@ -23,8 +23,10 @@ fi
 
 # 构建基础镜像
 echo "📦 步骤 1/3: 构建基础镜像..."
-cd "${OS_NAME}"
-docker build -t "fit-framework:${OS_NAME}-test" .
+# 需要从 base-images 目录构建，以便访问 common/ 目录
+docker build --build-arg FIT_VERSION="${FIT_VERSION}" \
+    -t "fit-framework:${OS_NAME}-test" \
+    -f "${OS_NAME}/Dockerfile" .
 
 if [[ $? -ne 0 ]]; then
     echo "❌ 基础镜像构建失败"
@@ -41,14 +43,12 @@ docker images "fit-framework:${OS_NAME}-test" --format "table {{.Repository}}:{{
 
 echo ""
 echo "测试基本命令..."
-if docker run --rm "fit-framework:${OS_NAME}-test" fit --version; then
+if docker run --rm "fit-framework:${OS_NAME}-test" fit help > /dev/null 2>&1; then
     echo "✅ 基础镜像可以正常运行"
 else
     echo "❌ 基础镜像运行失败"
     exit 1
 fi
-
-cd ..
 
 echo ""
 echo "🏗️  步骤 3/3: 构建测试应用..."
@@ -60,7 +60,7 @@ read -p "是否构建测试应用镜像? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "构建测试应用镜像..."
-    cd ..
+    cd ../..
     docker build -f "docker/base-images/${OS_NAME}/Dockerfile.test" \
         -t "fit-example:simple-web-app-${OS_NAME}" .
 
