@@ -156,9 +156,9 @@ USER fit
 # 暴露端口
 EXPOSE 8080
 
-# 设置健康检查
+# 设置健康检查（使用 actuator/plugins 端点）
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+    CMD curl -f http://localhost:8080/actuator/plugins > /dev/null 2>&1 || exit 1
 
 # 启动命令
 CMD ["fit", "start"]
@@ -195,7 +195,8 @@ log_info "等待应用启动 (约 10-15 秒)..."
 # 等待应用启动
 for i in {1..30}; do
     if docker ps --filter "name=fit-e2e-app" --format "{{.Status}}" | grep -q "Up"; then
-        if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+        # 使用 /actuator/plugins 作为健康检查端点
+        if curl -s http://localhost:8080/actuator/plugins > /dev/null 2>&1; then
             log_info "✓ 应用已就绪"
             break
         fi
@@ -227,9 +228,12 @@ HEALTH=$(docker inspect fit-e2e-app --format='{{.State.Health.Status}}' 2>/dev/n
 echo "  健康状态: ${HEALTH}"
 
 log_info "测试 3: 访问 HTTP 端点"
-if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+if curl -s http://localhost:8080/actuator/plugins > /dev/null 2>&1; then
     echo "  ✓ HTTP 服务可访问"
-    echo "  URL: http://localhost:8080"
+    echo "  URL: http://localhost:8080/actuator/plugins"
+    # 显示插件数量
+    PLUGIN_COUNT=$(curl -s http://localhost:8080/actuator/plugins | jq '. | length' 2>/dev/null || echo "N/A")
+    echo "  已加载插件数: ${PLUGIN_COUNT}"
 else
     log_warn "HTTP 服务暂不可用 (这可能是正常的，FIT 可能还在初始化)"
 fi
