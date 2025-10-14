@@ -1,0 +1,40 @@
+# 测试Dockerfile - 基于FIT基础镜像构建simple-web-app示例
+# 此文件用于验证基础镜像是否可以正常工作
+
+# 第一阶段：使用Maven构建应用
+FROM maven:3.9-openjdk-17-slim AS builder
+
+WORKDIR /build
+
+# 复制pom文件以利用Docker层缓存
+COPY examples/fit-example/01-simple-web-app/pom.xml ./pom.xml
+COPY examples/fit-example/pom.xml ../pom.xml
+COPY examples/pom.xml ../../pom.xml
+COPY pom.xml ../../../pom.xml
+
+# 下载依赖
+RUN mvn dependency:go-offline -B || true
+
+# 复制源代码
+COPY examples/fit-example/01-simple-web-app/src ./src
+
+# 构建应用
+RUN mvn clean package -DskipTests -B
+
+# 第二阶段：使用FIT基础镜像运行
+FROM fit-framework:ubuntu-test
+
+# 切换到root用户以复制文件
+USER root
+
+# 从构建阶段复制构建产物
+COPY --from=builder --chown=fit:fit /build/target/*.jar ${FIT_JAVA_DIR}/dynamic-plugins/
+
+# 切换回fit用户
+USER fit
+
+# 暴露应用端口
+EXPOSE 8080
+
+# 使用默认启动命令
+CMD ["fit", "start"]
