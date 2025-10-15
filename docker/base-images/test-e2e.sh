@@ -78,6 +78,10 @@ cleanup() {
     docker rmi "fit-framework:${BUILD_OS}" >/dev/null 2>&1 || true
     docker rmi "fit-framework:${FIT_VERSION}-${BUILD_OS}" >/dev/null 2>&1 || true
 
+    # 清理悬空镜像（<none>:<none>）
+    log_info "清理悬空镜像..."
+    docker image prune -f >/dev/null 2>&1 || true
+
     log_info "✓ 清理完成"
 }
 

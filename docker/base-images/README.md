@@ -383,6 +383,7 @@ curl http://localhost:8080/actuator/plugins
 - 停止并删除 `fit-e2e-app` 容器
 - 停止并删除 `test-registry` 容器
 - 删除所有测试镜像（`fit-framework:*` 和 `localhost:15000/fit-framework:*`）
+- 清理悬空镜像（`<none>:<none>`，由重复构建产生）
 
 **手动清理** (仅在需要时使用):
 
