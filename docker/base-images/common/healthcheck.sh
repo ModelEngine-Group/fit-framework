@@ -2,7 +2,7 @@
 # FIT Framework Health Check Script
 
 FIT_HTTP_PORT="${FIT_HTTP_PORT:-8080}"
-HEALTH_ENDPOINT="http://localhost:${FIT_HTTP_PORT}/health"
+HEALTH_ENDPOINT="http://localhost:${FIT_HTTP_PORT}/actuator/plugins"
 
 # 检查进程是否运行
 check_process() {
