@@ -25,7 +25,7 @@ const {Panel} = Collapse;
  * @param shapeStatus 图形状态集合.
  * @returns {JSX.Element} DOM对象
  */
-const _VariableUpdateInputForm = ({variables, shapeStatus}) => {
+const _VariableUpdaterInputForm = ({variables, shapeStatus}) => {
 
   return (<>
     <div className={'jade-variable-input-content'}>
@@ -40,7 +40,7 @@ const _VariableUpdateInputForm = ({variables, shapeStatus}) => {
   </>);
 };
 
-_VariableUpdateInputForm.propTypes = {
+_VariableUpdaterInputForm.propTypes = {
   variables: PropTypes.array.isRequired, shapeStatus: PropTypes.object,
 };
 
@@ -60,7 +60,7 @@ const isVariablesEqual = (prevProps, nextProps) => {
   return true;
 };
 
-export const VariableUpdateInputForm = React.memo(_VariableUpdateInputForm, areEqual);
+export const VariableUpdaterInputForm = React.memo(_VariableUpdaterInputForm, areEqual);
 
 /**
  * 变量条目.

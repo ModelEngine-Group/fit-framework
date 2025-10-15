@@ -8,9 +8,9 @@ import React, {useState} from 'react';
 import {Button} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import PropTypes from 'prop-types';
-import {VariableUpdateInputForm} from './VariableUpdateInputForm.jsx';
+import {VariableUpdaterInputForm} from './VariableUpdaterInputForm.jsx';
 import {useTranslation} from 'react-i18next';
-import './variableUpdate.css';
+import './variableUpdater.css';
 import {useConfigContext, useDispatch} from '@/components/DefaultRoot.jsx';
 import {v4 as uuidv4} from 'uuid';
 
@@ -21,7 +21,7 @@ import {v4 as uuidv4} from 'uuid';
  * @param shapeStatus 图形状态集合.
  * @returns {JSX.Element} DOM对象.
  */
-const _VariableUpdateWrapper = ({data, shapeStatus}) => {
+const _VariableUpdaterWrapper = ({data, shapeStatus}) => {
   const {t} = useTranslation();
   const dispatch = useDispatch();
   const isConfig = useConfigContext();
@@ -60,13 +60,13 @@ const _VariableUpdateWrapper = ({data, shapeStatus}) => {
             <div className="jade-panel-header-font" style={{paddingLeft: '4px'}}>{t('add')}</div>
           </Button>
       </div>
-      <VariableUpdateInputForm variables={variables} shapeStatus={shapeStatus}/>
+      <VariableUpdaterInputForm variables={variables} shapeStatus={shapeStatus}/>
     </div>
   </>);
 };
 
-_VariableUpdateWrapper.propTypes = {
+_VariableUpdaterWrapper.propTypes = {
   data: PropTypes.object.isRequired, shapeStatus: PropTypes.object,
 };
 
-export const VariableUpdateWrapper = React.memo(_VariableUpdateWrapper);
+export const VariableUpdaterWrapper = React.memo(_VariableUpdaterWrapper);

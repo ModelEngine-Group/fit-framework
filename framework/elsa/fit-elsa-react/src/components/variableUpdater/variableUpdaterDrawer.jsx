@@ -5,23 +5,23 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {jadeNodeDrawer} from '../base/jadeNodeDrawer.jsx';
-import VariableUpdate from '../asserts/icon-variable-update.svg?react'; // 导入背景图片
+import VariableUpdater from '../asserts/icon-variable-update.svg?react'; // 导入背景图片
 
 /**
  * 变量更新节点绘制器
  *
  * @override
  */
-export const variableUpdateDrawer = (shape, div, x, y) => {
+export const variableUpdaterDrawer = (shape, div, x, y) => {
   const self = jadeNodeDrawer(shape, div, x, y);
-  self.type = 'variableUpdateDrawer';
+  self.type = 'variableUpdaterDrawer';
 
   /**
    * @override
    */
   self.getHeaderIcon = () => {
     return (<>
-      <VariableUpdate className='jade-node-custom-header-icon'/>
+      <VariableUpdater className='jade-node-custom-header-icon'/>
     </>);
   };
 

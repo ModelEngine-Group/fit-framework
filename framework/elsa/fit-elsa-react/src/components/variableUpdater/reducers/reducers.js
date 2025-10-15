@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {createDefaultVariable} from '@/components/variableUpdate/Constant.js';
+import {createDefaultVariable} from '@/components/variableUpdater/Constant.js';
 
 /**
  * 添加变量 事件处理器.

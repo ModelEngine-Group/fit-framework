@@ -6,18 +6,18 @@
 
 import {jadeNode} from '../base/jadeNode.jsx';
 import {DEFAULT_FLOW_META} from '@/common/Consts.js';
-import {variableUpdateDrawer} from '@/components/variableUpdate/variableUpdateDrawer.jsx';
+import {variableUpdaterDrawer} from '@/components/variableUpdater/variableUpdaterDrawer.jsx';
 
 /**
  * 变量更新节点.
  *
  * @override
  */
-export const variableUpdateNodeState = (id, x, y, width, height, parent, drawer) => {
-  const self = jadeNode(id, x, y, width, height, parent, drawer ? drawer : variableUpdateDrawer);
+export const variableUpdaterNodeState = (id, x, y, width, height, parent, drawer) => {
+  const self = jadeNode(id, x, y, width, height, parent, drawer ? drawer : variableUpdaterDrawer);
   self.text = '变量更新';
-  self.type = 'variableUpdateNodeState';
-  self.componentName = 'variableUpdateComponent';
+  self.type = 'variableUpdaterNodeState';
+  self.componentName = 'variableUpdaterComponent';
   self.flowMeta.jober.fitables.push("modelengine.fit.jade.aipp.variable.updater");
 
   /**

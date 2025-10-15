@@ -61,8 +61,8 @@ import {parallelNodeState} from '@/components/parallelNode/parallelNodeState.jsx
 import {parallelComponent} from '@/components/parallelNode/parallelComponent.jsx';
 import {textConcatenateNodeState} from "@/components/textConcatenationNode/textConcatenateNodeState.jsx";
 import {textConcatenateNodeComponent} from "@/components/textConcatenationNode/textConcatenateNodeComponent.jsx";
-import {variableUpdateNodeState} from '@/components/variableUpdate/variableUpdateNodeState.jsx';
-import {variableUpdateComponent} from '@/components/variableUpdate/variableUpdateComponent.jsx';
+import {variableUpdaterNodeState} from '@/components/variableUpdater/variableUpdaterNodeState.jsx';
+import {variableUpdaterComponent} from '@/components/variableUpdater/variableUpdaterComponent.jsx';
 import {replyNodeState} from '@/components/replyNode/replyNodeState.jsx';
 import {replyNodeComponent} from '@/components/replyNode/replyNodeComponent.jsx';
 
@@ -173,8 +173,8 @@ export const jadeFlowGraph = (div, title) => {
     self.registerPlugin('parallelComponent', parallelComponent);
     self.registerPlugin('textConcatenateNodeState', textConcatenateNodeState);
     self.registerPlugin('textConcatenateNodeComponent', textConcatenateNodeComponent);
-    self.registerPlugin('variableUpdateNodeState', variableUpdateNodeState);
-    self.registerPlugin('variableUpdateComponent', variableUpdateComponent);
+    self.registerPlugin('variableUpdaterNodeState', variableUpdaterNodeState);
+    self.registerPlugin('variableUpdaterComponent', variableUpdaterComponent);
     self.registerPlugin('replyNodeState', replyNodeState);
     self.registerPlugin('replyNodeComponent', replyNodeComponent);
     return initialize.apply(self);

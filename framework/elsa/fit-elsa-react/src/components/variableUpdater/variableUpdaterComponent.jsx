@@ -8,10 +8,10 @@ import {v4 as uuidv4} from 'uuid';
 
 import {defaultComponent} from '../defaultComponent.js';
 import {DATA_TYPES, FROM_TYPE} from '@/common/Consts.js';
-import {VariableUpdateWrapper} from '@/components/variableUpdate/VariableUpdateWrapper.jsx';
-import {AddVariableReducer, DeleteVariableReducer, UpdateVariableReducer} from '@/components/variableUpdate/reducers/reducers.js';
+import {VariableUpdaterWrapper} from '@/components/variableUpdater/VariableUpdaterWrapper.jsx';
+import {AddVariableReducer, DeleteVariableReducer, UpdateVariableReducer} from '@/components/variableUpdater/reducers/reducers.js';
 import {ChangeFlowMetaReducer} from '@/components/common/reducers/commonReducers.js';
-import {createDefaultVariable} from '@/components/variableUpdate/Constant.js';
+import {createDefaultVariable} from '@/components/variableUpdater/Constant.js';
 
 
 /**
@@ -20,7 +20,7 @@ import {createDefaultVariable} from '@/components/variableUpdate/Constant.js';
  * @param jadeConfig 组件配置信息
  * @return {{}} 组件
  */
-export const variableUpdateComponent = (jadeConfig) => {
+export const variableUpdaterComponent = (jadeConfig) => {
   const self = defaultComponent(jadeConfig);
   const addReducer = (map, reducer) => map.set(reducer.type, reducer);
   const builtInReducers = new Map();
@@ -52,7 +52,7 @@ export const variableUpdateComponent = (jadeConfig) => {
    * @param data 数据.
    */
   self.getReactComponents = (shapeStatus, data) => {
-    return (<><VariableUpdateWrapper shapeStatus={shapeStatus} data={data}/></>);
+    return (<><VariableUpdaterWrapper shapeStatus={shapeStatus} data={data}/></>);
   };
 
   /**
