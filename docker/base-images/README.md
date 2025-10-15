@@ -379,19 +379,27 @@ curl http://localhost:8080/actuator/plugins
 
 ### 清理测试环境
 
-```bash
-# 快速清理（停止容器）
-docker stop fit-e2e-app test-registry
-docker rm fit-e2e-app test-registry
+**自动清理**: 测试脚本会在退出时自动清理测试镜像和容器，包括：
+- 停止并删除 `fit-e2e-app` 容器
+- 停止并删除 `test-registry` 容器
+- 删除所有测试镜像（`fit-framework:*` 和 `localhost:15000/fit-framework:*`）
 
-# 完全清理（包括镜像）
-docker stop fit-e2e-app test-registry
-docker rm fit-e2e-app test-registry
-docker rmi localhost:15000/fit-framework:ubuntu
-docker rmi fit-framework:ubuntu
+**手动清理** (仅在需要时使用):
+
+```bash
+# 清理所有测试资源
+docker stop fit-e2e-app test-registry 2>/dev/null
+docker rm fit-e2e-app test-registry 2>/dev/null
+docker rmi localhost:15000/fit-framework:ubuntu 2>/dev/null
+docker rmi fit-framework:ubuntu 2>/dev/null
+
+# 清理 registry:2 基础镜像（可选，通常保留以复用）
+docker rmi registry:2
 ```
 
-**注意**: 测试脚本会在退出时自动清理容器（按 Ctrl+C 会触发清理）。
+**注意**:
+- `registry:2` 镜像不会被自动清理，可以复用于后续测试
+- 如需完全清理，请手动删除 `registry:2` 镜像
 
 ## 🔧 故障排除
 

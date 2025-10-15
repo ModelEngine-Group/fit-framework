@@ -66,10 +66,19 @@ REGISTRY_URL="localhost:${REGISTRY_PORT}"
 # 清理函数
 cleanup() {
     echo -e "\n${YELLOW}清理测试环境...${NC}"
-    docker stop fit-e2e-app 2>/dev/null || true
-    docker rm fit-e2e-app 2>/dev/null || true
-    docker stop test-registry 2>/dev/null || true
-    docker rm test-registry 2>/dev/null || true
+    docker stop fit-e2e-app >/dev/null 2>&1 || true
+    docker rm fit-e2e-app >/dev/null 2>&1 || true
+    docker stop test-registry >/dev/null 2>&1 || true
+    docker rm test-registry >/dev/null 2>&1 || true
+
+    # 清理测试镜像
+    log_info "清理测试镜像..."
+    docker rmi "${REGISTRY_URL}/fit-framework:${BUILD_OS}" >/dev/null 2>&1 || true
+    docker rmi "${REGISTRY_URL}/fit-framework:${FIT_VERSION}-${BUILD_OS}" >/dev/null 2>&1 || true
+    docker rmi "fit-framework:${BUILD_OS}" >/dev/null 2>&1 || true
+    docker rmi "fit-framework:${FIT_VERSION}-${BUILD_OS}" >/dev/null 2>&1 || true
+
+    log_info "✓ 清理完成"
 }
 
 # 捕获退出信号
@@ -96,8 +105,8 @@ if docker ps | grep -q "test-registry"; then
     else
         log_warn "test-registry 容器正在运行但端口不匹配 (当前: ${RUNNING_PORT}, 期望: ${REGISTRY_PORT})"
         log_info "停止现有容器并重新启动..."
-        docker stop test-registry 2>/dev/null || true
-        docker rm test-registry 2>/dev/null || true
+        docker stop test-registry >/dev/null 2>&1 || true
+        docker rm test-registry >/dev/null 2>&1 || true
 
         log_info "启动本地 Docker Registry (端口 ${REGISTRY_PORT})..."
         docker run -d \
@@ -159,8 +168,8 @@ curl -s "http://${REGISTRY_URL}/v2/_catalog" | grep -q "fit-framework" && \
 log_step "步骤 4/5: 启动 FIT Framework 基础镜像"
 
 # 清理可能存在的旧容器
-docker stop fit-e2e-app 2>/dev/null || true
-docker rm fit-e2e-app 2>/dev/null || true
+docker stop fit-e2e-app >/dev/null 2>&1 || true
+docker rm fit-e2e-app >/dev/null 2>&1 || true
 
 log_info "从本地仓库拉取并启动镜像..."
 CONTAINER_ID=$(docker run -d \
@@ -280,6 +289,8 @@ echo "  docker rmi fit-framework:${BUILD_OS}"
 echo ""
 echo "=============================================="
 echo ""
-echo "💡 提示: 容器会持续运行，按 Ctrl+C 不会停止容器"
-echo "        使用上面的清理命令来停止和删除资源"
+echo "💡 提示:"
+echo "  • 测试完成后，脚本会自动清理测试镜像和容器"
+echo "  • 如需手动清理，请使用上面的清理命令"
+echo "  • registry:2 镜像不会被清理（可复用）"
 echo ""
