@@ -4,10 +4,92 @@ set -euo pipefail
 # FIT Framework 端到端测试脚本
 # 完整测试流程：构建基础镜像 → 推送本地仓库 → 启动运行 → 访问验证
 
+# 显示帮助信息
+show_help() {
+    cat <<EOF
+FIT Framework 端到端测试脚本
+
+用途:
+  自动化测试完整的镜像构建、推送、部署和验证流程
+
+用法:
+  $0 [OS_NAME]
+  $0 --help
+
+参数:
+  OS_NAME          操作系统名称 [默认: ubuntu]
+                   可选值: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
+
+环境变量:
+  REGISTRY_PORT    本地 Registry 端口 [默认: 15000]
+                   脚本会自动检测端口冲突并尝试 +1, +2
+  FIT_VERSION      FIT Framework 版本号 [默认: 3.5.3]
+
+测试流程:
+  1. 启动本地 Docker Registry（端口 15000）
+  2. 构建 FIT Framework 基础镜像
+  3. 推送镜像到本地仓库
+  4. 从仓库拉取并启动容器
+  5. 验证功能（健康检查、插件加载、HTTP 服务）
+  6. 自动清理测试资源（容器、镜像、悬空镜像）
+
+示例:
+  # 测试 Ubuntu（默认）
+  $0
+
+  # 测试指定操作系统
+  $0 alpine
+  $0 debian
+  $0 rocky
+
+  # 使用自定义端口
+  REGISTRY_PORT=20000 $0 ubuntu
+
+  # 使用不同版本
+  FIT_VERSION=3.5.4 $0 ubuntu
+
+  # 组合使用
+  REGISTRY_PORT=20000 FIT_VERSION=3.5.4 $0 alpine
+
+清理说明:
+  • 测试完成后自动清理所有测试镜像和容器
+  • 保留 registry:2 镜像供后续测试复用
+  • 按 Ctrl+C 中断时也会自动清理
+
+详细文档:
+  README.md - 完整使用说明
+  BUILD.md  - 构建和发布指南
+
+EOF
+    exit 0
+}
+
+# 检查帮助参数
+if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "help" ]]; then
+    show_help
+fi
+
 # 配置
 REGISTRY_PORT="${REGISTRY_PORT:-15000}"
 FIT_VERSION="${FIT_VERSION:-3.5.3}"
 BUILD_OS="${1:-ubuntu}"  # 可选: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
+
+# 验证操作系统参数
+VALID_OS="ubuntu alpine debian rocky amazonlinux openeuler"
+if [[ ! " $VALID_OS " =~ " $BUILD_OS " ]]; then
+    echo "❌ 错误: 不支持的操作系统 '${BUILD_OS}'"
+    echo ""
+    echo "支持的操作系统:"
+    echo "  • ubuntu       - Ubuntu 22.04 LTS"
+    echo "  • alpine       - Alpine Linux"
+    echo "  • debian       - Debian 12"
+    echo "  • rocky        - Rocky Linux 9"
+    echo "  • amazonlinux  - Amazon Linux 2023"
+    echo "  • openeuler    - OpenEuler 22.03 LTS"
+    echo ""
+    echo "使用 '$0 --help' 查看完整帮助"
+    exit 1
+fi
 
 # 颜色输出
 GREEN='\033[0;32m'

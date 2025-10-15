@@ -309,8 +309,8 @@ PUSH_IMAGE=true ./build-all.sh 3.5.1 registry.mycompany.com/
 我们提供了完整的端到端测试脚本，自动完成：构建镜像 → 推送到本地仓库 → 启动运行 → 验证功能
 
 ```bash
-# 进入目录
-cd docker/base-images
+# 查看帮助信息
+./test-e2e.sh --help
 
 # 运行端到端测试（默认测试 Ubuntu）
 ./test-e2e.sh
