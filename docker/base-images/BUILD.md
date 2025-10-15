@@ -215,18 +215,39 @@ openeuler    - OpenEuler 22.03 LTS (国产化)
 
 ## 测试镜像
 
-### 使用测试脚本
+### 使用端到端测试脚本
+
+我们提供了完整的端到端测试脚本，自动完成构建、推送、启动和验证：
 
 ```bash
 cd docker/base-images
-./test-build.sh ubuntu
+
+# 测试单个操作系统（默认 Ubuntu）
+./test-e2e.sh
+
+# 测试其他操作系统
+./test-e2e.sh alpine
+./test-e2e.sh debian
+./test-e2e.sh rocky
 ```
 
-测试脚本会：
-1. 构建基础镜像
-2. 测试基本命令
-3. 显示镜像大小
-4. （可选）构建示例应用
+测试脚本会自动：
+1. 启动本地 Docker Registry（端口 15000，自动检测冲突）
+2. 构建基础镜像
+3. 推送到本地仓库
+4. 从仓库拉取并启动容器
+5. 验证功能（健康检查、插件加载、HTTP 服务）
+
+**自定义配置**：
+```bash
+# 使用不同端口
+REGISTRY_PORT=20000 ./test-e2e.sh ubuntu
+
+# 使用不同版本
+FIT_VERSION=3.5.4 ./test-e2e.sh ubuntu
+```
+
+详细的测试说明请参考 [README.md](README.md#-测试镜像)。
 
 ### 手动测试
 

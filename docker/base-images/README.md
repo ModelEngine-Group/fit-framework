@@ -302,6 +302,97 @@ PUSH_IMAGE=true ./build-all.sh 3.5.1 registry.mycompany.com/
 3. **预装应用插件**：将插件复制到镜像中
 4. **设置默认环境变量**：在Dockerfile中添加ENV指令
 
+## 🧪 测试镜像
+
+### 一键端到端测试
+
+我们提供了完整的端到端测试脚本，自动完成：构建镜像 → 推送到本地仓库 → 启动运行 → 验证功能
+
+```bash
+# 进入目录
+cd docker/base-images
+
+# 运行端到端测试（默认测试 Ubuntu）
+./test-e2e.sh
+
+# 测试其他操作系统
+./test-e2e.sh alpine
+./test-e2e.sh debian
+./test-e2e.sh rocky
+```
+
+测试流程包括：
+1. 自动启动本地 Docker Registry（端口 15000，自动检测冲突）
+2. 构建 FIT Framework 基础镜像
+3. 推送镜像到本地仓库
+4. 启动容器（使用基础镜像的默认配置）
+5. 验证功能（健康检查、插件加载、HTTP 服务）
+
+### 自定义测试配置
+
+```bash
+# 使用不同的 Registry 端口
+REGISTRY_PORT=20000 ./test-e2e.sh ubuntu
+
+# 使用不同的 FIT 版本
+FIT_VERSION=3.5.4 ./test-e2e.sh ubuntu
+
+# 组合使用
+REGISTRY_PORT=20000 FIT_VERSION=3.5.4 ./test-e2e.sh alpine
+```
+
+### 测试成功标志
+
+测试完成后会显示：
+
+```
+==============================================
+✅ 端到端测试完成！
+==============================================
+
+📊 测试摘要:
+  • 基础镜像: fit-framework:ubuntu (3.5.3)
+  • 本地仓库: localhost:15000
+  • 运行镜像: localhost:15000/fit-framework:ubuntu
+  • 容器名称: fit-e2e-app
+  • 访问地址: http://localhost:8080
+```
+
+### 查看测试资源
+
+```bash
+# 查看所有镜像
+docker images | grep fit
+
+# 查看本地仓库内容
+curl http://localhost:15000/v2/_catalog | jq
+
+# 查看运行的容器
+docker ps | grep fit
+
+# 查看容器日志
+docker logs fit-e2e-app
+
+# 访问 actuator 端点
+curl http://localhost:8080/actuator/plugins
+```
+
+### 清理测试环境
+
+```bash
+# 快速清理（停止容器）
+docker stop fit-e2e-app test-registry
+docker rm fit-e2e-app test-registry
+
+# 完全清理（包括镜像）
+docker stop fit-e2e-app test-registry
+docker rm fit-e2e-app test-registry
+docker rmi localhost:15000/fit-framework:ubuntu
+docker rmi fit-framework:ubuntu
+```
+
+**注意**: 测试脚本会在退出时自动清理容器（按 Ctrl+C 会触发清理）。
+
 ## 🔧 故障排除
 
 ### 常见问题
