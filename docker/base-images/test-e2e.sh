@@ -5,8 +5,7 @@ set -euo pipefail
 # 完整测试流程：构建基础镜像 → 推送本地仓库 → 启动运行 → 访问验证
 
 # 配置
-REGISTRY_PORT="${REGISTRY_PORT:-5001}"
-REGISTRY_URL="localhost:${REGISTRY_PORT}"
+REGISTRY_PORT="${REGISTRY_PORT:-15000}"
 FIT_VERSION="${FIT_VERSION:-3.5.3}"
 BUILD_OS="${1:-ubuntu}"  # 可选: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
 
@@ -29,6 +28,40 @@ log_info() {
 log_warn() {
     echo -e "${YELLOW}⚠${NC} $1"
 }
+
+# 查找可用端口（最多尝试3次）
+find_available_port() {
+    local port=$1
+    local max_attempts=3
+    local attempt=1
+
+    while [ $attempt -le $max_attempts ]; do
+        if ! lsof -Pi :${port} -sTCP:LISTEN -t >/dev/null 2>&1; then
+            echo $port
+            return 0
+        fi
+        log_warn "端口 ${port} 已被占用，尝试端口 $((port + 1))..."
+        port=$((port + 1))
+        attempt=$((attempt + 1))
+    done
+
+    return 1
+}
+
+# 查找可用端口
+AVAILABLE_PORT=$(find_available_port $REGISTRY_PORT)
+if [ $? -ne 0 ]; then
+    echo "❌ 错误: 无法找到可用端口（尝试了 ${REGISTRY_PORT} 到 $((REGISTRY_PORT + 2))）"
+    echo "请手动指定端口: REGISTRY_PORT=20000 $0 ${BUILD_OS}"
+    exit 1
+fi
+
+if [ "$AVAILABLE_PORT" != "$REGISTRY_PORT" ]; then
+    echo "ℹ️  原始端口 ${REGISTRY_PORT} 被占用，使用端口 ${AVAILABLE_PORT}"
+fi
+
+REGISTRY_PORT=$AVAILABLE_PORT
+REGISTRY_URL="localhost:${REGISTRY_PORT}"
 
 # 清理函数
 cleanup() {
@@ -55,18 +88,27 @@ echo "=============================================="
 # ========================================
 log_step "步骤 1/5: 启动本地 Docker Registry"
 
-if docker ps | grep -q "test-registry.*${REGISTRY_PORT}"; then
-    log_info "本地 Registry 已在运行"
+if docker ps | grep -q "test-registry"; then
+    # 检查是否在正确的端口上运行
+    RUNNING_PORT=$(docker port test-registry 5000 2>/dev/null | cut -d: -f2)
+    if [ "$RUNNING_PORT" = "$REGISTRY_PORT" ]; then
+        log_info "本地 Registry 已在端口 ${REGISTRY_PORT} 上运行"
+    else
+        log_warn "test-registry 容器正在运行但端口不匹配 (当前: ${RUNNING_PORT}, 期望: ${REGISTRY_PORT})"
+        log_info "停止现有容器并重新启动..."
+        docker stop test-registry 2>/dev/null || true
+        docker rm test-registry 2>/dev/null || true
+
+        log_info "启动本地 Docker Registry (端口 ${REGISTRY_PORT})..."
+        docker run -d \
+            -p ${REGISTRY_PORT}:5000 \
+            --name test-registry \
+            registry:2 > /dev/null
+        sleep 2
+        log_info "Registry 启动成功: http://${REGISTRY_URL}"
+    fi
 else
     log_info "启动本地 Docker Registry (端口 ${REGISTRY_PORT})..."
-
-    # 检查端口是否被占用
-    if lsof -Pi :${REGISTRY_PORT} -sTCP:LISTEN -t >/dev/null 2>&1; then
-        echo "错误: 端口 ${REGISTRY_PORT} 已被占用"
-        echo "请使用其他端口: REGISTRY_PORT=5002 $0 ${BUILD_OS}"
-        exit 1
-    fi
-
     docker run -d \
         -p ${REGISTRY_PORT}:5000 \
         --name test-registry \

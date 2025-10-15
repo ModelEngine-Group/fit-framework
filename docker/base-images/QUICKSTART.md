@@ -33,9 +33,10 @@ cd docker/base-images
 
 脚本会自动执行以下步骤：
 
-**步骤 1**: 启动本地 Docker Registry（端口 5001）
+**步骤 1**: 启动本地 Docker Registry（端口 15000）
 ```
-✓ 本地镜像仓库启动在 localhost:5001
+✓ 本地镜像仓库启动在 localhost:15000
+✓ 如果端口被占用，会自动尝试 15001、15002（最多3次）
 ```
 
 **步骤 2**: 构建 FIT 基础镜像
@@ -46,7 +47,7 @@ cd docker/base-images
 
 **步骤 3**: 推送到本地仓库
 ```
-✓ 推送镜像到 localhost:5001/fit-framework:ubuntu
+✓ 推送镜像到 localhost:15000/fit-framework:ubuntu
 ```
 
 **步骤 4**: 启动基础镜像容器
@@ -76,8 +77,8 @@ cd docker/base-images
 
 📊 测试摘要:
   • 基础镜像: fit-framework:ubuntu (3.5.3)
-  • 本地仓库: localhost:5001
-  • 运行镜像: localhost:5001/fit-framework:ubuntu
+  • 本地仓库: localhost:15000
+  • 运行镜像: localhost:15000/fit-framework:ubuntu
   • 容器名称: fit-e2e-app
   • 访问地址: http://localhost:8080
 ```
@@ -92,7 +93,7 @@ cd docker/base-images
 
 **Images（镜像）**:
 - `fit-framework:ubuntu` - 基础镜像
-- `localhost:5001/fit-framework:ubuntu` - 推送到仓库的镜像
+- `localhost:15000/fit-framework:ubuntu` - 推送到仓库的镜像
 
 **Containers（容器）**:
 - `fit-e2e-app` - 正在运行的示例应用
@@ -108,11 +109,11 @@ docker images | grep fit
 docker ps | grep fit
 
 # 查看本地仓库内容
-curl http://localhost:5001/v2/_catalog | jq
+curl http://localhost:15000/v2/_catalog | jq
 # 输出: {"repositories":["fit-framework"]}
 
 # 查看 fit-framework 的标签
-curl http://localhost:5001/v2/fit-framework/tags/list | jq
+curl http://localhost:15000/v2/fit-framework/tags/list | jq
 # 输出: {"name":"fit-framework","tags":["3.5.3-ubuntu","ubuntu"]}
 
 # 查看容器日志
@@ -155,7 +156,7 @@ docker rm fit-e2e-app test-registry
 # 方式 2: 完全清理（包括镜像）
 docker stop fit-e2e-app test-registry
 docker rm fit-e2e-app test-registry
-docker rmi localhost:5001/fit-framework:ubuntu
+docker rmi localhost:15000/fit-framework:ubuntu
 docker rmi fit-framework:ubuntu
 
 # 方式 3: 使用脚本清理
@@ -189,10 +190,10 @@ docker rmi fit-framework:ubuntu
 
 ### 使用不同的端口
 
-如果 5001 端口被占用：
+脚本会自动处理端口冲突，但你也可以手动指定：
 
 ```bash
-REGISTRY_PORT=5002 ./test-e2e.sh ubuntu
+REGISTRY_PORT=20000 ./test-e2e.sh ubuntu
 ```
 
 ### 使用不同的版本
@@ -204,21 +205,21 @@ FIT_VERSION=3.5.4 ./test-e2e.sh ubuntu
 ### 组合使用
 
 ```bash
-REGISTRY_PORT=5002 FIT_VERSION=3.5.4 ./test-e2e.sh alpine
+REGISTRY_PORT=20000 FIT_VERSION=3.5.4 ./test-e2e.sh alpine
 ```
 
 ---
 
 ## ❓ 常见问题
 
-### Q1: 端口 5001 被占用怎么办？
+### Q1: 端口 15000 被占用怎么办？
 
+脚本会自动检测端口占用并尝试下一个端口（15001、15002），无需手动处理。
+
+如果需要使用特定端口：
 ```bash
-# 检查端口占用
-lsof -i :5001
-
 # 使用其他端口
-REGISTRY_PORT=5002 ./test-e2e.sh ubuntu
+REGISTRY_PORT=20000 ./test-e2e.sh ubuntu
 ```
 
 ### Q2: 镜像构建很慢？
@@ -271,7 +272,7 @@ docker rmi fit-framework:ubuntu 2>/dev/null || true
    - 添加你的插件和配置文件
    - 示例 Dockerfile:
      ```dockerfile
-     FROM localhost:5001/fit-framework:ubuntu
+     FROM localhost:15000/fit-framework:ubuntu
      USER root
      COPY my-plugins/ /opt/fit-framework/java/plugins/
      COPY my-config.yml /opt/fit-framework/java/conf/fitframework.yml
