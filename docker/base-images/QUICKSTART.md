@@ -7,7 +7,7 @@
 完整的端到端流程：
 
 ```
-构建基础镜像 → 推送到本地仓库 → 构建示例应用 → 启动运行 → 访问验证
+构建基础镜像 → 推送到本地仓库 → 启动运行 → 访问验证
 ```
 
 ## ⚡ 一键测试
@@ -49,19 +49,15 @@ cd docker/base-images
 ✓ 推送镜像到 localhost:5001/fit-framework:ubuntu
 ```
 
-**步骤 4**: 构建示例应用镜像
+**步骤 4**: 启动基础镜像容器
 ```
-✓ 基于基础镜像构建示例应用
-✓ 应用镜像: fit-demo-app:3.5.3
-```
-
-**步骤 5**: 启动应用容器
-```
+✓ 从本地仓库拉取镜像
 ✓ 启动容器 fit-e2e-app
 ✓ 映射端口 8080:8080
+✓ 使用基础镜像的默认配置
 ```
 
-**步骤 6**: 验证应用功能
+**步骤 5**: 验证基础镜像功能
 ```
 ✓ 容器状态检查
 ✓ 健康检查
@@ -81,7 +77,7 @@ cd docker/base-images
 📊 测试摘要:
   • 基础镜像: fit-framework:ubuntu (3.5.3)
   • 本地仓库: localhost:5001
-  • 应用镜像: fit-demo-app:3.5.3
+  • 运行镜像: localhost:5001/fit-framework:ubuntu
   • 容器名称: fit-e2e-app
   • 访问地址: http://localhost:8080
 ```
@@ -96,7 +92,6 @@ cd docker/base-images
 
 **Images（镜像）**:
 - `fit-framework:ubuntu` - 基础镜像
-- `fit-demo-app:3.5.3` - 示例应用镜像
 - `localhost:5001/fit-framework:ubuntu` - 推送到仓库的镜像
 
 **Containers（容器）**:
@@ -120,11 +115,14 @@ curl http://localhost:5001/v2/_catalog | jq
 curl http://localhost:5001/v2/fit-framework/tags/list | jq
 # 输出: {"name":"fit-framework","tags":["3.5.3-ubuntu","ubuntu"]}
 
-# 查看应用日志
+# 查看容器日志
 docker logs fit-e2e-app
 
-# 访问应用健康检查
-curl http://localhost:8080/health
+# 访问 actuator 端点
+curl http://localhost:8080/actuator/plugins
+
+# 查看 FIT Framework 版本
+docker exec fit-e2e-app fit version
 ```
 
 ### 3. 进入容器查看
@@ -157,7 +155,6 @@ docker rm fit-e2e-app test-registry
 # 方式 2: 完全清理（包括镜像）
 docker stop fit-e2e-app test-registry
 docker rm fit-e2e-app test-registry
-docker rmi fit-demo-app:3.5.3
 docker rmi localhost:5001/fit-framework:ubuntu
 docker rmi fit-framework:ubuntu
 
@@ -270,8 +267,17 @@ docker rmi fit-framework:ubuntu 2>/dev/null || true
    - [README.md](README.md) - 使用指南
 
 2. **构建自己的应用**
-   - 参考 `test-e2e.sh` 中创建的 Dockerfile
-   - 基于 `fit-framework:ubuntu` 构建你的应用
+   - 基于 `fit-framework:ubuntu` 创建你的应用镜像
+   - 添加你的插件和配置文件
+   - 示例 Dockerfile:
+     ```dockerfile
+     FROM localhost:5001/fit-framework:ubuntu
+     USER root
+     COPY my-plugins/ /opt/fit-framework/java/plugins/
+     COPY my-config.yml /opt/fit-framework/java/conf/fitframework.yml
+     USER fit
+     CMD ["fit", "start"]
+     ```
 
 3. **发布到生产仓库**
    ```bash

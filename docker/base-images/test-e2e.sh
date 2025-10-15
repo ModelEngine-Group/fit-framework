@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # FIT Framework 端到端测试脚本
-# 完整测试流程：构建基础镜像 → 推送本地仓库 → 构建示例应用 → 启动运行 → 访问验证
+# 完整测试流程：构建基础镜像 → 推送本地仓库 → 启动运行 → 访问验证
 
 # 配置
 REGISTRY_PORT="${REGISTRY_PORT:-5001}"
@@ -53,7 +53,7 @@ echo "=============================================="
 # ========================================
 # 步骤 1: 启动本地 Docker Registry
 # ========================================
-log_step "步骤 1/6: 启动本地 Docker Registry"
+log_step "步骤 1/5: 启动本地 Docker Registry"
 
 if docker ps | grep -q "test-registry.*${REGISTRY_PORT}"; then
     log_info "本地 Registry 已在运行"
@@ -79,7 +79,7 @@ fi
 # ========================================
 # 步骤 2: 构建 FIT 基础镜像
 # ========================================
-log_step "步骤 2/6: 构建 FIT 基础镜像 (${BUILD_OS})"
+log_step "步骤 2/5: 构建 FIT 基础镜像 (${BUILD_OS})"
 
 log_info "构建镜像: fit-framework:${FIT_VERSION}-${BUILD_OS}..."
 docker build --quiet \
@@ -94,7 +94,7 @@ docker images fit-framework:${BUILD_OS} --format "  镜像: {{.Repository}}:{{.T
 # ========================================
 # 步骤 3: 推送到本地仓库
 # ========================================
-log_step "步骤 3/6: 推送镜像到本地仓库"
+log_step "步骤 3/5: 推送镜像到本地仓库"
 
 log_info "标记镜像..."
 docker tag "fit-framework:${BUILD_OS}" "${REGISTRY_URL}/fit-framework:${BUILD_OS}"
@@ -112,85 +112,23 @@ curl -s "http://${REGISTRY_URL}/v2/_catalog" | grep -q "fit-framework" && \
     log_info "✓ 镜像已在仓库中"
 
 # ========================================
-# 步骤 4: 构建示例应用镜像
+# 步骤 4: 启动基础镜像容器
 # ========================================
-log_step "步骤 4/6: 构建示例应用镜像"
-
-log_info "创建示例应用 Dockerfile..."
-cat > /tmp/fit-demo-app.Dockerfile <<EOF
-# 基于 FIT 基础镜像构建示例应用
-FROM ${REGISTRY_URL}/fit-framework:${BUILD_OS}
-
-# 切换到 root 用户以便复制文件
-USER root
-
-# 创建示例应用目录
-RUN mkdir -p /app/demo-plugin
-
-# 创建一个简单的配置文件
-RUN cat > /opt/fit-framework/java/conf/fitframework.yml <<'YAML'
-application:
-  name: 'fit-demo-app'
-
-worker:
-  id: 'demo-worker-001'
-  host: '0.0.0.0'
-  environment: 'dev'
-  exit:
-    graceful: true
-
-server:
-  http:
-    port: 8080
-
-fit:
-  beans:
-    packages:
-    - 'modelengine.fitframework'
-    - 'modelengine.fit'
-YAML
-
-# 切换回 fit 用户
-USER fit
-
-# 暴露端口
-EXPOSE 8080
-
-# 设置健康检查（使用 actuator/plugins 端点）
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/plugins > /dev/null 2>&1 || exit 1
-
-# 启动命令
-CMD ["fit", "start"]
-EOF
-
-log_info "构建应用镜像..."
-docker build --quiet \
-    -t "fit-demo-app:${FIT_VERSION}" \
-    -f /tmp/fit-demo-app.Dockerfile . > /dev/null
-
-log_info "应用镜像构建完成"
-docker images fit-demo-app:${FIT_VERSION} --format "  镜像: {{.Repository}}:{{.Tag}} ({{.Size}})"
-
-# ========================================
-# 步骤 5: 启动应用容器
-# ========================================
-log_step "步骤 5/6: 启动示例应用"
+log_step "步骤 4/5: 启动 FIT Framework 基础镜像"
 
 # 清理可能存在的旧容器
 docker stop fit-e2e-app 2>/dev/null || true
 docker rm fit-e2e-app 2>/dev/null || true
 
-log_info "启动容器..."
+log_info "从本地仓库拉取并启动镜像..."
 CONTAINER_ID=$(docker run -d \
     --name fit-e2e-app \
     -p 8080:8080 \
-    -e FIT_WORKER_ID=demo-worker-test \
-    -e FIT_LOG_LEVEL=info \
-    fit-demo-app:${FIT_VERSION})
+    "${REGISTRY_URL}/fit-framework:${BUILD_OS}")
 
 log_info "容器已启动: ${CONTAINER_ID:0:12}"
-log_info "等待应用启动 (约 10-15 秒)..."
+log_info "容器使用基础镜像的默认配置启动"
+log_info "等待 FIT Framework 启动 (约 10-20 秒)..."
 
 # 等待应用启动
 for i in {1..30}; do
@@ -215,9 +153,9 @@ done
 echo ""
 
 # ========================================
-# 步骤 6: 验证应用
+# 步骤 5: 验证基础镜像
 # ========================================
-log_step "步骤 6/6: 验证应用功能"
+log_step "步骤 5/5: 验证基础镜像功能"
 
 log_info "测试 1: 检查容器状态"
 STATUS=$(docker inspect fit-e2e-app --format='{{.State.Status}}')
@@ -238,7 +176,11 @@ else
     log_warn "HTTP 服务暂不可用 (这可能是正常的，FIT 可能还在初始化)"
 fi
 
-log_info "测试 4: 查看应用日志"
+log_info "测试 4: 查看 FIT Framework 版本"
+FIT_VERSION_OUTPUT=$(docker exec fit-e2e-app fit version 2>/dev/null || echo "N/A")
+echo "  FIT 版本: ${FIT_VERSION_OUTPUT}"
+
+log_info "测试 5: 查看容器日志"
 echo "  最近日志:"
 docker logs fit-e2e-app --tail 10 | sed 's/^/    /'
 
@@ -253,7 +195,7 @@ echo ""
 echo "📊 测试摘要:"
 echo "  • 基础镜像: fit-framework:${BUILD_OS} (${FIT_VERSION})"
 echo "  • 本地仓库: ${REGISTRY_URL}"
-echo "  • 应用镜像: fit-demo-app:${FIT_VERSION}"
+echo "  • 运行镜像: ${REGISTRY_URL}/fit-framework:${BUILD_OS}"
 echo "  • 容器名称: fit-e2e-app"
 echo "  • 访问地址: http://localhost:8080"
 echo ""
@@ -268,14 +210,17 @@ echo ""
 echo "  3. 查看运行的容器:"
 echo "     docker ps | grep fit"
 echo ""
-echo "  4. 查看应用日志:"
+echo "  4. 查看容器日志:"
 echo "     docker logs fit-e2e-app"
 echo ""
-echo "  5. 访问应用:"
-echo "     curl http://localhost:8080/health"
+echo "  5. 访问 actuator 端点:"
+echo "     curl http://localhost:8080/actuator/plugins"
 echo ""
-echo "  6. 进入容器:"
+echo "  6. 进入容器查看:"
 echo "     docker exec -it fit-e2e-app bash"
+echo ""
+echo "  7. 查看 FIT 版本:"
+echo "     docker exec fit-e2e-app fit version"
 echo ""
 echo "🧹 清理测试环境:"
 echo ""
@@ -288,8 +233,8 @@ echo "  docker stop test-registry"
 echo "  docker rm test-registry"
 echo ""
 echo "  # 删除测试镜像"
-echo "  docker rmi fit-demo-app:${FIT_VERSION}"
 echo "  docker rmi ${REGISTRY_URL}/fit-framework:${BUILD_OS}"
+echo "  docker rmi fit-framework:${BUILD_OS}"
 echo ""
 echo "=============================================="
 echo ""
