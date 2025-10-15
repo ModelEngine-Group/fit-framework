@@ -18,7 +18,7 @@
 
     <properties>
         <!-- Third-party versions -->
-        <bytebuddy.version>1.17.6</bytebuddy.version>
+        <bytebuddy.version>1.17.8</bytebuddy.version>
     </properties>
 
     <dependencies>
