@@ -1,18 +1,25 @@
 package modelengine.fel.tool.mcp.server.support;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
 import io.modelcontextprotocol.server.McpSyncServer;
-import modelengine.fitframework.annotation.ImportConfigs;
 
 import java.time.Duration;
 
+/**
+ * Mcp Server implemented with MCP SDK.
+ *
+ * @author 黄可欣
+ * @since 2025-10-15
+ */
 @Component
 public class DefaultStreamableSyncMcpServer {
+    /**
+     * Construct a transport provider Bean for MCP Server.
+     */
     @Bean
     public DefaultMcpStreamableServerTransportProvider defaultMcpStreamableServerTransportProvider() {
         return DefaultMcpStreamableServerTransportProvider.builder()
@@ -20,6 +27,11 @@ public class DefaultStreamableSyncMcpServer {
                 .build();
     }
 
+    /**
+     * Construct a synchronized MCP Server Bean with MCP SDK.
+     *
+     * @param transportProvider The bean of {@link DefaultMcpStreamableServerTransportProvider}.
+     */
     @Bean
     public McpSyncServer mcpSyncServer(DefaultMcpStreamableServerTransportProvider transportProvider) {
         return McpServer.sync(transportProvider)
@@ -34,5 +46,4 @@ public class DefaultStreamableSyncMcpServer {
                 .requestTimeout(Duration.ofSeconds(10))
                 .build();
     }
-
 }
