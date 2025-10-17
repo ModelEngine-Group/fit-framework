@@ -229,11 +229,11 @@ public class HttpUtils {
     }
 
     /**
-     * 验证给定的 Cookie 名称和值是否合法。
+     * 判断给定的 Cookie 名称和值是否无效。
      *
      * @param name 表示 Cookie 的名称 {@link String}。
      * @param value 表示 Cookie 的值 {@link String}，允许为空但不允许为 {@code null}，可带双引号。
-     * @return 如果 name 和 value 都合法返回 {@code true}，否则返回 {@code false}。
+     * @return 如果 name 或 value 无效返回 {@code true}，否则返回 {@code false}。
      */
     public static boolean isInvalidCookiePair(String name, String value) {
         if (StringUtils.isEmpty(name) || !TOKEN_PATTERN.matcher(name).matches()) {
