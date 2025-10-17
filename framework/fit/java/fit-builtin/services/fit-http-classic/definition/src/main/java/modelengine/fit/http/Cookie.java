@@ -7,6 +7,7 @@
 package modelengine.fit.http;
 
 import modelengine.fitframework.pattern.builder.BuilderFactory;
+import modelengine.fitframework.util.StringUtils;
 
 /**
  * 表示 Http 中的 Cookie。
@@ -210,7 +211,7 @@ public interface Cookie {
      * @return 表示 {@link Cookie} 的构建器的 {@link Builder}。
      */
     static Builder builder() {
-        return builder(null).maxAge(-1);
+        return builder(null).value(StringUtils.EMPTY).maxAge(-1).secure(false).httpOnly(false);
     }
 
     /**
