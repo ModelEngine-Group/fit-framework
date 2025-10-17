@@ -332,9 +332,8 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                     response.headers().set("Content-Type", MimeType.APPLICATION_JSON.value());
                     response.headers().set(HttpHeaders.MCP_SESSION_ID, init.session().getId());
                     logger.info(
-                            "[POST] Sending message via HTTP response to session {}: {}",
-                            init.session().getId(),
-                            requestBody.toString()
+                            "[POST] Sending initialize message via HTTP response to session {}",
+                            init.session().getId()
                     );
                     return Entity.createObject(response,
                             new McpSchema.JSONRPCResponse(McpSchema.JSONRPC_VERSION, jsonrpcRequest.id(), initResult, null));
