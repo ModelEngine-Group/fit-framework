@@ -82,7 +82,7 @@ public class HttpUtilsTest {
     void givenEmptySetCookieThenReturnEmptyCookie() {
         Cookie cookie = HttpUtils.parseSetCookie("");
         assertThat(cookie.name()).isNull();
-        assertThat(cookie.value()).isNull();
+        assertThat(cookie.value()).isEmpty();
     }
 
     @Test
