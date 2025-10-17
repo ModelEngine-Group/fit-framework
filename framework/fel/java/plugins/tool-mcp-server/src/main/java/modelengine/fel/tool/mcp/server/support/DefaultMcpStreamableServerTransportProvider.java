@@ -3,6 +3,7 @@ package modelengine.fel.tool.mcp.server.support;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.common.McpTransportContext;
+import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import io.modelcontextprotocol.spec.*;
 import io.modelcontextprotocol.util.Assert;
@@ -23,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +117,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
     @Override
     public List<String> protocolVersions() {
-        return List.of(ProtocolVersions.MCP_2024_11_05, ProtocolVersions.MCP_2025_03_26);
+        return List.of(ProtocolVersions.MCP_2024_11_05, ProtocolVersions.MCP_2025_03_26, ProtocolVersions.MCP_2025_06_18);
     }
 
     @Override
@@ -215,7 +217,9 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
         if (session == null) {
             response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-            return Entity.createObject(response, new McpError("Session not found: " + sessionId));
+            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
+                    .message("Session not found: " + sessionId)
+                    .build());
         }
 
         logger.info("[GET] Handling GET request for session: {}", sessionId);
@@ -308,7 +312,9 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                 || !acceptHeaders.contains(MimeType.APPLICATION_JSON.value())) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             return Entity.createObject(response,
-                    new McpError("Invalid Accept headers. Expected TEXT_EVENT_STREAM and APPLICATION_JSON"));
+                    McpError.builder(McpSchema.ErrorCodes.INVALID_REQUEST)
+                            .message("Invalid Accept headers. Expected TEXT_EVENT_STREAM and APPLICATION_JSON")
+                            .build());
         }
         McpTransportContext transportContext = this.contextExtractor.extract(request);
         try {
@@ -341,14 +347,18 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                 catch (Exception e) {
                     logger.error("Failed to initialize session: {}", e.getMessage());
                     response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-                    return Entity.createObject(response, new McpError(e.getMessage()));
+                    return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR)
+                            .message(e.getMessage())
+                            .build());
                 }
             }
 
             // Handle other messages that require a session
             if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
                 response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-                return Entity.createObject(response, new McpError("Session ID missing"));
+                return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_REQUEST)
+                        .message("Session ID missing")
+                        .build());
             }
 
             String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
@@ -357,7 +367,9 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
             if (session == null) {
                 response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-                return Entity.createObject(response, new McpError("Session not found: " + sessionId));
+                return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
+                        .message("Session not found: " + sessionId)
+                        .build());
             }
 
             if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
@@ -408,18 +420,18 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
             }
             else {
                 response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-                return Entity.createObject(response, new McpError("Unknown message type"));
+                return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
             }
         }
         catch (IllegalArgumentException | IOException e) {
             logger.error("Failed to deserialize message: {}", e.getMessage());
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createObject(response, new McpError("Invalid message format"));
+            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format").build());
         }
         catch (Exception e) {
             logger.error("Error handling message: {}", e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-            return Entity.createObject(response, new McpError(e.getMessage()));
+            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
         }
     }
 
@@ -455,7 +467,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         logger.info("[DELETE] Receiving delete request from session: {}", sessionId);
         if (session == null) {
             response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-            return Entity.createObject(response, new McpError("Session not found: " + sessionId));
+            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS).message("Session not found: " + sessionId).build());
         }
 
         try {
@@ -467,7 +479,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         catch (Exception e) {
             logger.error("Failed to delete session {}: {}", sessionId, e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-            return Entity.createObject(response, new McpError(e.getMessage()));
+            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
         }
     }
 
@@ -591,8 +603,15 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
          * @param <T> The target type
          */
         @Override
-        public <T> T unmarshalFrom(Object data, TypeReference<T> typeRef) {
-            return objectMapper.convertValue(data, typeRef);
+        public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
+            // Convert TypeRef to TypeReference for ObjectMapper compatibility
+            TypeReference<T> typeReference = new TypeReference<T>() {
+                @Override
+                public Type getType() {
+                    return typeRef.getType();
+                }
+            };
+            return objectMapper.convertValue(data, typeReference);
         }
 
         /**
