@@ -31,9 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default implementation of {@link McpStreamableServerTransportProvider}.
- * The FIT transport provider for MCP Server,
- * according to {@code WebMvcStreamableServerTransportProvider} in MCP SDK.
- *
+ * The FIT transport provider for MCP Server, according to {@code WebMvcStreamableServerTransportProvider} in MCP SDK.
  *
  * @author 黄可欣
  * @since 2025-10-15
@@ -83,11 +81,14 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
     private KeepAliveScheduler keepAliveScheduler;
 
     /**
-     * Constructs a new DefaultMcpStreamableServerTransportProvider instance.
+     * Constructs a new DefaultMcpStreamableServerTransportProvider instance,
+     * for {@link DefaultMcpStreamableServerTransportProvider.Builder}.
      *
      * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
      * of messages.
      * @param disallowDelete Whether to disallow DELETE requests on the endpoint.
+     * @param contextExtractor The context extractor to fill in a {@link McpTransportContext}.
+     * @param keepAliveInterval The interval for sending keep-alive messages to clients.
      * @throws IllegalArgumentException if any parameter is null
      */
     private DefaultMcpStreamableServerTransportProvider(ObjectMapper objectMapper,
@@ -560,7 +561,8 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                     }
 
                     String jsonText = objectMapper.writeValueAsString(message);
-                    TextEvent textEvent = TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
+                    TextEvent textEvent = TextEvent.custom()
+                            .id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
                     this.emitter.emit(textEvent);
 
                     logger.info("[SSE] Sending message to session {}: {}", this.sessionId, jsonText);
