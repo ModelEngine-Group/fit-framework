@@ -24,6 +24,7 @@ FIT Framework 端到端测试脚本
   REGISTRY_PORT    本地 Registry 端口 [默认: 15000]
                    脚本会自动检测端口冲突并尝试 +1, +2
   FIT_VERSION      FIT Framework 版本号 [默认: 3.5.3]
+  DEBUG            显示详细命令 (true|false) [默认: false]
 
 测试流程:
   1. 启动本地 Docker Registry（端口 15000）
@@ -51,9 +52,12 @@ FIT Framework 端到端测试脚本
   # 组合使用
   REGISTRY_PORT=20000 FIT_VERSION=3.5.4 $0 alpine
 
+  # 调试模式（显示详细命令）
+  DEBUG=true $0 ubuntu
+
 清理说明:
   • 测试完成后自动清理所有测试镜像和容器
-  • 保留 registry:2 镜像供后续测试复用
+  • 保留 registry:latest 镜像供后续测试复用
   • 按 Ctrl+C 中断时也会自动清理
 
 详细文档:
@@ -73,6 +77,7 @@ fi
 REGISTRY_PORT="${REGISTRY_PORT:-15000}"
 FIT_VERSION="${FIT_VERSION:-3.5.3}"
 BUILD_OS="${1:-ubuntu}"  # 可选: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
+DEBUG="${DEBUG:-false}"  # 设置为 true 显示详细命令
 
 # 验证操作系统参数
 VALID_OS="ubuntu alpine debian rocky amazonlinux openeuler"
@@ -111,6 +116,12 @@ log_warn() {
     echo -e "${YELLOW}⚠${NC} $1"
 }
 
+log_cmd() {
+    if [[ "${DEBUG}" == "true" ]]; then
+        echo -e "${CYAN}[命令]${NC} $1"
+    fi
+}
+
 # 查找可用端口（最多尝试3次）
 find_available_port() {
     local port=$1
@@ -122,7 +133,8 @@ find_available_port() {
             echo $port
             return 0
         fi
-        log_warn "端口 ${port} 已被占用，尝试端口 $((port + 1))..."
+        # 输出到stderr避免污染返回值
+        echo -e "${YELLOW}⚠${NC} 端口 ${port} 已被占用，尝试端口 $((port + 1))..." >&2
         port=$((port + 1))
         attempt=$((attempt + 1))
     done
@@ -198,16 +210,17 @@ if docker ps | grep -q "test-registry"; then
         docker run -d \
             -p ${REGISTRY_PORT}:5000 \
             --name test-registry \
-            registry:2 > /dev/null
+            registry:latest > /dev/null
         sleep 2
         log_info "Registry 启动成功: http://${REGISTRY_URL}"
     fi
 else
     log_info "启动本地 Docker Registry (端口 ${REGISTRY_PORT})..."
+    log_cmd "docker run -d -p ${REGISTRY_PORT}:5000 --name test-registry registry:latest"
     docker run -d \
         -p ${REGISTRY_PORT}:5000 \
         --name test-registry \
-        registry:2 > /dev/null
+        registry:latest > /dev/null
 
     sleep 2
     log_info "Registry 启动成功: http://${REGISTRY_URL}"
@@ -219,11 +232,21 @@ fi
 log_step "步骤 2/5: 构建 FIT 基础镜像 (${BUILD_OS})"
 
 log_info "构建镜像: fit-framework:${FIT_VERSION}-${BUILD_OS}..."
-docker build --quiet \
-    --build-arg FIT_VERSION="${FIT_VERSION}" \
-    -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
-    -t "fit-framework:${BUILD_OS}" \
-    -f "${BUILD_OS}/Dockerfile" . > /dev/null
+log_cmd "docker build --build-arg FIT_VERSION=\"${FIT_VERSION}\" -t \"fit-framework:${FIT_VERSION}-${BUILD_OS}\" -t \"fit-framework:${BUILD_OS}\" -f \"${BUILD_OS}/Dockerfile\" ."
+
+if [[ "${DEBUG}" == "true" ]]; then
+    docker build \
+        --build-arg FIT_VERSION="${FIT_VERSION}" \
+        -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
+        -t "fit-framework:${BUILD_OS}" \
+        -f "${BUILD_OS}/Dockerfile" .
+else
+    docker build --quiet \
+        --build-arg FIT_VERSION="${FIT_VERSION}" \
+        -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
+        -t "fit-framework:${BUILD_OS}" \
+        -f "${BUILD_OS}/Dockerfile" . > /dev/null
+fi
 
 log_info "镜像构建完成"
 docker images fit-framework:${BUILD_OS} --format "  镜像: {{.Repository}}:{{.Tag}} ({{.Size}})"
@@ -234,10 +257,14 @@ docker images fit-framework:${BUILD_OS} --format "  镜像: {{.Repository}}:{{.T
 log_step "步骤 3/5: 推送镜像到本地仓库"
 
 log_info "标记镜像..."
+log_cmd "docker tag \"fit-framework:${BUILD_OS}\" \"${REGISTRY_URL}/fit-framework:${BUILD_OS}\""
+log_cmd "docker tag \"fit-framework:${BUILD_OS}\" \"${REGISTRY_URL}/fit-framework:${FIT_VERSION}-${BUILD_OS}\""
 docker tag "fit-framework:${BUILD_OS}" "${REGISTRY_URL}/fit-framework:${BUILD_OS}"
 docker tag "fit-framework:${BUILD_OS}" "${REGISTRY_URL}/fit-framework:${FIT_VERSION}-${BUILD_OS}"
 
 log_info "推送镜像到 ${REGISTRY_URL}..."
+log_cmd "docker push \"${REGISTRY_URL}/fit-framework:${BUILD_OS}\""
+log_cmd "docker push \"${REGISTRY_URL}/fit-framework:${FIT_VERSION}-${BUILD_OS}\""
 docker push --quiet "${REGISTRY_URL}/fit-framework:${BUILD_OS}"
 docker push --quiet "${REGISTRY_URL}/fit-framework:${FIT_VERSION}-${BUILD_OS}"
 
@@ -245,6 +272,7 @@ log_info "镜像推送成功"
 
 # 验证仓库
 log_info "验证仓库内容..."
+log_cmd "curl -s \"http://${REGISTRY_URL}/v2/_catalog\""
 curl -s "http://${REGISTRY_URL}/v2/_catalog" | grep -q "fit-framework" && \
     log_info "✓ 镜像已在仓库中"
 
@@ -254,10 +282,13 @@ curl -s "http://${REGISTRY_URL}/v2/_catalog" | grep -q "fit-framework" && \
 log_step "步骤 4/5: 启动 FIT Framework 基础镜像"
 
 # 清理可能存在的旧容器
+log_cmd "docker stop fit-e2e-app"
+log_cmd "docker rm fit-e2e-app"
 docker stop fit-e2e-app >/dev/null 2>&1 || true
 docker rm fit-e2e-app >/dev/null 2>&1 || true
 
 log_info "从本地仓库拉取并启动镜像..."
+log_cmd "docker run -d --name fit-e2e-app -p 8080:8080 \"${REGISTRY_URL}/fit-framework:${BUILD_OS}\""
 CONTAINER_ID=$(docker run -d \
     --name fit-e2e-app \
     -p 8080:8080 \
@@ -378,5 +409,5 @@ echo ""
 echo "💡 提示:"
 echo "  • 测试完成后，脚本会自动清理测试镜像和容器"
 echo "  • 如需手动清理，请使用上面的清理命令"
-echo "  • registry:2 镜像不会被清理（可复用）"
+echo "  • registry:latest 镜像不会被清理（可复用）"
 echo ""

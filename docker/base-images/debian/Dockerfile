@@ -1,6 +1,9 @@
 ARG FIT_VERSION=3.5.3
 FROM debian:12-slim
 
+# 重新声明ARG以在FROM之后使用
+ARG FIT_VERSION=3.5.3
+
 LABEL maintainer="FIT Framework Team <support@fit-framework.org>"
 LABEL description="FIT Framework Base Image - Debian 12 (Stable)"
 LABEL org.opencontainers.image.source="https://github.com/ModelEngine-Group/fit-framework"
@@ -18,6 +21,10 @@ ENV FIT_JAVA_DIR=${FIT_HOME}/java
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH=${FIT_JAVA_DIR}/bin:${JAVA_HOME}/bin:${PATH}
 ENV JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true"
+
+# 配置APT使用阿里云镜像源
+RUN sed -i 's@//.*deb.debian.org@//mirrors.aliyun.com@g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's@//.*deb.debian.org@//mirrors.aliyun.com@g' /etc/apt/sources.list 2>/dev/null || true
 
 # 安装系统依赖和OpenJDK 17
 RUN apt-get update && \

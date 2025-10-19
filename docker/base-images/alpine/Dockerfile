@@ -1,5 +1,10 @@
 ARG FIT_VERSION=3.5.3
+
+# 使用Alpine官方镜像（如果镜像拉取失败，请先手动拉取：docker pull alpine:3.19）
 FROM alpine:3.19
+
+# 重新声明ARG以在FROM之后使用
+ARG FIT_VERSION=3.5.3
 
 LABEL maintainer="FIT Framework Team <support@fit-framework.org>"
 LABEL description="FIT Framework Base Image - Alpine Linux (Minimal)"

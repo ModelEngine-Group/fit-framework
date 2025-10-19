@@ -1,6 +1,9 @@
 ARG FIT_VERSION=3.5.3
 FROM amazonlinux:2023
 
+# 重新声明ARG以在FROM之后使用
+ARG FIT_VERSION=3.5.3
+
 LABEL maintainer="FIT Framework Team <support@fit-framework.org>"
 LABEL description="FIT Framework Base Image - Amazon Linux 2023 (Cloud Optimized)"
 LABEL org.opencontainers.image.source="https://github.com/ModelEngine-Group/fit-framework"
@@ -15,9 +18,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
 ENV PATH=${FIT_JAVA_DIR}/bin:${JAVA_HOME}/bin:${PATH}
 ENV JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true"
 
-# 安装系统依赖和Amazon Corretto 17 (推荐在AWS上使用)
-RUN yum update -y && \
-    yum install -y \
+# 配置yum和网络超时设置
+RUN yum install -y --allowerasing --setopt=timeout=300 --setopt=retries=3 \
         java-17-amazon-corretto-devel \
         curl \
         wget \

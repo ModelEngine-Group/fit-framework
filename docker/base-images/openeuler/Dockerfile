@@ -1,6 +1,9 @@
 ARG FIT_VERSION=3.5.3
 FROM openeuler/openeuler:22.03-lts-sp3
 
+# 重新声明ARG以在FROM之后使用
+ARG FIT_VERSION=3.5.3
+
 LABEL maintainer="FIT Framework Team <support@fit-framework.org>"
 LABEL description="FIT Framework Base Image - OpenEuler 22.03 LTS (国产化)"
 LABEL org.opencontainers.image.source="https://github.com/ModelEngine-Group/fit-framework"
@@ -16,9 +19,7 @@ ENV PATH=${FIT_JAVA_DIR}/bin:${JAVA_HOME}/bin:${PATH}
 ENV JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true"
 
 # 配置yum源并安装系统依赖和OpenJDK 17
-RUN yum makecache && \
-    yum update -y && \
-    yum install -y \
+RUN yum install -y \
         java-17-openjdk-devel \
         curl \
         wget \

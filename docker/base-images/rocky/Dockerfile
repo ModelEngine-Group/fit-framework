@@ -1,6 +1,9 @@
 ARG FIT_VERSION=3.5.3
 FROM rockylinux:9
 
+# 重新声明ARG以在FROM之后使用
+ARG FIT_VERSION=3.5.3
+
 LABEL maintainer="FIT Framework Team <support@fit-framework.org>"
 LABEL description="FIT Framework Base Image - Rocky Linux 9 (Enterprise)"
 LABEL org.opencontainers.image.source="https://github.com/ModelEngine-Group/fit-framework"
@@ -16,8 +19,7 @@ ENV PATH=${FIT_JAVA_DIR}/bin:${JAVA_HOME}/bin:${PATH}
 ENV JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true"
 
 # 安装系统依赖和OpenJDK 17
-RUN dnf update -y && \
-    dnf install -y \
+RUN dnf install -y --allowerasing \
         java-17-openjdk-devel \
         curl \
         wget \

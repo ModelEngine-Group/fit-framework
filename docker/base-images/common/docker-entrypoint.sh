@@ -11,7 +11,8 @@ FIT_CONFIG_FILE="${FIT_JAVA_DIR}/conf/fitframework.yml"
 FIT_LOG_LEVEL="${FIT_LOG_LEVEL:-info}"
 FIT_REGISTRY_HOST="${FIT_REGISTRY_HOST:-localhost}"
 FIT_REGISTRY_PORT="${FIT_REGISTRY_PORT:-8080}"
-FIT_WORKER_ID="${FIT_WORKER_ID:-fit-worker-$(hostname)}"
+# 使用容器ID作为fallback，避免依赖hostname命令
+FIT_WORKER_ID="${FIT_WORKER_ID:-fit-worker-$(hostname 2>/dev/null || echo ${HOSTNAME:-$(cat /etc/hostname 2>/dev/null || echo 'container')})}"
 FIT_HTTP_PORT="${FIT_HTTP_PORT:-8080}"
 
 # 日志函数
