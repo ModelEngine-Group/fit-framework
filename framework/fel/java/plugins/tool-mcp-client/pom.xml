@@ -37,6 +37,12 @@
             <groupId>org.fitframework.fel</groupId>
             <artifactId>tool-mcp-client-service</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp</artifactId>
+            <version>0.14.0</version>
+        </dependency>
+
 
         <!-- Test -->
         <dependency>
