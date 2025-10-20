@@ -17,8 +17,8 @@ FIT Framework 端到端测试脚本
   $0 --help
 
 参数:
-  OS_NAME          操作系统名称 [默认: ubuntu]
-                   可选值: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
+  OS_NAME          操作系统名称 [默认: alpine]
+                   可选值: alpine, debian
 
 环境变量:
   REGISTRY_PORT    本地 Registry 端口 [默认: 15000]
@@ -35,19 +35,18 @@ FIT Framework 端到端测试脚本
   6. 自动清理测试资源（容器、镜像、悬空镜像）
 
 示例:
-  # 测试 Ubuntu（默认）
+  # 测试 Alpine（默认）
   $0
 
   # 测试指定操作系统
   $0 alpine
   $0 debian
-  $0 rocky
 
   # 使用自定义端口
-  REGISTRY_PORT=20000 $0 ubuntu
+  REGISTRY_PORT=20000 $0 alpine
 
   # 使用不同版本
-  FIT_VERSION=3.5.4 $0 ubuntu
+  FIT_VERSION=3.5.4 $0 alpine
 
   # 组合使用
   REGISTRY_PORT=20000 FIT_VERSION=3.5.4 $0 alpine
@@ -76,21 +75,17 @@ fi
 # 配置
 REGISTRY_PORT="${REGISTRY_PORT:-15000}"
 FIT_VERSION="${FIT_VERSION:-3.5.3}"
-BUILD_OS="${1:-ubuntu}"  # 可选: ubuntu, alpine, debian, rocky, amazonlinux, openeuler
+BUILD_OS="${1:-alpine}"  # 可选: alpine, debian
 DEBUG="${DEBUG:-false}"  # 设置为 true 显示详细命令
 
 # 验证操作系统参数
-VALID_OS="ubuntu alpine debian rocky amazonlinux openeuler"
+VALID_OS="alpine debian"
 if [[ ! " $VALID_OS " =~ " $BUILD_OS " ]]; then
     echo "❌ 错误: 不支持的操作系统 '${BUILD_OS}'"
     echo ""
     echo "支持的操作系统:"
-    echo "  • ubuntu       - Ubuntu 22.04 LTS"
     echo "  • alpine       - Alpine Linux"
     echo "  • debian       - Debian 12"
-    echo "  • rocky        - Rocky Linux 9"
-    echo "  • amazonlinux  - Amazon Linux 2023"
-    echo "  • openeuler    - OpenEuler 22.03 LTS"
     echo ""
     echo "使用 '$0 --help' 查看完整帮助"
     exit 1

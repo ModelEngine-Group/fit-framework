@@ -11,22 +11,14 @@ BUILD_LOG_DIR="./build-logs"
 
 # 支持的操作系统列表
 OS_LIST=(
-    "ubuntu"
-    "alpine" 
-    "rocky"
+    "alpine"
     "debian"
-    "amazonlinux"
-    "openeuler"
 )
 
 # 操作系统描述
 declare -A OS_DESCRIPTIONS=(
-    ["ubuntu"]="Ubuntu 22.04 LTS (开发者友好)"
     ["alpine"]="Alpine Linux (轻量级云原生)"
-    ["rocky"]="Rocky Linux 9 (企业级)"
     ["debian"]="Debian 12 (稳定可靠)"
-    ["amazonlinux"]="Amazon Linux 2023 (AWS优化)"
-    ["openeuler"]="OpenEuler 22.03 LTS (国产化)"
 )
 
 # 显示帮助信息
@@ -60,8 +52,7 @@ FIT Framework 批量镜像构建脚本
   $0 list                               # 列出支持的OS
   
   # 环境变量示例
-  SKIP_OS=openeuler,amazonlinux $0 build
-  ONLY_OS=ubuntu,alpine $0 build
+  ONLY_OS=alpine,debian $0 build
   PARALLEL=4 PUSH_IMAGE=true $0 build
 
 EOF

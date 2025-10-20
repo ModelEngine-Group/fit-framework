@@ -81,7 +81,7 @@ fit-framework    latest-ubuntu   abc123def456    2 minutes ago    1GB
 每个操作系统目录下都有独立的 `build.sh` 脚本：
 
 ```bash
-cd <os-name>    # alpine, ubuntu, debian, rocky, amazonlinux, openeuler
+cd <os-name>    # alpine, debian
 ./build.sh [FIT_VERSION] [REGISTRY]
 ```
 
@@ -174,12 +174,13 @@ PARALLEL=4 ./build_all.sh build
 
 **只构建特定的操作系统**
 ```bash
-ONLY_OS=ubuntu,alpine ./build_all.sh build
+ONLY_OS=alpine,debian ./build_all.sh build
 ```
 
-**跳过某些操作系统**
+**跳过某些操作系统**（当前无跳过操作，只有2个操作系统）
 ```bash
-SKIP_OS=openeuler,amazonlinux ./build_all.sh build
+# 示例（如果需要将来扩展）
+# SKIP_OS=<os-name> ./build_all.sh build
 ```
 
 ### 环境变量
@@ -201,14 +202,10 @@ SKIP_OS=openeuler,amazonlinux ./build_all.sh build
 ```
 支持的操作系统列表:
 ====================
-ubuntu       - Ubuntu 22.04 LTS (开发者友好)
 alpine       - Alpine Linux (轻量级云原生)
-rocky        - Rocky Linux 9 (企业级)
 debian       - Debian 12 (稳定可靠)
-amazonlinux  - Amazon Linux 2023 (AWS优化)
-openeuler    - OpenEuler 22.03 LTS (国产化)
 ====================
-总计: 6 个操作系统
+总计: 2 个操作系统
 ```
 
 ---
@@ -438,7 +435,7 @@ cd docker/base-images
 PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.5.3 localhost:5000/
 
 # 检查所有镜像
-for os in ubuntu alpine debian rocky amazonlinux openeuler; do
+for os in alpine debian; do
   echo "Testing ${os}..."
   docker pull localhost:5000/fit-framework:${os}
   docker run --rm localhost:5000/fit-framework:${os} fit help

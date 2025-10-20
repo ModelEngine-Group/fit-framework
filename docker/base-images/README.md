@@ -6,27 +6,23 @@ FIT Framework 官方 Docker 基础镜像，提供多种操作系统选择，让�
 
 ### 选择合适的基础镜像
 
-我们提供 6 种操作系统的基础镜像，您可以根据需求选择：
+我们提供 2 种操作系统的基础镜像，您可以根据需求选择：
 
 | 镜像标签                        | 操作系统                | 特点         | 推荐场景         |
 |-----------------------------|---------------------|------------|--------------|
-| `fit-framework:ubuntu`      | Ubuntu 22.04 LTS    | 开发者友好，生态丰富 | 开发测试、快速原型    |
 | `fit-framework:alpine`      | Alpine Linux        | 轻量级，安全性高   | 云原生、微服务、生产环境 |
-| `fit-framework:rocky`       | Rocky Linux 9       | 企业级，RHEL兼容 | 企业生产环境       |
 | `fit-framework:debian`      | Debian 12           | 稳定可靠，长期支持  | 稳定性要求高的场景    |
-| `fit-framework:amazonlinux` | Amazon Linux 2023   | AWS优化，云原生  | AWS部署，云应用    |
-| `fit-framework:openeuler`   | OpenEuler 22.03 LTS | 国产化，华为主导   | 国产化要求，信创项目   |
 
 ### 基本使用
 
 ```bash
-# 拉取镜像（以Ubuntu为例）
-docker pull fit-framework:ubuntu
+# 拉取镜像（以Alpine为例）
+docker pull fit-framework:alpine
 
 # 启动容器
 docker run -d --name fit-server \
   -p 8080:8080 \
-  fit-framework:ubuntu
+  fit-framework:alpine
 
 # 查看日志
 docker logs fit-server
@@ -68,7 +64,7 @@ docker run -d --name fit-server \
 
 ```dockerfile
 # 选择适合的基础镜像
-FROM fit-framework:ubuntu
+FROM fit-framework:alpine
 
 # 复制应用插件
 COPY --chown=fit:fit my-ai-plugins/ /opt/fit-framework/java/plugins/
@@ -119,7 +115,7 @@ CMD ["fit", "start"]
 ### 示例3：Python + Java 混合应用
 
 ```dockerfile
-FROM fit-framework:ubuntu
+FROM fit-framework:alpine
 
 # 切换到root安装Python依赖
 USER root
@@ -312,13 +308,12 @@ PUSH_IMAGE=true ./build-all.sh 3.5.1 registry.mycompany.com/
 # 查看帮助信息
 ./test-e2e.sh --help
 
-# 运行端到端测试（默认测试 Ubuntu）
+# 运行端到端测试（默认测试 Alpine）
 ./test-e2e.sh
 
 # 测试其他操作系统
 ./test-e2e.sh alpine
 ./test-e2e.sh debian
-./test-e2e.sh rocky
 ```
 
 测试流程包括：
@@ -332,10 +327,10 @@ PUSH_IMAGE=true ./build-all.sh 3.5.1 registry.mycompany.com/
 
 ```bash
 # 使用不同的 Registry 端口
-REGISTRY_PORT=20000 ./test-e2e.sh ubuntu
+REGISTRY_PORT=20000 ./test-e2e.sh alpine
 
 # 使用不同的 FIT 版本
-FIT_VERSION=3.5.4 ./test-e2e.sh ubuntu
+FIT_VERSION=3.5.4 ./test-e2e.sh alpine
 
 # 组合使用
 REGISTRY_PORT=20000 FIT_VERSION=3.5.4 ./test-e2e.sh alpine
