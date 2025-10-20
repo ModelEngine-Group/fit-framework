@@ -20,7 +20,7 @@ import {useTranslation} from 'react-i18next';
  * @constructor
  */
 const _JadeReferenceMultiTreeSelect = (props) => {
-  const {reference, onReferencedValueChange, onReferencedKeyChange, rules, className, width, moveOutReference, treeFilter, ...rest} = props;
+  const {reference, onReferencedValueChange, onReferencedKeyChange, rules, className, width, moveOutReference, treeFilter, typeFilter, ...rest} = props;
   const shape = useShapeContext();
   const {t} = useTranslation();
   const name = `reference-${reference.id}`;
@@ -104,7 +104,7 @@ const _JadeReferenceMultiTreeSelect = (props) => {
         onChange={(e) => rest.onChange ? rest.onChange(e, treeData) : onChange(e, treeData)}
         treeData={treeData}
         onDropdownVisibleChange={() => {
-          setTreeData(buildTreeData(shape, treeFilter));
+          setTreeData(buildTreeData(shape, treeFilter, typeFilter));
         }}
         multiple={true}
         showArrow

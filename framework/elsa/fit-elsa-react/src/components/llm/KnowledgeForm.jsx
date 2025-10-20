@@ -7,11 +7,12 @@
 import {Collapse, Popover} from 'antd';
 import {useDataContext, useDispatch} from '@/components/DefaultRoot.jsx';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Trans, useTranslation} from 'react-i18next';
 import {JadeReferenceMultiTreeSelect} from '@/components/common/JadeReferenceMultiTreeSelect.jsx';
 import {QuestionCircleOutlined} from '@ant-design/icons';
 import {JadeCollapse} from '@/components/common/JadeCollapse.jsx';
+import {DATA_TYPES, VIRTUAL_CONTEXT_NODE} from "@/common/Consts.js";
 
 const {Panel} = Collapse;
 
@@ -26,6 +27,7 @@ const _KnowledgeForm = ({knowledgeData, disabled}) => {
   const dispatch = useDispatch();
   const data = useDataContext();
   const {t} = useTranslation();
+  const arrayType = useMemo(() => (DATA_TYPES?.ARRAY ?? 'ARRAY').toUpperCase(), [DATA_TYPES?.ARRAY]);
 
   const content = (<div className={'jade-font-size'} style={{lineHeight: '1.2'}}>
     <Trans i18nKey='llmKnowledgePopover' components={{p: <p/>}}/>
@@ -73,7 +75,8 @@ const _KnowledgeForm = ({knowledgeData, disabled}) => {
           reference={knowledgeData}
           onReferencedValueChange={handleReferenceValueChange}
           onReferencedKeyChange={handleReferenceKeyChange}
-          treeFilter={(node) => node.node.type === 'knowledgeRetrievalNodeState'}
+          treeFilter={(node) => node.node.type !== VIRTUAL_CONTEXT_NODE.name && node.observableList.some(item => item.type === 'Array')}
+          typeFilter={(o) => (o?.type ?? '').toUpperCase() === arrayType}
           moveOutReference={!data.tempReference || !data.tempReference[knowledgeData.id] ? [] : data.tempReference[knowledgeData.id]}
         />
       </div>
