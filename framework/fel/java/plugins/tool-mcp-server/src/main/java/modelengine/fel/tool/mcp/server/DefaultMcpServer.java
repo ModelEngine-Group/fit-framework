@@ -161,7 +161,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
         this.addTool(name, description, hkxSchema, (exchange, request) -> {
             Map<String, Object> args = request.arguments();
             String result = this.toolExecuteService.execute(name, args);
-            return new McpSchema.CallToolResult(result, true);
+            return new McpSchema.CallToolResult(result, false);
         });
     }
 

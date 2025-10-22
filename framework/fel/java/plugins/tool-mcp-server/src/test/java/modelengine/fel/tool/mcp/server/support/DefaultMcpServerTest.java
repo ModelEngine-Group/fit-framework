@@ -25,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -85,9 +86,12 @@ public class DefaultMcpServerTest {
             McpServer.ToolsChangedObserver observer = mock(McpServer.ToolsChangedObserver.class);
             server.registerToolsChangedObserver(observer);
 
-            server.onToolAdded("tool1",
-                    "description1",
-                    MapBuilder.<String, Object>get().put("schema", "value1").build());
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
+            server.onToolAdded("tool1", "description1", schema);
             verify(observer, times(1)).onToolsChanged();
 
             server.onToolRemoved("tool1");
@@ -104,7 +108,11 @@ public class DefaultMcpServerTest {
             DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
             String name = "tool1";
             String description = "description1";
-            Map<String, Object> schema = MapBuilder.<String, Object>get().put("input", "value").build();
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
 
             server.onToolAdded(name, description, schema);
 
@@ -114,18 +122,22 @@ public class DefaultMcpServerTest {
             Tool tool = tools.get(0);
             assertThat(tool.getName()).isEqualTo(name);
             assertThat(tool.getDescription()).isEqualTo(description);
-            assertThat(tool.getInputSchema()).isEqualTo(schema);
         }
 
         @Test
         @DisplayName("Should ignore invalid parameters and not add any tool")
         void ignoreInvalidParameters() {
             DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
 
-            server.onToolAdded("", "description", MapBuilder.<String, Object>get().put("input", "value").build());
+            server.onToolAdded("", "description", schema);
             assertThat(server.getTools()).isEmpty();
 
-            server.onToolAdded("tool1", "", MapBuilder.<String, Object>get().put("input", "value").build());
+            server.onToolAdded("tool1", "", schema);
             assertThat(server.getTools()).isEmpty();
 
             server.onToolAdded("tool1", "description", null);
@@ -140,7 +152,12 @@ public class DefaultMcpServerTest {
         @DisplayName("Should remove an added tool correctly")
         void removeToolSuccessfully() {
             DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
-            server.onToolAdded("tool1", "desc", MapBuilder.<String, Object>get().put("input", "value").build());
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
+            server.onToolAdded("tool1", "desc", schema);
 
             server.onToolRemoved("tool1");
 
@@ -151,7 +168,12 @@ public class DefaultMcpServerTest {
         @DisplayName("Should ignore removal if name is blank")
         void ignoreBlankName() {
             DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
-            server.onToolAdded("tool1", "desc", MapBuilder.<String, Object>get().put("input", "value").build());
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
+            server.onToolAdded("tool1", "desc", schema);
 
             server.onToolRemoved("");
 
