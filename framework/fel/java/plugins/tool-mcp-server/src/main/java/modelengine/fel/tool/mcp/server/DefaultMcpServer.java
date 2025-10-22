@@ -14,6 +14,7 @@ import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolExecuteService;
+import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
 import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fitframework.log.Logger;
@@ -33,7 +34,7 @@ import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
- * Mcp Server implemented with MCP SDK.
+ * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver} with MCP SDK.
  *
  * @author 黄可欣
  * @since 2025-09-30
@@ -53,22 +54,9 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
      * @param toolExecuteService The service used to execute tools when handling tool call requests.
      * @throws IllegalArgumentException If {@code toolExecuteService} is null.
      */
-    public DefaultMcpServer(ToolExecuteService toolExecuteService) {
-        DefaultMcpStreamableServerTransportProvider transportProvider = DefaultMcpStreamableServerTransportProvider.builder()
-                .objectMapper(new ObjectMapper())
-                .build();
-        this.mcpSyncServer = io.modelcontextprotocol.server.McpServer.sync(transportProvider)
-                .serverInfo("FIT Store MCP Server", "3.6.0-SNAPSHOT")
-                .capabilities(McpSchema.ServerCapabilities.builder()
-                        .resources(false, true)  // Enable resource support
-                        .tools(true)             // Enable tool support
-                        .prompts(true)           // Enable prompt support
-                        .logging()               // Enable logging support
-                        .completions()           // Enable completions support
-                        .build())
-                .requestTimeout(Duration.ofSeconds(10))
-                .build();
+    public DefaultMcpServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
+        this.mcpSyncServer = mcpSyncServer;
     }
 
     @Override
