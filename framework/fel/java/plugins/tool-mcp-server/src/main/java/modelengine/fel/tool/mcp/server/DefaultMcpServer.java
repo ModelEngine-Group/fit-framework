@@ -148,9 +148,8 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             return;
         }
         if (!(parameters.get(TYPE) instanceof String)
-                || !(parameters.get(PROPERTIES) instanceof Map)
-                || !(parameters.get(REQUIRED) instanceof List)) {
-
+                || parameters.get(PROPERTIES) != null && !(parameters.get(PROPERTIES) instanceof Map)
+                || parameters.get(REQUIRED) != null && !(parameters.get(REQUIRED) instanceof List)) {
             log.warn("Invalid parameter schema. [toolName={}]", name);
             return;
         }
