@@ -8,18 +8,14 @@ package modelengine.fel.tool.mcp.server.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
-import modelengine.fel.tool.mcp.server.DefaultStreamableSyncMcpServer;
+import modelengine.fel.tool.mcp.server.DefaultMcpServer;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
@@ -33,13 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Unit test for {@link DefaultStreamableSyncMcpServer}.
+ * Unit test for {@link DefaultMcpServer}.
  *
  * @author 季聿阶
  * @since 2025-05-20
  */
 @DisplayName("Unit tests for DefaultStreamableSyncMcpServer")
-public class DefaultStreamableSyncMcpServerTest {
+public class DefaultMcpServerTest {
     private ToolExecuteService toolExecuteService;
 
     @BeforeEach
@@ -54,7 +50,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @DisplayName("Should throw IllegalArgumentException when toolExecuteService is null")
         void throwIllegalArgumentExceptionWhenToolExecuteServiceIsNull() {
             IllegalArgumentException exception =
-                    catchThrowableOfType(IllegalArgumentException.class, () -> new DefaultStreamableSyncMcpServer(null));
+                    catchThrowableOfType(IllegalArgumentException.class, () -> new DefaultMcpServer(null));
             assertThat(exception).isNotNull().hasMessage("The tool execute service cannot be null.");
         }
     }
@@ -65,7 +61,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @Test
         @DisplayName("Should return expected server information")
         void returnExpectedServerInfo() {
-            McpServer server = new DefaultStreamableSyncMcpServer(toolExecuteService);
+            McpServer server = new DefaultMcpServer(toolExecuteService);
             ServerSchema info = server.getSchema();
 
             assertThat(info).returns("2025-06-18", ServerSchema::protocolVersion);
@@ -85,7 +81,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @Test
         @DisplayName("Should notify observers when tools are added or removed")
         void notifyObserversOnToolAddOrRemove() {
-            DefaultStreamableSyncMcpServer server = new DefaultStreamableSyncMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
             McpServer.ToolsChangedObserver observer = mock(McpServer.ToolsChangedObserver.class);
             server.registerToolsChangedObserver(observer);
 
@@ -105,7 +101,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @Test
         @DisplayName("Should add tool successfully with valid parameters")
         void addToolSuccessfully() {
-            DefaultStreamableSyncMcpServer server = new DefaultStreamableSyncMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
             String name = "tool1";
             String description = "description1";
             Map<String, Object> schema = MapBuilder.<String, Object>get().put("input", "value").build();
@@ -124,7 +120,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @Test
         @DisplayName("Should ignore invalid parameters and not add any tool")
         void ignoreInvalidParameters() {
-            DefaultStreamableSyncMcpServer server = new DefaultStreamableSyncMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
 
             server.onToolAdded("", "description", MapBuilder.<String, Object>get().put("input", "value").build());
             assertThat(server.getTools()).isEmpty();
@@ -143,7 +139,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @Test
         @DisplayName("Should remove an added tool correctly")
         void removeToolSuccessfully() {
-            DefaultStreamableSyncMcpServer server = new DefaultStreamableSyncMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
             server.onToolAdded("tool1", "desc", MapBuilder.<String, Object>get().put("input", "value").build());
 
             server.onToolRemoved("tool1");
@@ -154,7 +150,7 @@ public class DefaultStreamableSyncMcpServerTest {
         @Test
         @DisplayName("Should ignore removal if name is blank")
         void ignoreBlankName() {
-            DefaultStreamableSyncMcpServer server = new DefaultStreamableSyncMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
             server.onToolAdded("tool1", "desc", MapBuilder.<String, Object>get().put("input", "value").build());
 
             server.onToolRemoved("");

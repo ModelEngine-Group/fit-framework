@@ -39,8 +39,8 @@ import static modelengine.fitframework.inspection.Validation.notNull;
  * @since 2025-09-30
  */
 @Component
-public class DefaultStreamableSyncMcpServer implements McpServer, ToolChangedObserver {
-    private static final Logger log = Logger.get(DefaultStreamableSyncMcpServer.class);
+public class DefaultMcpServer implements McpServer, ToolChangedObserver {
+    private static final Logger log = Logger.get(DefaultMcpServer.class);
     private final McpSyncServer mcpSyncServer;
 
     private final Map<String, Tool> tools = new ConcurrentHashMap<>();
@@ -53,7 +53,7 @@ public class DefaultStreamableSyncMcpServer implements McpServer, ToolChangedObs
      * @param toolExecuteService The service used to execute tools when handling tool call requests.
      * @throws IllegalArgumentException If {@code toolExecuteService} is null.
      */
-    public DefaultStreamableSyncMcpServer(ToolExecuteService toolExecuteService) {
+    public DefaultMcpServer(ToolExecuteService toolExecuteService) {
         DefaultMcpStreamableServerTransportProvider transportProvider = DefaultMcpStreamableServerTransportProvider.builder()
                 .objectMapper(new ObjectMapper())
                 .build();
