@@ -6,11 +6,14 @@
 
 package modelengine.fel.tool.mcp.server;
 
+import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * Represents the MCP Server.
@@ -34,13 +37,22 @@ public interface McpServer {
     List<Tool> getTools();
 
     /**
-     * Calls MCP server tool.
+     * Add a tool.
      *
-     * @param name The tool name as a {@link String}.
-     * @param arguments The tool arguments as a {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
-     * @return The tool result as a {@link Object}.
+     * @param name The name of the added tool, as a {@link String}.
+     * @param description A description of the added tool, as a {@link String}.
+     * @param inputSchema The parameters associated with the added tool, as a {@link McpSchema.JsonSchema}.
+     * @param callHandler The tool call handler as a {@link BiFunction}
      */
-    Object callTool(String name, Map<String, Object> arguments);
+    void addTool(String name, String description, McpSchema.JsonSchema inputSchema,
+                    BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> callHandler);
+
+    /**
+     * Remove a tool.
+     *
+     * @param name The name of the removed tool, as a {@link String}.
+     */
+    void removeTool(String name);
 
     /**
      * Registers MCP server tools changed observer.

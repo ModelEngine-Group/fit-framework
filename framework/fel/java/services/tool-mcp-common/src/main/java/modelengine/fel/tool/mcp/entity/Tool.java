@@ -6,7 +6,7 @@
 
 package modelengine.fel.tool.mcp.entity;
 
-import java.util.Map;
+import io.modelcontextprotocol.spec.McpSchema;
 
 /**
  * Represents a tool entity with name, description, and schema.
@@ -31,7 +31,7 @@ public class Tool {
      * The input schema that defines the expected parameters when invoking the tool.
      * Typically represented using a map structure, e.g., JSON schema format.
      */
-    private Map<String, Object> inputSchema;
+    private McpSchema.JsonSchema inputSchema;
 
     /**
      * Gets the name of the tool.
@@ -73,19 +73,18 @@ public class Tool {
      * Gets the input schema of the tool.
      * This defines the required and optional parameters for invoking the tool.
      *
-     * @return The tool's input schema as a {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
+     * @return The tool's input schema as a {@link McpSchema.JsonSchema}.
      */
-    public Map<String, Object> getInputSchema() {
+    public McpSchema.JsonSchema getInputSchema() {
         return this.inputSchema;
     }
 
     /**
      * Sets the input schema of the tool.
      *
-     * @param inputSchema The new input schema for the tool, as a
-     * {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
+     * @param inputSchema The new input schema for the tool, as a {@link McpSchema.JsonSchema}.
      */
-    public void setInputSchema(Map<String, Object> inputSchema) {
+    public void setInputSchema(McpSchema.JsonSchema inputSchema) {
         this.inputSchema = inputSchema;
     }
 }
