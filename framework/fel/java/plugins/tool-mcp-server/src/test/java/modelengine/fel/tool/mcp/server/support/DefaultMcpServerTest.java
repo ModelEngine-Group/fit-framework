@@ -34,7 +34,7 @@ import java.util.Map;
  * @author 季聿阶
  * @since 2025-05-20
  */
-@DisplayName("Unit tests for DefaultStreamableSyncMcpServer")
+@DisplayName("Unit tests for DefaultMcpServer")
 public class DefaultMcpServerTest {
     private ToolExecuteService toolExecuteService;
 
