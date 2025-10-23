@@ -278,14 +278,17 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                         @Override
                         public void onCompleted() {
                             logger.info("[SSE] Completed SSE emitting for session: {}", sessionId);
-                            listeningStream.close();
                         }
 
                         @Override
                         public void onFailed(Exception cause) {
-                            // No action needed
+                            logger.warn("[SSE] SSE failed for session: {}, cause: {}", sessionId, cause.getMessage());
                         }
                     });
+                    
+                    // Add connection monitoring to detect client disconnection
+                    // This is a workaround to ensure listeningStream.close() is called when client disconnects
+                    startConnectionMonitoring(sessionId, listeningStream, response);
                 }
             });
         }
@@ -294,6 +297,43 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return null;
         }
+    }
+
+    /**
+     * Starts connection monitoring to detect client disconnection and ensure proper cleanup.
+     * This is a workaround to ensure listeningStream.close() is called when client disconnects.
+     *
+     * @param sessionId The session ID
+     * @param listeningStream The listening stream to close when connection is lost
+     * @param response The HTTP response to check for connection status
+     */
+    private void startConnectionMonitoring(String sessionId,
+                                        McpStreamableServerSession.McpStreamableServerSessionStream listeningStream,
+                                        HttpClassicServerResponse response) {
+        // Use a separate thread to periodically check connection status
+        Thread monitoringThread = new Thread(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    Thread.sleep(1000); // Check every second
+                    
+                    // Check if the HTTP response is still active
+                    if (!response.isActive()) {
+                        logger.info("[SSE] Connection lost for session, completing emitter to trigger cleanup");
+                        listeningStream.close();
+                        break;
+                    }
+                }
+            } catch (InterruptedException e) {
+                logger.debug("[SSE] Connection monitoring interrupted for session");
+                Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                logger.warn("[SSE] Error in connection monitoring: {}", e.getMessage());
+            }
+        });
+        
+        monitoringThread.setDaemon(true);
+        monitoringThread.setName("sse-connection-monitor-" + sessionId);
+        monitoringThread.start();
     }
 
     /**

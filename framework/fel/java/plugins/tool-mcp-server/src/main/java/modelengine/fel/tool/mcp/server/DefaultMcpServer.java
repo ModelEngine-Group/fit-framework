@@ -6,7 +6,6 @@
 
 package modelengine.fel.tool.mcp.server;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -14,14 +13,12 @@ import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolExecuteService;
-import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
 import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,8 @@ import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
- * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver} with MCP SDK.
+ * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
+ * with MCP Server Bean {@link McpSyncServer}.
  *
  * @author 黄可欣
  * @since 2025-09-30
