@@ -6,6 +6,7 @@
 
 package modelengine.fel.tool.mcp.server;
 
+import static modelengine.fitframework.inspection.Validation.notNull;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
@@ -26,22 +27,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
 import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
 import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
-import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
  * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
  * with MCP Server Bean {@link McpSyncServer}.
  *
- * @author 黄可欣
- * @since 2025-09-30
+ * @author 季聿阶
+ * @since 2025-05-15
  */
 @Component
 public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     private static final Logger log = Logger.get(DefaultMcpServer.class);
     private final McpSyncServer mcpSyncServer;
 
-    private final Map<String, Tool> tools = new ConcurrentHashMap<>();
     private final ToolExecuteService toolExecuteService;
+    private final Map<String, Tool> tools = new ConcurrentHashMap<>();
     private final List<ToolsChangedObserver> toolsChangedObservers = new ArrayList<>();
 
     /**
@@ -119,7 +119,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
         tool.setDescription(description);
         tool.setInputSchema(parameters);
         this.tools.put(name, tool);
-        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, inputSchema);
+        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
         this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 

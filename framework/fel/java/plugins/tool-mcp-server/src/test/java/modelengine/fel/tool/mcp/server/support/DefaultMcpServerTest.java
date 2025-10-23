@@ -127,6 +127,7 @@ public class DefaultMcpServerTest {
             Tool tool = tools.get(0);
             assertThat(tool.getName()).isEqualTo(name);
             assertThat(tool.getDescription()).isEqualTo(description);
+            assertThat(tool.getInputSchema()).isEqualTo(schema);
         }
 
         @Test
