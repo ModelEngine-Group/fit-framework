@@ -7,7 +7,6 @@
 package modelengine.fel.tool.mcp.server;
 
 import io.modelcontextprotocol.server.McpServerFeatures;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
@@ -23,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 
 import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
 import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
@@ -59,8 +57,10 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
 
     @Override
     public ServerSchema getSchema() {
-        McpSchema.Implementation info = this.mcpSyncServer.getServerInfo();
-        McpSchema.ServerCapabilities capabilities=  this.mcpSyncServer.getServerCapabilities();
+        ServerSchema.Info info = new ServerSchema.Info("FIT Store MCP Server", "3.6.0-SNAPSHOT");
+        ServerSchema.Capabilities.Logging logging = new ServerSchema.Capabilities.Logging();
+        ServerSchema.Capabilities.Tools tools = new ServerSchema.Capabilities.Tools(true);
+        ServerSchema.Capabilities capabilities = new ServerSchema.Capabilities(logging, tools);
         return new ServerSchema("2025-06-18", capabilities, info);
     }
 
@@ -77,8 +77,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     }
 
     @Override
-    public void addTool(String name, String description, McpSchema.JsonSchema inputSchema,
-            BiFunction<McpSyncServerExchange, McpSchema.CallToolRequest, McpSchema.CallToolResult> callHandler) {
+    public void onToolAdded(String name, String description, Map<String, Object> parameters) {
         if (StringUtils.isBlank(name)) {
             log.warn("Tool addition is ignored: tool name is blank.");
             return;
@@ -87,48 +86,6 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             log.warn("Tool addition is ignored: tool description is blank. [toolName={}]", name);
             return;
         }
-        if (inputSchema == null) {
-            log.warn("Tool addition is ignored: tool schema is null or empty. [toolName={}]", name);
-            return;
-        }
-        if (callHandler == null) {
-            log.warn("Tool addition is ignored: tool call handler is null or empty. [toolName={}]", name);
-            return;
-        }
-
-        McpServerFeatures.SyncToolSpecification toolSpecification = McpServerFeatures.SyncToolSpecification.builder()
-                .tool(McpSchema.Tool.builder()
-                        .name(name)
-                        .description(description)
-                        .inputSchema(inputSchema)
-                        .build())
-                .callHandler(callHandler)
-                .build();
-        this.mcpSyncServer.addTool(toolSpecification);
-
-        Tool tool = new Tool();
-        tool.setName(name);
-        tool.setDescription(description);
-        tool.setInputSchema(inputSchema);
-        this.tools.put(name, tool);
-        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, inputSchema);
-        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
-    }
-
-    @Override
-    public void removeTool(String name) {
-        if (StringUtils.isBlank(name)) {
-            log.warn("Tool removal is ignored: tool name is blank.");
-            return;
-        }
-        this.mcpSyncServer.removeTool(name);
-        this.tools.remove(name);
-        log.info("Tool removed from MCP server. [toolName={}]", name);
-        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
-    }
-
-    @Override
-    public void onToolAdded(String name, String description, Map<String, Object> parameters) {
         if (MapUtils.isEmpty(parameters)) {
             log.warn("Tool addition is ignored: tool schema is null or empty. [toolName={}]", name);
             return;
@@ -140,18 +97,41 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             return;
         }
         @SuppressWarnings("unchecked")
-        McpSchema.JsonSchema hkxSchema = new McpSchema.JsonSchema((String) parameters.get(TYPE),
+        McpSchema.JsonSchema inputSchema = new McpSchema.JsonSchema((String) parameters.get(TYPE),
                 (Map<String, Object>) parameters.get(PROPERTIES), (List<String>) parameters.get(REQUIRED),
                 null, null,null);
-        this.addTool(name, description, hkxSchema, (exchange, request) -> {
-            Map<String, Object> args = request.arguments();
-            String result = this.toolExecuteService.execute(name, args);
-            return new McpSchema.CallToolResult(result, false);
-        });
+        McpServerFeatures.SyncToolSpecification toolSpecification = McpServerFeatures.SyncToolSpecification.builder()
+                .tool(McpSchema.Tool.builder()
+                        .name(name)
+                        .description(description)
+                        .inputSchema(inputSchema)
+                        .build())
+                .callHandler((exchange, request) -> {
+                    Map<String, Object> args = request.arguments();
+                    String result = this.toolExecuteService.execute(name, args);
+                    return new McpSchema.CallToolResult(result, false);
+                })
+                .build();
+        this.mcpSyncServer.addTool(toolSpecification);
+
+        Tool tool = new Tool();
+        tool.setName(name);
+        tool.setDescription(description);
+        tool.setInputSchema(parameters);
+        this.tools.put(name, tool);
+        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, inputSchema);
+        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 
     @Override
     public void onToolRemoved(String name) {
-        this.removeTool(name);
+        if (StringUtils.isBlank(name)) {
+            log.warn("Tool removal is ignored: tool name is blank.");
+            return;
+        }
+        this.mcpSyncServer.removeTool(name);
+        this.tools.remove(name);
+        log.info("Tool removed from MCP server. [toolName={}]", name);
+        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 }

@@ -68,6 +68,16 @@ public class DefaultMcpServerTest {
             ServerSchema info = server.getSchema();
 
             assertThat(info).returns("2025-06-18", ServerSchema::protocolVersion);
+
+            ServerSchema.Capabilities capabilities = info.capabilities();
+            assertThat(capabilities).isNotNull();
+
+            ServerSchema.Capabilities.Tools toolsCapability = capabilities.tools();
+            assertThat(toolsCapability).returns(true, ServerSchema.Capabilities.Tools::listChanged);
+
+            ServerSchema.Info serverInfo = info.serverInfo();
+            assertThat(serverInfo).returns("FIT Store MCP Server", ServerSchema.Info::name)
+                    .returns("3.6.0-SNAPSHOT", ServerSchema.Info::version);
         }
     }
 

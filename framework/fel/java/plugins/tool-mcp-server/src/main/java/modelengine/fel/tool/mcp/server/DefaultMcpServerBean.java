@@ -34,11 +34,8 @@ public class DefaultMcpServerBean {
         return io.modelcontextprotocol.server.McpServer.sync(transportProvider)
                 .serverInfo("FIT Store MCP Server", "3.6.0-SNAPSHOT")
                 .capabilities(McpSchema.ServerCapabilities.builder()
-                        .resources(false, true)  // Enable resource support
                         .tools(true)             // Enable tool support
-                        .prompts(true)           // Enable prompt support
                         .logging()               // Enable logging support
-                        .completions()           // Enable completions support
                         .build())
                 .requestTimeout(Duration.ofSeconds(10))
                 .build();
