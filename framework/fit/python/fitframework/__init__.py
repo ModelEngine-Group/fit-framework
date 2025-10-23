@@ -215,7 +215,43 @@ if __package__ == 'fitframework' and sys.argv[0].find("pytest") == -1:  # 避免
     if platform.system() in ('Windows', 'Darwin'):  # Windows 或 macOS
         main()
     else:  # Linux 及其他
+        from fitframework.utils.restart_policy import create_default_restart_policy
+
+        restart_policy = create_default_restart_policy()
+        fit_logger.info(f"Starting process manager with restart policy: {restart_policy.get_status()}")
+
         while True:
-            main_process = Process(target=main, name='MainProcess')
-            main_process.start()
-            main_process.join()
+            try:
+                main_process = Process(target=main, name='MainProcess')
+                main_process.start()
+                fit_logger.info(f"Main process started with PID: {main_process.pid}")
+                main_process.join()
+
+                # 检查进程退出码
+                exit_code = main_process.exitcode
+                fit_logger.info(f"Main process exited with code: {exit_code}")
+
+                # 使用重启策略判断是否应该重启
+                if not restart_policy.should_restart(exit_code):
+                    fit_logger.info("Restart policy indicates no restart needed, stopping")
+                    break
+
+                # 获取重启延迟
+                restart_delay = restart_policy.get_restart_delay()
+                status = restart_policy.get_status()
+
+                fit_logger.warning(f"Main process exited unexpectedly, restarting in {restart_delay:.2f} seconds... "
+                                   f"(attempt {status['current_attempt']}/{status['max_attempts']})")
+                time.sleep(restart_delay)
+
+            except Exception as e:
+                fit_logger.error(f"Error during process management: {e}")
+                if not restart_policy.should_restart(-1):  # 使用-1表示异常退出
+                    fit_logger.error("Restart policy indicates no restart needed due to errors, stopping")
+                    break
+
+                restart_delay = restart_policy.get_restart_delay()
+                status = restart_policy.get_status()
+                fit_logger.warning(f"Error occurred, restarting in {restart_delay:.2f} seconds... "
+                                   f"(attempt {status['current_attempt']}/{status['max_attempts']})")
+                time.sleep(restart_delay)

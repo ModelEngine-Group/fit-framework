@@ -1,0 +1,7 @@
+# 健康监控插件元数据
+name: fit_py_health_monitor
+version: 1.0.0
+description: "系统健康监控插件"
+author: "Fit Framework Team"
+level: 1
+type: plugin
