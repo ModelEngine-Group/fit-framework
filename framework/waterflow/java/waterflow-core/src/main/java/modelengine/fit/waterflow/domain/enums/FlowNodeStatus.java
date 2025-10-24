@@ -47,5 +47,10 @@ public enum FlowNodeStatus {
     /**
      * 节点处理过程中发生错误
      */
-    ERROR
+    ERROR,
+
+    /**
+     * 可重试
+     */
+    RETRYABLE;
 }

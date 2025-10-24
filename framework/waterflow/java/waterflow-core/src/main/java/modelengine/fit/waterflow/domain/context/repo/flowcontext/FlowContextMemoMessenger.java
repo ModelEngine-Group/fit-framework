@@ -39,7 +39,7 @@ public class FlowContextMemoMessenger implements FlowContextMessenger {
      * @param <I> 流程实例执行时的入参数据类型，用于泛型推倒
      */
     @Override
-    public <I> void sendCallback(List<FlowContext<I>> contexts) {
+    public <I> void sendCallback(Object callback, List<FlowContext<I>> contexts) {
         LOG.warn("FlowEngine memo messenger does not support sending events.");
     }
 }

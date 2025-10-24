@@ -23,6 +23,7 @@ import modelengine.fit.waterflow.domain.enums.FlowTraceStatus;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
 import modelengine.fit.waterflow.domain.enums.SpecialDisplayNode;
 import modelengine.fit.waterflow.domain.states.DataStart;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.domain.stream.reactive.Processor;
 import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
@@ -44,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -124,7 +126,7 @@ public class From<I> extends IdGenerator implements Publisher<I> {
      */
     @Override
     public Processor<I, I> conditions(Operators.Whether<I> whether) {
-        ConditionsNode<I> node = new ConditionsNode<>(this.getStreamId(), repo, messenger, locks);
+        ConditionsNode<I> node = new ConditionsNode<>(this.getStreamId(), i -> {}, repo, messenger, locks);
         this.subscribe(node, whether);
         return node.displayAs(SpecialDisplayNode.CONDITION.name());
     }
@@ -266,9 +268,9 @@ public class From<I> extends IdGenerator implements Publisher<I> {
             window.createToken();
             return context;
         }).collect(Collectors.toList());
-        List<FlowContext<I>> after = this.startNodeMarkAsHandled(contexts, trace);
-        after.forEach(this::generateIndex);
-        this.offer(after);
+        List<FlowContext<I>> afters = this.startNodeMarkAsHandled(contexts, trace);
+        afters.forEach(this::generateIndex);
+        this.offer(afters, __ -> {});
         return trace.getId();
     }
 
@@ -320,9 +322,10 @@ public class From<I> extends IdGenerator implements Publisher<I> {
      * 这个数据可以来源于数据最开始，也可以是接受者处理完的数据
      *
      * @param contexts 数据上下文，里面有要处理的数据，还有其他流处理状态信息
+     * @param preSendCallback 在数据发送到下一个节点前触发当前节点完成回调操作
      */
     @Override
-    public void offer(List<FlowContext<I>> contexts) {
+    public void offer(List<FlowContext<I>> contexts, Consumer<PreSendCallbackInfo<I>> preSendCallback) {
         if (CollectionUtils.isEmpty(contexts)) {
             return;
         }
@@ -472,7 +475,7 @@ public class From<I> extends IdGenerator implements Publisher<I> {
             context.setStatus(FlowNodeStatus.ARCHIVED);
         });
         List<FlowContext<I>> afterList = preList.stream().map(pre -> {
-            FlowContext<I> after = pre.generate(pre.getData(), pre.getPosition()).batchId(toBatchId);
+            FlowContext<I> after = pre.generate(pre.getData(), pre.getPosition(), pre.getCreateAt()).batchId(toBatchId);
             trace.getContextPool().add(after.getId());
             return after;
         }).collect(Collectors.toList());

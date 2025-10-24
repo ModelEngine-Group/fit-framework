@@ -48,6 +48,15 @@ public interface FlowContextRepo {
     <T> List<FlowContext<T>> getContextsByPosition(String streamId, String posId, String batchId, String status);
 
     /**
+     * 根据traceId查询所有的context对象
+     *
+     * @param <T> 泛型类型，表示上下文的数据类型
+     * @param traceId traceId
+     * @return 上下文列表
+     */
+    <T> List<FlowContext<T>> findWithoutFlowDataByTraceId(String traceId);
+
+    /**
      * 根据traceId获取上下文
      *
      * @param <T> 泛型类型，表示上下文的数据类型
@@ -63,6 +72,22 @@ public interface FlowContextRepo {
      * @param contexts 上下文列表
      */
     <I> void save(List<FlowContext<I>> contexts);
+
+    /**
+     * 批量更新context的上下文数据flowData字段
+     *
+     * @param <I> 泛型类型，表示上下文的数据类型
+     * @param contexts contexts
+     */
+    <I> void updateFlowDataAndToBatch(List<FlowContext<I>> contexts);
+
+    /**
+     * 批量更新上下文数据
+     *
+     * @param <I> 泛型类型，表示上下文的数据类型
+     * @param flowDataList 数据列表（contextId, T）
+     */
+    <I> void updateFlowData(Map<String, I> flowDataList);
 
     /**
      * 批量更新context的内容，不更新status和position
@@ -110,6 +135,15 @@ public interface FlowContextRepo {
     <T> List<FlowContext<T>> getByIds(List<String> ids);
 
     /**
+     * 根据toBatch查找FlowContext
+     *
+     * @param <T> 泛型类型，表示上下文的数据类型
+     * @param toBatchIds 上下文toBatch
+     * @return 上下文列表
+     */
+    <T> List<FlowContext<T>> getByToBatch(List<String> toBatchIds);
+
+    /**
      * 查找和指定一批ID对应的状态为PENDING且SENT了的流程上下文
      *
      * @param <T> 泛型类型，表示上下文的数据类型
@@ -152,6 +186,17 @@ public interface FlowContextRepo {
      */
     default <T> List<FlowContext<T>> findByStreamId(String metaId, String version) {
         throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "findByStreamId");
+    }
+
+    /**
+     * 查找流程对应版本正在运行的上下文
+     *
+     * @param metaId metaId 流程metaId标识
+     * @param version 流程对应版本
+     * @return 对应所有上下文
+     */
+    default Integer findRunningContextCountByMetaId(String metaId, String version) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "findRunningContextCountByMetaId");
     }
 
     /**
@@ -241,5 +286,43 @@ public interface FlowContextRepo {
      * @param contexts 上下文信息
      */
     <T> void updateIndex(List<FlowContext<T>> contexts);
+
+    /**
+     * deleteByContextIds
+     *
+     * @param contextIds contextIds
+     */
+    default void deleteByContextIds(List<String> contextIds) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "deleteByContextIds");
+    }
+
+    /**
+     * 根据transId获取stream id
+     *
+     * @param flowTransId trans id
+     * @return stream id
+     */
+    default String getStreamIdByTransId(String flowTransId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "getStreamIdByTransId");
+    }
+
+    /**
+     * 根据transId获取traceId
+     *
+     * @param transId transId
+     * @return traceId
+     */
+    default List<String> getTraceByTransId(String transId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "getTraceByTransId");
+    }
+
+    /**
+     * 根据transId删除上下文
+     *
+     * @param transId trans id
+     */
+    default void deleteByTransId(String transId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "deleteByTransId");
+    }
 }
 

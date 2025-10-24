@@ -36,11 +36,23 @@ public class Retryable<I> {
     }
 
     /**
+     * 是否需要重试
+     *
+     * @param exception 出现的异常
+     * @param contexts 异常上下文信息
+     * @return 是否需要重试
+     */
+    public boolean isNeedRetry(Exception exception, List<FlowContext<I>> contexts) {
+        return false;
+    }
+
+    /**
      * 发生错误后，处理contexts上下文
      *
+     * @param exception 异常
      * @param contexts 需要错误处理的context列表
      */
-    public void process(List<FlowContext<I>> contexts) {
+    public void process(Exception exception, List<FlowContext<I>> contexts) {
         this.repo.update(contexts);
         this.repo.updateStatus(contexts, contexts.get(0).getStatus().toString(), contexts.get(0).getPosition());
     }
@@ -48,10 +60,11 @@ public class Retryable<I> {
     /**
      * 发生错误后，处理contexts上下文，并且发起重试
      *
+     * @param exception 异常
      * @param contexts 需要错误处理的context列表
      */
-    public void retry(List<FlowContext<I>> contexts) {
-        this.process(contexts);
+    public void retry(Exception exception, List<FlowContext<I>> contexts) {
+        this.process(exception, contexts);
         to.onProcess(null, contexts, false);
     }
 }

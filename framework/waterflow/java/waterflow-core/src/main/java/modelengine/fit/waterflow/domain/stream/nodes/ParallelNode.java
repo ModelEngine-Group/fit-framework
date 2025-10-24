@@ -12,8 +12,10 @@ import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo
 import modelengine.fit.waterflow.domain.context.repo.flowlock.FlowLocks;
 import modelengine.fit.waterflow.domain.enums.FlowNodeType;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 平行节点，也是fork的起始节点
@@ -78,9 +80,9 @@ public class ParallelNode<I> extends Node<I, I> {
             FlowContextMessenger messenger, FlowLocks locks) {
         return new From<I>(streamId, repo, messenger, locks) {
             @Override
-            public void offer(List<FlowContext<I>> contexts) {
+            public void offer(List<FlowContext<I>> contexts, Consumer<PreSendCallbackInfo<I>> preSendCallback) {
                 contexts.forEach(c -> c.setParallel(c.getId()).setParallelMode(mode.name()));
-                super.offer(contexts);
+                super.offer(contexts, preSendCallback);
             }
         };
     }

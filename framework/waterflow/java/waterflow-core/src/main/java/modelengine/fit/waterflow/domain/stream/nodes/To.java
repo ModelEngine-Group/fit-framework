@@ -10,6 +10,7 @@ import static modelengine.fit.waterflow.ErrorCodes.FLOW_NODE_CREATE_ERROR;
 import static modelengine.fit.waterflow.ErrorCodes.FLOW_NODE_MAX_TASK;
 
 import lombok.Getter;
+import lombok.Setter;
 import modelengine.fit.waterflow.domain.common.Constants;
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowSession;
@@ -24,6 +25,7 @@ import modelengine.fit.waterflow.domain.enums.FlowNodeStatus;
 import modelengine.fit.waterflow.domain.enums.FlowNodeType;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
 import modelengine.fit.waterflow.domain.enums.ProcessType;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 import modelengine.fit.waterflow.domain.stream.callbacks.ToCallback;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.domain.stream.reactive.Callback;
@@ -42,6 +44,7 @@ import modelengine.fitframework.util.CollectionUtils;
 import modelengine.fitframework.util.ObjectUtils;
 import modelengine.fitframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,6 +55,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -189,6 +193,10 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
 
     private Operators.ErrorHandler globalErrorHandler = null;
 
+    private Operators.Just<Callback<FlowContext<I>>> globalBeforeHandler = i -> {};
+
+    private Operators.Just<Callback<FlowContext<O>>> globalAfterHandler = i -> {};
+
     private boolean isAuto = true;
 
     private Thread processT = null;
@@ -196,6 +204,8 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     private Thread preProcessT = null;
 
     private final Map<Object, EmitterListener<O, FlowSession>> listeners = new ConcurrentHashMap<>();
+
+    private int order = 0;
 
     private final Map<Object, FlowSession> nextSessions = new ConcurrentHashMap<>();
 
@@ -311,7 +321,20 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             this.afterProcess(preList, afterList);
             if (CollectionUtils.isNotEmpty(afterList)) {
                 feedback(afterList);
-                this.onNext(afterList.get(0).getBatchId());
+                if (FlowNodeType.END.equals(this.nodeType)) {
+                    this.callback(preList, afterList);
+                } else {
+                    this.onNext(afterList.get(0).getBatchId(), c -> {
+                        List<String> discardContexts =
+                                c.getUnMatchedContexts().stream().map(IdGenerator::getId).collect(Collectors.toList());
+                        if (!discardContexts.isEmpty()) {
+                            this.getFlowContextRepo().deleteByContextIds(discardContexts);
+                        }
+
+                        List<FlowContext<O>> mergeContexts = c.getAllContext();
+                        this.callback(preList, mergeContexts);
+                    });
+                }
             }
             afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
         } catch (Exception ex) {
@@ -545,7 +568,22 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             if (CollectionUtils.isNotEmpty(afterList)) {
                 // 查找一个transaction里的所有数据的都完成了，运行callback给stream外反馈数据
                 feedback(afterList);
-                this.onNext(afterList.get(0).getBatchId());
+                if (FlowNodeType.END.equals(this.nodeType)) {
+                    this.callback(preList, afterList);
+                } else {
+                    this.onNext(afterList.get(0).getBatchId(), c -> {
+                        List<String> discardContexts = c.getUnMatchedContexts()
+                                .stream()
+                                .map(context -> context.getId())
+                                .collect(Collectors.toList());
+                        if (!discardContexts.isEmpty()) {
+                            this.getFlowContextRepo().deleteByContextIds(discardContexts);
+                        }
+
+                        List<FlowContext<O>> mergeContexts = c.getAllContext();
+                        this.callback(preList, mergeContexts);
+                    });
+                }
             }
             // 处理好数据后对外送数据，驱动其他flow响应
             afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
@@ -616,7 +654,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     }
 
     @Override
-    public void onNext(String batchId) {
+    public void onNext(String batchId, Consumer<PreSendCallbackInfo<O>> preSendCallback) {
     }
 
     private void feedback(List<FlowContext<O>> contexts) {
@@ -666,6 +704,18 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         this.getFlowContextRepo().update(preList);
         this.getFlowContextRepo()
                 .updateStatus(preList, preList.get(0).getStatus().toString(), preList.get(0).getPosition());
+    }
+
+    private void callback(List<FlowContext<I>> preContexts, List<FlowContext<O>> after) {
+        LocalDateTime createAt = preContexts.get(0).getCreateAt();
+        LocalDateTime archivedAt = LocalDateTime.now();
+        feedback(after.stream().map(context -> {
+            FlowContext<O> callbackContext = context.generate(context.getData(), context.getPosition(),
+                    createAt);
+            callbackContext.setArchivedAt(archivedAt);
+            callbackContext.setNextPositionId(context.getNextPositionId());
+            return callbackContext;
+        }).collect(Collectors.toList()));
     }
 
     /**
@@ -722,6 +772,21 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Override
     public void onGlobalError(Operators.ErrorHandler handler) {
         this.globalErrorHandler = handler;
+    }
+
+    @Override
+    public void onGlobalBefore(Operators.Just<Callback<FlowContext<I>>> handler) {
+        this.globalBeforeHandler = handler;
+    }
+
+    @Override
+    public void onGlobalAfter(Operators.Just<Callback<FlowContext<O>>> handler) {
+        this.globalAfterHandler = handler;
+    }
+
+    @Override
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     @Override
@@ -802,7 +867,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             public <T1, R1> List<FlowContext<R1>> process(To<T1, R1> to, List<FlowContext<T1>> contexts) {
                 return to.produce.process(contexts)
                         .stream()
-                        .map(data -> contexts.get(0).generate(data, to.getId()))
+                        .map(data -> contexts.get(0).generate(data, to.getId(), LocalDateTime.now()))
                         .collect(Collectors.toList());
             }
 
@@ -834,7 +899,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                     if (data != null) {
                         // create new session and window token for processed data
                         FlowSession nextSession = to.getNextSession(session);
-                        FlowContext<R1> clonedContext = context.generate(data, to.getId());
+                        FlowContext<R1> clonedContext = context.generate(data, to.getId(), LocalDateTime.now());
                         clonedContext.setSession(nextSession);
                         if (context.getSession().isAccumulator()) {
                             if (clonedContext.getIndex() > Constants.NOT_PRESERVED_INDEX) {
@@ -983,6 +1048,16 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 to.onProcess(type, ready, true);
                 concurrencyHolder.release();
             }).buildDisposable());
+
+            // FlowExecutors.getThreadPool(StringUtils.join(Constant.STREAM_ID_SEPARATOR, to.streamId, to.id),
+            //                 MAX_CONCURRENCY)
+            //         .submit(PriorityThreadPool.PriorityTask.builder()
+            //                 .priority(PriorityThreadPool.PriorityTask.PriorityInfo.builder()
+            //                         .order(to.order)
+            //                         .createTime(System.currentTimeMillis())
+            //                         .build())
+            //                 .runner(() -> to.onProcess(ready))
+            //                 .build());
         }
 
         private <T1, R1> void handleProcessConcurrentConflict(To<T1, R1> to) {

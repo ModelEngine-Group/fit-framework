@@ -10,6 +10,7 @@ import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowTrace;
 import modelengine.fit.waterflow.domain.enums.FlowNodeStatus;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
+import modelengine.fitframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -75,6 +76,11 @@ public class FlowContextMemoRepo implements FlowContextRepo {
     }
 
     @Override
+    public <T> List<FlowContext<T>> findWithoutFlowDataByTraceId(String traceId) {
+        throw new IllegalStateException("Not support");
+    }
+
+    @Override
     public <T> List<FlowContext<T>> getContextsByTrace(String traceId) {
         return query(stream -> stream
                 .filter(context -> context.getTraceId().contains(traceId)));
@@ -91,6 +97,21 @@ public class FlowContextMemoRepo implements FlowContextRepo {
                 this.contextsMap.remove(context.getId());
             } else {
                 this.contextsMap.put(context.getId(), context);
+            }
+        });
+    }
+
+    @Override
+    public <T> void updateFlowDataAndToBatch(List<FlowContext<T>> contexts) {
+        save(contexts);
+    }
+
+    @Override
+    public synchronized <T> void updateFlowData(Map<String, T> flowDataList) {
+        flowDataList.forEach((contextId, data) -> {
+            FlowContext<T> flowContext = ObjectUtils.cast(this.contextsMap.get(contextId));
+            if (flowContext != null) {
+                flowContext.setData(data);
             }
         });
     }
@@ -123,6 +144,14 @@ public class FlowContextMemoRepo implements FlowContextRepo {
     @Override
     public <T> List<FlowContext<T>> getByIds(List<String> ids) {
         return ids.stream().map(i -> (FlowContext<T>) contextsMap.get(i)).collect(Collectors.toList());
+    }
+
+    @Override
+    public <T> List<FlowContext<T>> getByToBatch(List<String> toBatchIds) {
+        return query(stream -> stream
+                .filter(context -> context.getStatus().equals(FlowNodeStatus.PENDING))
+                .filter(FlowContext::isSent)
+                .filter(context -> toBatchIds.contains(context.getToBatch())));
     }
 
     @Override
