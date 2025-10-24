@@ -142,6 +142,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     @Getter
     private ProcessMode processMode;
 
+    @Setter
+    private Boolean isAsyncJob = false;
+
     private Map<String, Integer> processingSessions = new ConcurrentHashMap<>();
 
     private Operators.Validator<I> validator = (repo, to) -> repo.requestMappingContext(to.streamId,
@@ -558,6 +561,11 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 this.afterProcess(preList, new ArrayList<>());
                 return;
             }
+            if (this.isAsyncJob) {
+                this.beforeAsyncProcess(preList);
+                this.getProcessMode().process(this, preList);
+                return;
+            }
             List<FlowContext<O>> afterList = this.getProcessMode().process(this, preList);
             preList.forEach(context -> {
                 context.getWindow()
@@ -666,6 +674,13 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 });
             });
         }
+    }
+
+    private void beforeAsyncProcess(List<FlowContext<I>> pre) {
+        updateBatch(pre, Collections.emptyList());
+        pre.forEach(p -> p.setStatus(FlowNodeStatus.PROCESSING));
+        this.getFlowContextRepo().update(pre);
+        this.getFlowContextRepo().updateStatus(pre, pre.get(0).getStatus().toString(), pre.get(0).getPosition());
     }
 
     private synchronized void updateConcurrency(int newConcurrency) {
@@ -865,7 +880,13 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         PRODUCING {
             @Override
             public <T1, R1> List<FlowContext<R1>> process(To<T1, R1> to, List<FlowContext<T1>> contexts) {
-                return to.produce.process(contexts)
+                // 异步任务，不关心结果
+                if (to.isAsyncJob) {
+                    this.processData(to, contexts);
+                    return null;
+                }
+                // 同步任务，返回结果
+                return processData(to, contexts)
                         .stream()
                         .map(data -> contexts.get(0).generate(data, to.getId(), LocalDateTime.now()))
                         .collect(Collectors.toList());
@@ -876,6 +897,10 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 return to.flowContextRepo.requestProducingContext(to.streamId,
                         to.froms.stream().map(Identity::getId).collect(Collectors.toList()),
                         to.postFilter());
+            }
+
+            private <T1, R1> List<R1> processData(To<T1, R1> to, List<FlowContext<T1>> contexts) {
+                return to.produce.process(contexts);
             }
         },
 
