@@ -8,16 +8,14 @@ package modelengine.fel.tool.mcp.server.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
+import modelengine.fel.tool.mcp.server.DefaultMcpServer;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
@@ -27,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +38,12 @@ import java.util.Map;
 @DisplayName("Unit tests for DefaultMcpServer")
 public class DefaultMcpServerTest {
     private ToolExecuteService toolExecuteService;
+    private McpSyncServer mcpSyncServer;
 
     @BeforeEach
     void setup() {
         this.toolExecuteService = mock(ToolExecuteService.class);
+        this.mcpSyncServer = mock(McpSyncServer.class);
     }
 
     @Nested
@@ -52,7 +53,7 @@ public class DefaultMcpServerTest {
         @DisplayName("Should throw IllegalArgumentException when toolExecuteService is null")
         void throwIllegalArgumentExceptionWhenToolExecuteServiceIsNull() {
             IllegalArgumentException exception =
-                    catchThrowableOfType(IllegalArgumentException.class, () -> new DefaultMcpServer(null));
+                    catchThrowableOfType(IllegalArgumentException.class, () -> new DefaultMcpServer(null, mcpSyncServer));
             assertThat(exception).isNotNull().hasMessage("The tool execute service cannot be null.");
         }
     }
@@ -63,10 +64,10 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should return expected server information")
         void returnExpectedServerInfo() {
-            McpServer server = new DefaultMcpServer(toolExecuteService);
+            McpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
             ServerSchema info = server.getSchema();
 
-            assertThat(info).returns("2024-11-05", ServerSchema::protocolVersion);
+            assertThat(info).returns("2025-06-18", ServerSchema::protocolVersion);
 
             ServerSchema.Capabilities capabilities = info.capabilities();
             assertThat(capabilities).isNotNull();
@@ -86,13 +87,16 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should notify observers when tools are added or removed")
         void notifyObserversOnToolAddOrRemove() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
             McpServer.ToolsChangedObserver observer = mock(McpServer.ToolsChangedObserver.class);
             server.registerToolsChangedObserver(observer);
 
-            server.onToolAdded("tool1",
-                    "description1",
-                    MapBuilder.<String, Object>get().put("schema", "value1").build());
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
+            server.onToolAdded("tool1", "description1", schema);
             verify(observer, times(1)).onToolsChanged();
 
             server.onToolRemoved("tool1");
@@ -106,10 +110,14 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should add tool successfully with valid parameters")
         void addToolSuccessfully() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
             String name = "tool1";
             String description = "description1";
-            Map<String, Object> schema = MapBuilder.<String, Object>get().put("input", "value").build();
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
 
             server.onToolAdded(name, description, schema);
 
@@ -125,12 +133,17 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should ignore invalid parameters and not add any tool")
         void ignoreInvalidParameters() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
 
-            server.onToolAdded("", "description", MapBuilder.<String, Object>get().put("input", "value").build());
+            server.onToolAdded("", "description", schema);
             assertThat(server.getTools()).isEmpty();
 
-            server.onToolAdded("tool1", "", MapBuilder.<String, Object>get().put("input", "value").build());
+            server.onToolAdded("tool1", "", schema);
             assertThat(server.getTools()).isEmpty();
 
             server.onToolAdded("tool1", "description", null);
@@ -144,8 +157,13 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should remove an added tool correctly")
         void removeToolSuccessfully() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
-            server.onToolAdded("tool1", "desc", MapBuilder.<String, Object>get().put("input", "value").build());
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
+            server.onToolAdded("tool1", "desc", schema);
 
             server.onToolRemoved("tool1");
 
@@ -155,28 +173,17 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should ignore removal if name is blank")
         void ignoreBlankName() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService);
-            server.onToolAdded("tool1", "desc", MapBuilder.<String, Object>get().put("input", "value").build());
+            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            Map<String, Object> schema = MapBuilder.<String, Object>get()
+                    .put("type", "object")
+                    .put("properties", Collections.emptyMap())
+                    .put("required", Collections.emptyList())
+                    .build();
+            server.onToolAdded("tool1", "desc", schema);
 
             server.onToolRemoved("");
 
             assertThat(server.getTools()).hasSize(1);
-        }
-    }
-
-    @Nested
-    @DisplayName("callTool Method Tests")
-    class GivenCallTool {
-        @Test
-        @DisplayName("Should call the tool and return correct result")
-        void callToolSuccessfully() {
-            when(toolExecuteService.execute(anyString(), anyMap())).thenReturn("result");
-            McpServer server = new DefaultMcpServer(toolExecuteService);
-
-            Object result = server.callTool("tool1", Map.of("arg1", "value1"));
-
-            assertThat(result).isEqualTo("result");
-            verify(toolExecuteService, times(1)).execute(eq("tool1"), anyMap());
         }
     }
 }

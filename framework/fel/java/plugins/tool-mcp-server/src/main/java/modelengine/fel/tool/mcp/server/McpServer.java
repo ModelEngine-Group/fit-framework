@@ -10,7 +10,6 @@ import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents the MCP Server.
@@ -32,15 +31,6 @@ public interface McpServer {
      * @return The MCP server tools as a {@link List}{@code <}{@link Tool}{@code >}.
      */
     List<Tool> getTools();
-
-    /**
-     * Calls MCP server tool.
-     *
-     * @param name The tool name as a {@link String}.
-     * @param arguments The tool arguments as a {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}.
-     * @return The tool result as a {@link Object}.
-     */
-    Object callTool(String name, Map<String, Object> arguments);
 
     /**
      * Registers MCP server tools changed observer.
