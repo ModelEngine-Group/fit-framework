@@ -235,7 +235,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                 // TODO emitter.onTimeout() logger.info()
 
                 DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(
-                        sessionId, emitter);
+                        sessionId, emitter, response);
 
                 // Check if this is a replay request
                 if (request.headers().contains(HttpHeaders.LAST_EVENT_ID)) {
@@ -278,17 +278,23 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                         @Override
                         public void onCompleted() {
                             logger.info("[SSE] Completed SSE emitting for session: {}", sessionId);
+                            try {
+                                listeningStream.close();
+                            } catch (Exception e) {
+                                logger.warn("[SSE] Error closing listeningStream on complete: {}", e.getMessage());
+                            }
                         }
 
                         @Override
                         public void onFailed(Exception cause) {
                             logger.warn("[SSE] SSE failed for session: {}, cause: {}", sessionId, cause.getMessage());
+                            try {
+                                listeningStream.close();
+                            } catch (Exception e) {
+                                logger.warn("[SSE] Error closing listeningStream on failure: {}", e.getMessage());
+                            }
                         }
                     });
-                    
-                    // Add connection monitoring to detect client disconnection
-                    // This is a workaround to ensure listeningStream.close() is called when client disconnects
-                    startConnectionMonitoring(sessionId, listeningStream, response);
                 }
             });
         }
@@ -297,43 +303,6 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return null;
         }
-    }
-
-    /**
-     * Starts connection monitoring to detect client disconnection and ensure proper cleanup.
-     * This is a workaround to ensure listeningStream.close() is called when client disconnects.
-     *
-     * @param sessionId The session ID
-     * @param listeningStream The listening stream to close when connection is lost
-     * @param response The HTTP response to check for connection status
-     */
-    private void startConnectionMonitoring(String sessionId,
-                                        McpStreamableServerSession.McpStreamableServerSessionStream listeningStream,
-                                        HttpClassicServerResponse response) {
-        // Use a separate thread to periodically check connection status
-        Thread monitoringThread = new Thread(() -> {
-            try {
-                while (!Thread.currentThread().isInterrupted()) {
-                    Thread.sleep(1000); // Check every second
-                    
-                    // Check if the HTTP response is still active
-                    if (!response.isActive()) {
-                        logger.info("[SSE] Connection lost for session, completing emitter to trigger cleanup");
-                        listeningStream.close();
-                        break;
-                    }
-                }
-            } catch (InterruptedException e) {
-                logger.debug("[SSE] Connection monitoring interrupted for session");
-                Thread.currentThread().interrupt();
-            } catch (Exception e) {
-                logger.warn("[SSE] Error in connection monitoring: {}", e.getMessage());
-            }
-        });
-        
-        monitoringThread.setDaemon(true);
-        monitoringThread.setName("sse-connection-monitor-" + sessionId);
-        monitoringThread.start();
     }
 
     /**
@@ -449,11 +418,11 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
                         @Override
                         public void onFailed(Exception e) {
-                            // No action needed
+                            logger.warn("[SSE] SSE failed for session: {}, cause: {}", sessionId, e.getMessage());
                         }
                     });
 
-                    DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(sessionId, emitter);
+                    DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(sessionId, emitter, response);
 
                     try {
                         session.responseStream(jsonrpcRequest, sessionTransport)
@@ -571,15 +540,20 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         private final ReentrantLock lock = new ReentrantLock();
 
         private volatile boolean closed = false;
+        
+        private final HttpClassicServerResponse response;
 
         /**
          * Creates a new session transport with the specified ID and SSE builder.
          *
          * @param sessionId The unique identifier for this session
+         * @param emitter The emitter for sending events
+         * @param response The HTTP response for checking connection status
          */
-        DefaultStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter) {
+        DefaultStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter, HttpClassicServerResponse response) {
             this.sessionId = sessionId;
             this.emitter = emitter;
+            this.response = response;
             logger.info("[SSE] Building SSE for session: {} ", sessionId);
         }
 
@@ -614,6 +588,13 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
                 try {
                     if (this.closed) {
                         logger.info("Session {} was closed during message send attempt", this.sessionId);
+                        return;
+                    }
+                    
+                    // Check if connection is still active before sending
+                    if (!this.response.isActive()) {
+                        logger.warn("[SSE] Connection inactive detected while sending message for session: {}", this.sessionId);
+                        this.close();
                         return;
                     }
 

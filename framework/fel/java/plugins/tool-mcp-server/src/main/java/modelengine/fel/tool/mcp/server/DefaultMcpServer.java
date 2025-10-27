@@ -90,9 +90,13 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             log.warn("Tool addition is ignored: tool schema is null or empty. [toolName={}]", name);
             return;
         }
+        Object props = parameters.get(PROPERTIES);
+        Object reqs = parameters.get(REQUIRED);
         if (!(parameters.get(TYPE) instanceof String)
-                || parameters.get(PROPERTIES) != null && !(parameters.get(PROPERTIES) instanceof Map)
-                || parameters.get(REQUIRED) != null && !(parameters.get(REQUIRED) instanceof List)) {
+                || (props != null && (!(props instanceof Map<?, ?>)
+                || ((Map<?, ?>) props).keySet().stream().anyMatch(k -> !(k instanceof String))))
+                || (reqs != null && (!(reqs instanceof List<?>)
+                || ((List<?>) reqs).stream().anyMatch(v -> !(v instanceof String))))) {
             log.warn("Invalid parameter schema. [toolName={}]", name);
             return;
         }
@@ -112,13 +116,19 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
                     return new McpSchema.CallToolResult(result, false);
                 })
                 .build();
-        this.mcpSyncServer.addTool(toolSpecification);
-
         Tool tool = new Tool();
         tool.setName(name);
         tool.setDescription(description);
         tool.setInputSchema(parameters);
-        this.tools.put(name, tool);
+
+        try {
+            this.mcpSyncServer.addTool(toolSpecification);
+            this.tools.put(name, tool);
+        } catch (Exception e) {
+            log.error("Failed to add tool: {}", name, e);
+            this.tools.remove(name);
+            return;
+        }
         log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
         this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }

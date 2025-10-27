@@ -22,6 +22,8 @@ import java.time.Duration;
  */
 @Component
 public class DefaultMcpServerBean {
+    private final static Duration requestTimeout = Duration.ofSeconds(10);
+
     @Bean
     public DefaultMcpStreamableServerTransportProvider defaultMcpStreamableServerTransportProvider() {
         return DefaultMcpStreamableServerTransportProvider.builder()
@@ -37,7 +39,7 @@ public class DefaultMcpServerBean {
                         .tools(true)             // Enable tool support
                         .logging()               // Enable logging support
                         .build())
-                .requestTimeout(Duration.ofSeconds(10))
+                .requestTimeout(requestTimeout)
                 .build();
     }
 }
