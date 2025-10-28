@@ -67,7 +67,10 @@ public class MethodToolMetadata implements Tool.Metadata {
             // TODO 需要考虑注解值的类型匹配与基础类型的默认值问题
             Property annotation = parameter.getDeclaredAnnotation(Property.class);
             if (annotation != null) {
-                return annotation.defaultValue();
+                String defaultValue = annotation.defaultValue();
+                if (defaultValue != null && !defaultValue.isEmpty()) {
+                    return defaultValue;
+                }
             }
             return null;
         }).orElse(null);

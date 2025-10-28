@@ -21,7 +21,6 @@ import net.bytebuddy.description.method.ParameterDescription;
 
 import static modelengine.fitframework.inspection.Validation.notNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -79,7 +78,9 @@ public class ByteBuddySchemaParser {
         if (returnPropertyEntity.getConvertor() != null) {
             returnProperty.put("convertor", returnPropertyEntity.getConvertor());
         }
-        returnProperty.put("examples", returnPropertyEntity.getExamples());
+        if (returnPropertyEntity.getExamples() != null) {
+            returnProperty.put("examples", returnPropertyEntity.getExamples());
+        }
         return returnProperty;
     }
 
@@ -113,8 +114,14 @@ public class ByteBuddySchemaParser {
             Property property = paramAnnotation.load();
             entity.setDescription(property.description());
             entity.setNeed(property.required());
-            entity.setDefaultValue(property.defaultValue());
-            entity.setExamples(Collections.singletonList(property.example()));
+            String defaultValue = property.defaultValue();
+            if (defaultValue != null && !defaultValue.isEmpty()) {
+                entity.setDefaultValue(defaultValue);
+            }
+            String example = property.example();
+            if (example != null && !example.isEmpty()) {
+                entity.setExamples(Collections.singletonList(example));
+            }
         }
         return entity;
     }
@@ -127,7 +134,10 @@ public class ByteBuddySchemaParser {
             Property property = returnAnnotation.load();
             returnPropertyEntity.setName(property.name());
             returnPropertyEntity.setDescription(property.description());
-            returnPropertyEntity.setExamples(Collections.singletonList(property.example()));
+            String example = property.example();
+            if (example != null && !example.isEmpty()) {
+                returnPropertyEntity.setExamples(Collections.singletonList(example));
+            }
         }
         notNull(methodDescription.getReturnType(), "The return type cannot be null.");
         JsonNode jsonNode = JacksonTypeParser.getParameterSchema(methodDescription.getReturnType());
