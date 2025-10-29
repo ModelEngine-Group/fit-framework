@@ -36,8 +36,8 @@ import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
  * @since 2025-05-15
  */
 @Component
-public class DefaultMcpServer implements McpServer, ToolChangedObserver {
-    private static final Logger log = Logger.get(DefaultMcpServer.class);
+public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserver {
+    private static final Logger log = Logger.get(DefaultMcpStreamableServer.class);
     private final McpSyncServer mcpSyncServer;
 
     private final ToolExecuteService toolExecuteService;
@@ -50,7 +50,7 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
      * @param toolExecuteService The service used to execute tools when handling tool call requests.
      * @throws IllegalArgumentException If {@code toolExecuteService} is null.
      */
-    public DefaultMcpServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
+    public DefaultMcpStreamableServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
         this.mcpSyncServer = mcpSyncServer;
     }

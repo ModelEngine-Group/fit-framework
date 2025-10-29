@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server;
+package modelengine.fel.tool.mcp.server.transport;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,9 +44,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author 黄可欣
  * @since 2025-09-30
  */
-public class DefaultMcpStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
-
-    private static final Logger logger = Logger.get(DefaultMcpStreamableServerTransportProvider.class);
+public class FitMcpStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
+    private static final Logger logger = Logger.get(FitMcpStreamableServerTransportProvider.class);
 
     private static final String MESSAGE_ENDPOINT = "/mcp/streamable";
 
@@ -90,7 +89,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
 
     /**
      * Constructs a new DefaultMcpStreamableServerTransportProvider instance,
-     * for {@link DefaultMcpStreamableServerTransportProvider.Builder}.
+     * for {@link FitMcpStreamableServerTransportProvider.Builder}.
      *
      * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
      * of messages.
@@ -99,7 +98,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
      * @param keepAliveInterval The interval for sending keep-alive messages to clients.
      * @throws IllegalArgumentException if any parameter is null
      */
-    private DefaultMcpStreamableServerTransportProvider(ObjectMapper objectMapper,
+    private FitMcpStreamableServerTransportProvider(ObjectMapper objectMapper,
                                                     boolean disallowDelete,
                                                     McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor,
                                                     Duration keepAliveInterval) {
@@ -683,7 +682,7 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
     }
 
     /**
-     * Builder for creating instances of {@link DefaultMcpStreamableServerTransportProvider}.
+     * Builder for creating instances of {@link FitMcpStreamableServerTransportProvider}.
      */
     public static class Builder {
 
@@ -751,16 +750,16 @@ public class DefaultMcpStreamableServerTransportProvider implements McpStreamabl
         }
 
         /**
-         * Builds a new instance of {@link DefaultMcpStreamableServerTransportProvider} with
+         * Builds a new instance of {@link FitMcpStreamableServerTransportProvider} with
          * the configured settings.
          *
          * @return A new DefaultMcpStreamableServerTransportProvider instance
          * @throws IllegalStateException if required parameters are not set
          */
-        public DefaultMcpStreamableServerTransportProvider build() {
+        public FitMcpStreamableServerTransportProvider build() {
             Assert.notNull(this.objectMapper, "ObjectMapper must be set");
 
-            return new DefaultMcpStreamableServerTransportProvider(this.objectMapper, this.disallowDelete,
+            return new FitMcpStreamableServerTransportProvider(this.objectMapper, this.disallowDelete,
                     this.contextExtractor, this.keepAliveInterval);
         }
 

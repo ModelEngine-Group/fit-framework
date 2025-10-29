@@ -76,7 +76,5 @@ public interface Emitter<T> {
          * @param cause 表示失败原因的 {@link Exception}。
          */
         void onFailed(Exception cause);
-
-        // TODO onTimeout()方法
     }
 }

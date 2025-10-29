@@ -4,11 +4,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server;
+package modelengine.fel.tool.mcp.server.bean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
+import modelengine.fel.tool.mcp.server.transport.FitMcpStreamableServerTransportProvider;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
 
@@ -25,14 +26,14 @@ public class DefaultMcpServerBean {
     private final static Duration requestTimeout = Duration.ofSeconds(10);
 
     @Bean
-    public DefaultMcpStreamableServerTransportProvider defaultMcpStreamableServerTransportProvider() {
-        return DefaultMcpStreamableServerTransportProvider.builder()
+    public FitMcpStreamableServerTransportProvider fitMcpStreamableServerTransportProvider() {
+        return FitMcpStreamableServerTransportProvider.builder()
                 .objectMapper(new ObjectMapper())
                 .build();
     }
 
     @Bean
-    public McpSyncServer mcpSyncServer(DefaultMcpStreamableServerTransportProvider transportProvider) {
+    public McpSyncServer mcpSyncServer(FitMcpStreamableServerTransportProvider transportProvider) {
         return io.modelcontextprotocol.server.McpServer.sync(transportProvider)
                 .serverInfo("FIT Store MCP Server", "3.6.0-SNAPSHOT")
                 .capabilities(McpSchema.ServerCapabilities.builder()
