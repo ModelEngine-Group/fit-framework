@@ -6,15 +6,14 @@
 
 package modelengine.fel.tool.mcp.server;
 
-import static modelengine.fitframework.inspection.Validation.notNull;
 import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Component;
-import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
@@ -27,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
 import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
 import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
+import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
  * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
