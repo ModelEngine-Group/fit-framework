@@ -91,7 +91,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     private KeepAliveScheduler keepAliveScheduler;
 
     /**
-     * Constructs a new DefaultMcpStreamableServerTransportProvider instance,
+     * Constructs a new FitMcpStreamableServerTransportProvider instance,
      * for {@link FitMcpStreamableServerTransportProvider.Builder}.
      *
      * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
@@ -236,7 +236,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             return Choir.<TextEvent>create(emitter -> {
                 // TODO emitter.onTimeout() logger.info()
 
-                DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(
+                FitStreamableMcpSessionTransport sessionTransport = new FitStreamableMcpSessionTransport(
                         sessionId, emitter, response);
 
                 // Check if this is a replay request
@@ -424,7 +424,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         }
                     });
 
-                    DefaultStreamableMcpSessionTransport sessionTransport = new DefaultStreamableMcpSessionTransport(sessionId, emitter, response);
+                    FitStreamableMcpSessionTransport sessionTransport = new FitStreamableMcpSessionTransport(sessionId, emitter, response);
 
                     try {
                         session.responseStream(jsonrpcRequest, sessionTransport)
@@ -533,7 +533,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * underlying SSE builder to prevent race conditions when multiple threads attempt to
      * send messages concurrently.
      */
-    private class DefaultStreamableMcpSessionTransport implements McpStreamableServerTransport {
+    private class FitStreamableMcpSessionTransport implements McpStreamableServerTransport {
 
         private final String sessionId;
 
@@ -552,7 +552,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * @param emitter The emitter for sending events
          * @param response The HTTP response for checking connection status
          */
-        DefaultStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter, HttpClassicServerResponse response) {
+        FitStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter, HttpClassicServerResponse response) {
             this.sessionId = sessionId;
             this.emitter = emitter;
             this.response = response;
@@ -650,7 +650,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          */
         @Override
         public Mono<Void> closeGracefully() {
-            return Mono.fromRunnable(DefaultStreamableMcpSessionTransport.this::close);
+            return Mono.fromRunnable(FitStreamableMcpSessionTransport.this::close);
         }
 
         /**
@@ -756,7 +756,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * Builds a new instance of {@link FitMcpStreamableServerTransportProvider} with
          * the configured settings.
          *
-         * @return A new DefaultMcpStreamableServerTransportProvider instance
+         * @return A new FitMcpStreamableServerTransportProvider instance
          * @throws IllegalStateException if required parameters are not set
          */
         public FitMcpStreamableServerTransportProvider build() {
