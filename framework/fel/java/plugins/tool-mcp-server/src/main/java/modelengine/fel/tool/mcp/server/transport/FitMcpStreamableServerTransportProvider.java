@@ -12,7 +12,6 @@ import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import io.modelcontextprotocol.spec.*;
-import io.modelcontextprotocol.util.Assert;
 import io.modelcontextprotocol.util.KeepAliveScheduler;
 import modelengine.fel.tool.mcp.entity.Event;
 import modelengine.fit.http.annotation.DeleteMapping;
@@ -28,6 +27,7 @@ import modelengine.fit.http.server.HttpClassicServerRequest;
 import modelengine.fit.http.server.HttpClassicServerResponse;
 import modelengine.fitframework.flowable.Choir;
 import modelengine.fitframework.flowable.Emitter;
+import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.log.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -59,24 +59,22 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * Flag indicating whether DELETE requests are disallowed on the endpoint.
      */
     private final boolean disallowDelete;
-
     private final ObjectMapper objectMapper;
+    private final McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
+    private KeepAliveScheduler keepAliveScheduler;
 
     private McpStreamableServerSession.Factory sessionFactory;
 
     /**
      * Map of active client sessions, keyed by mcp-session-id.
      */
-    private final ConcurrentHashMap<String, McpStreamableServerSession> sessions = new ConcurrentHashMap<>();
-
-    private final McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
+    private final Map<String, McpStreamableServerSession> sessions = new ConcurrentHashMap<>();
 
     /**
      * Flag indicating if the transport is shutting down.
      */
     private volatile boolean isClosing = false;
 
-    private KeepAliveScheduler keepAliveScheduler;
 
     /**
      * Constructs a new FitMcpStreamableServerTransportProvider instance,
@@ -93,8 +91,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                                                     boolean disallowDelete,
                                                     McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor,
                                                     Duration keepAliveInterval) {
-        Assert.notNull(objectMapper, "ObjectMapper must not be null");
-        Assert.notNull(contextExtractor, "McpTransportContextExtractor must not be null");
+        Validation.notNull(objectMapper, "ObjectMapper must not be null");
+        Validation.notNull(contextExtractor, "McpTransportContextExtractor must not be null");
 
         this.objectMapper = objectMapper;
         this.disallowDelete = disallowDelete;
@@ -522,16 +520,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * send messages concurrently.
      */
     private class FitStreamableMcpSessionTransport implements McpStreamableServerTransport {
-
         private final String sessionId;
-
+        private final HttpClassicServerResponse response;
         private final Emitter<TextEvent> emitter;
 
         private final ReentrantLock lock = new ReentrantLock();
 
         private volatile boolean closed = false;
-        
-        private final HttpClassicServerResponse response;
 
         /**
          * Creates a new session transport with the specified ID and SSE builder.
@@ -676,14 +671,10 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * Builder for creating instances of {@link FitMcpStreamableServerTransportProvider}.
      */
     public static class Builder {
-
         private ObjectMapper objectMapper;
-
         private boolean disallowDelete = false;
-
         private McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor = (
                 HttpClassicServerRequest) -> McpTransportContext.EMPTY;
-
         private Duration keepAliveInterval;
 
         /**
@@ -694,7 +685,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * @throws IllegalArgumentException if objectMapper is null
          */
         public Builder objectMapper(ObjectMapper objectMapper) {
-            Assert.notNull(objectMapper, "ObjectMapper must not be null");
+            Validation.notNull(objectMapper, "ObjectMapper must not be null");
             this.objectMapper = objectMapper;
             return this;
         }
@@ -722,7 +713,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * @throws IllegalArgumentException if contextExtractor is null
          */
         public Builder contextExtractor(McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor) {
-            Assert.notNull(contextExtractor, "contextExtractor must not be null");
+            Validation.notNull(contextExtractor, "contextExtractor must not be null");
             this.contextExtractor = contextExtractor;
             return this;
         }
@@ -748,7 +739,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * @throws IllegalStateException if required parameters are not set
          */
         public FitMcpStreamableServerTransportProvider build() {
-            Assert.notNull(this.objectMapper, "ObjectMapper must be set");
+            Validation.notNull(this.objectMapper, "ObjectMapper must be set");
 
             return new FitMcpStreamableServerTransportProvider(this.objectMapper, this.disallowDelete,
                     this.contextExtractor, this.keepAliveInterval);

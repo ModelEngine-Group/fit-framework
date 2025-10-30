@@ -7,7 +7,6 @@
 package modelengine.fel.tool.mcp.server.support;
 
 import io.modelcontextprotocol.server.McpSyncServer;
-import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolExecuteService;
@@ -23,7 +22,9 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit test for {@link DefaultMcpStreamableServer}.
@@ -51,29 +52,6 @@ public class DefaultMcpStreamableServerTest {
             IllegalArgumentException exception =
                     catchThrowableOfType(IllegalArgumentException.class, () -> new DefaultMcpStreamableServer(null, mcpSyncServer));
             assertThat(exception).isNotNull().hasMessage("The tool execute service cannot be null.");
-        }
-    }
-
-    @Nested
-    @DisplayName("getInfo Method Tests")
-    class GivenGetInfo {
-        @Test
-        @DisplayName("Should return expected server information")
-        void returnExpectedServerInfo() {
-            McpServer server = new DefaultMcpStreamableServer(toolExecuteService, mcpSyncServer);
-            ServerSchema info = server.getSchema();
-
-            assertThat(info).returns("2025-06-18", ServerSchema::protocolVersion);
-
-            ServerSchema.Capabilities capabilities = info.capabilities();
-            assertThat(capabilities).isNotNull();
-
-            ServerSchema.Capabilities.Tools toolsCapability = capabilities.tools();
-            assertThat(toolsCapability).returns(true, ServerSchema.Capabilities.Tools::listChanged);
-
-            ServerSchema.Info serverInfo = info.serverInfo();
-            assertThat(serverInfo).returns("FIT Store MCP Server", ServerSchema.Info::name)
-                    .returns("3.6.0-SNAPSHOT", ServerSchema.Info::version);
         }
     }
 

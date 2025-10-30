@@ -6,7 +6,6 @@
 
 package modelengine.fel.tool.mcp.server;
 
-import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 
 import java.util.List;
@@ -18,13 +17,6 @@ import java.util.List;
  * @since 2025-05-15
  */
 public interface McpServer {
-    /**
-     * Gets MCP server schema.
-     *
-     * @return The MCP server schema as a {@link ServerSchema}.
-     */
-    ServerSchema getSchema();
-
     /**
      * Gets MCP server tools.
      *

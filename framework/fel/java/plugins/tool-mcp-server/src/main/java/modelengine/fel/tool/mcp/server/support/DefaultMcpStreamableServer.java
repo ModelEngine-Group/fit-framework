@@ -9,7 +9,6 @@ package modelengine.fel.tool.mcp.server.support;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
-import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolChangedObserver;
@@ -55,15 +54,6 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
     public DefaultMcpStreamableServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
         this.mcpSyncServer = mcpSyncServer;
-    }
-
-    @Override
-    public ServerSchema getSchema() {
-        ServerSchema.Info info = new ServerSchema.Info("FIT Store MCP Server", "3.6.0-SNAPSHOT");
-        ServerSchema.Capabilities.Logging logging = new ServerSchema.Capabilities.Logging();
-        ServerSchema.Capabilities.Tools tools = new ServerSchema.Capabilities.Tools(true);
-        ServerSchema.Capabilities capabilities = new ServerSchema.Capabilities(logging, tools);
-        return new ServerSchema("2025-06-18", capabilities, info);
     }
 
     @Override
