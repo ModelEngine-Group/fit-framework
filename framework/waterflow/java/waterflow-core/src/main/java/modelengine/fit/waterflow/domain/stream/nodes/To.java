@@ -322,24 +322,6 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             }
             List<FlowContext<O>> afterList = this.getProcessMode().process(this, preList);
             this.afterProcess(preList, afterList);
-            if (CollectionUtils.isNotEmpty(afterList)) {
-                feedback(afterList);
-                if (FlowNodeType.END.equals(this.nodeType)) {
-                    this.callback(preList, afterList);
-                } else {
-                    this.onNext(afterList.get(0).getBatchId(), c -> {
-                        List<String> discardContexts =
-                                c.getUnMatchedContexts().stream().map(IdGenerator::getId).collect(Collectors.toList());
-                        if (!discardContexts.isEmpty()) {
-                            this.getFlowContextRepo().deleteByContextIds(discardContexts);
-                        }
-
-                        List<FlowContext<O>> mergeContexts = c.getAllContext();
-                        this.callback(preList, mergeContexts);
-                    });
-                }
-            }
-            afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
         } catch (Exception ex) {
             LOG.error("Node direct process exception. [streamId={}, nodeId={}, positionId={}, traceId={}, causedBy={}]",
                     this.streamId, this.id, preList.get(0).getPosition(), preList.get(0).getTraceId(),
@@ -573,28 +555,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                                 () -> this.processingSessions.remove(context.getSession().getId()));
             });
             this.afterProcess(preList, afterList);
-            if (CollectionUtils.isNotEmpty(afterList)) {
-                // 查找一个transaction里的所有数据的都完成了，运行callback给stream外反馈数据
-                feedback(afterList);
-                if (FlowNodeType.END.equals(this.nodeType)) {
-                    this.callback(preList, afterList);
-                } else {
-                    this.onNext(afterList.get(0).getBatchId(), c -> {
-                        List<String> discardContexts = c.getUnMatchedContexts()
-                                .stream()
-                                .map(context -> context.getId())
-                                .collect(Collectors.toList());
-                        if (!discardContexts.isEmpty()) {
-                            this.getFlowContextRepo().deleteByContextIds(discardContexts);
-                        }
 
-                        List<FlowContext<O>> mergeContexts = c.getAllContext();
-                        this.callback(preList, mergeContexts);
-                    });
-                }
-            }
-            // 处理好数据后对外送数据，驱动其他flow响应
-            afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
             // keep order
             preList.forEach(context -> {
                 if (context.getIndex() > Constants.NOT_PRESERVED_INDEX && !context.getWindow().isDone()) {
@@ -625,7 +586,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
      * @param exception 异常对象。
      * @param preList 失败时处理的上下文数据。
      */
-    protected void fail(Exception exception, List<FlowContext<I>> preList) {
+    public void fail(Exception exception, List<FlowContext<I>> preList) {
         Retryable<I> retryable = new Retryable<>(this.getFlowContextRepo(), this);
         Optional.ofNullable(this.errorHandler).ifPresent(handler -> handler.handle(exception, retryable, preList));
         Optional.ofNullable(this.globalErrorHandler)
@@ -719,6 +680,27 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         this.getFlowContextRepo().update(preList);
         this.getFlowContextRepo()
                 .updateStatus(preList, preList.get(0).getStatus().toString(), preList.get(0).getPosition());
+
+        if (CollectionUtils.isEmpty(afterList)) {
+            return;
+        }
+        // 查找一个transaction里的所有数据的都完成了，运行callback给stream外反馈数据
+        if (FlowNodeType.END.equals(this.nodeType)) {
+            this.callback(preList, afterList);
+        } else {
+            this.onNext(afterList.get(0).getBatchId(), c -> {
+                List<String> discardContexts =
+                        c.getUnMatchedContexts().stream().map(context -> context.getId()).collect(Collectors.toList());
+                if (!discardContexts.isEmpty()) {
+                    this.getFlowContextRepo().deleteByContextIds(discardContexts);
+                }
+
+                List<FlowContext<O>> mergeContexts = c.getAllContext();
+                this.callback(preList, mergeContexts);
+            });
+        }
+        // 处理好数据后对外送数据，驱动其他flow响应
+        afterList.forEach(context -> this.emit(context.getData(), context.getSession()));
     }
 
     private void callback(List<FlowContext<I>> preContexts, List<FlowContext<O>> after) {
