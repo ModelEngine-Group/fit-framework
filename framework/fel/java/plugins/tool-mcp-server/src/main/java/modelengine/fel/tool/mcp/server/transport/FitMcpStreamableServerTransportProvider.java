@@ -6,9 +6,8 @@
 
 package modelengine.fel.tool.mcp.server.transport;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.common.McpTransportContext;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import io.modelcontextprotocol.spec.*;
@@ -33,7 +32,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +57,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * Flag indicating whether DELETE requests are disallowed on the endpoint.
      */
     private final boolean disallowDelete;
-    private final ObjectMapper objectMapper;
+    private final McpJsonMapper jsonMapper;
     private final McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
     private KeepAliveScheduler keepAliveScheduler;
 
@@ -80,21 +78,21 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * Constructs a new FitMcpStreamableServerTransportProvider instance,
      * for {@link FitMcpStreamableServerTransportProvider.Builder}.
      *
-     * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization
+     * @param jsonMapper The jsonMapper to use for JSON serialization/deserialization
      * of messages.
      * @param disallowDelete Whether to disallow DELETE requests on the endpoint.
      * @param contextExtractor The context extractor to fill in a {@link McpTransportContext}.
      * @param keepAliveInterval The interval for sending keep-alive messages to clients.
      * @throws IllegalArgumentException if any parameter is null
      */
-    private FitMcpStreamableServerTransportProvider(ObjectMapper objectMapper,
+    private FitMcpStreamableServerTransportProvider(McpJsonMapper jsonMapper,
                                                     boolean disallowDelete,
                                                     McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor,
                                                     Duration keepAliveInterval) {
-        Validation.notNull(objectMapper, "ObjectMapper must not be null");
+        Validation.notNull(jsonMapper, "jsonMapper must not be null");
         Validation.notNull(contextExtractor, "McpTransportContextExtractor must not be null");
 
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.disallowDelete = disallowDelete;
         this.contextExtractor = contextExtractor;
 
@@ -321,15 +319,14 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         }
         McpTransportContext transportContext = this.contextExtractor.extract(request);
         try {
-
             McpSchema.JSONRPCMessage message = this.deserializeJsonRpcMessage(requestBody);
 
             // Handle initialization request
             if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest
                     && jsonrpcRequest.method().equals(McpSchema.METHOD_INITIALIZE)) {
                 logger.info("[POST] Handling initialize method, with receiving message: {}", requestBody.toString());
-                McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(jsonrpcRequest.params(),
-                        new TypeReference<McpSchema.InitializeRequest>() {
+                McpSchema.InitializeRequest initializeRequest = jsonMapper.convertValue(jsonrpcRequest.params(),
+                        new TypeRef<McpSchema.InitializeRequest>() {
                         });
                 McpStreamableServerSession.McpStreamableServerSessionInit init = this.sessionFactory
                         .startSession(initializeRequest);
@@ -487,7 +484,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     }
 
     /**
-     * Handles DELETE requests for session deletion.
+     * deserialize Map to JsonRpcMessage
      *
      * @param map the map of JSON-RPC message
      * @return The corresponding {@link McpSchema.JSONRPCMessage} class
@@ -495,16 +492,14 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      */
     public McpSchema.JSONRPCMessage deserializeJsonRpcMessage(Map<String, Object> map)
             throws IOException {
-
-        // Determine message type based on specific JSON structure
         if (map.containsKey("method") && map.containsKey("id")) {
-            return objectMapper.convertValue(map, McpSchema.JSONRPCRequest.class);
+            return jsonMapper.convertValue(map, McpSchema.JSONRPCRequest.class);
         }
         else if (map.containsKey("method") && !map.containsKey("id")) {
-            return objectMapper.convertValue(map, McpSchema.JSONRPCNotification.class);
+            return jsonMapper.convertValue(map, McpSchema.JSONRPCNotification.class);
         }
         else if (map.containsKey("result") || map.containsKey("error")) {
-            return objectMapper.convertValue(map, McpSchema.JSONRPCResponse.class);
+            return jsonMapper.convertValue(map, McpSchema.JSONRPCResponse.class);
         }
 
         throw new IllegalArgumentException("Cannot deserialize JSONRPCMessage: " + map.toString());
@@ -583,7 +578,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         return;
                     }
 
-                    String jsonText = objectMapper.writeValueAsString(message);
+                    String jsonText = jsonMapper.writeValueAsString(message);
                     TextEvent textEvent = TextEvent.custom()
                             .id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
                     this.emitter.emit(textEvent);
@@ -607,7 +602,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         }
 
         /**
-         * Converts data from one type to another using the configured ObjectMapper.
+         * Converts data from one type to another using the configured jsonMapper.
          *
          * @param data The source data object to convert
          * @param typeRef The target type reference
@@ -616,14 +611,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          */
         @Override
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
-            // Convert TypeRef to TypeReference for ObjectMapper compatibility
-            TypeReference<T> typeReference = new TypeReference<T>() {
-                @Override
-                public Type getType() {
-                    return typeRef.getType();
-                }
-            };
-            return objectMapper.convertValue(data, typeReference);
+            return jsonMapper.convertValue(data, typeRef);
         }
 
         /**
@@ -671,22 +659,22 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * Builder for creating instances of {@link FitMcpStreamableServerTransportProvider}.
      */
     public static class Builder {
-        private ObjectMapper objectMapper;
+        private McpJsonMapper jsonMapper;
         private boolean disallowDelete = false;
         private McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor = (
                 HttpClassicServerRequest) -> McpTransportContext.EMPTY;
         private Duration keepAliveInterval;
 
         /**
-         * Sets the ObjectMapper to use for JSON serialization/deserialization of MCP messages.
+         * Sets the jsonMapper to use for JSON serialization/deserialization of MCP messages.
          *
-         * @param objectMapper The ObjectMapper instance. Must not be null.
+         * @param jsonMapper The jsonMapper instance. Must not be null.
          * @return this builder instance
-         * @throws IllegalArgumentException if objectMapper is null
+         * @throws IllegalArgumentException if jsonMapper is null
          */
-        public Builder objectMapper(ObjectMapper objectMapper) {
-            Validation.notNull(objectMapper, "ObjectMapper must not be null");
-            this.objectMapper = objectMapper;
+        public Builder jsonMapper(McpJsonMapper jsonMapper) {
+            Validation.notNull(jsonMapper, "jsonMapper must not be null");
+            this.jsonMapper = jsonMapper;
             return this;
         }
 
@@ -739,12 +727,10 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * @throws IllegalStateException if required parameters are not set
          */
         public FitMcpStreamableServerTransportProvider build() {
-            Validation.notNull(this.objectMapper, "ObjectMapper must be set");
+            Validation.notNull(this.jsonMapper, "jsonMapper must be set");
 
-            return new FitMcpStreamableServerTransportProvider(this.objectMapper, this.disallowDelete,
+            return new FitMcpStreamableServerTransportProvider(this.jsonMapper, this.disallowDelete,
                     this.contextExtractor, this.keepAliveInterval);
         }
-
     }
-
 }

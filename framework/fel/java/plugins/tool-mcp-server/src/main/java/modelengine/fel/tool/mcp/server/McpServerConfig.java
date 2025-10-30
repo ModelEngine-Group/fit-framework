@@ -7,6 +7,7 @@
 package modelengine.fel.tool.mcp.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.server.transport.FitMcpStreamableServerTransportProvider;
@@ -27,7 +28,7 @@ public class McpServerConfig {
     @Bean
     public FitMcpStreamableServerTransportProvider fitMcpStreamableServerTransportProvider() {
         return FitMcpStreamableServerTransportProvider.builder()
-                .objectMapper(new ObjectMapper())
+                .jsonMapper(McpJsonMapper.getDefault())
                 .build();
     }
 

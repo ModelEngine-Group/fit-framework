@@ -34,7 +34,6 @@ import static modelengine.fitframework.inspection.Validation.notNull;
  * with MCP Server Bean {@link McpSyncServer}.
  *
  * @author 季聿阶
- * @author 黄可欣
  * @since 2025-05-15
  */
 @Component

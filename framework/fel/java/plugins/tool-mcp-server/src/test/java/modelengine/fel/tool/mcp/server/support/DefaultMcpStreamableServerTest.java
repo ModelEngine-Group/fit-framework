@@ -9,6 +9,7 @@ package modelengine.fel.tool.mcp.server.support;
 import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
+import modelengine.fel.tool.mcp.server.McpServerConfig;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,8 @@ public class DefaultMcpStreamableServerTest {
     @BeforeEach
     void setup() {
         this.toolExecuteService = mock(ToolExecuteService.class);
-        this.mcpSyncServer = mock(McpSyncServer.class);
+        McpServerConfig config = new McpServerConfig();
+        this.mcpSyncServer = config.mcpSyncServer(config.fitMcpStreamableServerTransportProvider(), 10);
     }
 
     @Nested
