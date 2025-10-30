@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -483,5 +484,55 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         repo.save(afterList);
         repo.save(preList);
         return afterList;
+    }
+
+    /**
+     * findNodeFromFlow
+     *
+     * @param from from
+     * @param nodeMetaId nodeMetaId
+     * @return Node The Target Node.
+     */
+    public Node<?, ?> findNodeFromFlow(From<I> from, String nodeMetaId) {
+        return (Node<?, ?>) findNode(this, nodeMetaId).orElse(null);
+    }
+
+    /**
+     * findNode
+     *
+     * @param from from
+     * @param nodeMetaId nodeMetaId
+     * @return Optional<To> To object
+     */
+    private static Optional<To<?, ?>> findNode(From<?> from, String nodeMetaId) {
+        ArrayDeque<Subscriber<?, ?>> nodesQueue = new ArrayDeque<>();
+        Set<String> visited = new HashSet<>();
+        for (Subscription<?> s : from.getSubscriptions()) {
+            Subscriber<?, Object> to = s.getTo();
+            nodesQueue.addLast(to);
+            visited.add(to.getId());
+            if (to.getId().equals(nodeMetaId)) {
+                return Optional.of((To<?, ?>) to);
+            }
+        }
+
+        while (!nodesQueue.isEmpty()) {
+            Subscriber<?, ?> cur = nodesQueue.removeFirst();
+            if (!(cur instanceof Node<?, ?>)) {
+                continue;
+            }
+            Node<?, ?> curNode = (Node<?, ?>) cur;
+            for (Subscription<?> s : curNode.getSubscriptions()) {
+                Subscriber<?, Object> to = s.getTo();
+                if (!visited.contains(to.getId())) {
+                    nodesQueue.offer(to);
+                    visited.add(to.getId());
+                }
+                if (to.getId().equals(nodeMetaId)) {
+                    return Optional.of((To<?, ?>) to);
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
