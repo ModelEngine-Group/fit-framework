@@ -91,18 +91,16 @@ public class ConditionsNode<I> extends Node<I, I> {
         @Override
         public void offer(List<FlowContext<I>> contexts, Consumer<PreSendCallbackInfo<I>> preSendCallback) {
             Map<Subscription<I>, List<FlowContext<I>>> matchedContexts = new LinkedHashMap<>();
-            this.getSubscriptions().forEach(subscription -> {
-                this.getSubscriptions().forEach(w -> {
-                    List<FlowContext<I>> matched = contexts.stream()
-                            .filter(c -> w.getWhether().is(c.getData()))
-                            .peek(c -> c.setNextPositionId(w.getId()))
-                            .collect(Collectors.toList());
-                    matched.forEach(contexts::remove);
-                    matchedContexts.put(w, matched);
-                });
-                PreSendCallbackInfo<I> callbackInfo = new PreSendCallbackInfo<>(matchedContexts, contexts);
-                preSendCallback.accept(callbackInfo);
+            this.getSubscriptions().forEach(w -> {
+                List<FlowContext<I>> matched = contexts.stream()
+                        .filter(c -> w.getWhether().is(c.getData()))
+                        .peek(c -> c.setNextPositionId(w.getId()))
+                        .collect(Collectors.toList());
+                matched.forEach(contexts::remove);
+                matchedContexts.put(w, matched);
             });
+            PreSendCallbackInfo<I> callbackInfo = new PreSendCallbackInfo<>(matchedContexts, contexts);
+            preSendCallback.accept(callbackInfo);
             matchedContexts.forEach((subscription, matched) -> {
                 // For order-sensitive data, directly synchronously executes the next conditional branch node.
                 if (CollectionUtils.isNotEmpty(matched) && matched.get(0).getSession().preserved()) {
