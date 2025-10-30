@@ -14,6 +14,8 @@ import modelengine.fel.tool.info.entity.PropertyEntity;
 import modelengine.fel.tool.info.entity.ReturnPropertyEntity;
 import modelengine.fel.tool.info.entity.SchemaEntity;
 import modelengine.fitframework.annotation.Property;
+import modelengine.fitframework.annotation.util.PropertyHelper;
+import modelengine.fitframework.util.StringUtils;
 
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.method.MethodDescription;
@@ -115,11 +117,11 @@ public class ByteBuddySchemaParser {
             entity.setDescription(property.description());
             entity.setNeed(property.required());
             String defaultValue = property.defaultValue();
-            if (defaultValue != null && !defaultValue.isEmpty()) {
+            if (defaultValue != null && PropertyHelper.isCustomValue(defaultValue)) {
                 entity.setDefaultValue(defaultValue);
             }
             String example = property.example();
-            if (example != null && !example.isEmpty()) {
+            if (StringUtils.isNotEmpty(example)) {
                 entity.setExamples(Collections.singletonList(example));
             }
         }
@@ -135,7 +137,7 @@ public class ByteBuddySchemaParser {
             returnPropertyEntity.setName(property.name());
             returnPropertyEntity.setDescription(property.description());
             String example = property.example();
-            if (example != null && !example.isEmpty()) {
+            if (StringUtils.isNotEmpty(example)) {
                 returnPropertyEntity.setExamples(Collections.singletonList(example));
             }
         }

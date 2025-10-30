@@ -186,6 +186,13 @@ public class MethodToolMetadataTest {
     }
 
     @Test
+    @DisplayName("当参数名称不存在时，返回 -1 序号")
+    void shouldReturnParameterIndexNegativeWhenNameNotExists() {
+        int actual = this.toolMetadata.parameterIndex("NotExists");
+        assertThat(actual).isEqualTo(-1);
+    }
+
+    @Test
     @DisplayName("返回正确的必须参数名字列表")
     void shouldReturnRequired() {
         Set<String> parameterNames = this.toolMetadata.requiredParameters();
@@ -193,10 +200,25 @@ public class MethodToolMetadataTest {
     }
 
     @Test
+    @DisplayName("当参数为基础类型时，必须参数应包含该参数")
+    void shouldReturnRequiredWhenPrimitiveParam() throws NoSuchMethodException {
+        Method primitiveMethod = PrimitiveInterface.class.getDeclaredMethod("primitiveMethod", int.class);
+        Tool.Metadata primitiveMetadata = Tool.Metadata.fromMethod(primitiveMethod);
+        Set<String> required = primitiveMetadata.requiredParameters();
+        assertThat(required).containsExactly("i");
+    }
+
+    @Test
     @DisplayName("返回正确的返回值类型")
     void shouldReturnReturnType() {
         Map<String, Object> type = this.toolMetadata.returnType();
         assertThat(type).isEqualTo(JsonSchemaManager.create().createSchema(String.class).toJsonObject());
+    }
+
+    @Test
+    @DisplayName("返回转换器字符串为空")
+    void shouldReturnEmptyReturnConverter() {
+        assertThat(this.toolMetadata.returnConverter()).isEqualTo("");
     }
 
     @Test
@@ -217,6 +239,23 @@ public class MethodToolMetadataTest {
         assertThat(definitionGroupName).isNotNull();
     }
 
+    @Test
+    @DisplayName("参数默认值非自定义占位时应为 null")
+    void shouldReturnNullParameterDefaultValueWhenNotCustom() {
+        Object defaultValue = this.toolMetadata.parameterDefaultValue("P1");
+        assertThat(defaultValue).isEqualTo("default_value");
+    }
+
+    @Test
+    @DisplayName("返回方法、名称、分组与描述信息正确")
+    void shouldReturnMethodAndDefinitions() {
+        assertThat(this.toolMetadata.getMethod()).isPresent();
+        assertThat(this.toolMetadata.getMethod().orElse(null)).isEqualTo(this.testMethod);
+        assertThat(this.toolMetadata.definitionName()).isEqualTo("test_tool_def_name");
+        assertThat(this.toolMetadata.definitionGroupName()).isEqualTo("test_def_group_name");
+        assertThat(this.toolMetadata.description()).isEqualTo("测试方法的描述信息");
+    }
+
     @Group(name = "test_def_group_name")
     interface TestInterface {
         /**
@@ -228,5 +267,11 @@ public class MethodToolMetadataTest {
         @ToolMethod(name = "test_tool_def_name", description = "测试方法的描述信息")
         @Genericable(id = "t1", description = "desc")
         String testMethod(@Property(name = "P1", required = true, defaultValue = "default_value") String p1);
+    }
+
+    @Group(name = "primitive_group")
+    interface PrimitiveInterface {
+        @ToolMethod(name = "primitive_tool", description = "primitive")
+        int primitiveMethod(@Property(name = "i") int i);
     }
 }

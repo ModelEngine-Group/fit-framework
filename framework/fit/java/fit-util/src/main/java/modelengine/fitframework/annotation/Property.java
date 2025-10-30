@@ -25,6 +25,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
 public @interface Property {
     /**
+     * 表示未设置默认值的标记常量。
+     */
+    String UNSET_DEFAULT_VALUE = "$$Fit$UnsetDefaultValue$$";
+
+    /**
      * 获取参数的名字。
      *
      * @return 表示参数的名字的 {@link String}。
@@ -50,7 +55,7 @@ public @interface Property {
      *
      * @return 表示参数的默认值的 {@link String}。
      */
-    String defaultValue() default StringUtils.EMPTY;
+    String defaultValue() default UNSET_DEFAULT_VALUE;
 
     /**
      * 获取参数的样例值。

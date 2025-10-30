@@ -13,6 +13,7 @@ import modelengine.fel.tool.ToolSchema;
 import modelengine.fel.tool.annotation.Group;
 import modelengine.fel.tool.annotation.ToolMethod;
 import modelengine.fitframework.annotation.Property;
+import modelengine.fitframework.annotation.util.PropertyHelper;
 import modelengine.fitframework.json.schema.JsonSchemaManager;
 import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.StringUtils;
@@ -68,7 +69,7 @@ public class MethodToolMetadata implements Tool.Metadata {
             Property annotation = parameter.getDeclaredAnnotation(Property.class);
             if (annotation != null) {
                 String defaultValue = annotation.defaultValue();
-                if (defaultValue != null && !defaultValue.isEmpty()) {
+                if (defaultValue != null && PropertyHelper.isCustomValue(defaultValue)) {
                     return defaultValue;
                 }
             }
