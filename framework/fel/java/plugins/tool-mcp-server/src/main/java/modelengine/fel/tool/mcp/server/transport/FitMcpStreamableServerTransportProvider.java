@@ -51,20 +51,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     private static final Logger logger = Logger.get(FitMcpStreamableServerTransportProvider.class);
 
     private static final String MESSAGE_ENDPOINT = "/mcp/streamable";
-
-    /**
-     * Event type for JSON-RPC messages sent through the SSE connection.
-     */
     public static final String MESSAGE_EVENT_TYPE = "message";
-
-    /**
-     * Event type for sending the message endpoint URI to clients.
-     */
     public static final String ENDPOINT_EVENT_TYPE = "endpoint";
-
-    /**
-     * Default base URL for the message endpoint.
-     */
     public static final String DEFAULT_BASE_URL = "";
 
     /**

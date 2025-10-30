@@ -9,7 +9,6 @@ package modelengine.fel.tool.mcp.server.support;
 import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
-import modelengine.fel.tool.mcp.server.DefaultMcpStreamableServer;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.*;
  * @author 季聿阶
  * @since 2025-05-20
  */
-@DisplayName("Unit tests for DefaultMcpServer")
+@DisplayName("Unit tests for DefaultMcpStreamableServer")
 public class DefaultMcpStreamableServerTest {
     private ToolExecuteService toolExecuteService;
     private McpSyncServer mcpSyncServer;

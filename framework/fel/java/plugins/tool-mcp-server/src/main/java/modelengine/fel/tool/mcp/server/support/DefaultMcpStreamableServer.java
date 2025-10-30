@@ -4,13 +4,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server;
+package modelengine.fel.tool.mcp.server.support;
 
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.ServerSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
+import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Component;
@@ -19,9 +20,10 @@ import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
 import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
@@ -33,6 +35,7 @@ import static modelengine.fitframework.inspection.Validation.notNull;
  * with MCP Server Bean {@link McpSyncServer}.
  *
  * @author 季聿阶
+ * @author 黄可欣
  * @since 2025-05-15
  */
 @Component
@@ -41,7 +44,6 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
     private final McpSyncServer mcpSyncServer;
 
     private final ToolExecuteService toolExecuteService;
-    private final Map<String, Tool> tools = new ConcurrentHashMap<>();
     private final List<ToolsChangedObserver> toolsChangedObservers = new ArrayList<>();
 
     /**
@@ -66,7 +68,9 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
 
     @Override
     public List<Tool> getTools() {
-        return List.copyOf(this.tools.values());
+        return this.mcpSyncServer.listTools().stream()
+                .map(this::convertToFelTool)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -90,13 +94,7 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
             log.warn("Tool addition is ignored: tool schema is null or empty. [toolName={}]", name);
             return;
         }
-        Object props = parameters.get(PROPERTIES);
-        Object reqs = parameters.get(REQUIRED);
-        if (!(parameters.get(TYPE) instanceof String)
-                || (props != null && (!(props instanceof Map<?, ?>)
-                || ((Map<?, ?>) props).keySet().stream().anyMatch(k -> !(k instanceof String))))
-                || (reqs != null && (!(reqs instanceof List<?>)
-                || ((List<?>) reqs).stream().anyMatch(v -> !(v instanceof String))))) {
+        if (!isValidParameterSchema(parameters)) {
             log.warn("Invalid parameter schema. [toolName={}]", name);
             return;
         }
@@ -111,26 +109,27 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
                         .inputSchema(inputSchema)
                         .build())
                 .callHandler((exchange, request) -> {
-                    Map<String, Object> args = request.arguments();
-                    String result = this.toolExecuteService.execute(name, args);
-                    return new McpSchema.CallToolResult(result, false);
+                    try {
+                        Map<String, Object> args = request.arguments();
+                        String result = this.toolExecuteService.execute(name, args);
+                        return new McpSchema.CallToolResult(result, false);
+                    } catch (IllegalArgumentException e) {
+                        log.warn("Invalid arguments for tool execution. [toolName={}, error={}]", name, e.getMessage());
+                        return new McpSchema.CallToolResult("Error: Invalid arguments - " + e.getMessage(), true);
+                    } catch (Exception e) {
+                        log.error("Failed to execute tool. [toolName={}]", name, e);
+                        return new McpSchema.CallToolResult("Error: Tool execution failed - " + e.getMessage(), true);
+                    }
                 })
                 .build();
-        Tool tool = new Tool();
-        tool.setName(name);
-        tool.setDescription(description);
-        tool.setInputSchema(parameters);
 
         try {
             this.mcpSyncServer.addTool(toolSpecification);
-            this.tools.put(name, tool);
+            log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
+            this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
         } catch (Exception e) {
-            log.error("Failed to add tool: {}", name, e);
-            this.tools.remove(name);
-            return;
+            log.error("Failed to add tool to MCP server. [toolName={}]", name, e);
         }
-        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
-        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 
     @Override
@@ -140,8 +139,64 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
             return;
         }
         this.mcpSyncServer.removeTool(name);
-        this.tools.remove(name);
         log.info("Tool removed from MCP server. [toolName={}]", name);
         this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
+    }
+
+    /**
+     * Converts an MCP SDK Tool to a FEL Tool entity.
+     *
+     * @param mcpTool The MCP SDK tool to convert.
+     * @return A FEL Tool entity with the corresponding name, description, and input schema.
+     */
+    private Tool convertToFelTool(McpSchema.Tool mcpTool) {
+        Tool tool = new Tool();
+        tool.setName(mcpTool.name());
+        tool.setDescription(mcpTool.description());
+        
+        // Convert JsonSchema to Map<String, Object>
+        McpSchema.JsonSchema inputSchema = mcpTool.inputSchema();
+        Map<String, Object> schemaMap = new HashMap<>();
+        schemaMap.put(TYPE, inputSchema.type());
+        if (inputSchema.properties() != null) {
+            schemaMap.put(PROPERTIES, inputSchema.properties());
+        }
+        if (inputSchema.required() != null) {
+            schemaMap.put(REQUIRED, inputSchema.required());
+        }
+        tool.setInputSchema(schemaMap);
+        
+        return tool;
+    }
+
+    /**
+     * Validates the structure of the parameter schema to ensure it conforms to the expected format.
+     *
+     * @param parameters The parameter schema to validate, represented as a Map with String keys and Object values.
+     * @return {@code true} if the parameter schema is valid; {@code false} otherwise.
+     */
+    private boolean isValidParameterSchema(Map<String, Object> parameters) {
+        Object type = parameters.get(TYPE);
+        if (!(type instanceof String)) {
+            return false;
+        }
+
+        Object props = parameters.get(PROPERTIES);
+        if (!(props instanceof Map<?, ?> propsMap)) {
+            return false;
+        }
+        if (propsMap.keySet().stream().anyMatch(k -> !(k instanceof String))) {
+            return false;
+        }
+
+        Object reqs = parameters.get(REQUIRED);
+        if (!(reqs instanceof List<?> reqsList)) {
+            return false;
+        }
+        if (reqsList.stream().anyMatch(v -> !(v instanceof String))) {
+            return false;
+        }
+
+        return true;
     }
 }

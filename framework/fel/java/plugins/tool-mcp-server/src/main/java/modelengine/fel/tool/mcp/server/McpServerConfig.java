@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server.bean;
+package modelengine.fel.tool.mcp.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.server.McpSyncServer;
@@ -12,6 +12,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.server.transport.FitMcpStreamableServerTransportProvider;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Value;
 
 import java.time.Duration;
 
@@ -22,9 +23,7 @@ import java.time.Duration;
  * @since 2025-10-22
  */
 @Component
-public class DefaultMcpServerBean {
-    private final static Duration requestTimeout = Duration.ofSeconds(10);
-
+public class McpServerConfig {
     @Bean
     public FitMcpStreamableServerTransportProvider fitMcpStreamableServerTransportProvider() {
         return FitMcpStreamableServerTransportProvider.builder()
@@ -33,14 +32,15 @@ public class DefaultMcpServerBean {
     }
 
     @Bean
-    public McpSyncServer mcpSyncServer(FitMcpStreamableServerTransportProvider transportProvider) {
+    public McpSyncServer mcpSyncServer(FitMcpStreamableServerTransportProvider transportProvider,
+            @Value("${mcp.server.request.timeout-seconds}") int requestTimeoutSeconds) {
         return io.modelcontextprotocol.server.McpServer.sync(transportProvider)
                 .serverInfo("FIT Store MCP Server", "3.6.0-SNAPSHOT")
                 .capabilities(McpSchema.ServerCapabilities.builder()
-                        .tools(true)             // Enable tool support
-                        .logging()               // Enable logging support
+                        .tools(true)
+                        .logging()
                         .build())
-                .requestTimeout(requestTimeout)
+                .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
                 .build();
     }
 }

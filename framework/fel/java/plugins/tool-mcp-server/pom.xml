@@ -74,16 +74,6 @@
                 <configuration>
                     <category>system</category>
                     <level>5</level>
-                    <sharedDependencies>
-                        <sharedDependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-api</artifactId>
-                        </sharedDependency>
-                        <sharedDependency>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-simple</artifactId>
-                        </sharedDependency>
-                    </sharedDependencies>
                 </configuration>
                 <executions>
                     <execution>
