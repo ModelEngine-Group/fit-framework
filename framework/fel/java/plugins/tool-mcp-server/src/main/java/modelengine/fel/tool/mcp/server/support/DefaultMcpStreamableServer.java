@@ -112,13 +112,9 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
                 })
                 .build();
 
-        try {
-            this.mcpSyncServer.addTool(toolSpecification);
-            log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
-            this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
-        } catch (Exception e) {
-            log.error("Failed to add tool to MCP server. [toolName={}]", name, e);
-        }
+        this.mcpSyncServer.addTool(toolSpecification);
+        log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
+        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 
     @Override

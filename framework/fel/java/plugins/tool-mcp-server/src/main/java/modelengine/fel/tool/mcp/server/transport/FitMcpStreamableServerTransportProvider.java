@@ -516,8 +516,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      */
     private class FitStreamableMcpSessionTransport implements McpStreamableServerTransport {
         private final String sessionId;
-        private final HttpClassicServerResponse response;
         private final Emitter<TextEvent> emitter;
+        private final HttpClassicServerResponse response;
 
         private final ReentrantLock lock = new ReentrantLock();
 
