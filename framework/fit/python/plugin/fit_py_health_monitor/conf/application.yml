@@ -1,0 +1,6 @@
+# 健康监控插件配置
+health-monitor:
+  check-interval: 30  # 健康检查间隔（秒）
+  memory-threshold: 80.0  # 内存使用率阈值（百分比）
+  cpu-threshold: 90.0  # CPU使用率阈值（百分比）
+  disk-threshold: 90.0  # 磁盘使用率阈值（百分比）

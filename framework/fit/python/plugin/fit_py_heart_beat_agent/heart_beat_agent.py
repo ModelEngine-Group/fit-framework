@@ -100,12 +100,17 @@ def _try_heart_beat_once():
         _registry_fitable_addresses()
         sys_plugin_logger.debug(f'heart beating success.')
         _LAST_HEART_BEAT_SUCCESS_TIME = heart_beat_finish_time
-    except:
+    except Exception as e:
         _FAIL_COUNT += 1
         except_type, except_value, except_traceback = sys.exc_info()
         sys_plugin_logger.warning(f"heart beat failed. [fail_count={_FAIL_COUNT}]")
         sys_plugin_logger.warning(f"heart beat error type: {except_type}, value: {except_value}, "
                                   f"trace back:\n{''.join(traceback.format_tb(except_traceback))}")
+
+        # 如果连续失败次数过多，考虑重启心跳任务
+        if _FAIL_COUNT >= 5:
+            sys_plugin_logger.error(f"heart beat failed too many times ({_FAIL_COUNT}), considering restart")
+            # 这里可以添加重启心跳任务的逻辑
 
 
 def _heart_beat_task(queue: multiprocessing.Queue):
@@ -128,6 +133,8 @@ def _heart_beat_monitor(heart_beat_background_job):
     global _HEART_BEAT_EXIT_UNEXPECTEDLY
     _HEART_BEAT_EXIT_UNEXPECTEDLY = True
     sys_plugin_logger.error("heart beat job is not alive, runtime should shutdown immediately.")
+    # 添加延迟，给进程重启机制一些时间
+    time.sleep(2)
     shutdown()
 
 
