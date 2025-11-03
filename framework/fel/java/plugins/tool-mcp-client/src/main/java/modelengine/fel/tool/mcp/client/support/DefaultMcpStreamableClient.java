@@ -9,6 +9,10 @@ package modelengine.fel.tool.mcp.client.support;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
+import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
+import io.modelcontextprotocol.json.schema.jackson.DefaultJsonSchemaValidator;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.entity.Tool;
@@ -46,8 +50,9 @@ public class DefaultMcpStreamableClient implements McpClient {
     public DefaultMcpStreamableClient(String baseUri, String sseEndpoint, int requestTimeoutSeconds) {
         notBlank(baseUri, "The MCP server base URI cannot be blank.");
         notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
+        ObjectMapper mapper = new ObjectMapper();
         HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport.builder(baseUri)
-                .objectMapper(new ObjectMapper())
+                .jsonMapper(new JacksonMcpJsonMapper(mapper))
                 .endpoint(sseEndpoint)
                 .build();
         this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
@@ -57,6 +62,7 @@ public class DefaultMcpStreamableClient implements McpClient {
                         .build())
                 .loggingConsumer(McpClientMessageHandler::handleLoggingMessage)
                 .elicitation(McpClientMessageHandler::handleElicitationRequest)
+                .jsonSchemaValidator(new DefaultJsonSchemaValidator(mapper))
                 .build();
     }
 
