@@ -6,9 +6,9 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
-import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.entity.Tool;
@@ -47,7 +47,7 @@ public class DefaultMcpStreamableClient implements McpClient {
         notBlank(baseUri, "The MCP server base URI cannot be blank.");
         notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
         HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport.builder(baseUri)
-                .jsonMapper(McpJsonMapper.getDefault())
+                .objectMapper(new ObjectMapper())
                 .endpoint(sseEndpoint)
                 .build();
         this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
@@ -103,6 +103,7 @@ public class DefaultMcpStreamableClient implements McpClient {
                     .collect(Collectors.toList());
             
             log.info("Successfully retrieved {} tools from MCP server.", tools.size());
+            tools.forEach(tool -> log.info("Tool - Name: {}, Description: {}", tool.getName(), tool.getDescription()));
             return tools;
         } catch (Exception e) {
             log.error("Failed to get tools from MCP server: {}", e);

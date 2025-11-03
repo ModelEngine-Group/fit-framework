@@ -6,21 +6,10 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
-import static modelengine.fitframework.inspection.Validation.notNull;
-
-import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
-import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.McpClientFactory;
-import modelengine.fit.http.client.HttpClassicClient;
-import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fitframework.annotation.Component;
-import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
-import modelengine.fitframework.serialization.ObjectSerializer;
-
-import java.time.Duration;
 
 /**
  * Represents a factory for creating instances of the {@link DefaultMcpStreamableClient}.

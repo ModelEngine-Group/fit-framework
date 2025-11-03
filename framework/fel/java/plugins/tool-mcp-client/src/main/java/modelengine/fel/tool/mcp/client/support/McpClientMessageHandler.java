@@ -48,7 +48,7 @@ public class McpClientMessageHandler {
         if (schema != null && schema.containsKey("properties")) {
             Map<String, Object> properties = (Map<String, Object>) schema.get("properties");
             if (properties.containsKey("message")) {
-                log.info("[ElicitationRequest] Input additional message: ");
+                log.info("[ElicitationRequest] Please input additional message: ");
                 Scanner scanner = new Scanner(System.in);
                 String input = scanner.nextLine();
                 userData.put("message", input);
