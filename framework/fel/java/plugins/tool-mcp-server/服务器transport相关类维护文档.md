@@ -195,13 +195,14 @@ sseEmitter.complete();
 ```java
 // 使用 Choir 和 Emitter 实现 SSE
 Choir.<TextEvent>create(emitter -> {
-    // 创建 TextEvent 并发送
-    TextEvent textEvent = TextEvent.custom()
-        .id(sessionId)
-        .event(Event.MESSAGE.code())
-        .data(jsonText)
-        .build();
-    emitter.emit(textEvent);
+    // 创建sessionTransport类，用于调用emitter发送消息
+    FitStreamableMcpSessionTransport sessionTransport =
+            new FitStreamableMcpSessionTransport(sessionId, emitter, response);
+    
+    // session的逻辑是SDK原有的，里面会调用sessionTransport发送事件流
+    session.responseStream(jsonrpcRequest, sessionTransport)
+        .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
+        .block();
     
     // 监听 Emitter 的生命周期
     emitter.observe(new Emitter.Observer<TextEvent>() {
