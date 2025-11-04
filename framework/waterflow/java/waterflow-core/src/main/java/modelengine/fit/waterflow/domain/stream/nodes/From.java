@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -350,9 +351,26 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         }
 
         // qualifiedWhens表示的与from节点连接的所有事件，条件节点符合条件的事件在这里筛选，在事件上处理需要下发的context
-        qualifiedWhens.forEach(when -> when.cache(contexts.stream()
-                .filter(context -> when.getWhether().is(context.getData()))
-                .collect(Collectors.toList())));
+        java.util.Map<Subscription<I>, List<FlowContext<I>>> matchedContexts = new LinkedHashMap<>();
+        Set<FlowContext<I>> matchedContextSet = new HashSet<>();
+        qualifiedWhens.forEach(
+                w -> {
+                    List<FlowContext<I>> afterContexts = contexts
+                            .stream()
+                            .filter(c -> w.getWhether().is(c.getData()))
+                            .peek(c -> c.setNextPositionId(w.getId()))
+                            .collect(Collectors.toList());
+                    matchedContexts.put(w, afterContexts);
+                    matchedContextSet.addAll(afterContexts);
+                }
+        );
+        List<FlowContext<I>> unMatchedContexts = contexts
+                .stream()
+                .filter(c -> !matchedContextSet.contains(c))
+                .collect(Collectors.toList());
+        PreSendCallbackInfo<I> callbackInfo = new PreSendCallbackInfo<>(matchedContexts, unMatchedContexts);
+        preSendCallback.accept(callbackInfo);
+        matchedContexts.forEach(Subscription::cache);
     }
 
     /**

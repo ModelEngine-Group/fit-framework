@@ -78,7 +78,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
     /**
      * 最大流量，也就是该节点可以处理的最大数据量
      */
-    private static final int MAX_CONCURRENCY = 10;
+    private static final int MAX_CONCURRENCY = 16;
 
     private static final int SLEEP_MILLS = 10;
 
@@ -539,6 +539,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
             if (CollectionUtils.isEmpty(preList)) {
                 return;
             }
+            this.beforeProcess(preList);
             if (preList.size() == 1 && preList.get(0).getData() == null) {
                 this.afterProcess(preList, new ArrayList<>());
                 return;
@@ -635,6 +636,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 });
             });
         }
+        this.globalAfterHandler.process(new ToCallback<>(contexts));
     }
 
     private void beforeAsyncProcess(List<FlowContext<I>> pre) {
@@ -642,6 +644,10 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         pre.forEach(p -> p.setStatus(FlowNodeStatus.PROCESSING));
         this.getFlowContextRepo().update(pre);
         this.getFlowContextRepo().updateStatus(pre, pre.get(0).getStatus().toString(), pre.get(0).getPosition());
+    }
+
+    private void beforeProcess(List<FlowContext<I>> contexts) {
+        this.globalBeforeHandler.process(new ToCallback<>(contexts));
     }
 
     private synchronized void updateConcurrency(int newConcurrency) {
