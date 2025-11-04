@@ -53,4 +53,14 @@ public enum FlowNodeStatus {
      * 可重试
      */
     RETRYABLE;
+
+    /**
+     * 判断是否在运行中的状态。
+     *
+     * @return 是否在运行中的状态。
+     */
+    public boolean isRunningStatus() {
+        return FlowNodeStatus.NEW.equals(this) || FlowNodeStatus.PENDING.equals(this)
+                || FlowNodeStatus.READY.equals(this) || FlowNodeStatus.PROCESSING.equals(this);
+    }
 }

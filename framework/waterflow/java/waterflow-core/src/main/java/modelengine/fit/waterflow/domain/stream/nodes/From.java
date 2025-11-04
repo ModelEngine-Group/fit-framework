@@ -261,6 +261,7 @@ public class From<I> extends IdGenerator implements Publisher<I> {
      */
     public String offer(I[] data, FlowSession session) {
         FlowTrace trace = new FlowTrace();
+        this.repo.getTraceOwner().own(trace.getId(), session.getId());
         Set<String> traceId = new HashSet<>();
         traceId.add(trace.getId());
         Window window = session.begin();

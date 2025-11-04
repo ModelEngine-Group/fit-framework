@@ -9,6 +9,7 @@ package modelengine.fit.waterflow.domain.context.repo.flowcontext;
 import modelengine.fit.waterflow.ErrorCodes;
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowTrace;
+import modelengine.fit.waterflow.domain.context.TraceOwner;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.exceptions.WaterflowException;
 
@@ -288,6 +289,15 @@ public interface FlowContextRepo {
     <T> void updateIndex(List<FlowContext<T>> contexts);
 
     /**
+     * 获取链路标识管理对象。
+     *
+     * @return 链路标识管理对象。
+     */
+    default TraceOwner getTraceOwner() {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "getTraceOwner");
+    }
+
+    /**
      * deleteByContextIds
      *
      * @param contextIds contextIds
@@ -323,6 +333,61 @@ public interface FlowContextRepo {
      */
     default void deleteByTransId(String transId) {
         throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "deleteByTransId");
+    }
+
+    /**
+     * 根据链路唯一标识查询所有错误上下文。
+     *
+     * @param <T> 泛型类型，表示上下文的数据类型。
+     * @param traceId 链路唯一标识。
+     * @return 错误上下文集合。
+     */
+    default <T> List<FlowContext<T>> findErrorContextsByTraceId(String traceId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "findErrorContextsByTraceId");
+    }
+
+    /**
+     * 至少含有一个符合状态的上下文。
+     *
+     * @param statusList 状态列表。
+     * @param traceId 链路唯一标识。
+     * @return true or false。
+     */
+    default boolean hasContextWithStatus(List<String> statusList, String traceId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "hasContextWithStatus");
+    }
+
+    /**
+     * 所有上下文状态都符合要求。
+     *
+     * @param statusList 状态列表。
+     * @param traceId 链路唯一标识。
+     * @return true or false。
+     */
+    default boolean isAllContextStatus(List<String> statusList, String traceId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "isAllContextStatus");
+    }
+
+    /**
+     * 在某个节点至少含有一个符合状态的上下文。
+     *
+     * @param statusList 状态列表.
+     * @param traceId 链路唯一标识。
+     * @param position 位置.
+     * @return true or false
+     */
+    default boolean hasContextWithStatusAtPosition(List<String> statusList, String traceId, String position) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "hasContextWithStatusAtPosition");
+    }
+
+    /**
+     * 根据链路唯一标识获取运行实例标识。
+     *
+     * @param traceId 链路唯一标识。
+     * @return 运行实例标识。
+     */
+    default String getTransIdByTrace(String traceId) {
+        throw new WaterflowException(ErrorCodes.FLOW_ENGINE_DATABASE_NOT_SUPPORT, "getTransIdByTrace");
     }
 
     /**

@@ -87,6 +87,14 @@ public interface FlowTraceRepo {
     void updateStatus(List<String> ids, String status);
 
     /**
+     * 查找运行中的链路标识。
+     *
+     * @param applications 应用标识列表。
+     * @return 链路标识列表。
+     */
+    List<String> findRunningTrace(List<String> applications);
+
+    /**
      * 根据traceId删除trace
      *
      * @param traceIds traceId列表

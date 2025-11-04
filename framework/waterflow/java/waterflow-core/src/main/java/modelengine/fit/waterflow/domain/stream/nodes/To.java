@@ -390,6 +390,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                     return;
                 }
                 messenger.send(this.getId(), ready);
+                this.releaseTrace(ready);
             } catch (Exception ex) {
                 ready.forEach( // 如果是数据库或者redis挂了，会死循环，线程不退出等待数据库或者redis恢复
                         r -> LOG.error("Preprocess main loop exception stream-id: {}, node-id: {}, context-id: {}.",
@@ -401,6 +402,13 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                 SleepUtil.sleep(SLEEP_MILLS);
             }
         }
+    }
+
+    private void releaseTrace(List<FlowContext<I>> contexts) {
+        contexts.forEach(context -> context.getTraceId().forEach(traceId -> {
+            LOG.debug("Release trace. [stage=preProcess, traceId={0}, contextId={1}]", traceId, context.getId());
+            this.getFlowContextRepo().getTraceOwner().release(traceId);
+        }));
     }
 
     private void process(ProcessType type) {
