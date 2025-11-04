@@ -10,7 +10,13 @@ import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
-import io.modelcontextprotocol.spec.*;
+import io.modelcontextprotocol.spec.HttpHeaders;
+import io.modelcontextprotocol.spec.McpError;
+import io.modelcontextprotocol.spec.McpSchema;
+import io.modelcontextprotocol.spec.McpStreamableServerSession;
+import io.modelcontextprotocol.spec.McpStreamableServerTransport;
+import io.modelcontextprotocol.spec.McpStreamableServerTransportProvider;
+import io.modelcontextprotocol.spec.ProtocolVersions;
 import io.modelcontextprotocol.util.KeepAliveScheduler;
 import modelengine.fel.tool.mcp.entity.Event;
 import modelengine.fit.http.annotation.DeleteMapping;
@@ -49,9 +55,6 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     private static final Logger logger = Logger.get(FitMcpStreamableServerTransportProvider.class);
 
     private static final String MESSAGE_ENDPOINT = "/mcp/streamable";
-    public static final String MESSAGE_EVENT_TYPE = "message";
-    public static final String ENDPOINT_EVENT_TYPE = "endpoint";
-    public static final String DEFAULT_BASE_URL = "";
 
     /**
      * Flag indicating whether DELETE requests are disallowed on the endpoint.
@@ -73,7 +76,6 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      */
     private volatile boolean isClosing = false;
 
-
     /**
      * Constructs a new FitMcpStreamableServerTransportProvider instance,
      * for {@link FitMcpStreamableServerTransportProvider.Builder}.
@@ -85,10 +87,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * @param keepAliveInterval The interval for sending keep-alive messages to clients.
      * @throws IllegalArgumentException if any parameter is null
      */
-    private FitMcpStreamableServerTransportProvider(McpJsonMapper jsonMapper,
-                                                    boolean disallowDelete,
-                                                    McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor,
-                                                    Duration keepAliveInterval) {
+    private FitMcpStreamableServerTransportProvider(McpJsonMapper jsonMapper, boolean disallowDelete,
+            McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor, Duration keepAliveInterval) {
         Validation.notNull(jsonMapper, "jsonMapper must not be null");
         Validation.notNull(contextExtractor, "McpTransportContextExtractor must not be null");
 
@@ -97,8 +97,9 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         this.contextExtractor = contextExtractor;
 
         if (keepAliveInterval != null) {
-            this.keepAliveScheduler = KeepAliveScheduler
-                    .builder(() -> (isClosing) ? Flux.empty() : Flux.fromIterable(this.sessions.values()))
+            this.keepAliveScheduler = KeepAliveScheduler.builder(() -> (isClosing)
+                            ? Flux.empty()
+                            : Flux.fromIterable(this.sessions.values()))
                     .initialDelay(keepAliveInterval)
                     .interval(keepAliveInterval)
                     .build();
@@ -109,7 +110,9 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
     @Override
     public List<String> protocolVersions() {
-        return List.of(ProtocolVersions.MCP_2024_11_05, ProtocolVersions.MCP_2025_03_26, ProtocolVersions.MCP_2025_06_18);
+        return List.of(ProtocolVersions.MCP_2024_11_05,
+                ProtocolVersions.MCP_2025_03_26,
+                ProtocolVersions.MCP_2025_06_18);
     }
 
     @Override
@@ -139,8 +142,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             this.sessions.values().parallelStream().forEach(session -> {
                 try {
                     session.sendNotification(method, params).block();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.error("Failed to send message to session {}: {}", session.getId(), e.getMessage());
                 }
             });
@@ -161,8 +163,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             this.sessions.values().parallelStream().forEach(session -> {
                 try {
                     session.closeGracefully().block();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.error("Failed to close session {}: {}", session.getId(), e.getMessage());
                 }
             });
@@ -175,7 +176,6 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             }
         });
     }
-
 
     /**
      * Set up the listening SSE connections and message replay.
@@ -209,9 +209,10 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
         if (session == null) {
             response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
-                    .message("Session not found: " + sessionId)
-                    .build());
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
+                            .message("Session not found: " + sessionId)
+                            .build());
         }
 
         logger.info("[GET] Handling GET request for session: {}", sessionId);
@@ -220,8 +221,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             return Choir.<TextEvent>create(emitter -> {
                 // TODO emitter.onTimeout() logger.info()
 
-                FitStreamableMcpSessionTransport sessionTransport = new FitStreamableMcpSessionTransport(
-                        sessionId, emitter, response);
+                FitStreamableMcpSessionTransport sessionTransport =
+                        new FitStreamableMcpSessionTransport(sessionId, emitter, response);
 
                 // Check if this is a replay request
                 if (request.headers().contains(HttpHeaders.LAST_EVENT_ID)) {
@@ -237,23 +238,20 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                                         sessionTransport.sendMessage(message)
                                                 .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                                                 .block();
-                                    }
-                                    catch (Exception e) {
+                                    } catch (Exception e) {
                                         logger.error("Failed to replay message: {}", e.getMessage());
                                         emitter.fail(e);
                                     }
                                 });
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         logger.error("Failed to replay messages: {}", e.getMessage());
                         emitter.fail(e);
                     }
-                }
-                else {
+                } else {
                     // Establish new listening stream
                     logger.info("[GET] Receiving Get request to establish new SSE for session: {}", sessionId);
-                    McpStreamableServerSession.McpStreamableServerSessionStream listeningStream = session
-                            .listeningStream(sessionTransport);
+                    McpStreamableServerSession.McpStreamableServerSessionStream listeningStream =
+                            session.listeningStream(sessionTransport);
 
                     emitter.observe(new Emitter.Observer<TextEvent>() {
                         @Override
@@ -283,8 +281,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                     });
                 }
             });
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return null;
@@ -300,9 +297,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * @return Return the HTTP response body {@link Entity} or a {@link Choir}{@code <}{@link TextEvent}{@code >} object
      */
     @PostMapping(path = MESSAGE_ENDPOINT)
-    public Object handlePost(HttpClassicServerRequest request,
-                                       HttpClassicServerResponse response,
-                                       @RequestBody Map<String, Object> requestBody) {
+    public Object handlePost(HttpClassicServerRequest request, HttpClassicServerResponse response,
+            @RequestBody Map<String, Object> requestBody) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             return Entity.createText(response, "Server is shutting down");
@@ -322,14 +318,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             McpSchema.JSONRPCMessage message = this.deserializeJsonRpcMessage(requestBody);
 
             // Handle initialization request
-            if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest
-                    && jsonrpcRequest.method().equals(McpSchema.METHOD_INITIALIZE)) {
+            if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest && jsonrpcRequest.method()
+                    .equals(McpSchema.METHOD_INITIALIZE)) {
                 logger.info("[POST] Handling initialize method, with receiving message: {}", requestBody.toString());
-                McpSchema.InitializeRequest initializeRequest = jsonMapper.convertValue(jsonrpcRequest.params(),
-                        new TypeRef<McpSchema.InitializeRequest>() {
-                        });
-                McpStreamableServerSession.McpStreamableServerSessionInit init = this.sessionFactory
-                        .startSession(initializeRequest);
+                McpSchema.InitializeRequest initializeRequest =
+                        jsonMapper.convertValue(jsonrpcRequest.params(), new TypeRef<McpSchema.InitializeRequest>() {});
+                McpStreamableServerSession.McpStreamableServerSessionInit init =
+                        this.sessionFactory.startSession(initializeRequest);
                 this.sessions.put(init.session().getId(), init.session());
 
                 try {
@@ -337,28 +332,26 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                     response.statusCode(HttpResponseStatus.OK.statusCode());
                     response.headers().set("Content-Type", MimeType.APPLICATION_JSON.value());
                     response.headers().set(HttpHeaders.MCP_SESSION_ID, init.session().getId());
-                    logger.info(
-                            "[POST] Sending initialize message via HTTP response to session {}",
-                            init.session().getId()
-                    );
+                    logger.info("[POST] Sending initialize message via HTTP response to session {}",
+                            init.session().getId());
                     return Entity.createObject(response,
-                            new McpSchema.JSONRPCResponse(McpSchema.JSONRPC_VERSION, jsonrpcRequest.id(), initResult, null));
-                }
-                catch (Exception e) {
+                            new McpSchema.JSONRPCResponse(McpSchema.JSONRPC_VERSION,
+                                    jsonrpcRequest.id(),
+                                    initResult,
+                                    null));
+                } catch (Exception e) {
                     logger.error("Failed to initialize session: {}", e.getMessage());
                     response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-                    return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR)
-                            .message(e.getMessage())
-                            .build());
+                    return Entity.createObject(response,
+                            McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
                 }
             }
 
             // Handle other messages that require a session
             if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
                 response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-                return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_REQUEST)
-                        .message("Session ID missing")
-                        .build());
+                return Entity.createObject(response,
+                        McpError.builder(McpSchema.ErrorCodes.INVALID_REQUEST).message("Session ID missing").build());
             }
 
             String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
@@ -367,9 +360,10 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
             if (session == null) {
                 response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-                return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
-                        .message("Session not found: " + sessionId)
-                        .build());
+                return Entity.createObject(response,
+                        McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
+                                .message("Session not found: " + sessionId)
+                                .build());
             }
 
             if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
@@ -378,15 +372,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         .block();
                 response.statusCode(HttpResponseStatus.ACCEPTED.statusCode());
                 return null;
-            }
-            else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
+            } else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
                 session.accept(jsonrpcNotification)
                         .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                         .block();
                 response.statusCode(HttpResponseStatus.ACCEPTED.statusCode());
                 return null;
-            }
-            else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
+            } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
                 // For streaming responses, we need to return SSE
                 return Choir.<TextEvent>create(emitter -> {
                     // TODO emitter.onTimeout() logger.info
@@ -407,7 +399,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         }
                     });
 
-                    FitStreamableMcpSessionTransport sessionTransport = new FitStreamableMcpSessionTransport(sessionId, emitter, response);
+                    FitStreamableMcpSessionTransport sessionTransport =
+                            new FitStreamableMcpSessionTransport(sessionId, emitter, response);
 
                     try {
                         session.responseStream(jsonrpcRequest, sessionTransport)
@@ -416,22 +409,23 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                     } catch (Exception e) {
                         logger.error("Failed to handle request stream: {}", e.getMessage());
                         emitter.fail(e);
-                    }});
-            }
-            else {
+                    }
+                });
+            } else {
                 response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-                return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
+                return Entity.createObject(response,
+                        McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
             }
-        }
-        catch (IllegalArgumentException | IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             logger.error("Failed to deserialize message: {}", e.getMessage());
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format").build());
-        }
-        catch (Exception e) {
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format").build());
+        } catch (Exception e) {
             logger.error("Error handling message: {}", e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
         }
     }
 
@@ -467,7 +461,10 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         logger.info("[DELETE] Receiving delete request from session: {}", sessionId);
         if (session == null) {
             response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS).message("Session not found: " + sessionId).build());
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
+                            .message("Session not found: " + sessionId)
+                            .build());
         }
 
         try {
@@ -475,11 +472,11 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             this.sessions.remove(sessionId);
             response.statusCode(HttpResponseStatus.OK.statusCode());
             return null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to delete session {}: {}", sessionId, e.getMessage());
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-            return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
         }
     }
 
@@ -490,15 +487,12 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * @return The corresponding {@link McpSchema.JSONRPCMessage} class
      * @throws IOException when cannot deserialize JSONRPCMessage
      */
-    public McpSchema.JSONRPCMessage deserializeJsonRpcMessage(Map<String, Object> map)
-            throws IOException {
+    public McpSchema.JSONRPCMessage deserializeJsonRpcMessage(Map<String, Object> map) throws IOException {
         if (map.containsKey("method") && map.containsKey("id")) {
             return jsonMapper.convertValue(map, McpSchema.JSONRPCRequest.class);
-        }
-        else if (map.containsKey("method") && !map.containsKey("id")) {
+        } else if (map.containsKey("method") && !map.containsKey("id")) {
             return jsonMapper.convertValue(map, McpSchema.JSONRPCNotification.class);
-        }
-        else if (map.containsKey("result") || map.containsKey("error")) {
+        } else if (map.containsKey("result") || map.containsKey("error")) {
             return jsonMapper.convertValue(map, McpSchema.JSONRPCResponse.class);
         }
 
@@ -530,7 +524,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          * @param emitter The emitter for sending events
          * @param response The HTTP response for checking connection status
          */
-        FitStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter, HttpClassicServerResponse response) {
+        FitStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter,
+                HttpClassicServerResponse response) {
             this.sessionId = sessionId;
             this.emitter = emitter;
             this.response = response;
@@ -570,32 +565,31 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         logger.info("Session {} was closed during message send attempt", this.sessionId);
                         return;
                     }
-                    
+
                     // Check if connection is still active before sending
                     if (!this.response.isActive()) {
-                        logger.warn("[SSE] Connection inactive detected while sending message for session: {}", this.sessionId);
+                        logger.warn("[SSE] Connection inactive detected while sending message for session: {}",
+                                this.sessionId);
                         this.close();
                         return;
                     }
 
                     String jsonText = jsonMapper.writeValueAsString(message);
-                    TextEvent textEvent = TextEvent.custom()
-                            .id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
+                    TextEvent textEvent =
+                            TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
                     this.emitter.emit(textEvent);
 
                     logger.info("[SSE] Sending message to session {}: {}", this.sessionId, jsonText);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage());
                     try {
                         this.emitter.fail(e);
-                    }
-                    catch (Exception errorException) {
-                        logger.error("Failed to send error to SSE builder for session {}: {}", this.sessionId,
+                    } catch (Exception errorException) {
+                        logger.error("Failed to send error to SSE builder for session {}: {}",
+                                this.sessionId,
                                 errorException.getMessage());
                     }
-                }
-                finally {
+                } finally {
                     this.lock.unlock();
                 }
             });
@@ -606,8 +600,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          *
          * @param data The source data object to convert
          * @param typeRef The target type reference
-         * @return The converted object of type T
          * @param <T> The target type
+         * @return The converted object of type T
          */
         @Override
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
@@ -640,11 +634,9 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
                 this.emitter.complete();
                 logger.info("[SSE] Closed SSE builder successfully for session {}", sessionId);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.warn("Failed to complete SSE builder for session {}: {}", sessionId, e.getMessage());
-            }
-            finally {
+            } finally {
                 this.lock.unlock();
             }
         }
@@ -661,8 +653,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     public static class Builder {
         private McpJsonMapper jsonMapper;
         private boolean disallowDelete = false;
-        private McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor = (
-                HttpClassicServerRequest) -> McpTransportContext.EMPTY;
+        private McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor =
+                (HttpClassicServerRequest) -> McpTransportContext.EMPTY;
         private Duration keepAliveInterval;
 
         /**
@@ -729,8 +721,10 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         public FitMcpStreamableServerTransportProvider build() {
             Validation.notNull(this.jsonMapper, "jsonMapper must be set");
 
-            return new FitMcpStreamableServerTransportProvider(this.jsonMapper, this.disallowDelete,
-                    this.contextExtractor, this.keepAliveInterval);
+            return new FitMcpStreamableServerTransportProvider(this.jsonMapper,
+                    this.disallowDelete,
+                    this.contextExtractor,
+                    this.keepAliveInterval);
         }
     }
 }

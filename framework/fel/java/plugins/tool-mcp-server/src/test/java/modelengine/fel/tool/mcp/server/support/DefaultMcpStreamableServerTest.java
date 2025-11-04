@@ -6,12 +6,19 @@
 
 package modelengine.fel.tool.mcp.server.support;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.mcp.server.McpServerConfig;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,12 +27,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * Unit test for {@link DefaultMcpStreamableServer}.
@@ -51,8 +52,8 @@ public class DefaultMcpStreamableServerTest {
         @Test
         @DisplayName("Should throw IllegalArgumentException when toolExecuteService is null")
         void throwIllegalArgumentExceptionWhenToolExecuteServiceIsNull() {
-            IllegalArgumentException exception =
-                    catchThrowableOfType(IllegalArgumentException.class, () -> new DefaultMcpStreamableServer(null, mcpSyncServer));
+            IllegalArgumentException exception = catchThrowableOfType(IllegalArgumentException.class,
+                    () -> new DefaultMcpStreamableServer(null, mcpSyncServer));
             assertThat(exception).isNotNull().hasMessage("The tool execute service cannot be null.");
         }
     }

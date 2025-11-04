@@ -6,6 +6,11 @@
 
 package modelengine.fel.tool.mcp.server.support;
 
+import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
+import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
+import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
+import static modelengine.fitframework.inspection.Validation.notNull;
+
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -23,11 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
-import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
-import static modelengine.fel.tool.info.schema.ToolsSchema.REQUIRED;
-import static modelengine.fitframework.inspection.Validation.notNull;
 
 /**
  * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
@@ -57,9 +57,7 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
 
     @Override
     public List<Tool> getTools() {
-        return this.mcpSyncServer.listTools().stream()
-                .map(this::convertToFelTool)
-                .collect(Collectors.toList());
+        return this.mcpSyncServer.listTools().stream().map(this::convertToFelTool).collect(Collectors.toList());
     }
 
     @Override
@@ -87,30 +85,9 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
             log.warn("Invalid parameter schema. [toolName={}]", name);
             return;
         }
-        @SuppressWarnings("unchecked")
-        McpSchema.JsonSchema inputSchema = new McpSchema.JsonSchema((String) parameters.get(TYPE),
-                (Map<String, Object>) parameters.get(PROPERTIES), (List<String>) parameters.get(REQUIRED),
-                null, null,null);
-        McpServerFeatures.SyncToolSpecification toolSpecification = McpServerFeatures.SyncToolSpecification.builder()
-                .tool(McpSchema.Tool.builder()
-                        .name(name)
-                        .description(description)
-                        .inputSchema(inputSchema)
-                        .build())
-                .callHandler((exchange, request) -> {
-                    try {
-                        Map<String, Object> args = request.arguments();
-                        String result = this.toolExecuteService.execute(name, args);
-                        return new McpSchema.CallToolResult(result, false);
-                    } catch (IllegalArgumentException e) {
-                        log.warn("Invalid arguments for tool execution. [toolName={}, error={}]", name, e.getMessage());
-                        return new McpSchema.CallToolResult("Error: Invalid arguments - " + e.getMessage(), true);
-                    } catch (Exception e) {
-                        log.error("Failed to execute tool. [toolName={}]", name, e);
-                        return new McpSchema.CallToolResult("Error: Tool execution failed - " + e.getMessage(), true);
-                    }
-                })
-                .build();
+
+        McpServerFeatures.SyncToolSpecification toolSpecification =
+                createToolSpecification(name, description, parameters);
 
         this.mcpSyncServer.addTool(toolSpecification);
         log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
@@ -129,6 +106,63 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
     }
 
     /**
+     * Creates a tool specification for the MCP server.
+     * <p>
+     * This method constructs a {@link McpServerFeatures.SyncToolSpecification} that includes:
+     * <ul>
+     *     <li>Tool metadata (name, description, input schema)</li>
+     *     <li>Call handler that executes the tool and handles exceptions</li>
+     * </ul>
+     *
+     * @param name The name of the tool.
+     * @param description The description of the tool.
+     * @param parameters The parameter schema containing type, properties, and required fields.
+     * @return A fully configured {@link McpServerFeatures.SyncToolSpecification}.
+     */
+    private McpServerFeatures.SyncToolSpecification createToolSpecification(String name, String description,
+            Map<String, Object> parameters) {
+        @SuppressWarnings("unchecked") McpSchema.JsonSchema inputSchema =
+                new McpSchema.JsonSchema((String) parameters.get(TYPE),
+                        (Map<String, Object>) parameters.get(PROPERTIES),
+                        (List<String>) parameters.get(REQUIRED),
+                        null,
+                        null,
+                        null);
+
+        return McpServerFeatures.SyncToolSpecification.builder()
+                .tool(McpSchema.Tool.builder().name(name).description(description).inputSchema(inputSchema).build())
+                .callHandler((exchange, request) -> executeToolWithErrorHandling(name, request))
+                .build();
+    }
+
+    /**
+     * Executes a tool and handles any exceptions that may occur.
+     * <p>
+     * This method handles two types of exceptions:
+     * <ul>
+     *     <li>{@link IllegalArgumentException}: Invalid tool arguments (logged as warning)</li>
+     *     <li>{@link Exception}: Any other execution failure (logged as error)</li>
+     * </ul>
+     *
+     * @param toolName The name of the tool to execute.
+     * @param request The tool call request containing arguments.
+     * @return A {@link McpSchema.CallToolResult} with the execution result or error message.
+     */
+    private McpSchema.CallToolResult executeToolWithErrorHandling(String toolName, McpSchema.CallToolRequest request) {
+        try {
+            Map<String, Object> args = request.arguments();
+            String result = this.toolExecuteService.execute(toolName, args);
+            return new McpSchema.CallToolResult(result, false);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid arguments for tool execution. [toolName={}, error={}]", toolName, e.getMessage());
+            return new McpSchema.CallToolResult("Error: Invalid arguments - " + e.getMessage(), true);
+        } catch (Exception e) {
+            log.error("Failed to execute tool. [toolName={}]", toolName, e);
+            return new McpSchema.CallToolResult("Error: Tool execution failed - " + e.getMessage(), true);
+        }
+    }
+
+    /**
      * Converts an MCP SDK Tool to a FEL Tool entity.
      *
      * @param mcpTool The MCP SDK tool to convert.
@@ -138,7 +172,7 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
         Tool tool = new Tool();
         tool.setName(mcpTool.name());
         tool.setDescription(mcpTool.description());
-        
+
         // Convert JsonSchema to Map<String, Object>
         McpSchema.JsonSchema inputSchema = mcpTool.inputSchema();
         Map<String, Object> schemaMap = new HashMap<>();
@@ -150,7 +184,7 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
             schemaMap.put(REQUIRED, inputSchema.required());
         }
         tool.setInputSchema(schemaMap);
-        
+
         return tool;
     }
 
@@ -178,10 +212,6 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
         if (!(reqs instanceof List<?> reqsList)) {
             return false;
         }
-        if (reqsList.stream().anyMatch(v -> !(v instanceof String))) {
-            return false;
-        }
-
-        return true;
+        return reqsList.stream().allMatch(v -> v instanceof String);
     }
 }
