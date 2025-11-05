@@ -27,7 +27,7 @@ public class DefaultMcpClientFactory implements McpClientFactory {
      *
      * @param requestTimeoutSeconds The timeout duration of requests. Units: seconds.
      */
-    public DefaultMcpClientFactory(@Value("${mcp.client.request.timeout-seconds}")int requestTimeoutSeconds) {
+    public DefaultMcpClientFactory(@Value("${mcp.client.request.timeout-seconds}") int requestTimeoutSeconds) {
         this.requestTimeoutSeconds = requestTimeoutSeconds;
     }
 

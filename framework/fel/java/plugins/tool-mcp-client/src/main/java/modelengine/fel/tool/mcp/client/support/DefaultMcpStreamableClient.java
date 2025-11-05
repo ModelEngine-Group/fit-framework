@@ -6,12 +6,13 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
+import static modelengine.fitframework.inspection.Validation.notBlank;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
-import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
-import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
 import io.modelcontextprotocol.json.schema.jackson.DefaultJsonSchemaValidator;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
@@ -24,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static modelengine.fitframework.inspection.Validation.notBlank;
 
 /**
  * A default implementation of the MCP client that uses the MCP SDK's streamable HTTP transport.
@@ -57,9 +56,7 @@ public class DefaultMcpStreamableClient implements McpClient {
                 .build();
         this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
                 .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds > 0 ? requestTimeoutSeconds : 5))
-                .capabilities(McpSchema.ClientCapabilities.builder()
-                        .elicitation()
-                        .build())
+                .capabilities(McpSchema.ClientCapabilities.builder().elicitation().build())
                 .loggingConsumer(McpClientMessageHandler::handleLoggingMessage)
                 .elicitation(McpClientMessageHandler::handleElicitationRequest)
                 .jsonSchemaValidator(new DefaultJsonSchemaValidator(mapper))
@@ -96,18 +93,16 @@ public class DefaultMcpStreamableClient implements McpClient {
         if (!this.initialized) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
-        
+
         try {
             McpSchema.ListToolsResult result = this.mcpSyncClient.listTools();
             if (result == null || result.tools() == null) {
                 log.warn("Failed to get tools from MCP server: result is null.");
                 throw new IllegalStateException("Failed to get tools from MCP server: result is null.");
             }
-            
-            List<Tool> tools = result.tools().stream()
-                    .map(this::convertToFelTool)
-                    .collect(Collectors.toList());
-            
+
+            List<Tool> tools = result.tools().stream().map(this::convertToFelTool).collect(Collectors.toList());
+
             log.info("Successfully retrieved {} tools from MCP server.", tools.size());
             tools.forEach(tool -> log.info("Tool - Name: {}, Description: {}", tool.getName(), tool.getDescription()));
             return tools;
@@ -136,24 +131,31 @@ public class DefaultMcpStreamableClient implements McpClient {
         if (!this.initialized) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
-        
+
         try {
             log.info("Calling tool: {} with arguments: {}", name, arguments);
-            McpSchema.CallToolResult result = this.mcpSyncClient.callTool(
-                    new McpSchema.CallToolRequest(name, arguments)
-            );
-            
+            McpSchema.CallToolResult result =
+                    this.mcpSyncClient.callTool(new McpSchema.CallToolRequest(name, arguments));
+
             if (result == null) {
                 log.error("Failed to call tool '{}': result is null.", name);
                 throw new IllegalStateException("Failed to call tool '" + name + "': result is null.");
             }
 
             if (result.isError() != null && result.isError()) {
-                String errorMsg = "Tool '" + name + "' returned an error.";
+                String errorMsg = "Tool '" + name + "' returned an error";
+                if (result.content() != null && !result.content().isEmpty()) {
+                    Object errorContent = result.content().get(0);
+                    if (errorContent instanceof McpSchema.TextContent textContent) {
+                        errorMsg += ": " + textContent.text();
+                    } else {
+                        errorMsg += ": " + errorContent;
+                    }
+                }
                 log.error(errorMsg);
                 throw new IllegalStateException(errorMsg);
             }
-            
+
             if (result.content() == null || result.content().isEmpty()) {
                 log.warn("Tool '{}' returned empty content.", name);
                 return null;
@@ -170,7 +172,7 @@ public class DefaultMcpStreamableClient implements McpClient {
                 log.info("Successfully called tool '{}', content type: {}", name, content.getClass().getSimpleName());
                 return content;
             }
-            
+
         } catch (Exception e) {
             log.error("Failed to call tool '{}' from MCP server.", name, e);
             throw new IllegalStateException("Failed to call tool '" + name + "': " + e.getMessage(), e);
