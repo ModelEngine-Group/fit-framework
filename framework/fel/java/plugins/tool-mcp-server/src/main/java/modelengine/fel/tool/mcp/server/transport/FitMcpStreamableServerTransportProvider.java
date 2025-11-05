@@ -377,7 +377,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * @param request The incoming {@link HttpClassicServerRequest} containing the session ID header
      * @param response The {@link HttpClassicServerResponse} to set status code if validation fails
      * @return An error {@link Entity} if validation fails (either missing session ID or session not found),
-     *         {@code null} if validation succeeds
+     * {@code null} if validation succeeds
      */
     private Object validateRequestSessionId(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
@@ -484,9 +484,11 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      *
      * @param request The incoming {@link HttpClassicServerRequest}
      * @param response The {@link HttpClassicServerResponse} to set session ID and initialization result
-     * @param jsonrpcRequest The {@link McpSchema.JSONRPCRequest} containing {@link McpSchema.InitializeRequest} parameters
-     * @return An {@link Entity} containing the {@link McpSchema.JSONRPCResponse} with {@link McpSchema.InitializeResult}
-     *         on success, or an error {@link Entity} with {@link McpError} on failure
+     * @param jsonrpcRequest The {@link McpSchema.JSONRPCRequest} containing {@link McpSchema.InitializeRequest}
+     * parameters
+     * @return An {@link Entity} containing the {@link McpSchema.JSONRPCResponse} with
+     * {@link McpSchema.InitializeResult}
+     * on success, or an error {@link Entity} with {@link McpError} on failure
      */
     private Object handleInitializeRequest(HttpClassicServerRequest request, HttpClassicServerResponse response,
             McpSchema.JSONRPCRequest jsonrpcRequest) {

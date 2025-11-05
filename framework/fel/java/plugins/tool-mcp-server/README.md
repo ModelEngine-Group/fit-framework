@@ -42,16 +42,38 @@
 
 ### 主要方法
 
-| 方法名                           | 来源         | 说明                      |
-|-------------------------------|------------|-------------------------|
-| `protocolVersions()`          | SDK 原始     | 返回支持的 MCP 协议版本          |
-| `setSessionFactory()`         | SDK 原始     | 设置会话工厂                  |
-| `notifyClients()`             | SDK 原始     | 广播通知到所有客户端              |
-| `closeGracefully()`           | SDK 原始     | 优雅关闭传输层                 |
-| `handleGet()`                 | **FIT 改造** | 处理 GET 请求（SSE 连接）       |
-| `handlePost()`                | **FIT 改造** | 处理 POST 请求（JSON-RPC 消息） |
-| `handleDelete()`              | **FIT 改造** | 处理 DELETE 请求（会话删除）      |
-| `deserializeJsonRpcMessage()` | **FIT 创建** | 反序列化 JSON-RPC 消息        |
+| 方法名                | 来源         | 说明                            |
+| --------------------- | ------------ | ------------------------------- |
+| `protocolVersions()`  | SDK 原始     | 返回支持的 MCP 协议版本         |
+| `setSessionFactory()` | SDK 原始     | 设置会话工厂                    |
+| `notifyClients()`     | SDK 原始     | 广播通知到所有客户端            |
+| `closeGracefully()`   | SDK 原始     | 优雅关闭传输层                  |
+| `handleGet()`         | **FIT 改造** | 处理 GET 请求（SSE 连接）       |
+| `handlePost()`        | **FIT 改造** | 处理 POST 请求（JSON-RPC 消息） |
+| `handleDelete()`      | **FIT 改造** | 处理 DELETE 请求（会话删除）    |
+
+### 重构后的辅助方法
+
+为提高代码可读性和可维护性，从原本的 `handleGet()`、`handlePost()`、`handleDelete()` 方法中抽取了以下辅助方法：
+
+#### 验证请求合法性的方法
+
+| 方法名                           | 说明                                                      |
+|-------------------------------|----------------------------------------------------------|
+| `validateGetAcceptHeaders()`  | 验证 GET 请求的 Accept 头，确保包含 `text/event-stream`         |
+| `validatePostAcceptHeaders()` | 验证 POST 请求的 Accept 头，确保包含 `text/event-stream` 和 `application/json` |
+| `validateRequestSessionId()`  | 验证请求的 `mcp-session-id` 头是否存在，以及对应的会话是否存在            |
+
+#### 根据请求类型调用处理逻辑的方法
+
+| 方法名                            | 处理的请求类型 | 说明                                   |
+|--------------------------------|---------|--------------------------------------|
+| `handleReplaySseRequest()`     | GET     | 处理 SSE 消息重放请求，用于断线重连后恢复错过的消息        |
+| `handleEstablishSseRequest()`  | GET     | 处理 SSE 连接建立请求，创建新的持久化 SSE 监听流      |
+| `handleInitializeRequest()`    | POST    | 处理客户端初始化连接请求，创建新的 MCP 会话           |
+| `handleJsonRpcResponse()`      | POST    | 处理 JSON-RPC 响应消息（如 Elicitation 中的客户端响应） |
+| `handleJsonRpcNotification()`  | POST    | 处理 JSON-RPC 通知消息（客户端单向通知）           |
+| `handleJsonRpcRequest()`       | POST    | 处理 JSON-RPC 请求消息，返回 SSE 流式响应         |
 
 ### 内部类
 
@@ -97,31 +119,7 @@ public Mono<Void> notifyClients(String method, Object params) {
 - 使用 `parallelStream()` 提高效率
 - 单个会话失败不影响其他会话
 
-### 4. HTTP 端点处理核心流程
-
-#### a. GET 请求处理流程（原始逻辑）
-
-1. 检查 Accept 头是否包含 `text/event-stream`
-2. 验证 `mcp-session-id` 头是否存在
-3. 查找对应的会话
-4. 检查是否是重放请求（`Last-Event-ID` 头）
-5. 建立 SSE 连接或重放消息
-
-#### b. POST 请求处理流程（原始逻辑）
-
-1. 检查 Accept 头
-2. 反序列化 JSON-RPC 消息
-3. 特殊处理 `initialize` 请求（创建新会话）
-4. 处理其他请求（需要已存在的会话）
-5. 根据消息类型（Response/Notification/Request）分别处理
-
-#### c. DELETE 请求处理流程（原始逻辑）
-
-1. 检查是否禁用 DELETE
-2. 验证 `mcp-session-id` 头
-3. 查找并删除会话
-
-### 5. 关闭逻辑
+### 4. 关闭逻辑
 
 ```java
 public Mono<Void> closeGracefully() {
@@ -135,62 +133,51 @@ public Mono<Void> closeGracefully() {
 - 关闭所有活跃会话
 - 清理资源
 
-### 6. Keep-Alive 机制
-
-```java
-if(keepAliveInterval != null){
-    this.keepAliveScheduler =KeepAliveScheduler.builder(...)
-        .initialDelay(keepAliveInterval)
-        .interval(keepAliveInterval)
-        .build();
-    this.keepAliveScheduler.start();
-}
-```
-
-- 支持可选的 Keep-Alive 调度
-
-## FIT 框架新增/改造逻辑
+## FIT 框架改造核心逻辑
 
 以下是为适配 FIT 框架而新增或改造的部分：
 
-### 1. HTTP 类替换（重要改造）
+### 1. HTTP 端点处理核心流程（核心改造）
 
-**原始 SDK（Spring MVC）**:
-
-```java
-
-@GetMapping("/mcp/streamable")
-public ResponseEntity<SseEmitter> handleGet(HttpServletRequest request, HttpServletResponse response)
-
-@PostMapping("/mcp/streamable")
-public ResponseEntity<?> handlePost(HttpServletRequest request, @RequestBody Map<String, Object> body)
-
-@DeleteMapping("/mcp/streamable")
-public ResponseEntity<Void> handleDelete(HttpServletRequest request)
-```
-
-**FIT 框架改造后**:
-
-```java
-
-@GetMapping(path = MESSAGE_ENDPOINT)
-public Object handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response)
-
-@PostMapping(path = MESSAGE_ENDPOINT)
-public Object handlePost(HttpClassicServerRequest request, HttpClassicServerResponse response,
-        @RequestBody Map<String, Object> requestBody)
-
-@DeleteMapping(path = MESSAGE_ENDPOINT)
-public Object handleDelete(HttpClassicServerRequest request, HttpClassicServerResponse response)
-```
-
-**关键变化**:
-
-- 使用 FIT 的注解：`@GetMapping`, `@PostMapping`, `@DeleteMapping`
 - 请求/响应对象类型变更：
   - `HttpServletRequest` → `HttpClassicServerRequest`
   - `HttpServletResponse` → `HttpClassicServerResponse`
 - 返回类型改为通用的 `Object`，支持多种返回形式
+
+#### a. GET 请求处理流程
+
+1. 检查服务器是否正在关闭
+2. **调用 `validateGetAcceptHeaders()`** - 验证 Accept 头是否包含 `text/event-stream`
+3. **调用 `validateRequestSessionId()`** - 验证 `mcp-session-id` 头是否存在及对应会话是否存在
+4. 提取 `transportContext` 上下文
+5. 获取会话 ID 和会话对象
+6. 检查是否是重放请求（`Last-Event-ID` 头）：
+   - 如果是，**调用 `handleReplaySseRequest()`** - 重放错过的消息
+   - 如果否，**调用 `handleEstablishSseRequest()`** - 建立新的 SSE 监听流
+
+#### b. POST 请求处理流程
+
+1. 检查服务器是否正在关闭
+2. **调用 `validatePostAcceptHeaders()`** - 验证 Accept 头包含 `text/event-stream` 和 `application/json`
+3. 提取 `transportContext` 上下文
+4. 反序列化 JSON-RPC 消息
+5. 判断是否为初始化请求（`initialize` 方法）：
+   - 如果是，**调用 `handleInitializeRequest()`** - 创建新会话并返回初始化结果
+6. **调用 `validateRequestSessionId()`** - 验证会话（仅非初始化请求）
+7. 获取会话 ID 和会话对象
+8. 根据消息类型分发处理：
+   - `JSONRPCResponse` → **调用 `handleJsonRpcResponse()`**
+   - `JSONRPCNotification` → **调用 `handleJsonRpcNotification()`**
+   - `JSONRPCRequest` → **调用 `handleJsonRpcRequest()`**
+
+#### c. DELETE 请求处理流程
+
+1. 检查服务器是否正在关闭
+2. 检查是否禁用 DELETE 操作
+3. **调用 `validateRequestSessionId()`** - 验证 `mcp-session-id` 头及会话存在性
+4. 提取 `transportContext` 上下文
+5. 获取会话 ID 和会话对象
+6. 删除会话并从会话映射表中移除
 
 ### 2. SSE 实现改造（核心改造）
 
@@ -320,42 +307,6 @@ if(!this.response.isActive()){
 }
 ```
 
-### 6. JSON-RPC 消息反序列化
-
-```java
-public McpSchema.JSONRPCMessage deserializeJsonRpcMessage(Map<String, Object> map) {
-    // 根据字段判断消息类型
-    if (map.containsKey("method") && map.containsKey("id")) {
-        return jsonMapper.convertValue(map, McpSchema.JSONRPCRequest.class);
-    } else if (map.containsKey("method") && !map.containsKey("id")) {
-        return jsonMapper.convertValue(map, McpSchema.JSONRPCNotification.class);
-    } else if (map.containsKey("result") || map.containsKey("error")) {
-        return jsonMapper.convertValue(map, McpSchema.JSONRPCResponse.class);
-    }
-    throw new IllegalArgumentException(...);
-}
-```
-
-- 智能识别 JSON-RPC 消息类型
-
-## 代码结构对照表
-
-| 功能模块       | 改造程度     | SDK 原始实现                               | FIT 框架实现                       |
-|------------|----------|----------------------------------------|--------------------------------|
-| SSE 实现     | **重大改造** | `SseEmitter`                           | `Choir<TextEvent>` + `Emitter` |
-| HTTP 请求对象  | **重大改造** | `HttpServletRequest`                   | `HttpClassicServerRequest`     |
-| HTTP 响应对象  | **重大改造** | `HttpServletResponse`                  | `HttpClassicServerResponse`    |
-| HTTP返回类型   | **重大改造** | `ResponseEntity<?>`                    | `Object` (`Entity`或者`Choir`)   |
-| Get连接检测    | 新增       | 无                                      | `response.isActive()`          |
-| 验证工具       | 新增       | 无或其他                                   | FIT Validation                 |
-| 日志系统       | 轻微改造     | SLF4J                                  | FIT Logger                     |
-| Builder 模式 | 轻微改造     | 原始逻辑                                   | 类型参数调整                         |
-| HTTP 注解    | 无变化      | `@GetMapping` (Spring)                 | `@GetMapping` (FIT)            |
-| 接口实现       | 无变化      | `McpStreamableServerTransportProvider` | 相同                             |
-| 会话管理       | 无变化      | 原始逻辑                                   | 相同                             |
-| 消息序列化      | 无变化      | 原始逻辑                                   | 相同                             |
-| Keep-Alive | 无变化      | 原始逻辑                                   | 相同                             |
-
 ## 参考资源
 
 ### MCP 协议文档
@@ -363,12 +314,9 @@ public McpSchema.JSONRPCMessage deserializeJsonRpcMessage(Map<String, Object> ma
 - MCP 协议规范：[https://spec.modelcontextprotocol.io/](https://spec.modelcontextprotocol.io/)
 - MCP SDK GitHub: [https://github.com/modelcontextprotocol/](https://github.com/modelcontextprotocol/)
 
-### FIT 框架文档
+### 更新记录
 
-- FIT HTTP 模块文档：`docs/framework/fit/java/user-guide-book/04. Web MVC 能力.md`
-- FIT 流式功能文档：`docs/framework/fit/java/user-guide-book/10. 流式功能.md`
-- FIT 日志文档：`docs/framework/fit/java/user-guide-book/08. 日志.md`
-
-### 相关类文档
-- `Event` 枚举定义：`modelengine.fel.tool.mcp.entity.Event`
-- MCP Server 工具其他实现：`framework/fel/java/plugins/tool-mcp-server/`
+| 日期       | 更新内容                          | 负责人 |
+|----------|---------------------------------|-----|
+| 2025-11-04 | 初始版本，从 SDK 改造为 FIT 框架实现        | 黄可欣 |
+| 2025-11-05 | 代码重构，提取9个辅助方法提高可读性和可维护性      | 黄可欣 |
