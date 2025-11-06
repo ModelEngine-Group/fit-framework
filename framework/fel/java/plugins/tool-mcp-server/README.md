@@ -3,10 +3,9 @@
 ## 文档概述
 
 本文档用于记录 `FitMcpStreamableServerTransportProvider` 类的设计、实现细节以及维护更新指南。该类是基于 MCP SDK 中的
-`WebMvcStreamableServerTransportProvider` 类改造而来，用于在 FIT 框架中提供 MCP（Model Context Protocol）服务端的传输层实现。
+`HttpServletStreamableServerTransportProvider` 类改造而来，用于在 FIT 框架中提供 MCP（Model Context Protocol）服务端的传输层实现。
 
-**原始参考类**: MCP SDK 中的 `WebMvcStreamableServerTransportProvider` (或
-`HttpServletStreamableServerTransportProvider`)
+**原始参考类**: MCP SDK 中的 `HttpServletStreamableServerTransportProvider`
 
 **创建时间**: 2025-11-04
 
@@ -86,7 +85,7 @@
 
 ## SDK 原始逻辑
 
-以下是从 MCP SDK 的 `WebMvcStreamableServerTransportProvider` 类保留的原始逻辑：
+以下是从 MCP SDK 的 `HttpServletStreamableServerTransportProvider` 类保留的原始逻辑：
 
 ### 1. 会话管理核心逻辑
 
@@ -181,7 +180,7 @@ public Mono<Void> closeGracefully() {
 
 ### 2. SSE 实现改造（核心改造）
 
-**原始 SDK (Spring MVC)**:
+**原始 SDK**:
 
 ```java
 SseEmitter sseEmitter = new SseEmitter();

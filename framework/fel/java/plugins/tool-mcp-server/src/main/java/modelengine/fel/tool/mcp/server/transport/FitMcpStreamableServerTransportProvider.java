@@ -46,7 +46,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default implementation of {@link McpStreamableServerTransportProvider}.
- * The FIT transport provider for MCP Server, according to {@code WebMvcStreamableServerTransportProvider} in MCP SDK.
+ * The FIT transport provider for MCP Server, according to {@code HttpServletStreamableServerTransportProvider} in MCP
+ * SDK.
  *
  * @author 黄可欣
  * @since 2025-09-30
@@ -143,7 +144,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                 try {
                     session.sendNotification(method, params).block();
                 } catch (Exception e) {
-                    logger.error("Failed to send message to session {}: {}", session.getId(), e.getMessage());
+                    logger.error("Failed to send message to session {}: {}", session.getId(), e.getMessage(), e);
                 }
             });
         });
@@ -164,7 +165,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                 try {
                     session.closeGracefully().block();
                 } catch (Exception e) {
-                    logger.error("Failed to close session {}: {}", session.getId(), e.getMessage());
+                    logger.error("Failed to close session {}: {}", session.getId(), e.getMessage(), e);
                 }
             });
 
@@ -219,7 +220,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                 }
             });
         } catch (Exception e) {
-            logger.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
+            logger.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return null;
         }
@@ -266,9 +267,11 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
             // Handle JSONRPCMessage
             if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
-                return handleJsonRpcResponse(jsonrpcResponse, session, transportContext, response);
+                handleJsonRpcResponse(jsonrpcResponse, session, transportContext, response);
+                return null;
             } else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
-                return handleJsonRpcNotification(jsonrpcNotification, session, transportContext, response);
+                handleJsonRpcNotification(jsonrpcNotification, session, transportContext, response);
+                return null;
             } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
                 return handleJsonRpcRequest(jsonrpcRequest, session, sessionId, transportContext, response);
             } else {
@@ -277,12 +280,12 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
             }
         } catch (IllegalArgumentException | IOException e) {
-            logger.error("Failed to deserialize message: {}", e.getMessage());
+            logger.error("Failed to deserialize message: {}", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format").build());
         } catch (Exception e) {
-            logger.error("Error handling message: {}", e.getMessage());
+            logger.error("Error handling message: {}", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
@@ -323,7 +326,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             response.statusCode(HttpResponseStatus.OK.statusCode());
             return null;
         } catch (Exception e) {
-            logger.error("Failed to delete session {}: {}", sessionId, e.getMessage());
+            logger.error("Failed to delete session {}: {}", sessionId, e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
@@ -423,12 +426,12 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                                     .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                                     .block();
                         } catch (Exception e) {
-                            logger.error("Failed to replay message: {}", e.getMessage());
+                            logger.error("Failed to replay message: {}", e.getMessage(), e);
                             emitter.fail(e);
                         }
                     });
         } catch (Exception e) {
-            logger.error("Failed to replay messages: {}", e.getMessage());
+            logger.error("Failed to replay messages: {}", e.getMessage(), e);
             emitter.fail(e);
         }
     }
@@ -507,7 +510,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             return Entity.createObject(response,
                     new McpSchema.JSONRPCResponse(McpSchema.JSONRPC_VERSION, jsonrpcRequest.id(), initResult, null));
         } catch (Exception e) {
-            logger.error("Failed to initialize session: {}", e.getMessage());
+            logger.error("Failed to initialize session: {}", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
@@ -523,13 +526,11 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * @param session The {@link McpStreamableServerSession} to accept the response
      * @param transportContext The {@link McpTransportContext} for request context propagation
      * @param response The {@link HttpClassicServerResponse} to set the status code
-     * @return {@code null} as the response status is set to {@code 202 Accepted}
      */
-    private Object handleJsonRpcResponse(McpSchema.JSONRPCResponse jsonrpcResponse, McpStreamableServerSession session,
+    private void handleJsonRpcResponse(McpSchema.JSONRPCResponse jsonrpcResponse, McpStreamableServerSession session,
             McpTransportContext transportContext, HttpClassicServerResponse response) {
         session.accept(jsonrpcResponse).contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext)).block();
         response.statusCode(HttpResponseStatus.ACCEPTED.statusCode());
-        return null;
     }
 
     /**
@@ -541,16 +542,14 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * @param session The {@link McpStreamableServerSession} to accept the notification
      * @param transportContext The {@link McpTransportContext} for request context propagation
      * @param response The {@link HttpClassicServerResponse} to set the status code
-     * @return {@code null} as the response status is set to {@code 202 Accepted}
      */
-    private Object handleJsonRpcNotification(McpSchema.JSONRPCNotification jsonrpcNotification,
+    private void handleJsonRpcNotification(McpSchema.JSONRPCNotification jsonrpcNotification,
             McpStreamableServerSession session, McpTransportContext transportContext,
             HttpClassicServerResponse response) {
         session.accept(jsonrpcNotification)
                 .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                 .block();
         response.statusCode(HttpResponseStatus.ACCEPTED.statusCode());
-        return null;
     }
 
     /**
@@ -593,7 +592,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
                         .block();
             } catch (Exception e) {
-                logger.error("Failed to handle request stream: {}", e.getMessage());
+                logger.error("Failed to handle request stream: {}", e.getMessage(), e);
                 emitter.fail(e);
             }
         });
@@ -681,13 +680,14 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
                     logger.info("[SSE] Sending message to session {}: {}", this.sessionId, jsonText);
                 } catch (Exception e) {
-                    logger.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage());
+                    logger.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage(), e);
                     try {
                         this.emitter.fail(e);
                     } catch (Exception errorException) {
                         logger.error("Failed to send error to SSE builder for session {}: {}",
                                 this.sessionId,
-                                errorException.getMessage());
+                                errorException.getMessage(),
+                                errorException);
                     }
                 } finally {
                     this.lock.unlock();

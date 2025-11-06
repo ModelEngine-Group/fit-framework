@@ -6,4 +6,4 @@ fit:
 mcp:
   server:
     request:
-      timeout-seconds: 10
+      timeout-seconds: 60
