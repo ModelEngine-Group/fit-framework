@@ -131,7 +131,6 @@ public class DefaultMcpStreamableClient implements McpClient {
         if (!this.initialized) {
             throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
         }
-
         try {
             log.info("Calling tool: {} with arguments: {}", name, arguments);
             McpSchema.CallToolResult result =
@@ -141,41 +140,54 @@ public class DefaultMcpStreamableClient implements McpClient {
                 log.error("Failed to call tool '{}': result is null.", name);
                 throw new IllegalStateException("Failed to call tool '" + name + "': result is null.");
             }
-
-            if (result.isError() != null && result.isError()) {
-                String errorMsg = "Tool '" + name + "' returned an error";
-                if (result.content() != null && !result.content().isEmpty()) {
-                    Object errorContent = result.content().get(0);
-                    if (errorContent instanceof McpSchema.TextContent textContent) {
-                        errorMsg += ": " + textContent.text();
-                    } else {
-                        errorMsg += ": " + errorContent;
-                    }
-                }
-                log.error(errorMsg);
-                throw new IllegalStateException(errorMsg);
-            }
-
-            if (result.content() == null || result.content().isEmpty()) {
-                log.warn("Tool '{}' returned empty content.", name);
-                return null;
-            }
-
-            Object content = result.content().get(0);
-            if (content instanceof McpSchema.TextContent textContent) {
-                log.info("Successfully called tool '{}', result: {}", name, textContent.text());
-                return textContent.text();
-            } else if (content instanceof McpSchema.ImageContent imageContent) {
-                log.info("Successfully called tool '{}', returned image content.", name);
-                return imageContent;
-            } else {
-                log.info("Successfully called tool '{}', content type: {}", name, content.getClass().getSimpleName());
-                return content;
-            }
-
+            return processToolResult(result, name);
         } catch (Exception e) {
             log.error("Failed to call tool '{}' from MCP server.", name, e);
             throw new IllegalStateException("Failed to call tool '" + name + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Processes the tool call result and extracts the content.
+     * Handles error cases and different content types (text, image, etc.).
+     *
+     * @param result The {@link McpSchema.CallToolResult} returned from the tool call.
+     * @param name The name of the tool that was called.
+     * @return The extracted content. For text content, returns the text as a {@link String}.
+     * For image content, returns the {@link McpSchema.ImageContent} object.
+     * Returns {@code null} if the tool returns empty content.
+     * @throws IllegalStateException if the tool returns an error.
+     */
+    private Object processToolResult(McpSchema.CallToolResult result, String name) {
+        if (result.isError() != null && result.isError()) {
+            String errorMsg = "Tool '" + name + "' returned an error";
+            if (result.content() != null && !result.content().isEmpty()) {
+                Object errorContent = result.content().get(0);
+                if (errorContent instanceof McpSchema.TextContent textContent) {
+                    errorMsg += ": " + textContent.text();
+                } else {
+                    errorMsg += ": " + errorContent;
+                }
+            }
+            log.error(errorMsg);
+            throw new IllegalStateException(errorMsg);
+        }
+
+        if (result.content() == null || result.content().isEmpty()) {
+            log.warn("Tool '{}' returned empty content.", name);
+            return null;
+        }
+
+        Object content = result.content().get(0);
+        if (content instanceof McpSchema.TextContent textContent) {
+            log.info("Successfully called tool '{}', result: {}", name, textContent.text());
+            return textContent.text();
+        } else if (content instanceof McpSchema.ImageContent imageContent) {
+            log.info("Successfully called tool '{}', returned image content.", name);
+            return imageContent;
+        } else {
+            log.info("Successfully called tool '{}', content type: {}", name, content.getClass().getSimpleName());
+            return content;
         }
     }
 
