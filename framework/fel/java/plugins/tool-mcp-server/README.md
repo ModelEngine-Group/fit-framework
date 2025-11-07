@@ -65,14 +65,15 @@
 
 #### 根据请求类型调用处理逻辑的方法
 
-| 方法名                            | 处理的请求类型 | 说明                                   |
-|--------------------------------|---------|--------------------------------------|
-| `handleReplaySseRequest()`     | GET     | 处理 SSE 消息重放请求，用于断线重连后恢复错过的消息        |
-| `handleEstablishSseRequest()`  | GET     | 处理 SSE 连接建立请求，创建新的持久化 SSE 监听流      |
-| `handleInitializeRequest()`    | POST    | 处理客户端初始化连接请求，创建新的 MCP 会话           |
-| `handleJsonRpcResponse()`      | POST    | 处理 JSON-RPC 响应消息（如 Elicitation 中的客户端响应） |
-| `handleJsonRpcNotification()`  | POST    | 处理 JSON-RPC 通知消息（客户端单向通知）           |
-| `handleJsonRpcRequest()`       | POST    | 处理 JSON-RPC 请求消息，返回 SSE 流式响应         |
+| 方法名                             | 处理的请求类型 | 说明                                       |
+|---------------------------------|---------|------------------------------------------|
+| `handleReplaySseRequest()`      | GET     | 处理 SSE 消息重放请求，用于断线重连后恢复错过的消息             |
+| `handleEstablishSseRequest()`   | GET     | 处理 SSE 连接建立请求，创建新的持久化 SSE 监听流            |
+| `handleInitializeRequest()`     | POST    | 处理客户端初始化连接请求，创建新的 MCP 会话                 |
+| `handleJsonRpcMessage()`        | POST    | 把非Initialize的客户端消息分流给下面三个方法，包含Session验证。 |
+| `handleJsonRpcResponse()`       | POST    | 处理 JSON-RPC 响应消息（如 Elicitation 中的客户端响应）  |
+| `handleJsonRpcNotification()`   | POST    | 处理 JSON-RPC 通知消息（客户端单向通知）                |
+| `handleJsonRpcRequest()`        | POST    | 处理 JSON-RPC 请求消息，返回 SSE 流式响应             |
 
 ### 内部类
 

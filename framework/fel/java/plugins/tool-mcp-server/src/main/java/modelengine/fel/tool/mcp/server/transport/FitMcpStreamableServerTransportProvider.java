@@ -249,35 +249,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
             McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(jsonMapper, requestBody);
 
-            // Handle initialization request
+            // Handle JSONRPCMessage
             if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest && jsonrpcRequest.method()
                     .equals(McpSchema.METHOD_INITIALIZE)) {
                 logger.info("[POST] Handling initialize method, with receiving message: {}", requestBody);
                 return handleInitializeRequest(request, response, jsonrpcRequest);
-            }
-
-            // Get session ID and session
-            Object sessionError = validateRequestSessionId(request, response);
-            if (sessionError != null) {
-                return sessionError;
-            }
-            String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
-            McpStreamableServerSession session = this.sessions.get(sessionId);
-            logger.info("[POST] Receiving message from session {}: {}", sessionId, requestBody);
-
-            // Handle JSONRPCMessage
-            if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
-                handleJsonRpcResponse(jsonrpcResponse, session, transportContext, response);
-                return null;
-            } else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
-                handleJsonRpcNotification(jsonrpcNotification, session, transportContext, response);
-                return null;
-            } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
-                return handleJsonRpcRequest(jsonrpcRequest, session, sessionId, transportContext, response);
             } else {
-                response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
-                return Entity.createObject(response,
-                        McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
+                return handleJsonRpcMessage(message, request, requestBody, transportContext, response);
             }
         } catch (IllegalArgumentException | IOException e) {
             logger.error("Failed to deserialize message: {}", e.getMessage(), e);
@@ -514,6 +492,43 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message(e.getMessage()).build());
+        }
+    }
+
+    /**
+     * Handles different types of JSON-RPC messages (Response, Notification, Request).
+     * Routes the message to the appropriate handler method based on its type.
+     *
+     * @param message The {@link McpSchema.JSONRPCMessage} to handle
+     * @param request The incoming {@link HttpClassicServerRequest}
+     * @param requestBody The {@link String} of request body.
+     * @param transportContext The {@link McpTransportContext} for request context propagation
+     * @param response The {@link HttpClassicServerResponse} to set status code and return data
+     * @return An {@link Entity} or {@link Choir} containing the response data, or {@code null} for accepted messages
+     */
+    private Object handleJsonRpcMessage(McpSchema.JSONRPCMessage message, HttpClassicServerRequest request,
+            String requestBody, McpTransportContext transportContext, HttpClassicServerResponse response) {
+        // Get session ID and session
+        Object sessionError = validateRequestSessionId(request, response);
+        if (sessionError != null) {
+            return sessionError;
+        }
+        String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
+        McpStreamableServerSession session = this.sessions.get(sessionId);
+        logger.info("[POST] Receiving message from session {}: {}", sessionId, requestBody);
+
+        if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
+            handleJsonRpcResponse(jsonrpcResponse, session, transportContext, response);
+            return null;
+        } else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
+            handleJsonRpcNotification(jsonrpcNotification, session, transportContext, response);
+            return null;
+        } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
+            return handleJsonRpcRequest(jsonrpcRequest, session, sessionId, transportContext, response);
+        } else {
+            response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
         }
     }
 
