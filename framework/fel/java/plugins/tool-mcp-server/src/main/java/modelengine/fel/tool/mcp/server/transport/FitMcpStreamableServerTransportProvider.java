@@ -204,7 +204,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         }
         String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
         McpStreamableServerSession session = this.sessions.get(sessionId);
-        logger.info("[GET] Handling GET request for session: {}", sessionId);
+        logger.info("[GET] Receiving GET request from session: {}", sessionId);
 
         McpTransportContext transportContext = this.contextExtractor.extract(request);
         try {
@@ -392,7 +392,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             String sessionId, McpStreamableServerSession session, FitStreamableMcpSessionTransport sessionTransport,
             Emitter<TextEvent> emitter) {
         String lastId = request.headers().first(HttpHeaders.LAST_EVENT_ID).orElse("0");
-        logger.info("[GET] Receiving replay request from session: {}", sessionId);
+        logger.info("[GET] Handling replay request from session: {}", sessionId);
 
         try {
             session.replay(lastId)
@@ -426,7 +426,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      */
     private void handleEstablishSseRequest(String sessionId, McpStreamableServerSession session,
             FitStreamableMcpSessionTransport sessionTransport, Emitter<TextEvent> emitter) {
-        logger.info("[GET] Receiving Get request to establish new SSE for session: {}", sessionId);
+        logger.info("[GET] Handling Get request to establish new SSE for session: {}", sessionId);
         McpStreamableServerSession.McpStreamableServerSessionStream listeningStream =
                 session.listeningStream(sessionTransport);
 
@@ -643,7 +643,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             this.sessionId = sessionId;
             this.emitter = emitter;
             this.response = response;
-            logger.info("[SSE] Building SSE for session: {} ", sessionId);
+            logger.info("[SSE] Building SSE emitter for session: {} ", sessionId);
         }
 
         /**

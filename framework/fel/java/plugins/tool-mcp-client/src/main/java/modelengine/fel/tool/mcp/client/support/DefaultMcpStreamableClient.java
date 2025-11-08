@@ -115,19 +115,19 @@ public class DefaultMcpStreamableClient implements McpClient {
         try {
             McpSchema.ListToolsResult result = this.mcpSyncClient.listTools();
             if (result == null || result.tools() == null) {
-                log.warn("Failed to get tools: result is null. [clientId={}]", clientId);
-                throw new IllegalStateException("Failed to get tools from MCP server: result is null.");
+                log.warn("Failed to get tools list: result is null. [clientId={}]", clientId);
+                throw new IllegalStateException("Failed to get tools list from MCP server: result is null.");
             }
 
             List<Tool> tools = result.tools().stream().map(this::convertToFelTool).collect(Collectors.toList());
 
-            log.info("Successfully retrieved tools. [clientId={}, count={}]", clientId, tools.size());
+            log.info("Successfully retrieved tools list. [clientId={}, count={}]", clientId, tools.size());
             tools.forEach(tool -> log.debug("Tool information. [name={}, description={}]",
                     tool.getName(),
                     tool.getDescription()));
             return tools;
         } catch (Exception e) {
-            log.error("Failed to get tools. [clientId={}, error={}]", clientId, e.getMessage());
+            log.error("Failed to get tools list. [clientId={}, error={}]", clientId, e.getMessage());
             throw new IllegalStateException("Failed to get tools from MCP server. [error=" + e.getMessage() + "]", e);
         }
     }
@@ -251,7 +251,7 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     private void ensureNotClosed() {
         if (this.closed) {
-            throw new IllegalStateException("The MCP client is closed. [clientId=" + clientId + "]");
+            throw new IllegalStateException("The MCP client is already closed. [clientId=" + clientId + "]");
         }
     }
 
@@ -264,7 +264,7 @@ public class DefaultMcpStreamableClient implements McpClient {
         ensureNotClosed();
         if (!this.initialized) {
             throw new IllegalStateException(
-                    "MCP client is not initialized. Please wait a moment. [clientId=" + clientId + "]");
+                    "MCP client is not initialized. [clientId=" + clientId + "]");
         }
     }
 
