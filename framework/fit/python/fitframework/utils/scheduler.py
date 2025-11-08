@@ -109,8 +109,11 @@ def _start():
 @register_event(FrameworkEvent.FRAMEWORK_STOPPING)
 def _stop():
     global _timer
-    _timer.cancel()
-    fit_logger.info("timer stopped")
+    if _timer is not None:
+        _timer.cancel()
+        fit_logger.info("timer stopped")
+    else:
+        fit_logger.warning("timer was not initialized, skip stopping")
 
 
 class _Timer:
