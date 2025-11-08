@@ -44,7 +44,7 @@
         <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
             <artifactId>mcp</artifactId>
-            <version>0.14.1</version>
+            <version>0.15.0</version>
         </dependency>
 
         <!-- Test -->

@@ -23,6 +23,13 @@ import java.util.Map;
  */
 public interface McpClient extends Closeable {
     /**
+     * Gets the unique identifier of this MCP client instance.
+     *
+     * @return The client ID as a {@link String}.
+     */
+    String getClientId();
+
+    /**
      * Initializes the MCP Client.
      */
     void initialize();

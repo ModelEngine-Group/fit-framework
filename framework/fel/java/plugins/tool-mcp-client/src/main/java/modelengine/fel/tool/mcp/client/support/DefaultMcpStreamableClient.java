@@ -24,6 +24,9 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 public class DefaultMcpStreamableClient implements McpClient {
     private static final Logger log = Logger.get(DefaultMcpStreamableClient.class);
 
+    private final String clientId;
     private final McpSyncClient mcpSyncClient;
     private volatile boolean initialized = false;
     private volatile boolean closed = false;
@@ -45,22 +49,44 @@ public class DefaultMcpStreamableClient implements McpClient {
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The endpoint for the Server-Sent Events (SSE) connection.
      * @param requestTimeoutSeconds The timeout duration of requests. Units: seconds.
+     * @param loggingConsumer The consumer to handle logging messages from the MCP server.
+     * @param elicitationHandler The function to handle elicitation requests from the MCP server.
      */
-    public DefaultMcpStreamableClient(String baseUri, String sseEndpoint, int requestTimeoutSeconds) {
+    public DefaultMcpStreamableClient(String baseUri, String sseEndpoint, int requestTimeoutSeconds,
+            Consumer<McpSchema.LoggingMessageNotification> loggingConsumer,
+            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler) {
+        this.clientId = UUID.randomUUID().toString();
         notBlank(baseUri, "The MCP server base URI cannot be blank.");
         notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
+        log.info("Creating MCP client [{}] for server: {}", clientId, baseUri);
         ObjectMapper mapper = new ObjectMapper();
         HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport.builder(baseUri)
                 .jsonMapper(new JacksonMcpJsonMapper(mapper))
                 .endpoint(sseEndpoint)
                 .build();
-        this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
-                .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds > 0 ? requestTimeoutSeconds : 5))
-                .capabilities(McpSchema.ClientCapabilities.builder().elicitation().build())
-                .loggingConsumer(McpClientMessageHandler::handleLoggingMessage)
-                .elicitation(McpClientMessageHandler::handleElicitationRequest)
-                .jsonSchemaValidator(new DefaultJsonSchemaValidator(mapper))
-                .build();
+
+        if (elicitationHandler != null) {
+            this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
+                    .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
+                    .capabilities(McpSchema.ClientCapabilities.builder().elicitation().build())
+                    .loggingConsumer(loggingConsumer)
+                    .elicitation(elicitationHandler)
+                    .jsonSchemaValidator(new DefaultJsonSchemaValidator(mapper))
+                    .build();
+        } else {
+            this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
+                    .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
+                    .capabilities(McpSchema.ClientCapabilities.builder().build())
+                    .loggingConsumer(loggingConsumer)
+                    .jsonSchemaValidator(new DefaultJsonSchemaValidator(mapper))
+                    .build();
+        }
+
+    }
+
+    @Override
+    public String getClientId() {
+        return clientId;
     }
 
     /**
@@ -70,12 +96,10 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public void initialize() {
-        if (this.closed) {
-            throw new IllegalStateException("The MCP client is closed.");
-        }
+        ensureNotClosed();
         mcpSyncClient.initialize();
         this.initialized = true;
-        log.info("MCP client initialized successfully.");
+        log.info("MCP client [{}] initialized successfully.", clientId);
     }
 
     /**
@@ -87,27 +111,22 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public List<Tool> getTools() {
-        if (this.closed) {
-            throw new IllegalStateException("The MCP client is closed.");
-        }
-        if (!this.initialized) {
-            throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
-        }
+        ensureReady();
 
         try {
             McpSchema.ListToolsResult result = this.mcpSyncClient.listTools();
             if (result == null || result.tools() == null) {
-                log.warn("Failed to get tools from MCP server: result is null.");
+                log.warn("MCP client [{}] failed to get tools: result is null.", clientId);
                 throw new IllegalStateException("Failed to get tools from MCP server: result is null.");
             }
 
             List<Tool> tools = result.tools().stream().map(this::convertToFelTool).collect(Collectors.toList());
 
-            log.info("Successfully retrieved {} tools from MCP server.", tools.size());
-            tools.forEach(tool -> log.info("Tool - Name: {}, Description: {}", tool.getName(), tool.getDescription()));
+            log.info("MCP client [{}] successfully retrieved {} tools.", clientId, tools.size());
+            tools.forEach(tool -> log.debug("Tool - Name: {}, Description: {}", tool.getName(), tool.getDescription()));
             return tools;
         } catch (Exception e) {
-            log.error("Failed to get tools from MCP server: {}", e);
+            log.error("MCP client [{}] failed to get tools: {}", clientId, e);
             throw new IllegalStateException("Failed to get tools from MCP server: " + e.getMessage(), e);
         }
     }
@@ -125,26 +144,41 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public Object callTool(String name, Map<String, Object> arguments) {
-        if (this.closed) {
-            throw new IllegalStateException("The MCP client is closed.");
-        }
-        if (!this.initialized) {
-            throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
-        }
+        ensureReady();
         try {
-            log.info("Calling tool: {} with arguments: {}", name, arguments);
+            log.info("MCP client [{}] calling tool: {} with arguments: {}", clientId, name, arguments);
             McpSchema.CallToolResult result =
                     this.mcpSyncClient.callTool(new McpSchema.CallToolRequest(name, arguments));
 
             if (result == null) {
-                log.error("Failed to call tool '{}': result is null.", name);
+                log.error("MCP client [{}] failed to call tool '{}': result is null.", clientId, name);
                 throw new IllegalStateException("Failed to call tool '" + name + "': result is null.");
             }
             return processToolResult(result, name);
         } catch (Exception e) {
-            log.error("Failed to call tool '{}' from MCP server.", name, e);
+            log.error("MCP client [{}] failed to call tool '{}': {}", clientId, name, e);
             throw new IllegalStateException("Failed to call tool '" + name + "': " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Builds an error message from tool result content.
+     *
+     * @param name The name of the tool that was called.
+     * @param content The content list from the tool result.
+     * @return The formatted error message.
+     */
+    private String buildToolErrorMessage(String name, List<McpSchema.Content> content) {
+        String errorMsg = "Tool '" + name + "' returned an error";
+        if (content != null && !content.isEmpty()) {
+            McpSchema.Content errorContent = content.get(0);
+            if (errorContent instanceof McpSchema.TextContent textContent) {
+                errorMsg += ": " + textContent.text();
+            } else {
+                errorMsg += ": " + errorContent;
+            }
+        }
+        return errorMsg;
     }
 
     /**
@@ -160,33 +194,25 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     private Object processToolResult(McpSchema.CallToolResult result, String name) {
         if (result.isError() != null && result.isError()) {
-            String errorMsg = "Tool '" + name + "' returned an error";
-            if (result.content() != null && !result.content().isEmpty()) {
-                Object errorContent = result.content().get(0);
-                if (errorContent instanceof McpSchema.TextContent textContent) {
-                    errorMsg += ": " + textContent.text();
-                } else {
-                    errorMsg += ": " + errorContent;
-                }
-            }
-            log.error(errorMsg);
+            String errorMsg = buildToolErrorMessage(name, result.content());
+            log.error("MCP client [{}]: {}", clientId, errorMsg);
             throw new IllegalStateException(errorMsg);
         }
 
         if (result.content() == null || result.content().isEmpty()) {
-            log.warn("Tool '{}' returned empty content.", name);
+            log.warn("MCP client [{}] tool '{}' returned empty content.", clientId, name);
             return null;
         }
 
         Object content = result.content().get(0);
         if (content instanceof McpSchema.TextContent textContent) {
-            log.info("Successfully called tool '{}', result: {}", name, textContent.text());
+            log.info("MCP client [{}] successfully called tool '{}', result: {}", clientId, name, textContent.text());
             return textContent.text();
         } else if (content instanceof McpSchema.ImageContent imageContent) {
-            log.info("Successfully called tool '{}', returned image content.", name);
+            log.info("MCP client [{}] successfully called tool '{}', returned image content.", clientId, name);
             return imageContent;
         } else {
-            log.info("Successfully called tool '{}', content type: {}", name, content.getClass().getSimpleName());
+            log.info("MCP client [{}] successfully called tool '{}', content type: {}", clientId, name, content.getClass().getSimpleName());
             return content;
         }
     }
@@ -198,9 +224,10 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public void close() throws IOException {
+        ensureNotClosed();
         this.closed = true;
         this.mcpSyncClient.closeGracefully();
-        log.info("MCP client closed.");
+        log.info("MCP client [{}] closed.", clientId);
     }
 
     /**
@@ -229,5 +256,28 @@ public class DefaultMcpStreamableClient implements McpClient {
         }
 
         return tool;
+    }
+
+    /**
+     * Ensures the MCP client is not closed.
+     *
+     * @throws IllegalStateException if the client is closed.
+     */
+    private void ensureNotClosed() {
+        if (this.closed) {
+            throw new IllegalStateException("The MCP client is closed.");
+        }
+    }
+
+    /**
+     * Ensures the MCP client is ready for operations (not closed and initialized).
+     *
+     * @throws IllegalStateException if the client is closed or not initialized.
+     */
+    private void ensureReady() {
+        ensureNotClosed();
+        if (!this.initialized) {
+            throw new IllegalStateException("MCP client is not initialized. Please wait a moment.");
+        }
     }
 }
