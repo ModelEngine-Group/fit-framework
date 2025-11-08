@@ -67,6 +67,47 @@ build/
 
 ### Unix/Linux/macOS 使用方法
 
+#### 初始化新项目
+
+使用 `init` 命令可以快速创建一个新的 FIT 项目（脚手架功能）：
+
+```bash
+./fit init <project-name> [options]
+```
+
+**选项：**
+- `--group-id=<id>`: Maven Group ID（默认：com.example）
+- `--artifact-id=<id>`: Maven Artifact ID（默认：项目名称）
+- `--package=<name>`: Java 包名（默认：groupId.artifactId）
+
+**示例：**
+
+```bash
+# 交互式创建项目（会提示输入信息）
+./fit init my-app
+
+# 使用命令行参数创建项目
+./fit init my-app --group-id=com.mycompany --artifact-id=my-app --package=com.mycompany.myapp
+```
+
+创建的项目包含：
+- 标准的 Maven 项目结构
+- FIT 框架依赖配置
+- 示例启动类（Application.java）
+- 示例控制器（HelloController.java）
+- 示例领域模型（Message.java）
+- README.md 和 .gitignore 文件
+
+创建后即可进入项目目录，编译并运行：
+
+```bash
+cd my-app
+mvn clean install
+./fit start
+```
+
+访问 http://localhost:8080/hello 测试应用。
+
 #### 启动应用
 
 ```bash
@@ -115,6 +156,10 @@ Debug 模式会自动添加以下 JVM 参数：
 使用 `fit.cmd` 命令：
 
 ```cmd
+# 初始化新项目
+fit.cmd init my-app
+fit.cmd init my-app --group-id=com.mycompany --artifact-id=my-app
+
 # 启动应用
 fit.cmd start
 
