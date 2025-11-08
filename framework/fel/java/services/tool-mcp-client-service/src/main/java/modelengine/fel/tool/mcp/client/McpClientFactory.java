@@ -37,7 +37,8 @@ public interface McpClientFactory {
      * @param loggingConsumer The consumer to handle logging messages from the MCP server.
      * @return The connected {@link McpClient} instance with custom logging consumer but without elicitation ability.
      */
-    McpClient create(String baseUri, String sseEndpoint, Consumer<McpSchema.LoggingMessageNotification> loggingConsumer);
+    McpClient create(String baseUri, String sseEndpoint,
+            Consumer<McpSchema.LoggingMessageNotification> loggingConsumer);
 
     /**
      * Creates a {@link McpClient} instance with default logging consumer and elicitation ability.
@@ -47,7 +48,8 @@ public interface McpClientFactory {
      * @param elicitationHandler The function to handle elicitation requests from the MCP server.
      * @return The connected {@link McpClient} instance with default logging consumer and elicitation ability.
      */
-    McpClient create(String baseUri, String sseEndpoint, Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler);
+    McpClient create(String baseUri, String sseEndpoint,
+            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler);
 
     /**
      * Creates a {@link McpClient} instance with custom message handlers and elicitation ability.

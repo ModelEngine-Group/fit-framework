@@ -31,6 +31,8 @@ public class DefaultMcpClientMessageHandler {
      * @param notification The {@link McpSchema.LoggingMessageNotification} containing the log level and data.
      */
     public static void defaultLoggingMessageHandler(McpSchema.LoggingMessageNotification notification) {
-        log.info("[Client] log: {}-{}", notification.level(), notification.data());
+        log.info("Received logging message from MCP server. [level={}, data={}]",
+                notification.level(),
+                notification.data());
     }
 }

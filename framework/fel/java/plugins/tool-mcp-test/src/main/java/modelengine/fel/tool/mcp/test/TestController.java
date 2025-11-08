@@ -6,6 +6,7 @@
 
 package modelengine.fel.tool.mcp.test;
 
+import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.McpClientFactory;
 import modelengine.fel.tool.mcp.entity.Tool;
@@ -15,8 +16,10 @@ import modelengine.fit.http.annotation.RequestBody;
 import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestQuery;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.log.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,8 @@ import java.util.Map;
 @Component
 @RequestMapping(path = "/mcp-test")
 public class TestController {
+    private static final Logger log = Logger.get(TestController.class);
+
     private final McpClientFactory mcpClientFactory;
     private McpClient client;
 
@@ -43,10 +48,12 @@ public class TestController {
     }
 
     /**
-     * Initializes the MCP client by creating an instance using the provided factory and initializing it.
-     * This method sets up the connection to the MCP server and prepares it for further interactions.
+     * Initializes the MCP client with default settings (default logging, no elicitation).
+     * This method creates an instance using the provided factory and initializes it.
      *
-     * @return A string indicating that the initialization was successful.
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return A map with clientId and status message.
      */
     @PostMapping(path = "/initialize")
     public String initialize(@RequestQuery(name = "baseUri") String baseUri,
@@ -54,6 +61,55 @@ public class TestController {
         this.client = this.mcpClientFactory.create(baseUri, sseEndpoint);
         this.client.initialize();
         return "Initialized";
+    }
+
+    /**
+     * Initializes the MCP client with custom logging consumer but without elicitation.
+     * This demonstrates using a custom logging handler.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return A string indicating that the initialization was successful.
+     */
+    @PostMapping(path = "/initialize-with-log")
+    public String initializeWithCustomLogging(@RequestQuery(name = "baseUri") String baseUri,
+            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
+        this.client = this.mcpClientFactory.create(baseUri, sseEndpoint, this::loggingConsumer);
+        this.client.initialize();
+        return "Initialized with custom logging";
+    }
+
+    /**
+     * Initializes the MCP client with elicitation capability.
+     * This demonstrates enabling elicitation with default logging.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return A string indicating that the initialization was successful.
+     */
+    @PostMapping(path = "/initialize-with-elicitation")
+    public String initializeWithElicitation(@RequestQuery(name = "baseUri") String baseUri,
+            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
+        this.client = this.mcpClientFactory.create(baseUri, sseEndpoint, this::elicitationHandler);
+        this.client.initialize();
+        return "Initialized with elicitation";
+    }
+
+    /**
+     * Initializes the MCP client with both custom logging and elicitation.
+     * This demonstrates full customization of the client.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return A string indicating that the initialization was successful.
+     */
+    @PostMapping(path = "/initialize-full")
+    public String initializeFullCustom(@RequestQuery(name = "baseUri") String baseUri,
+            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
+        this.client =
+                this.mcpClientFactory.create(baseUri, sseEndpoint, this::loggingConsumer, this::elicitationHandler);
+        this.client.initialize();
+        return "Initialized with full customization";
     }
 
     /**
@@ -94,5 +150,29 @@ public class TestController {
     @PostMapping(path = "/tools/call")
     public Object toolsCall(@RequestQuery(name = "name") String name, @RequestBody Map<String, Object> jsonArgs) {
         return this.client.callTool(name, jsonArgs);
+    }
+
+    /**
+     * Custom logging consumer for MCP client.
+     *
+     * @param notification The logging message notification from MCP server.
+     */
+    private void loggingConsumer(McpSchema.LoggingMessageNotification notification) {
+        log.info("Custom logging handler received message. [level={}, data={}]",
+                notification.level(),
+                notification.data());
+    }
+
+    /**
+     * Elicitation handler for MCP client.
+     *
+     * @param request The elicitation request from MCP server.
+     * @return The elicitation result with action and user data.
+     */
+    private McpSchema.ElicitResult elicitationHandler(McpSchema.ElicitRequest request) {
+        log.info("Elicitation request received. [message={}, schema={}]", request.message(), request.requestedSchema());
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("response", "Auto-accepted by test controller");
+        return new McpSchema.ElicitResult(McpSchema.ElicitResult.Action.ACCEPT, userData);
     }
 }

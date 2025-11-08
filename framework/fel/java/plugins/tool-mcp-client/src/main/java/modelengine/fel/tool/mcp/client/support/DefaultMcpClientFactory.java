@@ -41,13 +41,18 @@ public class DefaultMcpClientFactory implements McpClientFactory {
     }
 
     @Override
-    public McpClient create(String baseUri, String sseEndpoint, Consumer<McpSchema.LoggingMessageNotification> loggingConsumer) {
+    public McpClient create(String baseUri, String sseEndpoint,
+            Consumer<McpSchema.LoggingMessageNotification> loggingConsumer) {
         return create(baseUri, sseEndpoint, loggingConsumer, null);
     }
 
     @Override
-    public McpClient create(String baseUri, String sseEndpoint, Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler) {
-        return create(baseUri, sseEndpoint, DefaultMcpClientMessageHandler::defaultLoggingMessageHandler, elicitationHandler);
+    public McpClient create(String baseUri, String sseEndpoint,
+            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler) {
+        return create(baseUri,
+                sseEndpoint,
+                DefaultMcpClientMessageHandler::defaultLoggingMessageHandler,
+                elicitationHandler);
     }
 
     @Override
