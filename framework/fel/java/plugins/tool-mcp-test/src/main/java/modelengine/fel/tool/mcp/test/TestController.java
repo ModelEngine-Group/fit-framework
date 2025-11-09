@@ -15,7 +15,6 @@ import modelengine.fit.http.annotation.RequestBody;
 import modelengine.fit.http.annotation.RequestMapping;
 import modelengine.fit.http.annotation.RequestQuery;
 import modelengine.fitframework.annotation.Component;
-import modelengine.fitframework.log.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,8 +30,6 @@ import java.util.Map;
 @Component
 @RequestMapping(path = "/mcp-test")
 public class TestController {
-    private static final Logger log = Logger.get(TestController.class);
-
     private final McpClientFactory mcpClientFactory;
     private McpClient client;
 
