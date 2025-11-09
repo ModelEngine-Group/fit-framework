@@ -6,14 +6,10 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
-import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.McpClientFactory;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Value;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Represents a factory for creating instances of the {@link DefaultMcpStreamableClient}.
@@ -37,32 +33,6 @@ public class DefaultMcpClientFactory implements McpClientFactory {
 
     @Override
     public McpClient create(String baseUri, String sseEndpoint) {
-        return create(baseUri, sseEndpoint, DefaultMcpClientMessageHandler::defaultLoggingMessageHandler, null);
-    }
-
-    @Override
-    public McpClient create(String baseUri, String sseEndpoint,
-            Consumer<McpSchema.LoggingMessageNotification> loggingConsumer) {
-        return create(baseUri, sseEndpoint, loggingConsumer, null);
-    }
-
-    @Override
-    public McpClient create(String baseUri, String sseEndpoint,
-            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler) {
-        return create(baseUri,
-                sseEndpoint,
-                DefaultMcpClientMessageHandler::defaultLoggingMessageHandler,
-                elicitationHandler);
-    }
-
-    @Override
-    public McpClient create(String baseUri, String sseEndpoint,
-            Consumer<McpSchema.LoggingMessageNotification> loggingConsumer,
-            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler) {
-        return new DefaultMcpStreamableClient(baseUri,
-                sseEndpoint,
-                requestTimeoutSeconds,
-                loggingConsumer,
-                elicitationHandler);
+        return new DefaultMcpStreamableClient(baseUri, sseEndpoint, requestTimeoutSeconds);
     }
 }

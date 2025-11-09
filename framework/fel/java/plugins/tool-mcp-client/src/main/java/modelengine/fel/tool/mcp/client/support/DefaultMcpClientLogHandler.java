@@ -7,12 +7,7 @@
 package modelengine.fel.tool.mcp.client.support;
 
 import io.modelcontextprotocol.spec.McpSchema;
-import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.log.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
 
 /**
  * Handles MCP client messages received from MCP server,
@@ -21,17 +16,28 @@ import java.util.Scanner;
  * @author 黄可欣
  * @since 2025-11-03
  */
-@Component
-public class DefaultMcpClientMessageHandler {
-    private static final Logger log = Logger.get(DefaultMcpClientMessageHandler.class);
+public class DefaultMcpClientLogHandler {
+    private static final Logger log = Logger.get(DefaultMcpClientLogHandler.class);
+    private final String clientId;
+
+    /**
+     * Constructs a new instance of DefaultMcpClientLogHandler.
+     *
+     * @param clientId The unique identifier of the MCP client.
+     */
+    public DefaultMcpClientLogHandler(String clientId) {
+        this.clientId = clientId;
+    }
 
     /**
      * Handles logging messages received from the MCP server.
+     * Includes the client UUID in the log message for tracking.
      *
      * @param notification The {@link McpSchema.LoggingMessageNotification} containing the log level and data.
      */
-    public static void defaultLoggingMessageHandler(McpSchema.LoggingMessageNotification notification) {
-        log.info("Received logging message from MCP server. [level={}, data={}]",
+    public void handleLoggingMessage(McpSchema.LoggingMessageNotification notification) {
+        log.info("Received logging message from MCP server. [clientId={}, level={}, data={}]",
+                this.clientId,
                 notification.level(),
                 notification.data());
     }

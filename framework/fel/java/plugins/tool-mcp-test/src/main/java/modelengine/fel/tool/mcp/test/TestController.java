@@ -48,7 +48,7 @@ public class TestController {
     }
 
     /**
-     * Initializes the MCP client with default settings (default logging, no elicitation).
+     * Initializes the MCP client .
      * This method creates an instance using the provided factory and initializes it.
      *
      * @param baseUri The base URI of the MCP server.
@@ -61,55 +61,6 @@ public class TestController {
         this.client = this.mcpClientFactory.create(baseUri, sseEndpoint);
         this.client.initialize();
         return "Initialized";
-    }
-
-    /**
-     * Initializes the MCP client with custom logging consumer but without elicitation.
-     * This demonstrates using a custom logging handler.
-     *
-     * @param baseUri The base URI of the MCP server.
-     * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return A string indicating that the initialization was successful.
-     */
-    @PostMapping(path = "/initialize-with-log")
-    public String initializeWithCustomLogging(@RequestQuery(name = "baseUri") String baseUri,
-            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
-        this.client = this.mcpClientFactory.create(baseUri, sseEndpoint, this::loggingConsumer);
-        this.client.initialize();
-        return "Initialized with custom logging";
-    }
-
-    /**
-     * Initializes the MCP client with elicitation capability.
-     * This demonstrates enabling elicitation with default logging.
-     *
-     * @param baseUri The base URI of the MCP server.
-     * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return A string indicating that the initialization was successful.
-     */
-    @PostMapping(path = "/initialize-with-elicitation")
-    public String initializeWithElicitation(@RequestQuery(name = "baseUri") String baseUri,
-            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
-        this.client = this.mcpClientFactory.create(baseUri, sseEndpoint, this::elicitationHandler);
-        this.client.initialize();
-        return "Initialized with elicitation";
-    }
-
-    /**
-     * Initializes the MCP client with both custom logging and elicitation.
-     * This demonstrates full customization of the client.
-     *
-     * @param baseUri The base URI of the MCP server.
-     * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return A string indicating that the initialization was successful.
-     */
-    @PostMapping(path = "/initialize-full")
-    public String initializeFullCustom(@RequestQuery(name = "baseUri") String baseUri,
-            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
-        this.client =
-                this.mcpClientFactory.create(baseUri, sseEndpoint, this::loggingConsumer, this::elicitationHandler);
-        this.client.initialize();
-        return "Initialized with full customization";
     }
 
     /**

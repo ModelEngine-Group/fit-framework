@@ -6,11 +6,6 @@
 
 package modelengine.fel.tool.mcp.client;
 
-import io.modelcontextprotocol.spec.McpSchema;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 /**
  * Indicates the factory of {@link McpClient}.
  * <p>
@@ -21,45 +16,11 @@ import java.util.function.Function;
  */
 public interface McpClientFactory {
     /**
-     * Creates a {@link McpClient} instance with default logging consumer but without elicitation ability.
+     * Creates a {@link McpClient} instance.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return The connected {@link McpClient} instance with default logging consumer but without elicitation ability.
+     * @return The connected {@link McpClient} instance.
      */
     McpClient create(String baseUri, String sseEndpoint);
-
-    /**
-     * Creates a {@link McpClient} instance with custom logging consumer but without elicitation ability.
-     *
-     * @param baseUri The base URI of the MCP server.
-     * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @param loggingConsumer The consumer to handle logging messages from the MCP server.
-     * @return The connected {@link McpClient} instance with custom logging consumer but without elicitation ability.
-     */
-    McpClient create(String baseUri, String sseEndpoint,
-            Consumer<McpSchema.LoggingMessageNotification> loggingConsumer);
-
-    /**
-     * Creates a {@link McpClient} instance with default logging consumer and elicitation ability.
-     *
-     * @param baseUri The base URI of the MCP server.
-     * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @param elicitationHandler The function to handle elicitation requests from the MCP server.
-     * @return The connected {@link McpClient} instance with default logging consumer and elicitation ability.
-     */
-    McpClient create(String baseUri, String sseEndpoint,
-            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler);
-
-    /**
-     * Creates a {@link McpClient} instance with custom message handlers and elicitation ability.
-     *
-     * @param baseUri The base URI of the MCP server.
-     * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @param loggingConsumer The consumer to handle logging messages from the MCP server.
-     * @param elicitationHandler The function to handle elicitation requests from the MCP server.
-     * @return The connected {@link McpClient} instance with custom message handlers and elicitation ability.
-     */
-    McpClient create(String baseUri, String sseEndpoint, Consumer<McpSchema.LoggingMessageNotification> loggingConsumer,
-            Function<McpSchema.ElicitRequest, McpSchema.ElicitResult> elicitationHandler);
 }
