@@ -259,20 +259,22 @@ public class AssistantController {
    ```bash
    cd examples/fit-example/08-nacos-complicated-apps/app-default-weather
    mvn clean package
-   java -jar target/app-default-weather-1.0-SNAPSHOT.jar
+   java -jar target/nacos-default-weather-for-complicated-1.0-SNAPSHOT.jar
    ```
 
 3. **启动服务消费者**：
    ```bash
    cd examples/fit-example/08-nacos-complicated-apps/app-assistant
    mvn clean package
-   java -jar target/app-assistant-1.0-SNAPSHOT.jar
+   java -jar target/nacos-assistant-for-complicated-1.0-SNAPSHOT.jar
    ```
 
 4. **测试服务调用**：
    ```bash
    curl http://localhost:8080/weather
    ```
+   
+5. 打开nacos控制台，点击左边命名空间，添加ID为`local`的命名空间，即可看到服务注册信息。
 
 #### 依赖配置
 
