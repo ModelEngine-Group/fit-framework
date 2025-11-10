@@ -18,7 +18,7 @@ import time
 import traceback
 from multiprocessing import Process
 from queue import Empty
-from threading import Thread
+from threading import Thread, Lock
 from typing import List
 
 from fitframework import const
@@ -36,6 +36,9 @@ _FAIL_COUNT = 0
 _LAST_HEART_BEAT_SUCCESS_TIME = time.time()
 # 心跳进程是否意外退出
 _HEART_BEAT_EXIT_UNEXPECTEDLY = False
+# 是否正在关闭中（用于区分正常关闭和意外退出）
+_SHUTDOWN_IN_PROGRESS = False
+_SHUTDOWN_LOCK = Lock()
 
 
 @value('heart-beat.client.sceneType', "fit-registry")
@@ -130,8 +133,15 @@ def _heart_beat_task(queue: multiprocessing.Queue):
 def _heart_beat_monitor(heart_beat_background_job):
     while heart_beat_background_job.is_alive():
         time.sleep(1)
-    global _HEART_BEAT_EXIT_UNEXPECTEDLY
-    _HEART_BEAT_EXIT_UNEXPECTEDLY = True
+    global _HEART_BEAT_EXIT_UNEXPECTEDLY, _SHUTDOWN_IN_PROGRESS, _SHUTDOWN_LOCK
+    # 检查是否正在关闭中
+    with _SHUTDOWN_LOCK:
+        if _SHUTDOWN_IN_PROGRESS:
+            # 如果是正常关闭，心跳任务退出是预期的，不需要再次调用shutdown
+            sys_plugin_logger.info("heart beat job exited during graceful shutdown, no action needed.")
+            return
+        # 如果不是正常关闭，则认为是意外退出
+        _HEART_BEAT_EXIT_UNEXPECTEDLY = True
     sys_plugin_logger.error("heart beat job is not alive, runtime should shutdown immediately.")
     # 添加延迟，给进程重启机制一些时间
     time.sleep(2)
@@ -157,7 +167,11 @@ def online() -> None:
 @register_event(Fit_Event.FRAMEWORK_STOPPING)
 def offline():
     """ Runtime关闭前应主动向心跳代理申请offline，心跳代理停止发送heartbeat并调用心跳服务端leave接口 """
+    global _SHUTDOWN_IN_PROGRESS, _SHUTDOWN_LOCK
     sys_plugin_logger.info("heart beat agent offline")
+    # 设置关闭标志，表示正在正常关闭
+    with _SHUTDOWN_LOCK:
+        _SHUTDOWN_IN_PROGRESS = True
     _HEART_BEAT_FINISH_QUEUE.put(None)
 
 
