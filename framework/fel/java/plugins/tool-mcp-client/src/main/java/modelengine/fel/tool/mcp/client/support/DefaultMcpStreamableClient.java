@@ -31,6 +31,9 @@ import java.util.stream.Collectors;
 /**
  * A default implementation of the MCP client that uses the MCP SDK's streamable HTTP transport.
  *
+ * <p><b>Not thread-safe:</b> This class is <b>not thread-safe</b>. External synchronization is required
+ * if instances are to be accessed by multiple threads concurrently.
+ *
  * @author 黄可欣
  * @since 2025-11-03
  */
@@ -83,7 +86,7 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public void initialize() {
-        ensureNotClosed();
+        this.ensureNotClosed();
         this.mcpSyncClient.initialize();
         this.initialized = true;
         log.info("MCP client initialized successfully. [clientId={}]", this.clientId);
@@ -98,7 +101,7 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public List<Tool> getTools() {
-        ensureReady();
+        this.ensureReady();
         try {
             McpSchema.ListToolsResult result = this.mcpSyncClient.listTools();
             if (result == null || result.tools() == null) {
@@ -133,7 +136,7 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     @Override
     public Object callTool(String name, Map<String, Object> arguments) {
-        ensureReady();
+        this.ensureReady();
         try {
             log.info("Calling tool. [clientId={}, name={}, arguments={}]", this.clientId, name, arguments);
             McpSchema.CallToolResult result =
@@ -144,7 +147,7 @@ public class DefaultMcpStreamableClient implements McpClient {
                 throw new IllegalStateException(StringUtils.format("Failed to call tool: result is null. [name={0}]",
                         name));
             }
-            return processToolResult(result, name);
+            return this.processToolResult(result, name);
         } catch (Exception e) {
             log.error("Failed to call tool. [clientId={}, name={}, error={}]", this.clientId, name, e.getMessage());
             throw new IllegalStateException(StringUtils.format("Failed to call tool. [name={0}, error={1}]",
@@ -166,7 +169,7 @@ public class DefaultMcpStreamableClient implements McpClient {
      */
     private Object processToolResult(McpSchema.CallToolResult result, String name) {
         if (result.isError() != null && result.isError()) {
-            String errorDetails = extractErrorDetails(result.content());
+            String errorDetails = this.extractErrorDetails(result.content());
             log.error("Tool returned an error. [clientId={}, name={}, details={}]", this.clientId, name, errorDetails);
             throw new IllegalStateException(StringUtils.format("Tool returned an error. [name={0}, details={1}]",
                     name,
@@ -200,11 +203,14 @@ public class DefaultMcpStreamableClient implements McpClient {
     /**
      * Closes the MCP client connection and releases associated resources.
      *
+     * <p><b>Note:</b> This method is <b>not thread-safe</b>. Callers should ensure that this method
+     * is not invoked concurrently from multiple threads.
+     *
      * @throws IOException if an I/O error occurs during the close operation.
      */
     @Override
     public void close() throws IOException {
-        ensureNotClosed();
+        this.ensureNotClosed();
         this.closed = true;
         this.mcpSyncClient.closeGracefully();
         log.info("MCP client closed. [clientId={}]", this.clientId);
@@ -256,7 +262,7 @@ public class DefaultMcpStreamableClient implements McpClient {
      * @throws IllegalStateException if the client is closed or not initialized.
      */
     private void ensureReady() {
-        ensureNotClosed();
+        this.ensureNotClosed();
         if (!this.initialized) {
             throw new IllegalStateException(StringUtils.format("MCP client is not initialized. [clientId={0}]",
                     this.clientId));
