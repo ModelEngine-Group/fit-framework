@@ -180,16 +180,6 @@ def heart_beat_exit_unexpectedly() -> bool:
     pass
 
 
-def determine_should_terminate_main() -> bool:
-    try:
-        return heart_beat_exit_unexpectedly() or get_should_terminate_main()
-    except:
-        except_type, except_value, except_traceback = sys.exc_info()
-        fit_logger.warning(f"get should terminate main error, error type: {except_type}, value: {except_value}, "
-                           f"trace back:\n{''.join(traceback.format_tb(except_traceback))}")
-        return False
-
-
 @shutdown_on_error
 @timer
 def main():
@@ -205,7 +195,31 @@ def main():
     fit_logger.info(f"fit framework is now available in version {_FIT_FRAMEWORK_VERSION}.")
     if get_terminate_main_enabled():
         fit_logger.info("terminate main enabled.")
-        while not determine_should_terminate_main():
+        while True:
+            # 明确区分退出原因并打印日志
+            hb_exit = False
+            should_terminate = False
+            try:
+                hb_exit = heart_beat_exit_unexpectedly()
+            except:
+                except_type, except_value, except_traceback = sys.exc_info()
+                fit_logger.warning(f"check heart_beat_exit_unexpectedly error, error type: {except_type}, "
+                                   f"value: {except_value}, trace back:\n"
+                                   f"{''.join(traceback.format_tb(except_traceback))}")
+            try:
+                should_terminate = get_should_terminate_main()
+            except:
+                except_type, except_value, except_traceback = sys.exc_info()
+                fit_logger.warning(f"check get_should_terminate_main error, error type: {except_type}, "
+                                   f"value: {except_value}, trace back:\n"
+                                   f"{''.join(traceback.format_tb(except_traceback))}")
+            if hb_exit:
+                fit_logger.warning("main process will exit due to heartbeat background job exited unexpectedly.")
+                break
+            if should_terminate:
+                # 详细原因已在 terminate_main 插件内部按条件分别打印，这里汇总打印一次
+                fit_logger.info("main process will exit due to terminate-main condition matched.")
+                break
             time.sleep(1)
         fit_logger.info("main process terminated.")
         shutdown()
