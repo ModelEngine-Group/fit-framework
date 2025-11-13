@@ -36,9 +36,8 @@ import java.util.stream.Collectors;
  * @author 季聿阶
  * @since 2025-05-15
  */
-@Component
-public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserver {
-    private static final Logger log = Logger.get(DefaultMcpStreamableServer.class);
+public class DefaultMcpServer implements McpServer, ToolChangedObserver {
+    private static final Logger log = Logger.get(DefaultMcpServer.class);
     private final McpSyncServer mcpSyncServer;
 
     private final ToolExecuteService toolExecuteService;
@@ -50,7 +49,7 @@ public class DefaultMcpStreamableServer implements McpServer, ToolChangedObserve
      * @param toolExecuteService The service used to execute tools when handling tool call requests.
      * @throws IllegalArgumentException If {@code toolExecuteService} is null.
      */
-    public DefaultMcpStreamableServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
+    public DefaultMcpServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
         this.mcpSyncServer = mcpSyncServer;
     }
