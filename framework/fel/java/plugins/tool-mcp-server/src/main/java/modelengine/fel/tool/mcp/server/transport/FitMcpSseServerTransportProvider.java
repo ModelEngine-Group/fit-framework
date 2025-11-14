@@ -29,6 +29,7 @@ import modelengine.fit.http.server.HttpClassicServerRequest;
 import modelengine.fit.http.server.HttpClassicServerResponse;
 import modelengine.fitframework.flowable.Choir;
 import modelengine.fitframework.flowable.Emitter;
+import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.log.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -74,8 +75,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * maintains its own SSE connection.
  *
  * @author 黄可欣
- * @since 2025-11-10
  * @see McpServerTransportProvider
+ * @since 2025-11-10
  */
 public class FitMcpSseServerTransportProvider implements McpServerTransportProvider {
     private static final Logger logger = Logger.get(FitMcpSseServerTransportProvider.class);
@@ -198,7 +199,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      * the server is shutting down or the connection fails
      */
     @GetMapping(path = SSE_ENDPOINT)
-    private Object handleSseConnection(HttpClassicServerRequest request, HttpClassicServerResponse response) {
+    public Object handleSseConnection(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             return Entity.createText(response, "Server is shutting down");
@@ -209,7 +210,8 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         try {
             return Choir.<TextEvent>create(emitter -> {
                 this.addEmitterObserver(emitter, sessionId);
-                FitMcpSessionTransport sessionTransport = new FitMcpSessionTransport(sessionId, emitter);
+                FitSseMcpSessionTransport sessionTransport =
+                        new FitSseMcpSessionTransport(sessionId, emitter, response);
                 McpServerSession session = sessionFactory.create(sessionTransport);
                 this.sessions.put(sessionId, session);
 
@@ -246,7 +248,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      * with error details in case of failures
      */
     @PostMapping(path = MESSAGE_ENDPOINT)
-    private Object handleMessage(HttpClassicServerRequest request, HttpClassicServerResponse response,
+    public Object handleMessage(HttpClassicServerRequest request, HttpClassicServerResponse response,
             @RequestParam("sessionId") String sessionId) {
         if (this.isClosing) {
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
@@ -258,12 +260,14 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         }
 
         McpServerSession session = this.sessions.get(sessionId);
-        logger.info("[POST] Receiving delete request. [sessionId={}]", sessionId);
         try {
             final McpTransportContext transportContext = this.contextExtractor.extract(request);
 
             String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
             McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(jsonMapper, requestBody);
+            logger.info("[POST] Receiving message from session. [sessionId={}, requestBody={}]",
+                    sessionId,
+                    requestBody);
             session.handle(message).contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext)).block();
             response.statusCode(HttpResponseStatus.OK.statusCode());
             return null;
@@ -289,26 +293,16 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
 
             @Override
             public void onCompleted() {
-                logger.info("[SSE] Completed SSE emitting. [sessionId={}]", sessionId);
-                try {
-                    FitMcpSseServerTransportProvider.this.sessions.remove(sessionId);
-                } catch (Exception e) {
-                    logger.warn("[SSE] Error closing listeningStream on complete. [sessionId={}, error={}]",
-                            sessionId,
-                            e.getMessage());
-                }
+                FitMcpSseServerTransportProvider.this.sessions.remove(sessionId);
+                logger.info("[SSE] Completed SSE emitting and closed session successfully. [sessionId={}]", sessionId);
             }
 
             @Override
             public void onFailed(Exception cause) {
-                logger.warn("[SSE] SSE failed. [sessionId={}, cause={}]", sessionId, cause.getMessage());
-                try {
-                    FitMcpSseServerTransportProvider.this.sessions.remove(sessionId);
-                } catch (Exception e) {
-                    logger.warn("[SSE] Error closing listeningStream on failure. [sessionId={}, error={}]",
-                            sessionId,
-                            e.getMessage());
-                }
+                FitMcpSseServerTransportProvider.this.sessions.remove(sessionId);
+                logger.warn("[SSE] SSE failed, session closed. [sessionId={}, cause={}]",
+                        sessionId,
+                        cause.getMessage());
             }
         });
     }
@@ -342,9 +336,10 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      * Implementation of McpServerTransport for WebMVC SSE sessions. This class handles
      * the transport-level communication for a specific client session.
      */
-    private class FitMcpSessionTransport implements McpServerTransport {
+    private class FitSseMcpSessionTransport implements McpServerTransport {
         private final String sessionId;
         private final Emitter<TextEvent> emitter;
+        private final HttpClassicServerResponse response;
 
         /**
          * Lock to ensure thread-safe access to the SSE builder when sending messages.
@@ -358,9 +353,10 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
          * @param sessionId The unique identifier for this session
          * @param emitter The emitter for sending events
          */
-        FitMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter) {
+        FitSseMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter, HttpClassicServerResponse response) {
             this.sessionId = sessionId;
             this.emitter = emitter;
+            this.response = response;
             logger.info("[SSE] Building SSE emitter. [sessionId={}]", sessionId);
         }
 
@@ -374,14 +370,27 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         public Mono<Void> sendMessage(McpSchema.JSONRPCMessage message) {
             return Mono.fromRunnable(() -> {
                 sseBuilderLock.lock();
+                // Check if connection is still active before sending
+                if (!this.response.isActive()) {
+                    logger.warn("[SSE] Connection inactive detected while sending message. [sessionId={}]",
+                            this.sessionId);
+                    this.close();
+                    return;
+                }
+
                 try {
                     String jsonText = jsonMapper.writeValueAsString(message);
                     TextEvent textEvent =
                             TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
                     this.emitter.emit(textEvent);
-                    FitMcpSseServerTransportProvider.logger.debug("Message sent to session {}", this.sessionId);
+                    logger.info("[SSE] Sending message to session. [sessionId={}, jsonText={}]",
+                            this.sessionId,
+                            jsonText);
                 } catch (Exception e) {
-                    logger.error("Failed to send message to session {}: {}", sessionId, e.getMessage());
+                    logger.error("[SSE] Failed to send message to session. [sessionId={}, error={}]",
+                            this.sessionId,
+                            e.getMessage(),
+                            e);
                     this.emitter.fail(e);
                 } finally {
                     sseBuilderLock.unlock();
@@ -409,18 +418,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
          */
         @Override
         public Mono<Void> closeGracefully() {
-            return Mono.fromRunnable(() -> {
-                logger.debug("Closing session transport: {}", sessionId);
-                sseBuilderLock.lock();
-                try {
-                    this.emitter.complete();
-                    logger.debug("Successfully completed SSE builder for session {}", sessionId);
-                } catch (Exception e) {
-                    logger.warn("Failed to complete SSE builder for session {}: {}", sessionId, e.getMessage());
-                } finally {
-                    sseBuilderLock.unlock();
-                }
-            });
+            return Mono.fromRunnable(FitMcpSseServerTransportProvider.FitSseMcpSessionTransport.this::close);
         }
 
         /**
@@ -429,11 +427,14 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         @Override
         public void close() {
             sseBuilderLock.lock();
+            logger.debug("[SSE] Closing session transport. [sessionId={}]", sessionId);
             try {
                 this.emitter.complete();
-                logger.debug("Successfully completed SSE builder for session {}", sessionId);
+                logger.info("[SSE] Closed SSE builder successfully. [sessionId={}]", sessionId);
             } catch (Exception e) {
-                logger.warn("Failed to complete SSE builder for session {}: {}", sessionId, e.getMessage());
+                logger.warn("[SSE] Failed to complete SSE builder. [sessionId={}, error={}]",
+                        sessionId,
+                        e.getMessage());
             } finally {
                 sseBuilderLock.unlock();
             }
@@ -513,6 +514,8 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
          * @throws IllegalStateException if jsonMapper or messageEndpoint is not set
          */
         public FitMcpSseServerTransportProvider build() {
+            Validation.notNull(this.jsonMapper, "jsonMapper must be set");
+
             return new FitMcpSseServerTransportProvider(
                     this.jsonMapper == null ? McpJsonMapper.getDefault() : this.jsonMapper,
                     this.keepAliveInterval,

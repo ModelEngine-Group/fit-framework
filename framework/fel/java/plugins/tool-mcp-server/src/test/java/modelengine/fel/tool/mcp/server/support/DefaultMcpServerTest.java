@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import io.modelcontextprotocol.server.McpSyncServer;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
+import modelengine.fel.tool.mcp.server.config.McpSseServerConfig;
 import modelengine.fel.tool.mcp.server.config.McpStreamableServerConfig;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.util.MapBuilder;
@@ -37,13 +38,18 @@ import java.util.Map;
 @DisplayName("Unit tests for DefaultMcpServer")
 public class DefaultMcpServerTest {
     private ToolExecuteService toolExecuteService;
-    private McpSyncServer mcpSyncServer;
+    private McpSyncServer mcpSyncSseServer;
+    private McpSyncServer mcpStreamableSyncServer;
 
     @BeforeEach
     void setup() {
         this.toolExecuteService = mock(ToolExecuteService.class);
-        McpStreamableServerConfig config = new McpStreamableServerConfig();
-        this.mcpSyncServer = config.mcpSyncStreamableServer(config.fitMcpStreamableServerTransportProvider(), 10);
+        McpSseServerConfig sseConfig = new McpSseServerConfig();
+        this.mcpSyncSseServer = sseConfig.mcpSyncSseServer(sseConfig.fitMcpSseServerTransportProvider(), 10);
+        McpStreamableServerConfig streamableConfig = new McpStreamableServerConfig();
+        this.mcpStreamableSyncServer =
+                streamableConfig.mcpSyncStreamableServer(streamableConfig.fitMcpStreamableServerTransportProvider(),
+                        10);
     }
 
     @Nested
@@ -53,7 +59,7 @@ public class DefaultMcpServerTest {
         @DisplayName("Should throw IllegalArgumentException when toolExecuteService is null")
         void throwIllegalArgumentExceptionWhenToolExecuteServiceIsNull() {
             IllegalArgumentException exception = catchThrowableOfType(IllegalArgumentException.class,
-                    () -> new DefaultMcpServer(null, mcpSyncServer));
+                    () -> new DefaultMcpServer(null, mcpSyncSseServer, mcpStreamableSyncServer));
             assertThat(exception).isNotNull().hasMessage("The tool execute service cannot be null.");
         }
     }
@@ -64,7 +70,8 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should notify observers when tools are added or removed")
         void notifyObserversOnToolAddOrRemove() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            DefaultMcpServer server =
+                    new DefaultMcpServer(toolExecuteService, mcpSyncSseServer, mcpStreamableSyncServer);
             McpServer.ToolsChangedObserver observer = mock(McpServer.ToolsChangedObserver.class);
             server.registerToolsChangedObserver(observer);
 
@@ -87,7 +94,8 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should add tool successfully with valid parameters")
         void addToolSuccessfully() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            DefaultMcpServer server =
+                    new DefaultMcpServer(toolExecuteService, mcpSyncSseServer, mcpStreamableSyncServer);
             String name = "tool1";
             String description = "description1";
             Map<String, Object> schema = MapBuilder.<String, Object>get()
@@ -110,7 +118,8 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should ignore invalid parameters and not add any tool")
         void ignoreInvalidParameters() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            DefaultMcpServer server =
+                    new DefaultMcpServer(toolExecuteService, mcpSyncSseServer, mcpStreamableSyncServer);
             Map<String, Object> schema = MapBuilder.<String, Object>get()
                     .put("type", "object")
                     .put("properties", Collections.emptyMap())
@@ -134,7 +143,8 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should remove an added tool correctly")
         void removeToolSuccessfully() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            DefaultMcpServer server =
+                    new DefaultMcpServer(toolExecuteService, mcpSyncSseServer, mcpStreamableSyncServer);
             Map<String, Object> schema = MapBuilder.<String, Object>get()
                     .put("type", "object")
                     .put("properties", Collections.emptyMap())
@@ -150,7 +160,8 @@ public class DefaultMcpServerTest {
         @Test
         @DisplayName("Should ignore removal if name is blank")
         void ignoreBlankName() {
-            DefaultMcpServer server = new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+            DefaultMcpServer server =
+                    new DefaultMcpServer(toolExecuteService, mcpSyncSseServer, mcpStreamableSyncServer);
             Map<String, Object> schema = MapBuilder.<String, Object>get()
                     .put("type", "object")
                     .put("properties", Collections.emptyMap())
