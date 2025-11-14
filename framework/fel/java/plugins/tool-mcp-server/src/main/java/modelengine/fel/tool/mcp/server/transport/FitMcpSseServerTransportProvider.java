@@ -148,13 +148,14 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
             return Mono.empty();
         }
 
-        logger.debug("Attempting to broadcast message to {} active sessions", sessions.size());
+        logger.debug("Attempting to broadcast message. [activeSessions={}]", sessions.size());
 
         return Flux.fromIterable(sessions.values())
                 .flatMap(session -> session.sendNotification(method, params)
-                        .doOnError(e -> logger.error("Failed to send message to session {}: {}",
+                        .doOnError(e -> logger.error("Failed to send message to session. [sessionId={}, error={}]",
                                 session.getId(),
-                                e.getMessage()))
+                                e.getMessage(),
+                                e))
                         .onErrorComplete())
                 .then();
     }
@@ -173,7 +174,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
     public Mono<Void> closeGracefully() {
         return Flux.fromIterable(sessions.values()).doFirst(() -> {
             this.isClosing = true;
-            logger.debug("Initiating graceful shutdown with {} active sessions", sessions.size());
+            logger.debug("Initiating graceful shutdown. [activeSessions={}]", sessions.size());
         }).flatMap(McpServerSession::closeGracefully).then().doOnSuccess(v -> {
             logger.debug("Graceful shutdown completed");
             sessions.clear();
@@ -206,7 +207,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         }
 
         String sessionId = UUID.randomUUID().toString();
-        logger.debug("Creating new SSE connection for session: {}", sessionId);
+        logger.debug("Creating new SSE connection. [sessionId={}]", sessionId);
         try {
             return Choir.<TextEvent>create(emitter -> {
                 this.addEmitterObserver(emitter, sessionId);
@@ -223,7 +224,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
                     logger.info("[SSE] Sending init data to session. [sessionId={}, initData={}]", sessionId, initData);
 
                 } catch (Exception e) {
-                    logger.error("Failed to send initial endpoint event: {}", e.getMessage());
+                    logger.error("Failed to send initial endpoint event. [error={}]", e.getMessage(), e);
                     emitter.fail(e);
                 }
             });
