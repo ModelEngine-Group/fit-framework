@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 /**
  * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
- * with MCP Server Bean {@link McpSyncServer}.
+ * with two MCP Server {@link McpSyncServer} Bean for SSE Server and Streamable Server.
  *
  * @author 季聿阶
  * @since 2025-05-15

@@ -46,7 +46,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default implementation of {@link McpStreamableServerTransportProvider}.
- * The FIT transport provider for MCP Server, according to {@code HttpServletStreamableServerTransportProvider} in MCP
+ * The FIT transport provider for MCP Streamable Server, according to {@code HttpServletStreamableServerTransportProvider} in MCP
  * SDK.
  *
  * @author 黄可欣

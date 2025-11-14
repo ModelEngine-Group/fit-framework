@@ -44,39 +44,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Server-side implementation of the Model Context Protocol (MCP) transport layer using
- * HTTP with Server-Sent Events (SSE) through Spring WebMVC. This implementation provides
- * a bridge between synchronous WebMVC operations and reactive programming patterns to
- * maintain compatibility with the reactive transport interface.
- *
- * <p>
- * Key features:
- * <ul>
- * <li>Implements bidirectional communication using HTTP POST for client-to-server
- * messages and SSE for server-to-client messages</li>
- * <li>Manages client sessions with unique IDs for reliable message delivery</li>
- * <li>Supports graceful shutdown with proper session cleanup</li>
- * <li>Provides JSON-RPC message handling through configured endpoints</li>
- * <li>Includes built-in error handling and logging</li>
- * </ul>
- *
- * <p>
- * The transport operates on two main endpoints:
- * <ul>
- * <li>{@code /sse} - The SSE endpoint where clients establish their event stream
- * connection</li>
- * <li>A configurable message endpoint where clients send their JSON-RPC messages via HTTP
- * POST</li>
- * </ul>
- *
- * <p>
- * This implementation uses {@link ConcurrentHashMap} to safely manage multiple client
- * sessions in a thread-safe manner. Each client session is assigned a unique ID and
- * maintains its own SSE connection.
+ * The default implementation of {@link McpServerTransportProvider}.
+ * The FIT transport provider for MCP SSE Server, according to {@code HttpServletSseServerTransportProvider} in MCP
+ * SDK.
  *
  * @author 黄可欣
- * @see McpServerTransportProvider
- * @since 2025-11-10
+ * @since 2025-09-30
  */
 public class FitMcpSseServerTransportProvider implements McpServerTransportProvider {
     private static final Logger logger = Logger.get(FitMcpSseServerTransportProvider.class);
