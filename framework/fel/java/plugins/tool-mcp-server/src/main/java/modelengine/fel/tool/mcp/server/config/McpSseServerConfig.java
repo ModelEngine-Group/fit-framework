@@ -9,13 +9,13 @@ package modelengine.fel.tool.mcp.server.config;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
-import io.modelcontextprotocol.server.transport.HttpServletSseServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.server.support.DefaultMcpServer;
-import modelengine.fel.tool.mcp.server.transport.FitMcpStreamableServerTransportProvider;
+import modelengine.fel.tool.mcp.server.transport.FitMcpSseServerTransportProvider;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
 
 import java.time.Duration;
@@ -24,21 +24,17 @@ import java.time.Duration;
  * Mcp Server Bean implemented with MCP SDK.
  *
  * @author 黄可欣
- * @since 2025-10-22
+ * @since 2025-11-10
  */
 @Component
 public class McpSseServerConfig {
     @Bean
-    public HttpServletSseServerTransportProvider httpServletSseServerTransportProvider() {
-        return HttpServletSseServerTransportProvider.builder()
-                .jsonMapper(McpJsonMapper.getDefault())
-                .messageEndpoint("/mcp/message")
-                .sseEndpoint("/mcp/sse")
-                .build();
+    public FitMcpSseServerTransportProvider fitMcpSseServerTransportProvider() {
+        return FitMcpSseServerTransportProvider.builder().jsonMapper(McpJsonMapper.getDefault()).build();
     }
 
     @Bean("McpSyncSseServer")
-    public McpSyncServer mcpSyncSseServer(HttpServletSseServerTransportProvider transportProvider,
+    public McpSyncServer mcpSyncSseServer(FitMcpSseServerTransportProvider transportProvider,
             @Value("${mcp.server.request.timeout-seconds}") int requestTimeoutSeconds) {
         return McpServer.sync(transportProvider)
                 .serverInfo("FIT Store MCP Server", "3.6.1-SNAPSHOT")
@@ -48,7 +44,8 @@ public class McpSseServerConfig {
     }
 
     @Bean("DefaultMcpSseServer")
-    public DefaultMcpServer defaultMcpSseServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
+    public DefaultMcpServer defaultMcpSseServer(ToolExecuteService toolExecuteService,
+            @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncServer) {
         return new DefaultMcpServer(toolExecuteService, mcpSyncServer);
     }
 }

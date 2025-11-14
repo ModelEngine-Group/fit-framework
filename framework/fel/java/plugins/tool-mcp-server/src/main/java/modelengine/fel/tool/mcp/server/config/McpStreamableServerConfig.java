@@ -9,13 +9,13 @@ package modelengine.fel.tool.mcp.server.config;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
-import io.modelcontextprotocol.server.transport.HttpServletSseServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.server.support.DefaultMcpServer;
 import modelengine.fel.tool.mcp.server.transport.FitMcpStreamableServerTransportProvider;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
 
 import java.time.Duration;
@@ -44,7 +44,8 @@ public class McpStreamableServerConfig {
     }
 
     @Bean("DefaultMcpStreamableServer")
-    public DefaultMcpServer defaultMcpStreamableServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
+    public DefaultMcpServer defaultMcpStreamableServer(ToolExecuteService toolExecuteService,
+            @Fit(alias = "McpSyncStreamableServer") McpSyncServer mcpSyncServer) {
         return new DefaultMcpServer(toolExecuteService, mcpSyncServer);
     }
 }

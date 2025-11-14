@@ -73,8 +73,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * sessions in a thread-safe manner. Each client session is assigned a unique ID and
  * maintains its own SSE connection.
  *
- * @author Christian Tzolov
- * @author Alexandros Pappas
+ * @author 黄可欣
+ * @since 2025-11-10
  * @see McpServerTransportProvider
  */
 public class FitMcpSseServerTransportProvider implements McpServerTransportProvider {
