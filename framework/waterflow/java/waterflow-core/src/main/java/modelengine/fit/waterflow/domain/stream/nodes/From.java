@@ -7,6 +7,7 @@
 package modelengine.fit.waterflow.domain.stream.nodes;
 
 import static modelengine.fit.waterflow.ErrorCodes.FLOW_ENGINE_INVALID_MANUAL_TASK;
+import static modelengine.fit.waterflow.ErrorCodes.FLOW_ENGINE_INVALID_NODE_ID;
 
 import modelengine.fit.waterflow.domain.context.FlatMapSourceWindow;
 import modelengine.fit.waterflow.domain.context.FlatMapWindow;
@@ -503,6 +504,17 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         repo.save(afterList);
         repo.save(preList);
         return afterList;
+    }
+
+    /**
+     * 通过订阅节点Id查找订阅节点
+     *
+     * @param nodeId 节点Id
+     * @return 订阅节点
+     */
+    public To<I, Object> getSubscriber(String nodeId) {
+        return ObjectUtils.cast(findNode(this, nodeId)
+                .orElseThrow(() -> new WaterflowException(FLOW_ENGINE_INVALID_NODE_ID, nodeId)));
     }
 
     /**
