@@ -34,6 +34,7 @@ import modelengine.fit.waterflow.domain.stream.reactive.Subscription;
 import modelengine.fit.waterflow.domain.utils.FlowExecutors;
 import modelengine.fit.waterflow.domain.utils.IdGenerator;
 import modelengine.fit.waterflow.domain.utils.Identity;
+import modelengine.fit.waterflow.domain.utils.PriorityThreadPool;
 import modelengine.fit.waterflow.domain.utils.SleepUtil;
 import modelengine.fit.waterflow.domain.utils.UUIDUtil;
 import modelengine.fit.waterflow.exceptions.WaterflowException;
@@ -658,7 +659,7 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
         this.globalBeforeHandler.process(new ToCallback<>(contexts));
     }
 
-    private synchronized void updateConcurrency(int newConcurrency) {
+    public synchronized void updateConcurrency(int newConcurrency) {
         this.curConcurrency += newConcurrency;
     }
 
@@ -1063,22 +1064,19 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                     .collect(Collectors.toList());
         }
 
-        private <T1, R1> void submit(ProcessType type, To<T1, R1> to, List<FlowContext<T1>> ready,
+        public <T1, R1> void submit(ProcessType type, To<T1, R1> to, List<FlowContext<T1>> ready,
                 FlowExecutors.ConcurrencyHolder concurrencyHolder) {
-            FlowExecutors.getThreadPool().execute(Task.builder().runnable(() -> {
-                to.onProcess(type, ready, true);
-                concurrencyHolder.release();
-            }).buildDisposable());
-
-            // FlowExecutors.getThreadPool(StringUtils.join(Constant.STREAM_ID_SEPARATOR, to.streamId, to.id),
-            //                 MAX_CONCURRENCY)
-            //         .submit(PriorityThreadPool.PriorityTask.builder()
-            //                 .priority(PriorityThreadPool.PriorityTask.PriorityInfo.builder()
-            //                         .order(to.order)
-            //                         .createTime(System.currentTimeMillis())
-            //                         .build())
-            //                 .runner(() -> to.onProcess(ready))
-            //                 .build());
+            FlowExecutors.getThreadPool()
+                    .submit(PriorityThreadPool.PriorityTask.builder()
+                            .priority(PriorityThreadPool.PriorityTask.PriorityInfo.builder()
+                                    .order(to.order)
+                                    .createTime(System.currentTimeMillis())
+                                    .build())
+                            .runner(() -> {
+                                to.onProcess(type, ready, true);
+                                concurrencyHolder.release();
+                            })
+                            .build());
         }
 
         private <T1, R1> void handleProcessConcurrentConflict(To<T1, R1> to) {
