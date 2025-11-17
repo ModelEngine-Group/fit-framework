@@ -1,17 +1,50 @@
-# FitMcpStreamableServerTransportProvider类维护文档
+# MCP Server 插件维护文档
 
 ## 文档概述
 
-本文档用于记录 `FitMcpStreamableServerTransportProvider` 类的设计、实现细节以及维护更新指南。该类是基于 MCP SDK 中的
-`HttpServletStreamableServerTransportProvider` 类改造而来，用于在 FIT 框架中提供 MCP（Model Context Protocol）服务端的传输层实现。
-
-**原始参考类**: MCP SDK 中的 `HttpServletStreamableServerTransportProvider`
+本文档用于记录 MCP Server 插件的设计、实现细节以及维护更新指南。该插件基于 MCP SDK 改造而来，用于在 FIT 框架中提供 MCP（Model Context Protocol）服务端的传输层实现。
 
 **创建时间**: 2025-11-04
 
 ---
 
-## 类的作用和职责
+## 架构概览
+
+### DefaultMcpServer 的双 Bean 管理
+
+`DefaultMcpServer` 是 MCP Server 的核心实现类，它同时管理两个 MCP 同步服务器 Bean：
+
+1. **McpSyncSseServer** - 用于 SSE (Server-Sent Events) 传输
+2. **McpSyncStreamableServer** - 用于 Streamable 传输
+
+这两个 Bean 分别由 `McpSseServerConfig` 和 `McpStreamableServerConfig` 配置类创建，并通过 `@Fit(alias = "...")` 注解进行区分注入：
+
+```java
+// McpSseServerConfig.java
+@Bean("McpSyncSseServer")
+public McpSyncServer mcpSyncSseServer(...) { ... }
+
+// McpStreamableServerConfig.java
+@Bean("McpSyncStreamableServer")
+public McpSyncServer mcpSyncStreamableServer(...) { ... }
+
+// DefaultMcpServer.java
+public DefaultMcpServer(ToolExecuteService toolExecuteService,
+        @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncSseServer,
+        @Fit(alias = "McpSyncStreamableServer") McpSyncServer mcpSyncStreamableServer) {
+    ...
+}
+```
+
+`DefaultMcpServer` 实现了 `McpServer` 和 `ToolChangedObserver` 接口，负责：
+- 统一管理两个传输类型的工具注册和移除
+- 确保两个 MCP 同步服务器保持工具列表同步
+- 处理工具执行请求并返回结果
+- 通知工具变更观察者
+
+---
+
+## FitMcpStreamableServerTransportProvider 类的作用和职责
 
 `FitMcpStreamableServerTransportProvider` 是 MCP 服务端传输层的核心实现类，负责：
 
@@ -306,6 +339,45 @@ if(!this.response.isActive()){
     return;
 }
 ```
+
+---
+
+## FitMcpSseServerTransportProvider 简要说明
+
+`FitMcpSseServerTransportProvider` 是基于 MCP SDK 中的 `HttpServletSseServerTransportProvider` 改造而来的 FIT 框架实现，用于提供 MCP SSE 传输层。
+
+### 与 Streamable 的主要区别
+
+`FitMcpSseServerTransportProvider` 的实现与 `FitMcpStreamableServerTransportProvider` 非常相似，主要区别在于：
+
+1. **端点路径**：
+   - SSE: `/mcp/sse` (GET) 和 `/mcp/message` (POST)
+   - Streamable: `/mcp/streamable` (GET/POST/DELETE)
+
+2. **协议版本支持**：
+   - SSE: 仅支持 `MCP_2024_11_05`
+   - Streamable: 支持 `MCP_2024_11_05`、`MCP_2025_03_26`、`MCP_2025_06_18`
+
+3. **请求处理**：
+   - SSE: GET 请求用于建立 SSE 连接，POST 请求用于发送 JSON-RPC 消息
+   - Streamable: GET 请求用于建立 SSE 连接或重放消息，POST 请求处理初始化和其他 JSON-RPC 消息，DELETE 请求用于删除会话
+
+4. **会话管理**：
+   - SSE: 使用 `McpServerSession`，会话通过 GET 请求建立
+   - Streamable: 使用 `McpStreamableServerSession`，会话通过 POST 初始化请求建立
+
+### 核心改造点
+
+与 Streamable 版本类似，SSE 版本也进行了以下 FIT 框架改造：
+
+- 使用 `HttpClassicServerRequest` 和 `HttpClassicServerResponse` 替代 Servlet API
+- 使用 `Choir<TextEvent>` 和 `Emitter<TextEvent>` 实现 SSE 事件流
+- 使用 FIT 的 HTTP 注解 (`@GetMapping`, `@PostMapping`) 处理请求
+- 使用 `Entity.createText()` 和 `Entity.createObject()` 创建响应
+
+详细的实现细节可以参考 `FitMcpStreamableServerTransportProvider` 的相关章节。
+
+---
 
 ## 参考资源
 
