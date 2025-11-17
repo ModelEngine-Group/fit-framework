@@ -47,7 +47,6 @@ public class ConditionsNode<I> extends Node<I, I> {
             processor.process(i);
             return i.getData();
         }, repo, messenger, locks, () -> initFrom(streamId, repo, messenger, locks));
-        super.id = "condition:" + UUIDUtil.uuid();
     }
 
     /**
