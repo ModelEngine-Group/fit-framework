@@ -55,9 +55,6 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
     private static final Logger logger = Logger.get(FitMcpSseServerTransportProvider.class);
     private static final String MESSAGE_ENDPOINT = "/mcp/message";
     private static final String SSE_ENDPOINT = "/mcp/sse";
-    /**
-     * Event type for sending the message endpoint URI to clients.
-     */
     public static final String ENDPOINT_EVENT_TYPE = "endpoint";
 
     private final McpJsonMapper jsonMapper;
@@ -94,11 +91,21 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         }
     }
 
+    /**
+     * Returns the list of supported MCP protocol versions.
+     *
+     * @return A list of supported protocol version strings
+     */
     @Override
     public List<String> protocolVersions() {
         return List.of(ProtocolVersions.MCP_2024_11_05);
     }
 
+    /**
+     * Sets the session factory used to create new MCP server sessions.
+     *
+     * @param sessionFactory The factory for creating server sessions
+     */
     @Override
     public void setSessionFactory(McpServerSession.Factory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -162,15 +169,15 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      * establishing an SSE connection. This method:
      * <ul>
      * <li>Generates a unique session ID</li>
-     * <li>Creates a new session with a FitMcpSessionTransport</li>
-     * <li>Sends an initial endpoint event to inform the client where to send
-     * messages</li>
+     * <li>Creates a new session with a {@link FitSseMcpSessionTransport}</li>
+     * <li>Sends an initial endpoint event to inform the client where to send messages</li>
      * <li>Maintains the session in the sessions map</li>
      * </ul>
      *
      * @param request The incoming server request
-     * @return A ServerResponse configured for SSE communication, or an error response if
-     * the server is shutting down or the connection fails
+     * @param response The HTTP response for SSE communication
+     * @return A {@link Choir}{@code <}{@link TextEvent}{@code >} object for SSE streaming,
+     * or an error response if the server is shutting down or the connection fails
      */
     @GetMapping(path = SSE_ENDPOINT)
     public Object handleSseConnection(HttpClassicServerRequest request, HttpClassicServerResponse response) {
@@ -212,14 +219,16 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
     /**
      * Handles incoming JSON-RPC messages from clients. This method:
      * <ul>
+     * <li>Validates the session ID from the request parameter</li>
      * <li>Deserializes the request body into a JSON-RPC message</li>
      * <li>Processes the message through the session's handle method</li>
      * <li>Returns appropriate HTTP responses based on the processing result</li>
      * </ul>
      *
      * @param request The incoming server request containing the JSON-RPC message
-     * @return A ServerResponse indicating success (200 OK) or appropriate error status
-     * with error details in case of failures
+     * @param response The HTTP response to set status code and return data
+     * @param sessionId The session ID from the request parameter
+     * @return An error {@link Entity} if validation fails, or {@code null} on success
      */
     @PostMapping(path = MESSAGE_ENDPOINT)
     public Object handleMessage(HttpClassicServerRequest request, HttpClassicServerResponse response,
@@ -258,6 +267,14 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         }
     }
 
+    /**
+     * Adds an observer to the SSE emitter to handle connection lifecycle events.
+     * The observer removes the session from the sessions map when the connection
+     * completes or fails.
+     *
+     * @param emitter The SSE emitter to observe
+     * @param sessionId The session ID associated with this emitter
+     */
     private void addEmitterObserver(Emitter<TextEvent> emitter, String sessionId) {
         emitter.observe(new Emitter.Observer<TextEvent>() {
             @Override
@@ -307,8 +324,13 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
     }
 
     /**
-     * Implementation of McpServerTransport for WebMVC SSE sessions. This class handles
-     * the transport-level communication for a specific client session.
+     * Implementation of {@link McpServerTransport} for FIT SSE sessions.
+     * This class handles the transport-level communication for a specific client session.
+     *
+     * <p>
+     * This class is thread-safe and uses a {@link ReentrantLock} to synchronize access to the
+     * underlying SSE emitter to prevent race conditions when multiple threads attempt to
+     * send messages concurrently.
      */
     private class FitSseMcpSessionTransport implements McpServerTransport {
         private final String sessionId;
@@ -316,16 +338,17 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         private final HttpClassicServerResponse response;
 
         /**
-         * Lock to ensure thread-safe access to the SSE builder when sending messages.
+         * Lock to ensure thread-safe access to the SSE emitter when sending messages.
          * This prevents concurrent modifications that could lead to corrupted SSE events.
          */
         private final ReentrantLock sseBuilderLock = new ReentrantLock();
 
         /**
-         * Creates a new session transport with the specified ID and SSE builder.
+         * Creates a new session transport with the specified ID and SSE emitter.
          *
          * @param sessionId The unique identifier for this session
-         * @param emitter The emitter for sending events
+         * @param emitter The emitter for sending SSE events to the client
+         * @param response The HTTP response for checking connection status
          */
         FitSseMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter, HttpClassicServerResponse response) {
             this.sessionId = sessionId;
@@ -336,6 +359,8 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
 
         /**
          * Sends a JSON-RPC message to the client through the SSE connection.
+         * The message is serialized to JSON and sent as an SSE event with type "message".
+         * This method is thread-safe and checks if the connection is still active before sending.
          *
          * @param message The JSON-RPC message to send
          * @return A Mono that completes when the message has been sent
@@ -343,7 +368,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         @Override
         public Mono<Void> sendMessage(McpSchema.JSONRPCMessage message) {
             return Mono.fromRunnable(() -> {
-                sseBuilderLock.lock();
+                this.sseBuilderLock.lock();
                 // Check if connection is still active before sending
                 if (!this.response.isActive()) {
                     logger.warn("[SSE] Connection inactive detected while sending message. [sessionId={}]",
@@ -367,7 +392,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
                             e);
                     this.emitter.fail(e);
                 } finally {
-                    sseBuilderLock.unlock();
+                    this.sseBuilderLock.unlock();
                 }
             });
         }
@@ -397,20 +422,21 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
 
         /**
          * Closes the transport immediately.
+         * Completes the SSE emitter and releases any associated resources.
          */
         @Override
         public void close() {
-            sseBuilderLock.lock();
-            logger.debug("[SSE] Closing session transport. [sessionId={}]", sessionId);
+            this.sseBuilderLock.lock();
+            logger.debug("[SSE] Closing session transport. [sessionId={}]", this.sessionId);
             try {
                 this.emitter.complete();
-                logger.info("[SSE] Closed SSE builder successfully. [sessionId={}]", sessionId);
+                logger.info("[SSE] Closed SSE builder successfully. [sessionId={}]", this.sessionId);
             } catch (Exception e) {
                 logger.warn("[SSE] Failed to complete SSE builder. [sessionId={}, error={}]",
-                        sessionId,
+                        this.sessionId,
                         e.getMessage());
             } finally {
-                sseBuilderLock.unlock();
+                this.sseBuilderLock.unlock();
             }
         }
 

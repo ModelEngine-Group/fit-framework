@@ -18,7 +18,7 @@ import modelengine.fitframework.annotation.Value;
 import java.time.Duration;
 
 /**
- * Mcp Server Bean implemented with MCP SDK.
+ * MCP Streamable Server Bean implemented with MCP SDK.
  *
  * @author 黄可欣
  * @since 2025-10-22

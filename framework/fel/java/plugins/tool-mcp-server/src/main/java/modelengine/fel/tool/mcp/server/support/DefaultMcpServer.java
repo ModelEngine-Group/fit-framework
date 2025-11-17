@@ -49,8 +49,9 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     /**
      * Constructs a new instance of the DefaultMcpServer class.
      *
-     * @param toolExecuteService The service used to execute tools when handling tool call requests.
-     * @throws IllegalArgumentException If {@code toolExecuteService} is null.
+     * @param toolExecuteService The service used to execute tools when handling tool call requests
+     * @param mcpSyncSseServer The MCP sync server for SSE transport
+     * @param mcpSyncStreamableServer The MCP sync server for Streamable transport
      */
     public DefaultMcpServer(ToolExecuteService toolExecuteService,
             @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncSseServer,
@@ -122,17 +123,11 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
 
     /**
      * Creates a tool specification for the MCP server.
-     * <p>
-     * This method constructs a {@link McpServerFeatures.SyncToolSpecification} that includes:
-     * <ul>
-     *     <li>Tool metadata (name, description, input schema)</li>
-     *     <li>Call handler that executes the tool and handles exceptions</li>
-     * </ul>
      *
-     * @param name The name of the tool.
-     * @param description The description of the tool.
-     * @param parameters The parameter schema containing type, properties, and required fields.
-     * @return A fully configured {@link McpServerFeatures.SyncToolSpecification}.
+     * @param name The name of the tool
+     * @param description The description of the tool
+     * @param parameters The parameter schema containing type, properties, and required fields
+     * @return A configured {@link McpServerFeatures.SyncToolSpecification}
      */
     private McpServerFeatures.SyncToolSpecification createToolSpecification(String name, String description,
             Map<String, Object> parameters) {
@@ -152,16 +147,10 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
 
     /**
      * Executes a tool and handles any exceptions that may occur.
-     * <p>
-     * This method handles two types of exceptions:
-     * <ul>
-     *     <li>{@link IllegalArgumentException}: Invalid tool arguments (logged as warning)</li>
-     *     <li>{@link Exception}: Any other execution failure (logged as error)</li>
-     * </ul>
      *
-     * @param toolName The name of the tool to execute.
-     * @param request The tool call request containing arguments.
-     * @return A {@link McpSchema.CallToolResult} with the execution result or error message.
+     * @param toolName The name of the tool to execute
+     * @param request The tool call request containing arguments
+     * @return A {@link McpSchema.CallToolResult} with the execution result or error message
      */
     private McpSchema.CallToolResult executeToolWithErrorHandling(String toolName, McpSchema.CallToolRequest request) {
         try {
