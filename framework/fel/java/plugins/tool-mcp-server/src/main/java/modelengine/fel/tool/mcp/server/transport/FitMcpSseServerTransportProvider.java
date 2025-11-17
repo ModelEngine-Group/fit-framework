@@ -116,14 +116,14 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      */
     @Override
     public Mono<Void> notifyClients(String method, Object params) {
-        if (sessions.isEmpty()) {
+        if (this.sessions.isEmpty()) {
             logger.debug("No active sessions to broadcast message to");
             return Mono.empty();
         }
 
-        logger.debug("Attempting to broadcast message. [activeSessions={}]", sessions.size());
+        logger.debug("Attempting to broadcast message. [activeSessions={}]", this.sessions.size());
 
-        return Flux.fromIterable(sessions.values())
+        return Flux.fromIterable(this.sessions.values())
                 .flatMap(session -> session.sendNotification(method, params)
                         .doOnError(e -> logger.error("Failed to send message to session. [sessionId={}, error={}]",
                                 session.getId(),
@@ -145,12 +145,12 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      */
     @Override
     public Mono<Void> closeGracefully() {
-        return Flux.fromIterable(sessions.values()).doFirst(() -> {
+        return Flux.fromIterable(this.sessions.values()).doFirst(() -> {
             this.isClosing = true;
-            logger.debug("Initiating graceful shutdown. [activeSessions={}]", sessions.size());
+            logger.debug("Initiating graceful shutdown. [activeSessions={}]", this.sessions.size());
         }).flatMap(McpServerSession::closeGracefully).then().doOnSuccess(v -> {
             logger.debug("Graceful shutdown completed");
-            sessions.clear();
+            this.sessions.clear();
             if (this.keepAliveScheduler != null) {
                 this.keepAliveScheduler.shutdown();
             }
@@ -186,7 +186,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
                 this.addEmitterObserver(emitter, sessionId);
                 FitSseMcpSessionTransport sessionTransport =
                         new FitSseMcpSessionTransport(sessionId, emitter, response);
-                McpServerSession session = sessionFactory.create(sessionTransport);
+                McpServerSession session = this.sessionFactory.create(sessionTransport);
                 this.sessions.put(sessionId, session);
 
                 try {
@@ -203,7 +203,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
             });
         } catch (Exception e) {
             logger.error("[GET] Failed to handle GET request. [sessionId={}, error={}]", sessionId, e.getMessage(), e);
-            sessions.remove(sessionId);
+            this.sessions.remove(sessionId);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return null;
         }
@@ -228,7 +228,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             return Entity.createText(response, "Server is shutting down");
         }
-        Object sessionError = validateRequestSessionId(sessionId, response);
+        Object sessionError = this.validateRequestSessionId(sessionId, response);
         if (sessionError != null) {
             return sessionError;
         }
@@ -238,7 +238,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
             final McpTransportContext transportContext = this.contextExtractor.extract(request);
 
             String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
-            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(jsonMapper, requestBody);
+            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
             logger.info("[POST] Receiving message from session. [sessionId={}, requestBody={}]",
                     sessionId,
                     requestBody);
@@ -353,7 +353,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
                 }
 
                 try {
-                    String jsonText = jsonMapper.writeValueAsString(message);
+                    String jsonText = FitMcpSseServerTransportProvider.this.jsonMapper.writeValueAsString(message);
                     TextEvent textEvent =
                             TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
                     this.emitter.emit(textEvent);
@@ -382,7 +382,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
          */
         @Override
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
-            return jsonMapper.convertValue(data, typeRef);
+            return FitMcpSseServerTransportProvider.this.jsonMapper.convertValue(data, typeRef);
         }
 
         /**

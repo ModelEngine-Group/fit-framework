@@ -98,7 +98,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         this.contextExtractor = contextExtractor;
 
         if (keepAliveInterval != null) {
-            this.keepAliveScheduler = KeepAliveScheduler.builder(() -> (isClosing)
+            this.keepAliveScheduler = KeepAliveScheduler.builder(() -> (this.isClosing)
                             ? Flux.empty()
                             : Flux.fromIterable(this.sessions.values()))
                     .initialDelay(keepAliveInterval)
@@ -198,13 +198,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             return Entity.createText(response, "Server is shutting down");
         }
 
-        Object headerError = validateGetAcceptHeaders(request, response);
+        Object headerError = this.validateGetAcceptHeaders(request, response);
         if (headerError != null) {
             return headerError;
         }
 
         // Get session ID and session
-        Object sessionError = validateRequestSessionId(request, response);
+        Object sessionError = this.validateRequestSessionId(request, response);
         if (sessionError != null) {
             return sessionError;
         }
@@ -220,9 +220,9 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
                 // Handle building SSE, and check if this is a replay request
                 if (request.headers().contains(HttpHeaders.LAST_EVENT_ID)) {
-                    handleReplaySseRequest(request, transportContext, sessionId, session, sessionTransport, emitter);
+                    FitMcpStreamableServerTransportProvider.this.handleReplaySseRequest(request, transportContext, sessionId, session, sessionTransport, emitter);
                 } else {
-                    handleEstablishSseRequest(sessionId, session, sessionTransport, emitter);
+                    FitMcpStreamableServerTransportProvider.this.handleEstablishSseRequest(sessionId, session, sessionTransport, emitter);
                 }
             });
         } catch (Exception e) {
@@ -245,7 +245,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
             return Entity.createText(response, "Server is shutting down");
         }
-        Object headerError = validatePostAcceptHeaders(request, response);
+        Object headerError = this.validatePostAcceptHeaders(request, response);
         if (headerError != null) {
             return headerError;
         }
@@ -253,15 +253,15 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         McpTransportContext transportContext = this.contextExtractor.extract(request);
         try {
             String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
-            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(jsonMapper, requestBody);
+            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
 
             // Handle JSONRPCMessage
             if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest && jsonrpcRequest.method()
                     .equals(McpSchema.METHOD_INITIALIZE)) {
                 logger.info("[POST] Handling initialize method. [requestBody={}]", requestBody);
-                return handleInitializeRequest(request, response, jsonrpcRequest);
+                return this.handleInitializeRequest(request, response, jsonrpcRequest);
             } else {
-                return handleJsonRpcMessage(message, request, requestBody, transportContext, response);
+                return this.handleJsonRpcMessage(message, request, requestBody, transportContext, response);
             }
         } catch (IllegalArgumentException | IOException e) {
             logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
@@ -295,7 +295,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         }
 
         // Get session ID and session
-        Object sessionError = validateRequestSessionId(request, response);
+        Object sessionError = this.validateRequestSessionId(request, response);
         if (sessionError != null) {
             return sessionError;
         }
@@ -484,7 +484,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     private Object handleInitializeRequest(HttpClassicServerRequest request, HttpClassicServerResponse response,
             McpSchema.JSONRPCRequest jsonrpcRequest) {
         McpSchema.InitializeRequest initializeRequest =
-                jsonMapper.convertValue(jsonrpcRequest.params(), new TypeRef<McpSchema.InitializeRequest>() {});
+                this.jsonMapper.convertValue(jsonrpcRequest.params(), new TypeRef<McpSchema.InitializeRequest>() {});
         McpStreamableServerSession.McpStreamableServerSessionInit init =
                 this.sessionFactory.startSession(initializeRequest);
         this.sessions.put(init.session().getId(), init.session());
@@ -519,7 +519,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     private Object handleJsonRpcMessage(McpSchema.JSONRPCMessage message, HttpClassicServerRequest request,
             String requestBody, McpTransportContext transportContext, HttpClassicServerResponse response) {
         // Get session ID and session
-        Object sessionError = validateRequestSessionId(request, response);
+        Object sessionError = this.validateRequestSessionId(request, response);
         if (sessionError != null) {
             return sessionError;
         }
@@ -528,13 +528,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
         logger.info("[POST] Receiving message from session. [sessionId={}, requestBody={}]", sessionId, requestBody);
 
         if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
-            handleJsonRpcResponse(jsonrpcResponse, session, transportContext, response);
+            this.handleJsonRpcResponse(jsonrpcResponse, session, transportContext, response);
             return null;
         } else if (message instanceof McpSchema.JSONRPCNotification jsonrpcNotification) {
-            handleJsonRpcNotification(jsonrpcNotification, session, transportContext, response);
+            this.handleJsonRpcNotification(jsonrpcNotification, session, transportContext, response);
             return null;
         } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
-            return handleJsonRpcRequest(jsonrpcRequest, session, sessionId, transportContext, response);
+            return this.handleJsonRpcRequest(jsonrpcRequest, session, sessionId, transportContext, response);
         } else {
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return Entity.createObject(response,
@@ -699,7 +699,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
                         return;
                     }
 
-                    String jsonText = jsonMapper.writeValueAsString(message);
+                    String jsonText = FitMcpStreamableServerTransportProvider.this.jsonMapper.writeValueAsString(message);
                     TextEvent textEvent =
                             TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
                     this.emitter.emit(textEvent);
@@ -736,7 +736,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          */
         @Override
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
-            return jsonMapper.convertValue(data, typeRef);
+            return FitMcpStreamableServerTransportProvider.this.jsonMapper.convertValue(data, typeRef);
         }
 
         /**
