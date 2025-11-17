@@ -16,7 +16,6 @@ import io.modelcontextprotocol.spec.McpServerSession;
 import io.modelcontextprotocol.spec.McpServerTransport;
 import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import io.modelcontextprotocol.spec.ProtocolVersions;
-import io.modelcontextprotocol.util.Assert;
 import io.modelcontextprotocol.util.KeepAliveScheduler;
 import modelengine.fel.tool.mcp.entity.Event;
 import modelengine.fit.http.annotation.GetMapping;
@@ -60,7 +59,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
     private final McpJsonMapper jsonMapper;
     private McpServerSession.Factory sessionFactory;
     private final Map<String, McpServerSession> sessions = new ConcurrentHashMap();
-    private McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
+    private final McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
     private volatile boolean isClosing = false;
     private KeepAliveScheduler keepAliveScheduler;
 
@@ -76,8 +75,8 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
      */
     private FitMcpSseServerTransportProvider(McpJsonMapper jsonMapper, Duration keepAliveInterval,
             McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor) {
-        Assert.notNull(jsonMapper, "McpJsonMapper must not be null");
-        Assert.notNull(contextExtractor, "Context extractor must not be null");
+        Validation.notNull(jsonMapper, "McpJsonMapper must not be null");
+        Validation.notNull(contextExtractor, "Context extractor must not be null");
         this.jsonMapper = jsonMapper;
         this.contextExtractor = contextExtractor;
         if (keepAliveInterval != null) {
@@ -195,7 +194,6 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
                         new FitSseMcpSessionTransport(sessionId, emitter, response);
                 McpServerSession session = this.sessionFactory.create(sessionTransport);
                 this.sessions.put(sessionId, session);
-
                 try {
                     String initData = MESSAGE_ENDPOINT + "?sessionId=" + sessionId;
                     TextEvent textEvent =
@@ -241,10 +239,9 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
         if (sessionError != null) {
             return sessionError;
         }
-
         McpServerSession session = this.sessions.get(sessionId);
         try {
-            final McpTransportContext transportContext = this.contextExtractor.extract(request);
+            McpTransportContext transportContext = this.contextExtractor.extract(request);
 
             String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
             McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
@@ -471,7 +468,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
          * @return This builder instance for method chaining
          */
         public Builder jsonMapper(McpJsonMapper jsonMapper) {
-            Assert.notNull(jsonMapper, "McpJsonMapper must not be null");
+            Validation.notNull(jsonMapper, "McpJsonMapper must not be null");
             this.jsonMapper = jsonMapper;
             return this;
         }
@@ -501,7 +498,7 @@ public class FitMcpSseServerTransportProvider implements McpServerTransportProvi
          * @throws IllegalArgumentException if contextExtractor is null
          */
         public Builder contextExtractor(McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor) {
-            Assert.notNull(contextExtractor, "contextExtractor must not be null");
+            Validation.notNull(contextExtractor, "contextExtractor must not be null");
             this.contextExtractor = contextExtractor;
             return this;
         }
