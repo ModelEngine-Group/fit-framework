@@ -180,6 +180,20 @@ def heart_beat_exit_unexpectedly() -> bool:
     pass
 
 
+def _safe_check(checker, desc: str) -> bool:
+    """
+    安全执行checker，异常时打印日志并返回False
+    """
+    try:
+        return checker()
+    except:
+        except_type, except_value, except_traceback = sys.exc_info()
+        fit_logger.warning(f"check {desc} error, error type: {except_type}, "
+                           f"value: {except_value}, trace back:\n"
+                           f"{''.join(traceback.format_tb(except_traceback))}")
+        return False
+
+
 @shutdown_on_error
 @timer
 def main():
@@ -197,22 +211,8 @@ def main():
         fit_logger.info("terminate main enabled.")
         while True:
             # 明确区分退出原因并打印日志
-            hb_exit = False
-            should_terminate = False
-            try:
-                hb_exit = heart_beat_exit_unexpectedly()
-            except:
-                except_type, except_value, except_traceback = sys.exc_info()
-                fit_logger.warning(f"check heart_beat_exit_unexpectedly error, error type: {except_type}, "
-                                   f"value: {except_value}, trace back:\n"
-                                   f"{''.join(traceback.format_tb(except_traceback))}")
-            try:
-                should_terminate = get_should_terminate_main()
-            except:
-                except_type, except_value, except_traceback = sys.exc_info()
-                fit_logger.warning(f"check get_should_terminate_main error, error type: {except_type}, "
-                                   f"value: {except_value}, trace back:\n"
-                                   f"{''.join(traceback.format_tb(except_traceback))}")
+            hb_exit = _safe_check(heart_beat_exit_unexpectedly, "heart_beat_exit_unexpectedly")
+            should_terminate = _safe_check(get_should_terminate_main, "get_should_terminate_main")
             if hb_exit:
                 fit_logger.warning("main process will exit due to heartbeat background job exited unexpectedly.")
                 break
@@ -235,37 +235,27 @@ if __package__ == 'fitframework' and sys.argv[0].find("pytest") == -1:  # 避免
         fit_logger.info(f"Starting process manager with restart policy: {restart_policy.get_status()}")
 
         while True:
+            exit_code = None
             try:
                 main_process = Process(target=main, name='MainProcess')
                 main_process.start()
                 fit_logger.info(f"Main process started with PID: {main_process.pid}")
                 main_process.join()
-
-                # 检查进程退出码
                 exit_code = main_process.exitcode
-                fit_logger.info(f"Main process exited with code: {exit_code}")
-
-                # 使用重启策略判断是否应该重启
-                if not restart_policy.should_restart(exit_code):
-                    fit_logger.info("Restart policy indicates no restart needed, stopping")
-                    break
-
-                # 获取重启延迟
-                restart_delay = restart_policy.get_restart_delay()
-                status = restart_policy.get_status()
-
-                fit_logger.warning(f"Main process exited unexpectedly, restarting in {restart_delay:.2f} seconds... "
-                                   f"(attempt {status['current_attempt']}/{status['max_attempts']})")
-                time.sleep(restart_delay)
-
             except Exception as e:
                 fit_logger.error(f"Error during process management: {e}")
-                if not restart_policy.should_restart(-1):  # 使用-1表示异常退出
-                    fit_logger.error("Restart policy indicates no restart needed due to errors, stopping")
-                    break
+                exit_code = -1
 
-                restart_delay = restart_policy.get_restart_delay()
-                status = restart_policy.get_status()
-                fit_logger.warning(f"Error occurred, restarting in {restart_delay:.2f} seconds... "
-                                   f"(attempt {status['current_attempt']}/{status['max_attempts']})")
-                time.sleep(restart_delay)
+            fit_logger.info(f"Main process exited with code: {exit_code}")
+            # 使用重启策略判断是否应该重启
+            if not restart_policy.should_restart(exit_code):
+                fit_logger.info("Restart policy indicates no restart needed, stopping")
+                break
+
+            # 获取重启延迟
+            restart_delay = restart_policy.get_restart_delay()
+            status = restart_policy.get_status()
+
+            fit_logger.warning(f"Main process exited unexpectedly, restarting in {restart_delay:.2f} seconds... "
+                               f"(attempt {status['current_attempt']}/{status['max_attempts']})")
+            time.sleep(restart_delay)
