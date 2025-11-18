@@ -1,0 +1,54 @@
+name: Anti-Spam Filter
+
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  moderate:
+    if: ${{ github.event.action == 'created' || github.event.action == 'edited' || github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run spam filter
+        uses: actions/github-script@v7
+        env:
+          SPAM_DETECTION_SCRIPT: ${{ secrets.SPAM_DETECTION_SCRIPT }}
+        with:
+          script: |
+            const raw = process.env.SPAM_DETECTION_SCRIPT;
+            
+            if (!raw) {
+              core.warning("SPAM_DETECTION_SCRIPT secret not configured.");
+              return;
+            }
+            
+            try {
+              const factory = eval(raw);  // factory = (module)=> fn
+            
+              if (typeof factory !== "function") {
+                throw new Error("Secret must export (module)=>function");
+              }
+            
+              // 调用工厂函数
+              const detectSpam = factory({});
+            
+              if (typeof detectSpam !== "function") {
+                throw new Error("Factory did not return a function");
+              }
+            
+              await detectSpam(github, context, core);
+            
+            } catch (err) {
+              core.error("Spam filter error: " + err.message);
+            }
