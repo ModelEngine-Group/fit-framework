@@ -17,14 +17,12 @@
               "name" : "location",
               "type" : "string",
               "examples" : [ "Hangzhou" ],
-              "default" : ""
+              "default" : "Shanghai"
             },
             "date" : {
               "description" : "查询日期",
               "name" : "date",
-              "type" : "string",
-              "examples" : [ "" ],
-              "default" : ""
+              "type" : "string"
             },
             "rainPosition" : {
               "description" : "下雨的经纬度",
@@ -38,17 +36,13 @@
                   "type" : "string"
                 }
               },
-              "examples" : [ "" ],
-              "required" : [ "latitude", "longitude" ],
-              "default" : ""
+              "required" : [ "latitude", "longitude" ]
             },
             "info" : {
               "description" : "其他信息",
               "name" : "info",
               "type" : "object",
-              "properties" : { },
-              "examples" : [ "" ],
-              "default" : ""
+              "properties" : { }
             }
           },
           "required" : [ "location", "date" ]
@@ -136,8 +130,7 @@
           "name" : "",
           "description" : "获取今日下雨信息的结果",
           "type" : "string",
-          "convertor" : "",
-          "examples" : [ "" ]
+          "convertor" : ""
         }
       },
       "runnables" : {
@@ -174,8 +167,7 @@
           "name" : "",
           "description" : "获取明日下雨信息的结果",
           "type" : "string",
-          "convertor" : "",
-          "examples" : [ "" ]
+          "convertor" : ""
         }
       },
       "runnables" : {

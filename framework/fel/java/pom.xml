@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework.fel</groupId>
     <artifactId>fel-parent</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>FEL Parent</name>
@@ -53,9 +53,9 @@
         <java.version>17</java.version>
 
         <!-- Framework version -->
-        <fit.version>3.5.4-SNAPSHOT</fit.version>
-        <fel.version>3.5.4-SNAPSHOT</fel.version>
-        <waterflow.version>3.5.4-SNAPSHOT</waterflow.version>
+        <fit.version>3.6.1-SNAPSHOT</fit.version>
+        <fel.version>3.6.1-SNAPSHOT</fel.version>
+        <waterflow.version>3.6.1-SNAPSHOT</waterflow.version>
 
         <!-- Maven plugin versions -->
         <maven.antrun.version>3.1.0</maven.antrun.version>
@@ -67,7 +67,7 @@
         <maven.plugin.version>3.8.2</maven.plugin.version>
         <maven.surefire.version>3.5.3</maven.surefire.version>
         <maven.source.version>3.3.1</maven.source.version>
-        <central-publishing.maven-plugin.version>0.7.0</central-publishing.maven-plugin.version>
+        <central-publishing.maven-plugin.version>0.9.0</central-publishing.maven-plugin.version>
         <jacoco.maven-plugin.version>0.8.13</jacoco.maven-plugin.version>
     </properties>
 

@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework</groupId>
     <artifactId>parent</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

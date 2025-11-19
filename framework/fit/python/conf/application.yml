@@ -18,3 +18,23 @@ terminate-main:
   enabled: false
 local_ip: "localhost"
 context-path: ""
+http:
+  server:
+    enabled: true
+    address:
+      use-random-port: false
+      port: 9666
+      port-to-register:
+      protocol: 2
+      formats:
+        - 1
+        - 2
+registry-center:
+  server:
+    mode: 'DIRECT' # DIRECT 表示直连，直接连接内存注册中心；PROXY 表示代理模式，通过本地代理服务连接 Nacos 注册中心
+    addresses:
+      - "localhost:8080"
+    protocol: 2
+    formats:
+      - 1
+    context-path: ""

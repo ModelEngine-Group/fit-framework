@@ -96,9 +96,9 @@ import java.util.stream.Collectors;
  * @since 2020-08-19
  */
 @Component
-public class RegistryListener implements Registry {
+public class RegistryListener implements Registry, Notify {
     private static final Logger log = Logger.get(RegistryListener.class);
-    private static final String NOTIFY_FITABLE_ID = "347fd33f3cde4aa891614a9e244ae5e8";
+    private static final String NOTIFY_FITABLE_ID = "notify-fitables";
     private static final long INITIAL_DELAY = 10L;
     private static final int BATCH_NUM = 10;
     private static final Pattern CLUSTER_PORT_PATTERN = Pattern.compile("cluster\\.(.*?)\\.port");
@@ -471,7 +471,8 @@ public class RegistryListener implements Registry {
      * @param fitableInstances 表示本地监听的服务地址的更新列表的 {@link List}{@code <}{@link FitableAddressInstance}
      * {@code >}。
      */
-    @Fitable(genericable = "b69df5e8cbcd4166aa5029602e7a58cf", id = NOTIFY_FITABLE_ID)
+    @Override
+    @Fitable(NOTIFY_FITABLE_ID)
     public void notifyFitables(List<FitableAddressInstance> fitableInstances) {
         if (CollectionUtils.isEmpty(fitableInstances)) {
             log.info("Received latest fitable instances, but ignored: no data.");

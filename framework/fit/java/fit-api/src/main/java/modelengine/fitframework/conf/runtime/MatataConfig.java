@@ -37,6 +37,13 @@ public interface MatataConfig {
         String host();
 
         /**
+         * 获取 {@code 'matata.registry.mode'} 的配置项。
+         *
+         * @return 表示 {@code 'matata.registry.mode'} 的配置项的 {@link RegistryConnectMode}。
+         */
+        RegistryConnectMode mode();
+
+        /**
          * 获取 {@code 'matata.registry.port'} 的配置项。
          *
          * @return 表示 {@code 'matata.registry.port'} 的配置项的 {@code int}。

@@ -10,9 +10,9 @@ from numpy import int32, uint32, uint64
 
 class Genericable(object):
 
-    def __init__(self, genericable_id: str, genericable_version: str):
-        self.genericable_id = genericable_id
-        self.genericable_version = genericable_version
+    def __init__(self, genericableId: str, genericableVersion: str):
+        self.genericableId = genericableId
+        self.genericableVersion = genericableVersion
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -28,11 +28,11 @@ class Genericable(object):
 
 class Fitable(object):
 
-    def __init__(self, genericable_id: str, genericable_version: str, fitable_id: str, fitable_version: str):
-        self.genericable_id = genericable_id
-        self.genericable_version = genericable_version
-        self.fitable_id = fitable_id
-        self.fitable_version = fitable_version
+    def __init__(self, genericableId: str, genericableVersion: str, fitableId: str, fitableVersion: str):
+        self.genericableId = genericableId
+        self.genericableVersion = genericableVersion
+        self.fitableId = fitableId
+        self.fitableVersion = fitableVersion
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

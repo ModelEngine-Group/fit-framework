@@ -1,13 +1,14 @@
 <div align="center">
   <img src="docs/resources/fit-logo.png" alt="FIT Logo" width="395">
 
-# FIT Framework v3.5.4-SNAPSHOT
+# FIT Framework v3.6.1-SNAPSHOT
 
 **Java 企业级 AI 开发框架，提供多语言函数引擎（FIT）、流式编排引擎（WaterFlow）及 Java 生态的 LangChain 替代方案（FEL）。原生 /
 Spring 双模运行，支持插件热插拔与智能聚散部署，无缝统一大模型与业务系统。**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/MIT)
 [![JDK](https://img.shields.io/badge/JDK-17-green.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+[![JDK](https://img.shields.io/badge/JDK-21-green.svg)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
 </div>
 
 ----------

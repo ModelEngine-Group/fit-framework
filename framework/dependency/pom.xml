@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework</groupId>
     <artifactId>fit-dependency</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>FIT Dependency Management</name>
@@ -49,7 +49,7 @@
         <java.version>17</java.version>
 
         <!-- FIT version -->
-        <fit.version>3.5.4-SNAPSHOT</fit.version>
+        <fit.version>3.6.1-SNAPSHOT</fit.version>
 
         <!-- Third-party versions -->
         <byte-buddy.version>1.17.6</byte-buddy.version>
@@ -71,7 +71,7 @@
         <maven.gpg.version>3.2.7</maven.gpg.version>
         <maven.javadoc.version>3.11.2</maven.javadoc.version>
         <maven.source.version>3.3.1</maven.source.version>
-        <central-publishing.maven-plugin.version>0.7.0</central-publishing.maven-plugin.version>
+        <central-publishing.maven-plugin.version>0.9.0</central-publishing.maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -201,16 +201,6 @@
             <dependency>
                 <groupId>org.fitframework.extension</groupId>
                 <artifactId>fit-transaction</artifactId>
-                <version>${fit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.fitframework.extension</groupId>
-                <artifactId>fit-validation</artifactId>
-                <version>${fit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.fitframework.extension</groupId>
-                <artifactId>fit-validation-hibernate</artifactId>
                 <version>${fit.version}</version>
             </dependency>
 
@@ -362,7 +352,17 @@
             </dependency>
             <dependency>
                 <groupId>org.fitframework.plugin</groupId>
+                <artifactId>fit-service-coordination-nacos</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.plugin</groupId>
                 <artifactId>fit-service-coordination-simple</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.plugin</groupId>
+                <artifactId>fit-service-discovery</artifactId>
                 <version>${fit.version}</version>
             </dependency>
             <dependency>
@@ -372,7 +372,12 @@
             </dependency>
             <dependency>
                 <groupId>org.fitframework.plugin</groupId>
-                <artifactId>fit-service-discovery</artifactId>
+                <artifactId>fit-validation-hibernate-jakarta</artifactId>
+                <version>${fit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fitframework.plugin</groupId>
+                <artifactId>fit-validation-hibernate-javax</artifactId>
                 <version>${fit.version}</version>
             </dependency>
             <dependency>

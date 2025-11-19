@@ -8,7 +8,6 @@ on:
     paths:
     - 'framework/**'
     - '!framework/python/**'
-    - '!framework/elsa/**'
     - 'examples/**'
   pull_request:
     branches:
@@ -17,7 +16,6 @@ on:
     paths:
       - 'framework/**'
       - '!framework/python/**'
-      - '!framework/elsa/**'
       - 'examples/**'
 
 jobs:

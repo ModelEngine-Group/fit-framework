@@ -26,7 +26,7 @@ from fitframework.api.decorators import fit, fitable, value
 from fitframework.api.decorators import register_event
 from fitframework.api.enums import FrameworkEvent as Fit_Event
 from fitframework.api.logging import sys_plugin_logger
-from .heart_beat_utils import HeartBeatAddress, HeartBeatInfo
+from fit_common_struct.entity import HeartBeatInfo, HeartBeatAddress
 
 # 用于控制心跳任务退出的队列
 _HEART_BEAT_FINISH_QUEUE = multiprocessing.Queue()
@@ -36,9 +36,12 @@ _FAIL_COUNT = 0
 _LAST_HEART_BEAT_SUCCESS_TIME = time.time()
 # 心跳进程是否意外退出
 _HEART_BEAT_EXIT_UNEXPECTEDLY = False
+
 # 是否正在关闭中（用于区分正常关闭和意外退出）
 _SHUTDOWN_IN_PROGRESS = False
 _SHUTDOWN_LOCK = Lock()
+# 上次注册服务的时间，用于避免频繁注册覆盖热加载的服务
+_LAST_REGISTRY_TIME = 0
 
 
 @value('heart-beat.client.sceneType', "fit-registry")
@@ -74,7 +77,7 @@ def get_runtime_worker_id() -> str:
     pass
 
 
-@fit(const.HEART_BEAT_GEN_ID)
+@fit(const.SEND_HEART_BEAT_GEN_ID)
 def heartbeat(beat_info: List[HeartBeatInfo], address: HeartBeatAddress) -> bool:
     """ 可能返回 false，也可能抛出异常，也可能超时 """
     pass
@@ -86,7 +89,7 @@ def shutdown() -> None:
 
 
 def _try_heart_beat_once():
-    global _FAIL_COUNT, _LAST_HEART_BEAT_SUCCESS_TIME
+    global _FAIL_COUNT, _LAST_HEART_BEAT_SUCCESS_TIME, _LAST_REGISTRY_TIME
     try:
         heartbeat([HeartBeatInfo(_scene_type(), _alive_time(), _init_delay())],
                   HeartBeatAddress(get_runtime_worker_id()))
@@ -96,11 +99,27 @@ def _try_heart_beat_once():
             sys_plugin_logger.warning(f"heart beat unstable. "
                                       f"heart_beat_gap={'{:.3f}'.format(heart_beat_gap)}s, "
                                       f"heart_beat_interval={'{:.3f}'.format(_interval() / 1000)}s]")
+
+        # 心跳重连成功后，需要重新注册所有服务，确保服务不丢失
+        # 但为了避免覆盖热加载刚注册的服务，增加时间窗口保护（3倍心跳间隔）
+        current_time = time.time()
+        registry_protection_window = 3 * _interval() / 1000  # 保护窗口：3倍心跳间隔
+        should_registry = False
+
         if _FAIL_COUNT != 0:
+            # 重连成功，必须注册（解决服务丢失问题）
+            should_registry = True
             sys_plugin_logger.info(f"heart beat reconnect success. [fail_count={_FAIL_COUNT}]")
             _FAIL_COUNT = 0
-        # 当前的优化仅为临时优化，待 Nacos 版注册中心上线后，更新并验证
-        _registry_fitable_addresses()
+        elif _LAST_REGISTRY_TIME > 0 and current_time - _LAST_REGISTRY_TIME > registry_protection_window:
+            # 距离上次注册时间超过保护窗口，可以注册（用于兜底，防止服务丢失）
+            should_registry = True
+
+        if should_registry:
+            # 当前的优化仅为临时优化，待 Nacos 版注册中心上线后，更新并验证
+            _registry_fitable_addresses()
+            _LAST_REGISTRY_TIME = current_time
+
         sys_plugin_logger.debug(f'heart beating success.')
         _LAST_HEART_BEAT_SUCCESS_TIME = heart_beat_finish_time
     except Exception as e:
@@ -189,8 +208,10 @@ def _registry_fitable_addresses():
     """
     Register with the registration center after the heartbeat is reconnected.
     """
+    global _LAST_REGISTRY_TIME
     try:
         register_all_fit_services()
+        _LAST_REGISTRY_TIME = time.time()
         sys_plugin_logger.debug("In heart beat agent registry all fitable address success.")
     except:
         sys_plugin_logger.warning(f"In heart beat agent registry all fitable address failed.")

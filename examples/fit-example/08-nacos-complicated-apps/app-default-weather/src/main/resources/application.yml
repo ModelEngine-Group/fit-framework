@@ -1,0 +1,19 @@
+application:
+  name: 'default-weather'
+
+worker:
+  id: 'default-weather'
+  host: '127.0.0.1'
+  environment: 'local'
+  environment-sequence: 'local'
+
+matata:
+  registry:
+    mode: 'PROXY'
+    host: '127.0.0.1'
+    port: 8848
+    environment: 'local'
+
+server:
+  http:
+    port: 8081

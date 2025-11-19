@@ -6,6 +6,8 @@
 
 package modelengine.fit.service.locator;
 
+import static modelengine.fitframework.conf.runtime.RegistryConnectMode.PROXY;
+import static modelengine.fitframework.inspection.Validation.greaterThan;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fit.server.FitServer;
@@ -13,6 +15,7 @@ import modelengine.fit.service.RegistryLocator;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.broker.Endpoint;
 import modelengine.fitframework.broker.Target;
+import modelengine.fitframework.conf.runtime.CommunicationProtocol;
 import modelengine.fitframework.conf.runtime.MatataConfig;
 import modelengine.fitframework.conf.runtime.WorkerConfig;
 import modelengine.fitframework.log.Logger;
@@ -41,25 +44,38 @@ public class AddressRepository implements RegistryLocator {
      * @param servers 表示 FIT 的服务器的列表的 {@link List}{@code <}{@link FitServer}{@code >}。
      * @param worker 表示进程配置的 {@link WorkerConfig}。
      * @param matata 表示 matata 配置的 {@link MatataConfig}。
+     * @param fitServer 表示 FIT 服务器的 {@link FitServer}。
      */
-    public AddressRepository(List<FitServer> servers, WorkerConfig worker, MatataConfig matata) {
+    public AddressRepository(List<FitServer> servers, WorkerConfig worker, MatataConfig matata, FitServer fitServer) {
         List<FitServer> actualServers = ObjectUtils.getIfNull(servers, Collections::emptyList);
         notNull(worker, "The worker config cannot be null.");
         notNull(matata, "The matata config cannot be null.");
-        boolean isRegistryLocalhost = isRegistryLocalhost(actualServers,
-                worker.host(),
-                worker.domain(),
-                matata.registry().host(),
-                matata.registry().port(),
-                matata.registry().protocolCode());
-        String registryWorkerId =
-                isRegistryLocalhost ? worker.id() : matata.registry().host() + ":" + matata.registry().port();
+        notNull(fitServer, "The fitserver cannot be null.");
+        int port = matata.registry().port();
+        int protocolCode = matata.registry().protocolCode();
+        CommunicationProtocol protocol = matata.registry().protocol();
+        String host = matata.registry().host();
+
+        if (PROXY == matata.registry().mode()) {
+            log.debug("The registry mode is Nacos, using the local proxy registry center.");
+            int size = fitServer.endpoints().size();
+            greaterThan(size, 0, "The fit server must have at least one endpoint.");
+            Endpoint endpoint = fitServer.endpoints().get(0);
+            port = endpoint.port();
+            protocolCode = endpoint.protocolCode();
+            protocol = CommunicationProtocol.from(endpoint.protocol());
+            host = worker.host();
+        }
+
+        boolean isRegistryLocalhost =
+                isRegistryLocalhost(actualServers, worker.host(), worker.domain(), host, port, protocolCode);
+        String registryWorkerId = isRegistryLocalhost ? worker.id() : host + ":" + port;
         this.registryTarget = Target.custom()
                 .workerId(registryWorkerId)
-                .host(matata.registry().host())
+                .host(host)
                 .endpoints(Collections.singletonList(Endpoint.custom()
-                        .port(matata.registry().port())
-                        .protocol(matata.registry().protocol().name(), matata.registry().protocolCode())
+                        .port(port)
+                        .protocol(protocol.name(), protocolCode)
                         .build()))
                 .environment(matata.registry().environment())
                 .extensions(matata.registry().visualExtensions())

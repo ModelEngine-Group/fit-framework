@@ -46,6 +46,8 @@ public class TestController {
      * Initializes the MCP client by creating an instance using the provided factory and initializing it.
      * This method sets up the connection to the MCP server and prepares it for further interactions.
      *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
      * @return A string indicating that the initialization was successful.
      */
     @PostMapping(path = "/initialize")

@@ -17,10 +17,6 @@
         <emptyLine />
         <package name="androidx" withSubpackages="true" static="false" />
         <emptyLine />
-        <package name="huawei" withSubpackages="true" static="false" />
-        <emptyLine />
-        <package name="com.huawei" withSubpackages="true" static="false" />
-        <emptyLine />
         <package name="com" withSubpackages="true" static="false" />
         <emptyLine />
         <package name="" withSubpackages="true" static="false" />

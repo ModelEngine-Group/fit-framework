@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework</groupId>
     <artifactId>framework-parent</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Framework Parent</name>
@@ -55,7 +55,7 @@
 
     <properties>
         <maven.gpg.version>3.2.7</maven.gpg.version>
-        <central-publishing.maven-plugin.version>0.7.0</central-publishing.maven-plugin.version>
+        <central-publishing.maven-plugin.version>0.9.0</central-publishing.maven-plugin.version>
     </properties>
 
     <build>

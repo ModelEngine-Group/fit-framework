@@ -88,7 +88,7 @@ public class RegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "dedaa28cfb2742819a9b0271bc34f72a")
+    @Fitable(id = "register-fitables")
     public void registerFitables(List<FitableMeta> fitableMetas, Worker worker, Application application) {
         if (!this.workers.containsKey(worker.getId()) && this.workers.size() >= MAX_WORKER_NUM) {
             throw new IllegalStateException("Too many workers.");
@@ -121,10 +121,11 @@ public class RegistryServer implements RegistryService {
     }
 
     @Override
+    @Fitable(id = "unregister-fitables")
     public void unregisterFitables(List<FitableInfo> fitables, String workerId) {}
 
     @Override
-    @Fitable(id = "5807f06a3a704708b264ea3c6cfbbd53")
+    @Fitable(id = "query-fitables-addresses")
     public List<FitableAddressInstance> queryFitables(List<FitableInfo> fitables, String workerId) {
         List<FitableAddressInstance> instances = new ArrayList<>();
         for (Map.Entry<String, Set<FitableMeta>> entry : this.applicationMetas.entrySet()) {
@@ -203,17 +204,18 @@ public class RegistryServer implements RegistryService {
     }
 
     @Override
-    @Fitable(id = "ee0a8337d3654a22a548d5d5abe1d5f3")
+    @Fitable(id = "subscribe-fitables")
     public List<FitableAddressInstance> subscribeFitables(List<FitableInfo> fitables, String workerId,
             String callbackFitableId) {
         return this.queryFitables(fitables, workerId);
     }
 
     @Override
+    @Fitable(id = "unsubscribe-fitables")
     public void unsubscribeFitables(List<FitableInfo> fitables, String workerId, String callbackFitableId) {}
 
     @Override
-    @Fitable(id = "33b1f9b8f1cc49d19719a6536c96e854")
+    @Fitable(id = "query-running-fitables")
     public List<FitableMetaInstance> queryFitableMetas(List<GenericableInfo> genericables) {
         Map<FitableMeta, FitableMetaInstance> instances = new HashMap<>();
         for (Map.Entry<String, Set<FitableMeta>> entry : this.applicationMetas.entrySet()) {

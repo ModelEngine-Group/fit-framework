@@ -5,4 +5,5 @@ fit:
 
 mcp:
   client:
-    ping-interval: 15000
+    request:
+      timeout-seconds: 300

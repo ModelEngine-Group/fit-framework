@@ -1,0 +1,11 @@
+fit:
+  beans:
+    packages:
+    - 'modelengine.fit.service'
+    - 'modelengine.fit.heartbeat'
+
+matata:
+  registry:
+    nacos:
+      weight: 1
+      isEphemeral: true

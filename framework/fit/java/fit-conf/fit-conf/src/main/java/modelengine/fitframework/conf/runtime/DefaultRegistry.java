@@ -31,6 +31,7 @@ public class DefaultRegistry implements Registry {
     private List<DefaultAvailableService> authRequiredServices;
     private Map<String, Object> extensions;
     private DefaultSecureAccess secureAccess;
+    private String mode = RegistryConnectMode.DIRECT.name();
 
     /**
      * 设置主机地址的配置。
@@ -106,9 +107,23 @@ public class DefaultRegistry implements Registry {
         this.extensions = extensions;
     }
 
+    /**
+     * 设置注册中心连接模式。
+     *
+     * @param mode 表示待设置的模式配置的 {@link String}。
+     */
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
     @Override
     public String host() {
         return this.host;
+    }
+
+    @Override
+    public RegistryConnectMode mode() {
+        return RegistryConnectMode.fromMode(this.mode);
     }
 
     @Override

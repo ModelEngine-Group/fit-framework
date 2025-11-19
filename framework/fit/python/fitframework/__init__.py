@@ -43,7 +43,7 @@ _STARTUP_PLUGINS_USER_LOCATION_FULL_KEY = \
     f"{const.STARTUP_PLUGINS_KEY}.{const.STARTUP_PLUGINS_USER_KEY}.{const.STARTUP_PLUGINS_LOCATION_KEY}"
 
 # 框架版本
-_FIT_FRAMEWORK_VERSION = "3.5.0.dev"
+_FIT_FRAMEWORK_VERSION = "3.6.1.dev"
 
 _LOGO = """
 -----------------------------------------

@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework.ohscript</groupId>
     <artifactId>ohscript</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.6.1-SNAPSHOT</version>
 
     <name>Ohscript</name>
     <description>A Lightweight Java-Based Scripting Language.</description>
@@ -48,7 +48,7 @@
         <java.version>17</java.version>
 
         <!-- FIT version -->
-        <fit.version>3.5.4-SNAPSHOT</fit.version>
+        <fit.version>3.6.1-SNAPSHOT</fit.version>
 
         <!-- Maven plugin versions -->
         <maven.compiler.version>3.14.0</maven.compiler.version>
@@ -56,7 +56,7 @@
         <maven.javadoc.version>3.11.2</maven.javadoc.version>
         <maven.surefire.version>3.5.3</maven.surefire.version>
         <maven.source.version>3.3.1</maven.source.version>
-        <central-publishing.maven-plugin.version>0.7.0</central-publishing.maven-plugin.version>
+        <central-publishing.maven-plugin.version>0.9.0</central-publishing.maven-plugin.version>
         <jacoco.maven-plugin.version>0.8.13</jacoco.maven-plugin.version>
     </properties>
 

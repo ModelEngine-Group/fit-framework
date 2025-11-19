@@ -14,7 +14,7 @@ from fitframework import const
 from fitframework.api.decorators import fitable, fit, scheduled_executor, value
 from fitframework.api.logging import sys_plugin_logger
 from fitframework.utils import tools
-from .entity import FitableAddressInstance, FitableInfo
+from fit_common_struct.entity import FitableAddressInstance
 from .registry_address_service import get_cache_aware_registry_address
 
 _PUSH_MODE = 'push'
@@ -58,7 +58,7 @@ def get_runtime_worker_id() -> str:
 
 
 @fit(const.SUBSCRIBE_FIT_SERVICE_GEN_ID)
-def subscribe_fit_service(fitables: List[FitableInfo], worker_id: str, callback_fitable_id: str) \
+def subscribe_fit_service(fitables: List[Fitable], worker_id: str, callback_fitable_id: str) \
         -> List[FitableAddressInstance]:
     """
     注册中心所提供接口，用于订阅某个泛服务实现的实例信息，并且也会返回查询到的实例信息，在推模式下使用。
@@ -72,7 +72,7 @@ def subscribe_fit_service(fitables: List[FitableInfo], worker_id: str, callback_
 
 
 @fit(const.QUERY_FIT_SERVICE_GEN_ID)
-def query_fitable_addresses(fitables: List[FitableInfo], worker_id: str) -> List[FitableAddressInstance]:
+def query_fitable_addresses(fitables: List[Fitable], worker_id: str) -> List[FitableAddressInstance]:
     """
     注册中心所提供接口，用于查询某个泛服务实现的实例信息，在拉模式下使用。
 
@@ -83,9 +83,9 @@ def query_fitable_addresses(fitables: List[FitableInfo], worker_id: str) -> List
     pass
 
 
-def _convert_fitable_to_fitable_info(fitable_: Fitable) -> FitableInfo:
-    return FitableInfo(fitable_.genericable_id, fitable_.genericable_version, fitable_.fitable_id,
-                       fitable_.fitable_version)
+def _convert_fitable_to_fitable_info(fitable_: Fitable) -> Fitable:
+    return Fitable(fitable_.genericableId, fitable_.genericableVersion, fitable_.fitableId,
+                   fitable_.fitableVersion)
 
 
 def _convert_fitable_address_instance_to_addresses(fitable_inst: FitableAddressInstance) -> \
@@ -120,7 +120,7 @@ def notify_fitable_changes(fitable_instances: List[FitableAddressInstance]) -> N
             _update_addresses_in_cache(fitable_, addresses)
 
 
-def _get_fitable_address_instances(fitable_infos: List[FitableInfo]) -> List[FitableAddressInstance]:
+def _get_fitable_address_instances(fitable_infos: List[Fitable]) -> List[FitableAddressInstance]:
     if _registry_client_mode() == _PULL_MODE:
         return query_fitable_addresses(fitable_infos, get_runtime_worker_id())
     else:
@@ -157,9 +157,9 @@ def get_fit_service_address_list(fitable_: Fitable) -> List[Address]:
     @param fitable_: 待查询的泛服务实例信息。
     @return: 所查询到的该泛服务的实例列表。
     """
-    sys_plugin_logger.debug(f"get fit service address list: gid{fitable_.genericable_id}")
-    if fitable_.genericable_id in _get_registry_server_generic_ids():
-        sys_plugin_logger.debug(f"get fit service address list: gid{fitable_.genericable_id}, is registry server api")
+    sys_plugin_logger.debug(f"get fit service address list: gid{fitable_.genericableId}")
+    if fitable_.genericableId in _get_registry_server_generic_ids():
+        sys_plugin_logger.debug(f"get fit service address list: gid{fitable_.genericableId}, is registry server api")
         return get_cache_aware_registry_address()
     addresses = _get_addresses_from_cache(fitable_)
     if addresses:

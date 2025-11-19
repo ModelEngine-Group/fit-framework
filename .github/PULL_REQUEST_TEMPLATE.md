@@ -25,7 +25,7 @@ Do not create a Pull Request without creating an issue first.
 <!-- 请先创建 Issue 讨论，然后在这里链接 -->
 <!-- Please create an issue for discussion first, then link it here -->
 
-**Issue 链接 / Issue Link:** #{$IssueNumber}
+**Issue 链接 / Issue Link:** <mark>#{$IssueNumber}</mark> 👈👈
 
 <!-- 请修改 {$IssueNumber} 为真实的编号。 -->
 <!-- Please update {$IssueNumber} to an actual number. -->
@@ -101,7 +101,7 @@ Do not create a Pull Request without creating an issue first.
 
 - [ ] 我已经编写了必要的单元测试来验证逻辑正确性 / I have written necessary unit-tests to verify the logic correction
 - [ ] 当存在跨模块依赖时，我尽量使用了 mock / I have used mocks when cross-module dependencies exist
-- [ ] 基础检查通过：`mvn -B clean package -Dmaven.test.skip=true`，elsa README 中的编译检查 / Basic checks pass
+- [ ] 基础检查通过：`mvn -B clean package -Dmaven.test.skip=true` / Basic checks pass
 - [ ] 单元测试通过：`mvn clean install` / Unit tests pass
 
 **文档和兼容性 / Documentation and Compatibility:**

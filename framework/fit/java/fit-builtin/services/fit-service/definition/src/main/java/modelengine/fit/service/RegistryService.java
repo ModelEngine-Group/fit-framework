@@ -31,7 +31,7 @@ public interface RegistryService {
      * @param worker 表示服务实现所在的进程信息的 {@link Worker}。
      * @param application 表示服务实现所在的应用信息的 {@link Application}。
      */
-    @Genericable(id = "85bdce64cf724589b87cb6b6a950999d")
+    @Genericable(id = "modelengine.fit.registry.registry-service.register-fitables")
     void registerFitables(List<FitableMeta> fitableMetas, Worker worker, Application application);
 
     /**
@@ -40,7 +40,7 @@ public interface RegistryService {
      * @param fitables 表示待取消注册的服务实现列表的 {@link List}{@code <}{@link FitableInfo}{@code >}。
      * @param workerId 表示服务实现所在的进程的唯一标识的 {@link String}。
      */
-    @Genericable(id = "c02af9dafb5b4a609f8c586a8e884710")
+    @Genericable(id = "modelengine.fit.registry.registry-service.unregister-fitables")
     void unregisterFitables(List<FitableInfo> fitables, String workerId);
 
     /**
@@ -50,7 +50,7 @@ public interface RegistryService {
      * @param workerId 表示指定的进程的唯一标识的 {@link String}。
      * @return 表示指定服务实现的所有实例信息的 {@link List}{@code <}{@link FitableAddressInstance}{@code >}。
      */
-    @Genericable(id = "33be4142494e4742aa122555a451d996")
+    @Genericable(id = "modelengine.fit.registry.registry-service.query-fitables-addresses")
     List<FitableAddressInstance> queryFitables(List<FitableInfo> fitables, String workerId);
 
     /**
@@ -61,7 +61,7 @@ public interface RegistryService {
      * @param callbackFitableId 表示订阅回调服务实现的唯一标识的 {@link String}。
      * @return 表示指定服务实现的所有实例信息的 {@link List}{@code <}{@link FitableAddressInstance}{@code >}。
      */
-    @Genericable(id = "c9aa580f3fa845c99c2c6145a0499e45")
+    @Genericable(id = "modelengine.fit.registry.registry-service.subscribe-fitables")
     List<FitableAddressInstance> subscribeFitables(List<FitableInfo> fitables, String workerId,
             String callbackFitableId);
 
@@ -72,7 +72,7 @@ public interface RegistryService {
      * @param workerId 表示指定的进程的唯一标识的 {@link String}。
      * @param callbackFitableId 表示取消订阅回调服务实现的唯一标识的 {@link String}。
      */
-    @Genericable(id = "087994fc907b4f76b9f9b2a62e07ef2c")
+    @Genericable(id = "modelengine.fit.registry.registry-service.unsubscribe-fitables")
     void unsubscribeFitables(List<FitableInfo> fitables, String workerId, String callbackFitableId);
 
     /**
@@ -81,6 +81,6 @@ public interface RegistryService {
      * @param genericables 表示指定服务列表的 {@link List}{@code <}{@link GenericableInfo}{@code >}。
      * @return 表示正在运行的服务实现元数据列表的 {@link List}{@code <}{@link FitableMetaInstance}{@code >}。
      */
-    @Genericable(id = "7c52fb4fdfa243af928f23607fbbee02")
+    @Genericable(id = "modelengine.fit.registry.registry-service.query-running-fitables")
     List<FitableMetaInstance> queryFitableMetas(List<GenericableInfo> genericables);
 }

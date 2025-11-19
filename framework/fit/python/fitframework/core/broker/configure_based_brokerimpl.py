@@ -317,7 +317,7 @@ class ConfigureBasedBroker(BrokerTemplate, metaclass=Singleton):
                          f"addresses count: {len(addresses)}")
         if len(addresses) == 0:
             fit_logger.warning(f"cannot get any address can use in this worker. "
-                               f"[genericable_id={fitable.genericable_id}, fitable_id={fitable.fitable_id}]")
+                               f"[genericable_id={fitable.genericableId}, fitable_id={fitable.fitableId}]")
             return None
         # no choice!
         if len(addresses) == 1:
@@ -339,13 +339,13 @@ class ConfigureBasedBroker(BrokerTemplate, metaclass=Singleton):
         addresses: List[Address] = _get_fit_service_address_with_priorities(fitable)
         if not addresses:
             fit_logger.warning(f"cannot get any endpoint after checking format and protocol. "
-                               f"[genericable_id={fitable.genericable_id}, fitable_id={fitable.fitable_id}]")
+                               f"[genericable_id={fitable.genericableId}, fitable_id={fitable.fitableId}]")
             return []
 
         addresses: List[Address] = _load_balance_env_filtering(addresses)
         if not addresses:
             fit_logger.warning(f"cannot get any endpoint after filtering by environment. "
-                               f"[genericable_id={fitable.genericable_id}, fitable_id={fitable.fitable_id}]")
+                               f"[genericable_id={fitable.genericableId}, fitable_id={fitable.fitableId}]")
             return []
 
         return addresses
@@ -398,7 +398,7 @@ class ConfigureBasedBroker(BrokerTemplate, metaclass=Singleton):
         addresses: List[Address] = self.get_fit_service_addresses(fitable)
         if len(addresses) == 0:
             fit_logger.warning(f"cannot get any address can use in this worker. "
-                               f"[genericable_id={fitable.genericable_id}, fitable_id={fitable.fitable_id}]")
+                               f"[genericable_id={fitable.genericableId}, fitable_id={fitable.fitableId}]")
             return None
         try:
             addresses = [address for address in addresses if address_filter(address)]
@@ -407,15 +407,15 @@ class ConfigureBasedBroker(BrokerTemplate, metaclass=Singleton):
             return None
         if not addresses:
             fit_logger.warning(f"cannot get any address after custom load balancing. "
-                               f"[genericable_id={fitable.genericable_id}, fitable_id={fitable.fitable_id}]")
+                               f"[genericable_id={fitable.genericableId}, fitable_id={fitable.fitableId}]")
             return None
         if len(addresses) > 1:
             fit_logger.warning(f"get more than one address after custom load balancing. "
-                               f"[genericable_id={fitable.genericable_id}, fitable_id={fitable.fitable_id}]")
+                               f"[genericable_id={fitable.genericableId}, fitable_id={fitable.fitableId}]")
             return addresses[0]
 
         if addresses[0].id == _worker_id():
-            return service_repo.get_fitable_ref(fitable.genericable_id, fitable.fitable_id)
+            return service_repo.get_fitable_ref(fitable.genericableId, fitable.fitableId)
 
         return addresses[0]
 
@@ -466,9 +466,9 @@ def _load_balancing(fitable: Fitable, addresses: List[Address]) -> Address:
         pass
 
     args = fitable, addresses
-    lb_fitable_id = get_fit_ffp_fitable_id(fitable.genericable_id, 'load_balance')
+    lb_fitable_id = get_fit_ffp_fitable_id(fitable.genericableId, 'load_balance')
     if lb_fitable_id:
-        fit_invoke_info = (fitable.genericable_id, lb_fitable_id, lb_call_template)
+        fit_invoke_info = (fitable.genericableId, lb_fitable_id, lb_call_template)
         return _ffp_invoke(fit_invoke_info, False, None, None, *args)
     else:
         fit_invoke_info = (const.LOAD_BALANCING_GEN_ID, const.LOAD_BALANCING_RANDOM_FIT_ID, lb_call_template)
@@ -591,7 +591,7 @@ def _get_fit_service_address_with_priorities(fitable: Fitable) -> List[Address]:
 
 def _get_fit_service_address_and_convert(fitable: Fitable) -> List[Address]:
     addresses: List[Address] = get_fit_service_address_list(fitable)
-    fit_logger.debug(f"got address, gid: {fitable.genericable_id}, count: {len(addresses)}")
+    fit_logger.debug(f"got address, gid: {fitable.genericableId}, count: {len(addresses)}")
     return addresses
 
 

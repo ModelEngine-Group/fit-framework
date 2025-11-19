@@ -39,8 +39,35 @@
 ## 标签管理
 
 - 每个标签的名字和发布分支的名字需要保持一致。例如：`fit-java-1.0.0`、`waterflow-2.1.1`。
+- 纯数字版本的分支需要以 `v` 开头。例如：`v3.6.0`。
 - 候选版本以特殊词组结尾，后面可以跟若干数字代表序号。例如：`fit-java-1.0.0-alpha1` 或 `waterflow-python-2.0.0-beta2`。
 - 当标签被打出后，对应的发布分支应当删除，`Git-Flow` 模式下的 `*-main` 分支除外。
+- **注意：** 请不要使用自动生成的深色标签，如 `dependencies`、`python`、`java` 等，他们是平台自动生成用于机器人创建的 Issue 的。
+- 所有的 Issue 和 PR 都需要至少包含两种标签，一种是 `in: {$module}`，另一种是 `type: {$type}`。
+
+## 开发规范
+
+### 版权信息
+
+- 在 `IntelliJ IDEA` 开发环境中，点击 `Settings...`，在 `Copyright Profiles` 中添加一份 `Local Profile`，内容如下：
+
+``` text
+Copyright (c) $originalComment.match("Copyright \(c\) (\d+)", 1, "-")$today.year Huawei Technologies Co., Ltd. All rights reserved.
+This file is a part of the ModelEngine Project.
+Licensed under the MIT License. See License.txt in the project root for license information.
+```
+
+- 在其上一级菜单的 `Copyright` 中添加针对 `All Changed Files` 范围的修改，选中刚刚添加的 `Profile`。
+- 可以添加自己熟悉的快捷键，以便在每次提交前全局修改所有被修改的文件的版权头信息。例如，我选择的快捷键是：`Command + \`。
+
+### 注释信息
+
+- 每一个类文件都需要注释，包括作者和创建时间：
+  - 作者需要添加 `@author {$authorName}`，对于后续的修改者，请在原来的作者下面添加一行新的信息；
+  - 创建时间为该类的创建日期，格式是 `@since yyyy-MM-dd`，一旦文件被创建，该时间不可修改。
+- 所有被 `public` 和 `protected` 修饰的类、方法、字段等都需要添加注释，注释风格请参考当前项目中已有的文件：
+  - 所有 `@param` 和 `@return` 的注释，最后都需要根据其类型添加引用，基本类型需要添加 `{@code }` 标记，其他需要添加 `{@link }` 标记。
+  - 所有半角字符和全角字符之间需要增加一个空格，来使得整体排版规整，方便超长内容的换行。
 
 ## 提交规则
 
@@ -94,4 +121,5 @@ exec git-hooks/check-utf8-encoding.sh
 6. 参与代码审查和讨论，根据反馈进行必要的修改。
 7. 一旦更改被接受并合并，您的贡献将成为项目的一部分。
 
-请注意，项目维护者可能会提出对您的贡献进行修改或调整的建议。请保持开放的态度，与项目维护者保持积极沟通，以确保您的贡献符合项目的目标和标准。
+> - 请注意，项目维护者可能会提出对您的贡献进行修改或调整的建议。请保持开放的态度，与项目维护者保持积极沟通，以确保您的贡献符合项目的目标和标准。
+> - 如果您发现了一个问题或优化点，但并不准备自己进行修复或改造，您可以仅提交一个 Issue。但如果您想自己动手解决，您可以直接提交一个 PR。如果对于方案存在疑问，可以在“讨论”模块中进行提问，以广泛收集意见，项目维护者会定期审视。

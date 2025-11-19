@@ -6,6 +6,7 @@
 /build
 /dist
 /fit.egg-info
+fit_plugin_cli.egg-info
 
 __pycache__
 plugin/*

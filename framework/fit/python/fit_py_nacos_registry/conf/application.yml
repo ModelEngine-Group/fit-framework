@@ -1,0 +1,3 @@
+nacos:
+  async:
+    timeout: 30

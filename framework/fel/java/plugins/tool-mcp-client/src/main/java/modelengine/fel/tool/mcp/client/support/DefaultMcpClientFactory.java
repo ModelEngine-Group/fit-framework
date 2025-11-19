@@ -6,52 +6,33 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
-import static modelengine.fitframework.inspection.Validation.notNull;
-
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.McpClientFactory;
-import modelengine.fit.http.client.HttpClassicClient;
-import modelengine.fit.http.client.HttpClassicClientFactory;
 import modelengine.fitframework.annotation.Component;
-import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
-import modelengine.fitframework.serialization.ObjectSerializer;
 
 /**
- * Represents a factory for creating instances of the DefaultMcpClient.
- * This class is responsible for initializing and configuring the HTTP client and JSON serializer
- * required by the DefaultMcpClient.
+ * Represents a factory for creating instances of the {@link DefaultMcpStreamableClient}.
+ * This class is responsible for initializing and configuring.
  *
  * @author 季聿阶
  * @since 2025-05-21
  */
 @Component
 public class DefaultMcpClientFactory implements McpClientFactory {
-    private final HttpClassicClient client;
-    private final ObjectSerializer jsonSerializer;
-    private final long pingInterval;
+    private final int requestTimeoutSeconds;
 
     /**
      * Constructs a new instance of the DefaultMcpClientFactory.
      *
-     * @param clientFactory The factory used to create the HTTP client.
-     * @param jsonSerializer The JSON serializer used for serialization and deserialization.
-     * @param pingInterval The interval between ping requests. Units: milliseconds.
+     * @param requestTimeoutSeconds The timeout duration of requests. Units: seconds.
      */
-    public DefaultMcpClientFactory(HttpClassicClientFactory clientFactory,
-            @Fit(alias = "json") ObjectSerializer jsonSerializer,
-            @Value("${mcp.client.ping-interval}") long pingInterval) {
-        this.client = clientFactory.create(HttpClassicClientFactory.Config.builder()
-                .connectTimeout(30_000)
-                .socketTimeout(60_000)
-                .connectionRequestTimeout(60_000)
-                .build());
-        this.jsonSerializer = notNull(jsonSerializer, "The json serializer cannot be null.");
-        this.pingInterval = pingInterval;
+    public DefaultMcpClientFactory(@Value("${mcp.client.request.timeout-seconds}") int requestTimeoutSeconds) {
+        this.requestTimeoutSeconds = requestTimeoutSeconds > 0 ? requestTimeoutSeconds : 180;
     }
 
     @Override
     public McpClient create(String baseUri, String sseEndpoint) {
-        return new DefaultMcpClient(this.jsonSerializer, this.client, baseUri, sseEndpoint, this.pingInterval);
+        return new DefaultMcpStreamableClient(baseUri, sseEndpoint, requestTimeoutSeconds);
     }
 }
