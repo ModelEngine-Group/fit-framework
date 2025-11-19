@@ -18,7 +18,7 @@ import io.modelcontextprotocol.spec.McpStreamableServerTransport;
 import io.modelcontextprotocol.spec.McpStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import io.modelcontextprotocol.util.KeepAliveScheduler;
-import modelengine.fel.tool.mcp.entity.Event;
+import modelengine.fel.tool.mcp.server.FitMcpServerTransportProvider;
 import modelengine.fit.http.annotation.DeleteMapping;
 import modelengine.fit.http.annotation.GetMapping;
 import modelengine.fit.http.annotation.PostMapping;
@@ -40,42 +40,22 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default implementation of {@link McpStreamableServerTransportProvider}.
- * The FIT transport provider for MCP Streamable Server, according to {@code HttpServletStreamableServerTransportProvider} in MCP
+ * The FIT transport provider for MCP Streamable Server, according to
+ * {@code HttpServletStreamableServerTransportProvider} in MCP
  * SDK.
  *
  * @author 黄可欣
  * @since 2025-09-30
  */
-public class FitMcpStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
+public class FitMcpStreamableServerTransportProvider extends FitMcpServerTransportProvider<McpStreamableServerSession>
+        implements McpStreamableServerTransportProvider {
     private static final Logger logger = Logger.get(FitMcpStreamableServerTransportProvider.class);
-
     private static final String MESSAGE_ENDPOINT = "/mcp/streamable";
-
-    /**
-     * Flag indicating whether DELETE requests are disallowed on the endpoint.
-     */
-    private final boolean disallowDelete;
-    private final McpJsonMapper jsonMapper;
-    private final McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
-    private KeepAliveScheduler keepAliveScheduler;
-
     private McpStreamableServerSession.Factory sessionFactory;
-
-    /**
-     * Map of active client sessions, keyed by mcp-session-id.
-     */
-    private final Map<String, McpStreamableServerSession> sessions = new ConcurrentHashMap<>();
-
-    /**
-     * Flag indicating if the transport is shutting down.
-     */
-    private volatile boolean isClosing = false;
+    private final boolean disallowDelete;
 
     /**
      * Constructs a new FitMcpStreamableServerTransportProvider instance,
@@ -90,23 +70,39 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      */
     private FitMcpStreamableServerTransportProvider(McpJsonMapper jsonMapper, boolean disallowDelete,
             McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor, Duration keepAliveInterval) {
-        Validation.notNull(jsonMapper, "jsonMapper must not be null");
-        Validation.notNull(contextExtractor, "McpTransportContextExtractor must not be null");
-
-        this.jsonMapper = jsonMapper;
+        super(jsonMapper, contextExtractor, keepAliveInterval);
         this.disallowDelete = disallowDelete;
-        this.contextExtractor = contextExtractor;
+    }
 
-        if (keepAliveInterval != null) {
-            this.keepAliveScheduler = KeepAliveScheduler.builder(() -> (this.isClosing)
-                            ? Flux.empty()
-                            : Flux.fromIterable(this.sessions.values()))
-                    .initialDelay(keepAliveInterval)
-                    .interval(keepAliveInterval)
-                    .build();
+    @Override
+    protected Logger getLogger() {
+        return logger;
+    }
 
-            this.keepAliveScheduler.start();
-        }
+    @Override
+    protected void initKeepAliveScheduler(Duration keepAliveInterval) {
+        this.keepAliveScheduler = KeepAliveScheduler.builder(() -> this.isClosing
+                        ? Flux.empty()
+                        : Flux.fromIterable(this.sessions.values()))
+                .initialDelay(keepAliveInterval)
+                .interval(keepAliveInterval)
+                .build();
+        this.keepAliveScheduler.start();
+    }
+
+    @Override
+    protected String getSessionId(McpStreamableServerSession session) {
+        return session.getId();
+    }
+
+    @Override
+    protected Mono<Void> closeSession(McpStreamableServerSession session) {
+        return session.closeGracefully();
+    }
+
+    @Override
+    protected Mono<Void> sendNotificationToSession(McpStreamableServerSession session, String method, Object params) {
+        return session.sendNotification(method, params);
     }
 
     @Override
@@ -122,69 +118,6 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     }
 
     /**
-     * Broadcasts a notification to all connected clients through their SSE connections.
-     * If any errors occur during sending to a particular client, they are logged but
-     * don't prevent sending to other clients.
-     *
-     * @param method The method name for the notification
-     * @param params The parameters for the notification
-     * @return A Mono that completes when the broadcast attempt is finished
-     */
-    @Override
-    public Mono<Void> notifyClients(String method, Object params) {
-        if (this.sessions.isEmpty()) {
-            logger.debug("No active sessions to broadcast message.");
-            return Mono.empty();
-        }
-
-        logger.info("Attempting to broadcast message. [sessionCount={}]", this.sessions.size());
-
-        return Mono.fromRunnable(() -> {
-            this.sessions.values().parallelStream().forEach(session -> {
-                try {
-                    session.sendNotification(method, params).block();
-                } catch (Exception e) {
-                    logger.error("Failed to send message to session. [sessionId={}, error={}]",
-                            session.getId(),
-                            e.getMessage(),
-                            e);
-                }
-            });
-        });
-    }
-
-    /**
-     * Initiates a graceful shutdown of the transport.
-     *
-     * @return A Mono that completes when all cleanup operations are finished
-     */
-    @Override
-    public Mono<Void> closeGracefully() {
-        return Mono.fromRunnable(() -> {
-            this.isClosing = true;
-            logger.info("Initiating graceful shutdown. [sessionCount={}]", this.sessions.size());
-
-            this.sessions.values().parallelStream().forEach(session -> {
-                try {
-                    session.closeGracefully().block();
-                } catch (Exception e) {
-                    logger.error("Failed to close session. [sessionId={}, error={}]",
-                            session.getId(),
-                            e.getMessage(),
-                            e);
-                }
-            });
-
-            this.sessions.clear();
-            logger.info("Graceful shutdown completed.");
-        }).then().doOnSuccess(v -> {
-            if (this.keepAliveScheduler != null) {
-                this.keepAliveScheduler.shutdown();
-            }
-        });
-    }
-
-    /**
      * Set up the listening SSE connections and message replay.
      *
      * @param request The incoming server request
@@ -194,8 +127,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     @GetMapping(path = MESSAGE_ENDPOINT)
     public Object handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
-            response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
-            return Entity.createText(response, "Server is shutting down");
+            return this.createShuttingDownResponse(response);
         }
 
         Object headerError = this.validateGetAcceptHeaders(request, response);
@@ -220,9 +152,17 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
                 // Handle building SSE, and check if this is a replay request
                 if (request.headers().contains(HttpHeaders.LAST_EVENT_ID)) {
-                    FitMcpStreamableServerTransportProvider.this.handleReplaySseRequest(request, transportContext, sessionId, session, sessionTransport, emitter);
+                    FitMcpStreamableServerTransportProvider.this.handleReplaySseRequest(request,
+                            transportContext,
+                            sessionId,
+                            session,
+                            sessionTransport,
+                            emitter);
                 } else {
-                    FitMcpStreamableServerTransportProvider.this.handleEstablishSseRequest(sessionId, session, sessionTransport, emitter);
+                    FitMcpStreamableServerTransportProvider.this.handleEstablishSseRequest(sessionId,
+                            session,
+                            sessionTransport,
+                            emitter);
                 }
             });
         } catch (Exception e) {
@@ -242,8 +182,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     @PostMapping(path = MESSAGE_ENDPOINT)
     public Object handlePost(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
-            response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
-            return Entity.createText(response, "Server is shutting down");
+            return this.createShuttingDownResponse(response);
         }
         Object headerError = this.validatePostAcceptHeaders(request, response);
         if (headerError != null) {
@@ -286,8 +225,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
     @DeleteMapping(path = MESSAGE_ENDPOINT)
     public Object handleDelete(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (this.isClosing) {
-            response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
-            return Entity.createText(response, "Server is shutting down");
+            return this.createShuttingDownResponse(response);
         }
         if (this.disallowDelete) {
             response.statusCode(HttpResponseStatus.METHOD_NOT_ALLOWED.statusCode());
@@ -372,14 +310,7 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
             return Entity.createText(response, "Session ID required in mcp-session-id header");
         }
         String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
-        if (this.sessions.get(sessionId) == null) {
-            response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
-            return Entity.createObject(response,
-                    McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
-                            .message("Session not found: " + sessionId)
-                            .build());
-        }
-        return null;
+        return this.validateSessionExists(sessionId, response);
     }
 
     /**
@@ -444,11 +375,13 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
             @Override
             public void onCompleted() {
-                logger.info("[SSE] Completed SSE emitting. [sessionId={}]", sessionId);
+                FitMcpStreamableServerTransportProvider.logger.info("[SSE] Completed SSE emitting. [sessionId={}]",
+                        sessionId);
                 try {
                     listeningStream.close();
                 } catch (Exception e) {
-                    logger.warn("[SSE] Error closing listeningStream on complete. [sessionId={}, error={}]",
+                    FitMcpStreamableServerTransportProvider.logger.warn(
+                            "[SSE] Error closing listeningStream on complete. [sessionId={}, error={}]",
                             sessionId,
                             e.getMessage());
                 }
@@ -456,11 +389,14 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
             @Override
             public void onFailed(Exception cause) {
-                logger.warn("[SSE] SSE failed. [sessionId={}, cause={}]", sessionId, cause.getMessage());
+                FitMcpStreamableServerTransportProvider.logger.warn("[SSE] SSE failed. [sessionId={}, cause={}]",
+                        sessionId,
+                        cause.getMessage());
                 try {
                     listeningStream.close();
                 } catch (Exception e) {
-                    logger.warn("[SSE] Error closing listeningStream on failure. [sessionId={}, error={}]",
+                    FitMcpStreamableServerTransportProvider.logger.warn(
+                            "[SSE] Error closing listeningStream on failure. [sessionId={}, error={}]",
                             sessionId,
                             e.getMessage());
                 }
@@ -600,12 +536,15 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
 
                 @Override
                 public void onCompleted() {
-                    logger.info("[SSE] Completed SSE emitting. [sessionId={}]", sessionId);
+                    FitMcpStreamableServerTransportProvider.logger.info("[SSE] Completed SSE emitting. [sessionId={}]",
+                            sessionId);
                 }
 
                 @Override
                 public void onFailed(Exception e) {
-                    logger.warn("[SSE] SSE failed. [sessionId={}, cause={}]", sessionId, e.getMessage());
+                    FitMcpStreamableServerTransportProvider.logger.warn("[SSE] SSE failed. [sessionId={}, cause={}]",
+                            sessionId,
+                            e.getMessage());
                 }
             });
 
@@ -632,15 +571,8 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
      * underlying SSE builder to prevent race conditions when multiple threads attempt to
      * send messages concurrently.
      */
-    private class FitStreamableMcpSessionTransport implements McpStreamableServerTransport {
-        private final String sessionId;
-        private final Emitter<TextEvent> emitter;
-        private final HttpClassicServerResponse response;
-
-        private final ReentrantLock lock = new ReentrantLock();
-
-        private volatile boolean closed = false;
-
+    private class FitStreamableMcpSessionTransport extends AbstractFitMcpSessionTransport
+            implements McpStreamableServerTransport {
         /**
          * Creates a new session transport with the specified ID and SSE builder.
          *
@@ -650,130 +582,23 @@ public class FitMcpStreamableServerTransportProvider implements McpStreamableSer
          */
         FitStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter,
                 HttpClassicServerResponse response) {
-            this.sessionId = sessionId;
-            this.emitter = emitter;
-            this.response = response;
-            logger.info("[SSE] Building SSE emitter. [sessionId={}]", sessionId);
+            super(sessionId, emitter, response);
         }
 
-        /**
-         * Sends a JSON-RPC message to the client through the SSE connection.
-         *
-         * @param message The JSON-RPC message to send
-         * @return A Mono that completes when the message has been sent
-         */
         @Override
         public Mono<Void> sendMessage(McpSchema.JSONRPCMessage message) {
-            return sendMessage(message, null);
+            return this.doSendMessage(message, null);
         }
 
-        /**
-         * Sends a JSON-RPC message to the client through the SSE connection with a
-         * specific message ID.
-         *
-         * @param message The JSON-RPC message to send
-         * @param messageId The message ID for SSE event identification
-         * @return A Mono that completes when the message has been sent
-         */
         @Override
         public Mono<Void> sendMessage(McpSchema.JSONRPCMessage message, String messageId) {
-            return Mono.fromRunnable(() -> {
-                if (this.closed) {
-                    logger.info("[SSE] Attempted to send message to closed session. [sessionId={}]", this.sessionId);
-                    return;
-                }
-
-                this.lock.lock();
-                try {
-                    if (this.closed) {
-                        logger.info("[SSE] Session was closed during message send attempt. [sessionId={}]",
-                                this.sessionId);
-                        return;
-                    }
-
-                    // Check if connection is still active before sending
-                    if (!this.response.isActive()) {
-                        logger.warn("[SSE] Connection inactive detected while sending message. [sessionId={}]",
-                                this.sessionId);
-                        this.close();
-                        return;
-                    }
-
-                    String jsonText = FitMcpStreamableServerTransportProvider.this.jsonMapper.writeValueAsString(message);
-                    TextEvent textEvent =
-                            TextEvent.custom().id(this.sessionId).event(Event.MESSAGE.code()).data(jsonText).build();
-                    this.emitter.emit(textEvent);
-
-                    logger.info("[SSE] Sending message to session. [sessionId={}, jsonText={}]",
-                            this.sessionId,
-                            jsonText);
-                } catch (Exception e) {
-                    logger.error("[SSE] Failed to send message to session. [sessionId={}, error={}]",
-                            this.sessionId,
-                            e.getMessage(),
-                            e);
-                    try {
-                        this.emitter.fail(e);
-                    } catch (Exception errorException) {
-                        logger.error("[SSE] Failed to send error to SSE builder. [sessionId={}, error={}]",
-                                this.sessionId,
-                                errorException.getMessage(),
-                                errorException);
-                    }
-                } finally {
-                    this.lock.unlock();
-                }
-            });
+            return this.doSendMessage(message, messageId);
         }
 
-        /**
-         * Converts data from one type to another using the configured jsonMapper.
-         *
-         * @param data The source data object to convert
-         * @param typeRef The target type reference
-         * @param <T> The target type
-         * @return The converted object of type T
-         */
-        @Override
-        public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
-            return FitMcpStreamableServerTransportProvider.this.jsonMapper.convertValue(data, typeRef);
-        }
-
-        /**
-         * Initiates a graceful shutdown of the transport.
-         *
-         * @return A Mono that completes when the shutdown is complete
-         */
-        @Override
-        public Mono<Void> closeGracefully() {
-            return Mono.fromRunnable(FitStreamableMcpSessionTransport.this::close);
-        }
-
-        /**
-         * Closes the transport immediately.
-         */
         @Override
         public void close() {
-            this.lock.lock();
-            try {
-                if (this.closed) {
-                    logger.info("[SSE] Session transport already closed. [sessionId={}]", this.sessionId);
-                    return;
-                }
-
-                this.closed = true;
-
-                this.emitter.complete();
-                logger.info("[SSE] Closed SSE builder successfully. [sessionId={}]", sessionId);
-            } catch (Exception e) {
-                logger.warn("[SSE] Failed to complete SSE builder. [sessionId={}, error={}]",
-                        sessionId,
-                        e.getMessage());
-            } finally {
-                this.lock.unlock();
-            }
+            this.doClose();
         }
-
     }
 
     public static Builder builder() {
