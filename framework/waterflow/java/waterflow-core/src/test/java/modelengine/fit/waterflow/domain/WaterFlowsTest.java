@@ -842,38 +842,38 @@ class WaterFlowsTest {
         @Test
         @DisplayName("流程实例异常处理流转逻辑")
         void testExceptionHandleForFitStream() {
-            // AtomicReference<TestData> output = new AtomicReference<>();
-            // // 单节点错误处理
-            // Flows.<TestData>create(repo, messenger, locks).just(data -> data.first(100)).just(data -> {
-            //     if (data.first < 120) {
-            //         throw new IllegalArgumentException();
-            //     } else {
-            //         data.second(100);
-            //     }
-            // }).error((error, retryable, contexts) -> {
-            //     contexts.get(0).getData().first(120);
-            //     contexts.forEach(context -> context.setStatus(READY));
-            //     retryable.retry(contexts);
-            // }).close(callback -> output.set(callback.get().getData())).offer(new TestData());
-            // FlowsTestUtil.waitUntil(() -> output.get() != null, 2000);
-            // assertEquals(120, output.get().first);
-            // assertEquals(100, output.get().second);
-            //
-            // // 整体错误处理
-            // Flows.<TestData>create(repo, messenger, locks).just(data -> data.first(100)).just(data -> {
-            //     if (data.first < 120) {
-            //         throw new IllegalArgumentException();
-            //     } else {
-            //         data.second(100);
-            //     }
-            // }).close(callback -> output.set(callback.get().getData()), (exception, retryable, contexts) -> {
-            //     ObjectUtils.<TestData>cast(contexts.get(0).getData()).first(120);
-            //     contexts.forEach(context -> context.setStatus(READY));
-            //     retryable.retry(contexts);
-            // }).offer(new TestData());
-            // FlowsTestUtil.waitFortyMillis(Collections::emptyList);
-            // assertEquals(120, output.get().first);
-            // assertEquals(100, output.get().second);
+            AtomicReference<TestData> output = new AtomicReference<>();
+            // 单节点错误处理
+            Flows.<TestData>create(repo, messenger, locks).just(data -> data.first(100)).just(data -> {
+                if (data.first < 120) {
+                    throw new IllegalArgumentException();
+                } else {
+                    data.second(100);
+                }
+            }).error((error, retryable, contexts) -> {
+                contexts.get(0).getData().first(120);
+                contexts.forEach(context -> context.setStatus(READY));
+                retryable.retry(error, contexts);
+            }).close(callback -> output.set(callback.get().getData())).offer(new TestData());
+            FlowsTestUtil.waitUntil(() -> output.get() != null, 2000);
+            assertEquals(120, output.get().first);
+            assertEquals(100, output.get().second);
+
+            // 整体错误处理
+            Flows.<TestData>create(repo, messenger, locks).just(data -> data.first(100)).just(data -> {
+                if (data.first < 120) {
+                    throw new IllegalArgumentException();
+                } else {
+                    data.second(100);
+                }
+            }).close(callback -> output.set(callback.get().getData()), (exception, retryable, contexts) -> {
+                ObjectUtils.<TestData>cast(contexts.get(0).getData()).first(120);
+                contexts.forEach(context -> context.setStatus(READY));
+                retryable.retry(exception, contexts);
+            }).offer(new TestData());
+            FlowsTestUtil.waitFortyMillis(Collections::emptyList);
+            assertEquals(120, output.get().first);
+            assertEquals(100, output.get().second);
         }
 
         @Test
