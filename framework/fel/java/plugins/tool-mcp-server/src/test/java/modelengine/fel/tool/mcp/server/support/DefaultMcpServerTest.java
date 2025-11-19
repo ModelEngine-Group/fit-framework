@@ -45,10 +45,10 @@ public class DefaultMcpServerTest {
     void setup() {
         this.toolExecuteService = mock(ToolExecuteService.class);
         McpSseServerConfig sseConfig = new McpSseServerConfig();
-        this.mcpSyncSseServer = sseConfig.mcpSyncSseServer(sseConfig.fitMcpSseServerTransportProvider(), 10);
+        this.mcpSyncSseServer = sseConfig.mcpSyncSseServer(sseConfig.fitMcpSseServerTransportProvider(30), 10);
         McpStreamableServerConfig streamableConfig = new McpStreamableServerConfig();
         this.mcpStreamableSyncServer =
-                streamableConfig.mcpSyncStreamableServer(streamableConfig.fitMcpStreamableServerTransportProvider(),
+                streamableConfig.mcpSyncStreamableServer(streamableConfig.fitMcpStreamableServerTransportProvider(30),
                         10);
     }
 

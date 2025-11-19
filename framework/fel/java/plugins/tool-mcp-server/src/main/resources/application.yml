@@ -7,3 +7,4 @@ mcp:
   server:
     request:
       timeout-seconds: 60
+    keep-alive-interval-seconds: 30

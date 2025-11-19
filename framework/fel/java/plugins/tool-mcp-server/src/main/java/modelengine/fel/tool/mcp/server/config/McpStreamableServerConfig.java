@@ -26,10 +26,11 @@ import java.time.Duration;
 @Component
 public class McpStreamableServerConfig {
     @Bean
-    public FitMcpStreamableServerTransportProvider fitMcpStreamableServerTransportProvider() {
+    public FitMcpStreamableServerTransportProvider fitMcpStreamableServerTransportProvider(
+            @Value("${mcp.server.keep-alive-interval-seconds}") int keepAliveIntervalSeconds) {
         return FitMcpStreamableServerTransportProvider.builder()
                 .jsonMapper(McpJsonMapper.getDefault())
-                .keepAliveInterval(Duration.ofSeconds(30))
+                .keepAliveInterval(Duration.ofSeconds(keepAliveIntervalSeconds))
                 .build();
     }
 
