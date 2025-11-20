@@ -28,7 +28,7 @@ public McpSyncServer mcpSyncSseServer(...) { ... }
 @Bean("McpSyncStreamableServer")
 public McpSyncServer mcpSyncStreamableServer(...) { ... }
 
-// DefaultMcpServer.java
+// FitMcpServer.java
 public DefaultMcpServer(ToolExecuteService toolExecuteService,
         @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncSseServer,
         @Fit(alias = "McpSyncStreamableServer") McpSyncServer mcpSyncStreamableServer) {

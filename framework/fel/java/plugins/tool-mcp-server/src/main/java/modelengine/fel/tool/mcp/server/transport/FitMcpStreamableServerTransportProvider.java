@@ -188,6 +188,7 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
         String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
         McpSchema.JSONRPCMessage message = this.deserializeMessage(requestBody, response);
         if (message == null) {
+            logger.error("[POST] Invalid message format.  [requestBody={}]", requestBody);
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
         }

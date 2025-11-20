@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @param <S> The session type
  * @author 黄可欣
- * @since 2025-09-30
+ * @since 2025-11-19
  */
 public abstract class FitMcpServerTransportProvider<S> {
     private static final Logger logger = Logger.get(FitMcpServerTransportProvider.class);
@@ -200,7 +200,7 @@ public abstract class FitMcpServerTransportProvider<S> {
         try {
             return McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
         } catch (IllegalArgumentException | IOException e) {
-            logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
+            logger.error("Failed to deserialize message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             return null;
         }

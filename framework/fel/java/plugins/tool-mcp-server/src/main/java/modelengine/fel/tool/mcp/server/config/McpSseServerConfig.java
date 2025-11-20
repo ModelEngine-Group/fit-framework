@@ -10,8 +10,9 @@ import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
-import modelengine.fel.tool.mcp.server.support.DefaultMcpServer;
+import modelengine.fel.tool.mcp.server.FitMcpServer;
 import modelengine.fel.tool.mcp.server.transport.FitMcpSseServerTransportProvider;
+import modelengine.fel.tool.service.ToolChangedObserverRegistry;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
@@ -48,8 +49,9 @@ public class McpSseServerConfig {
     }
 
     @Bean("DefaultMcpSseServer")
-    public DefaultMcpServer defaultMcpSseServer(ToolExecuteService toolExecuteService,
-            @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncServer) {
-        return new DefaultMcpServer(toolExecuteService, mcpSyncServer);
+    public FitMcpServer defaultMcpSseServer(ToolExecuteService toolExecuteService,
+            @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncServer,
+            ToolChangedObserverRegistry toolChangedObserverRegistry) {
+        return new FitMcpServer(toolExecuteService, mcpSyncServer, toolChangedObserverRegistry);
     }
 }

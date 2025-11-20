@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.server.support;
+package modelengine.fel.tool.mcp.server;
 
 import static modelengine.fel.tool.info.schema.PluginSchema.TYPE;
 import static modelengine.fel.tool.info.schema.ToolsSchema.PROPERTIES;
@@ -15,9 +15,10 @@ import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.entity.Tool;
-import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolChangedObserver;
+import modelengine.fel.tool.service.ToolChangedObserverRegistry;
 import modelengine.fel.tool.service.ToolExecuteService;
+import modelengine.fitframework.ioc.annotation.PreDestroy;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
@@ -28,29 +29,37 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
+ * Mcp Server implementing interface {@link ToolChangedObserver}
  * with MCP Server {@link McpSyncServer} implemented with SDK.
  *
  * @author 季聿阶
  * @since 2025-05-15
  */
-public class DefaultMcpServer implements McpServer, ToolChangedObserver {
-    private static final Logger log = Logger.get(DefaultMcpServer.class);
+public class FitMcpServer implements ToolChangedObserver {
+    private static final Logger log = Logger.get(FitMcpServer.class);
     private final McpSyncServer mcpSyncServer;
     private final ToolExecuteService toolExecuteService;
+    private final ToolChangedObserverRegistry toolChangedObserverRegistry;
 
     /**
-     * Constructs a new instance of the DefaultMcpServer class.
+     * Constructs a new instance of the FitMcpServer class.
      *
      * @param toolExecuteService The service used to execute tools when handling tool call requests.
      * @param mcpSyncServer The MCP sync server.
      */
-    public DefaultMcpServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
+    public FitMcpServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer,
+            ToolChangedObserverRegistry toolChangedObserverRegistry) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
         this.mcpSyncServer = mcpSyncServer;
+        this.toolChangedObserverRegistry = toolChangedObserverRegistry;
+        this.toolChangedObserverRegistry.registerToolChangedObserver(this);
     }
 
-    @Override
+    @PreDestroy
+    public void onDestroy() {
+        this.toolChangedObserverRegistry.unregisterToolChangedObserver(this);
+    }
+
     public List<Tool> getTools() {
         return this.mcpSyncServer.listTools().stream().map(this::convertToFelTool).collect(Collectors.toList());
     }

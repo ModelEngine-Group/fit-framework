@@ -43,7 +43,7 @@ import java.util.UUID;
  * SDK.
  *
  * @author 黄可欣
- * @since 2025-09-30
+ * @since 2025-11-19
  */
 public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvider<McpServerSession>
         implements McpServerTransportProvider {
@@ -193,6 +193,7 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
         String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
         McpSchema.JSONRPCMessage message = this.deserializeMessage(requestBody, response);
         if (message == null) {
+            logger.error("[POST] Invalid message format. [sessionId={}, requestBody={}]", sessionId, requestBody);
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
         }

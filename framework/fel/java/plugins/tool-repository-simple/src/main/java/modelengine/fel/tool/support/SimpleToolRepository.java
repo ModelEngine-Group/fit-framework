@@ -7,17 +7,18 @@
 package modelengine.fel.tool.support;
 
 import static modelengine.fitframework.inspection.Validation.notBlank;
-import static modelengine.fitframework.inspection.Validation.notNull;
 import static modelengine.fitframework.util.ObjectUtils.cast;
 
 import modelengine.fel.core.tool.ToolInfo;
 import modelengine.fel.tool.ToolInfoEntity;
 import modelengine.fel.tool.service.ToolChangedObserver;
+import modelengine.fel.tool.service.ToolChangedObserverRegistry;
 import modelengine.fel.tool.service.ToolRepository;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,21 +32,24 @@ import java.util.stream.Collectors;
  * @since 2024-08-15
  */
 @Component
-public class SimpleToolRepository implements ToolRepository {
+public class SimpleToolRepository implements ToolRepository, ToolChangedObserverRegistry {
     private static final Logger log = Logger.get(SimpleToolRepository.class);
 
-    private final ToolChangedObserver toolChangedObserver;
     private final Map<String, ToolInfoEntity> toolCache = new ConcurrentHashMap<>();
+    private final List<ToolChangedObserver> toolChangedObservers = new ArrayList<>();
 
-    /**
-     * Constructs a new instance of the SimpleToolRepository class.
-     *
-     * @param toolChangedObserver The observer to be notified when tools are added or removed, as a
-     * {@link ToolChangedObserver}.
-     * @throws IllegalStateException If {@code toolChangedObserver} is null.
-     */
-    public SimpleToolRepository(ToolChangedObserver toolChangedObserver) {
-        this.toolChangedObserver = notNull(toolChangedObserver, "The tool changed observer cannot be null.");
+    @Override
+    public void registerToolChangedObserver(ToolChangedObserver observer) {
+        if (observer != null) {
+            this.toolChangedObservers.add(observer);
+        }
+    }
+
+    @Override
+    public void unregisterToolChangedObserver(ToolChangedObserver observer) {
+        if (observer != null) {
+            this.toolChangedObservers.remove(observer);
+        }
     }
 
     @Override
@@ -57,7 +61,7 @@ public class SimpleToolRepository implements ToolRepository {
         this.toolCache.put(uniqueName, tool);
         log.info("Register tool[uniqueName={}] success.", uniqueName);
         Map<String, Object> parameters = cast(tool.schema().get("parameters"));
-        this.toolChangedObserver.onToolAdded(uniqueName, tool.description(), parameters);
+        this.toolChangedObservers.forEach(observer -> observer.onToolAdded(uniqueName, tool.description(), parameters));
     }
 
     @Override
@@ -68,7 +72,7 @@ public class SimpleToolRepository implements ToolRepository {
         String uniqueName = ToolInfo.identify(namespace, toolName);
         this.toolCache.remove(uniqueName);
         log.info("Unregister tool[uniqueName={}] success.", uniqueName);
-        this.toolChangedObserver.onToolRemoved(uniqueName);
+        this.toolChangedObservers.forEach(observer -> observer.onToolRemoved(uniqueName));
     }
 
     @Override
