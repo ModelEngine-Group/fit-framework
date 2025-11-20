@@ -36,7 +36,6 @@ import modelengine.fitframework.log.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -186,11 +185,14 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
             return headerError;
         }
 
+        String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
+        McpSchema.JSONRPCMessage message = this.deserializeMessage(requestBody, response);
+        if (message == null) {
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
+        }
         McpTransportContext transportContext = this.contextExtractor.extract(request);
         try {
-            String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
-            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
-
             // Handle JSONRPCMessage
             if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest && jsonrpcRequest.method()
                     .equals(McpSchema.METHOD_INITIALIZE)) {
@@ -199,11 +201,6 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
             } else {
                 return this.handleJsonRpcMessage(message, request, requestBody, transportContext, response);
             }
-        } catch (IllegalArgumentException | IOException e) {
-            logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
-            response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createObject(response,
-                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
         } catch (Exception e) {
             logger.error("[POST] Error handling message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
@@ -256,9 +253,9 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Validates the Accept header for SSE (Server-Sent Events) connections in GET requests.
      * Checks if the request contains the required {@code text/event-stream} content type.
      *
-     * @param request The incoming {@link HttpClassicServerRequest}
-     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails
-     * @return An error {@link Entity} if validation fails, {@code null} if validation succeeds
+     * @param request The incoming {@link HttpClassicServerRequest}.
+     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails.
+     * @return An error {@link Entity} if validation fails, {@code null} if validation succeeds.
      */
     private Object validateGetAcceptHeaders(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         String acceptHeaders = request.headers().first(MessageHeaderNames.ACCEPT).orElse("");
@@ -274,9 +271,9 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Checks if the request contains both {@code text/event-stream} and {@code application/json} content types,
      * as POST requests may return either SSE streams or JSON responses.
      *
-     * @param request The incoming {@link HttpClassicServerRequest}
-     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails
-     * @return An error {@link Entity} with {@link McpError} if validation fails, {@code null} if validation succeeds
+     * @param request The incoming {@link HttpClassicServerRequest}.
+     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails.
+     * @return An error {@link Entity} with {@link McpError} if validation fails, {@code null} if validation succeeds.
      */
     private Object validatePostAcceptHeaders(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         String acceptHeaders = request.headers().first(MessageHeaderNames.ACCEPT).orElse("");
@@ -296,10 +293,10 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * This method checks both the presence of the {@code mcp-session-id} header and
      * the existence of the corresponding session in the active sessions map.
      *
-     * @param request The incoming {@link HttpClassicServerRequest} containing the session ID header
-     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails
+     * @param request The incoming {@link HttpClassicServerRequest} containing the session ID header.
+     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails.
      * @return An error {@link Entity} if validation fails (either missing session ID or session not found),
-     * {@code null} if validation succeeds
+     * {@code null} if validation succeeds.
      */
     private Object validateRequestSessionId(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
@@ -315,12 +312,12 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Replays previously sent messages starting from the last received event ID,
      * allowing clients to recover missed messages after reconnection.
      *
-     * @param request The incoming {@link HttpClassicServerRequest} containing the {@code Last-Event-ID} header
-     * @param transportContext The {@link McpTransportContext} for request context propagation
-     * @param sessionId The MCP session identifier
-     * @param session The {@link McpStreamableServerSession} to replay messages from
-     * @param sessionTransport The {@link FitStreamableMcpSessionTransport} for sending replayed messages
-     * @param emitter The SSE {@link Emitter} to send {@link TextEvent} to the client
+     * @param request The incoming {@link HttpClassicServerRequest} containing the {@code Last-Event-ID} header.
+     * @param transportContext The {@link McpTransportContext} for request context propagation.
+     * @param sessionId The MCP session identifier.
+     * @param session The {@link McpStreamableServerSession} to replay messages from.
+     * @param sessionTransport The {@link FitStreamableMcpSessionTransport} for sending replayed messages.
+     * @param emitter The SSE {@link Emitter} to send {@link TextEvent} to the client.
      */
     private void handleReplaySseRequest(HttpClassicServerRequest request, McpTransportContext transportContext,
             String sessionId, McpStreamableServerSession session, FitStreamableMcpSessionTransport sessionTransport,
@@ -353,10 +350,10 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Creates a persistent connection that allows the server to push messages to the client
      * as they become available. The stream remains open until explicitly closed or an error occurs.
      *
-     * @param sessionId The MCP session identifier
-     * @param session The {@link McpStreamableServerSession} to establish the listening stream for
-     * @param sessionTransport The {@link FitStreamableMcpSessionTransport} for bidirectional communication
-     * @param emitter The SSE {@link Emitter} to send {@link TextEvent} to the client
+     * @param sessionId The MCP session identifier.
+     * @param session The {@link McpStreamableServerSession} to establish the listening stream for.
+     * @param sessionTransport The {@link FitStreamableMcpSessionTransport} for bidirectional communication.
+     * @param emitter The SSE {@link Emitter} to send {@link TextEvent} to the client.
      */
     private void handleEstablishSseRequest(String sessionId, McpStreamableServerSession session,
             FitStreamableMcpSessionTransport sessionTransport, Emitter<TextEvent> emitter) {
@@ -406,13 +403,13 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Creates a new {@link McpStreamableServerSession} and returns the initialization result
      * with the assigned session ID in the response headers.
      *
-     * @param request The incoming {@link HttpClassicServerRequest}
-     * @param response The {@link HttpClassicServerResponse} to set session ID and initialization result
+     * @param request The incoming {@link HttpClassicServerRequest}.
+     * @param response The {@link HttpClassicServerResponse} to set session ID and initialization result.
      * @param jsonrpcRequest The {@link McpSchema.JSONRPCRequest} containing {@link McpSchema.InitializeRequest}
-     * parameters
+     * parameters.
      * @return An {@link Entity} containing the {@link McpSchema.JSONRPCResponse} with
      * {@link McpSchema.InitializeResult}
-     * on success, or an error {@link Entity} with {@link McpError} on failure
+     * on success, or an error {@link Entity} with {@link McpError} on failure.
      */
     private Object handleInitializeRequest(HttpClassicServerRequest request, HttpClassicServerResponse response,
             McpSchema.JSONRPCRequest jsonrpcRequest) {
@@ -442,12 +439,12 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Handles different types of JSON-RPC messages (Response, Notification, Request).
      * Routes the message to the appropriate handler method based on its type.
      *
-     * @param message The {@link McpSchema.JSONRPCMessage} to handle
-     * @param request The incoming {@link HttpClassicServerRequest}
-     * @param requestBody The {@link String} of request body.
-     * @param transportContext The {@link McpTransportContext} for request context propagation
-     * @param response The {@link HttpClassicServerResponse} to set status code and return data
-     * @return An {@link Entity} or {@link Choir} containing the response data, or {@code null} for accepted messages
+     * @param message The {@link McpSchema.JSONRPCMessage} to handle.
+     * @param request The incoming {@link HttpClassicServerRequest}.
+     * @param requestBody The {@link String} of request body..
+     * @param transportContext The {@link McpTransportContext} for request context propagation.
+     * @param response The {@link HttpClassicServerResponse} to set status code and return data.
+     * @return An {@link Entity} or {@link Choir} containing the response data, or {@code null} for accepted messages.
      */
     private Object handleJsonRpcMessage(McpSchema.JSONRPCMessage message, HttpClassicServerRequest request,
             String requestBody, McpTransportContext transportContext, HttpClassicServerResponse response) {
@@ -480,10 +477,10 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Accepts the response and delivers it to the corresponding pending request within the session.
      * Sets the HTTP response status to {@code 202 Accepted} to acknowledge receipt.
      *
-     * @param jsonrpcResponse The {@link McpSchema.JSONRPCResponse} from the client
-     * @param session The {@link McpStreamableServerSession} to accept the response
-     * @param transportContext The {@link McpTransportContext} for request context propagation
-     * @param response The {@link HttpClassicServerResponse} to set the status code
+     * @param jsonrpcResponse The {@link McpSchema.JSONRPCResponse} from the client.
+     * @param session The {@link McpStreamableServerSession} to accept the response.
+     * @param transportContext The {@link McpTransportContext} for request context propagation.
+     * @param response The {@link HttpClassicServerResponse} to set the status code.
      */
     private void handleJsonRpcResponse(McpSchema.JSONRPCResponse jsonrpcResponse, McpStreamableServerSession session,
             McpTransportContext transportContext, HttpClassicServerResponse response) {
@@ -496,10 +493,10 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Notifications are one-way messages that do not require a response.
      * Sets the HTTP response status to {@code 202 Accepted} to acknowledge receipt.
      *
-     * @param jsonrpcNotification The {@link McpSchema.JSONRPCNotification} from the client
-     * @param session The {@link McpStreamableServerSession} to accept the notification
-     * @param transportContext The {@link McpTransportContext} for request context propagation
-     * @param response The {@link HttpClassicServerResponse} to set the status code
+     * @param jsonrpcNotification The {@link McpSchema.JSONRPCNotification} from the client.
+     * @param session The {@link McpStreamableServerSession} to accept the notification.
+     * @param transportContext The {@link McpTransportContext} for request context propagation.
+     * @param response The {@link HttpClassicServerResponse} to set the status code.
      */
     private void handleJsonRpcNotification(McpSchema.JSONRPCNotification jsonrpcNotification,
             McpStreamableServerSession session, McpTransportContext transportContext,
@@ -515,12 +512,12 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * Creates an SSE stream to send the response and any subsequent messages back to the client.
      * This allows for real-time, bidirectional communication during request processing.
      *
-     * @param jsonrpcRequest The {@link McpSchema.JSONRPCRequest} from the client
-     * @param session The {@link McpStreamableServerSession} to process the request
-     * @param sessionId The MCP session identifier for logging and tracking
-     * @param transportContext The {@link McpTransportContext} for request context propagation
-     * @param response The {@link HttpClassicServerResponse} for the SSE stream
-     * @return A {@link Choir} containing {@link TextEvent} for SSE streaming of the response
+     * @param jsonrpcRequest The {@link McpSchema.JSONRPCRequest} from the client.
+     * @param session The {@link McpStreamableServerSession} to process the request.
+     * @param sessionId The MCP session identifier for logging and tracking.
+     * @param transportContext The {@link McpTransportContext} for request context propagation.
+     * @param response The {@link HttpClassicServerResponse} for the SSE stream.
+     * @return A {@link Choir} containing {@link TextEvent} for SSE streaming of the response.
      */
     private Object handleJsonRpcRequest(McpSchema.JSONRPCRequest jsonrpcRequest, McpStreamableServerSession session,
             String sessionId, McpTransportContext transportContext, HttpClassicServerResponse response) {

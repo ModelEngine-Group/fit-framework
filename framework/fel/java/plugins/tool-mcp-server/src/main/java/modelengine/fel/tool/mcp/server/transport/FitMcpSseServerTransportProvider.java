@@ -32,7 +32,6 @@ import modelengine.fitframework.log.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -190,22 +189,19 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
             return sessionError;
         }
         McpServerSession session = this.sessions.get(sessionId);
-        try {
-            McpTransportContext transportContext = this.contextExtractor.extract(request);
 
-            String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
-            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
-            logger.info("[POST] Receiving message from session. [sessionId={}, requestBody={}]",
-                    sessionId,
-                    requestBody);
+        String requestBody = new String(request.entityBytes(), StandardCharsets.UTF_8);
+        McpSchema.JSONRPCMessage message = this.deserializeMessage(requestBody, response);
+        if (message == null) {
+            return Entity.createObject(response,
+                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
+        }
+        logger.info("[POST] Receiving message from session. [sessionId={}, requestBody={}]", sessionId, requestBody);
+        McpTransportContext transportContext = this.contextExtractor.extract(request);
+        try {
             session.handle(message).contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext)).block();
             response.statusCode(HttpResponseStatus.OK.statusCode());
             return null;
-        } catch (IllegalArgumentException | IOException e) {
-            logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
-            response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createObject(response,
-                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
         } catch (Exception e) {
             logger.error("[POST] Error handling message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());

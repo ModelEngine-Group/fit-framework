@@ -23,6 +23,7 @@ import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.log.Logger;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -186,6 +187,23 @@ public abstract class FitMcpServerTransportProvider<S> {
                             .build());
         }
         return null;
+    }
+
+    /**
+     * Deserializes a JSON-RPC message from the request body.
+     *
+     * @param requestBody The request body string to deserialize.
+     * @param response The HTTP response to set error status if deserialization fails.
+     * @return The deserialized {@link McpSchema.JSONRPCMessage}, or {@code null} if deserialization fails.
+     */
+    protected McpSchema.JSONRPCMessage deserializeMessage(String requestBody, HttpClassicServerResponse response) {
+        try {
+            return McpSchema.deserializeJsonRpcMessage(this.jsonMapper, requestBody);
+        } catch (IllegalArgumentException | IOException e) {
+            logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
+            response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
+            return null;
+        }
     }
 
     /**
