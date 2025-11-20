@@ -66,17 +66,12 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
      * @param disallowDelete Whether to disallow DELETE requests on the endpoint.
      * @param contextExtractor The context extractor to fill in a {@link McpTransportContext}.
      * @param keepAliveInterval The interval for sending keep-alive messages to clients.
-     * @throws IllegalArgumentException if any parameter is null
+     * @throws IllegalArgumentException if any parameter is null.
      */
     private FitMcpStreamableServerTransportProvider(McpJsonMapper jsonMapper, boolean disallowDelete,
             McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor, Duration keepAliveInterval) {
         super(jsonMapper, contextExtractor, keepAliveInterval);
         this.disallowDelete = disallowDelete;
-    }
-
-    @Override
-    protected Logger getLogger() {
-        return logger;
     }
 
     @Override
@@ -120,9 +115,10 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
     /**
      * Set up the listening SSE connections and message replay.
      *
-     * @param request The incoming server request
-     * @param response The HTTP response
-     * @return Return the HTTP response body {@link Entity} or a {@link Choir}{@code <}{@link TextEvent}{@code >} object
+     * @param request The incoming server request.
+     * @param response The HTTP response.
+     * @return Return the HTTP response body {@link Entity} or a {@link Choir}{@code <}{@link TextEvent}{@code >}
+     * object.
      */
     @GetMapping(path = MESSAGE_ENDPOINT)
     public Object handleGet(HttpClassicServerRequest request, HttpClassicServerResponse response) {
@@ -175,9 +171,10 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
     /**
      * Handles POST requests for incoming JSON-RPC messages from clients.
      *
-     * @param request The incoming server request containing the JSON-RPC message
-     * @param response The HTTP response
-     * @return Return the HTTP response body {@link Entity} or a {@link Choir}{@code <}{@link TextEvent}{@code >} object
+     * @param request The incoming server request containing the JSON-RPC message.
+     * @param response The HTTP response.
+     * @return Return the HTTP response body {@link Entity} or a {@link Choir}{@code <}{@link TextEvent}{@code >}
+     * object.
      */
     @PostMapping(path = MESSAGE_ENDPOINT)
     public Object handlePost(HttpClassicServerRequest request, HttpClassicServerResponse response) {
@@ -206,7 +203,7 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
             logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             return Entity.createObject(response,
-                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format").build());
+                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
         } catch (Exception e) {
             logger.error("[POST] Error handling message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
@@ -218,8 +215,8 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
     /**
      * Handles DELETE requests for session deletion.
      *
-     * @param request The incoming server request
-     * @param response The HTTP response
+     * @param request The incoming server request.
+     * @param response The HTTP response.
      * @return Return HTTP response body {@link Entity}.
      */
     @DeleteMapping(path = MESSAGE_ENDPOINT)
@@ -267,7 +264,7 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
         String acceptHeaders = request.headers().first(MessageHeaderNames.ACCEPT).orElse("");
         if (!acceptHeaders.contains(MimeType.TEXT_EVENT_STREAM.value())) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createText(response, "Invalid Accept header. Expected TEXT_EVENT_STREAM");
+            return Entity.createText(response, "Invalid Accept header. Expected TEXT_EVENT_STREAM.");
         }
         return null;
     }
@@ -288,7 +285,7 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             return Entity.createObject(response,
                     McpError.builder(McpSchema.ErrorCodes.INVALID_REQUEST)
-                            .message("Invalid Accept headers. Expected TEXT_EVENT_STREAM and APPLICATION_JSON")
+                            .message("Invalid Accept headers. Expected TEXT_EVENT_STREAM and APPLICATION_JSON.")
                             .build());
         }
         return null;
@@ -307,7 +304,7 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
     private Object validateRequestSessionId(HttpClassicServerRequest request, HttpClassicServerResponse response) {
         if (!request.headers().contains(HttpHeaders.MCP_SESSION_ID)) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createText(response, "Session ID required in mcp-session-id header");
+            return Entity.createText(response, "Session ID required in mcp-session-id header.");
         }
         String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
         return this.validateSessionExists(sessionId, response);
@@ -474,7 +471,7 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
         } else {
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
             return Entity.createObject(response,
-                    McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type").build());
+                    McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR).message("Unknown message type.").build());
         }
     }
 
@@ -576,9 +573,9 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
         /**
          * Creates a new session transport with the specified ID and SSE builder.
          *
-         * @param sessionId The unique identifier for this session
-         * @param emitter The emitter for sending events
-         * @param response The HTTP response for checking connection status
+         * @param sessionId The unique identifier for this session.
+         * @param emitter The emitter for sending events.
+         * @param response The HTTP response for checking connection status.
          */
         FitStreamableMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter,
                 HttpClassicServerResponse response) {
@@ -619,11 +616,11 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
          * Sets the jsonMapper to use for JSON serialization/deserialization of MCP messages.
          *
          * @param jsonMapper The jsonMapper instance. Must not be null.
-         * @return this builder instance
-         * @throws IllegalArgumentException if jsonMapper is null
+         * @return This builder instance.
+         * @throws IllegalArgumentException if jsonMapper is null.
          */
         public Builder jsonMapper(McpJsonMapper jsonMapper) {
-            Validation.notNull(jsonMapper, "jsonMapper must not be null");
+            Validation.notNull(jsonMapper, "Json mapper must not be null.");
             this.jsonMapper = jsonMapper;
             return this;
         }
@@ -631,8 +628,8 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
         /**
          * Sets whether to disallow DELETE requests on the endpoint.
          *
-         * @param disallowDelete true to disallow DELETE requests, false otherwise
-         * @return this builder instance
+         * @param disallowDelete true to disallow DELETE requests, false otherwise.
+         * @return This builder instance.
          */
         public Builder disallowDelete(boolean disallowDelete) {
             this.disallowDelete = disallowDelete;
@@ -647,11 +644,11 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
          *
          * @param contextExtractor The contextExtractor to fill in a
          * {@link McpTransportContext}.
-         * @return this builder instance
-         * @throws IllegalArgumentException if contextExtractor is null
+         * @return This builder instance.
+         * @throws IllegalArgumentException if contextExtractor is null.
          */
         public Builder contextExtractor(McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor) {
-            Validation.notNull(contextExtractor, "contextExtractor must not be null");
+            Validation.notNull(contextExtractor, "Context extractor must not be null.");
             this.contextExtractor = contextExtractor;
             return this;
         }
@@ -661,8 +658,8 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
          * will be created to periodically check and send keep-alive messages to clients.
          *
          * @param keepAliveInterval The interval duration for keep-alive messages, or null
-         * to disable keep-alive
-         * @return this builder instance
+         * to disable keep-alive.
+         * @return This builder instance.
          */
         public Builder keepAliveInterval(Duration keepAliveInterval) {
             this.keepAliveInterval = keepAliveInterval;
@@ -673,11 +670,11 @@ public class FitMcpStreamableServerTransportProvider extends FitMcpServerTranspo
          * Builds a new instance of {@link FitMcpStreamableServerTransportProvider} with
          * the configured settings.
          *
-         * @return A new FitMcpStreamableServerTransportProvider instance
-         * @throws IllegalStateException if required parameters are not set
+         * @return A new FitMcpStreamableServerTransportProvider instance.
+         * @throws IllegalStateException if required parameters are not set.
          */
         public FitMcpStreamableServerTransportProvider build() {
-            Validation.notNull(this.jsonMapper, "jsonMapper must be set");
+            Validation.notNull(this.jsonMapper, "Json mapper must be set.");
 
             return new FitMcpStreamableServerTransportProvider(this.jsonMapper,
                     this.disallowDelete,

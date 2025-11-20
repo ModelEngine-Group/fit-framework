@@ -23,21 +23,4 @@ public interface McpServer {
      * @return The MCP server tools as a {@link List}{@code <}{@link Tool}{@code >}.
      */
     List<Tool> getTools();
-
-    /**
-     * Registers MCP server tools changed observer.
-     *
-     * @param observer The MCP server tools changed observer as a {@link ToolsChangedObserver}.
-     */
-    void registerToolsChangedObserver(ToolsChangedObserver observer);
-
-    /**
-     * Represents the MCP server tools changed observer.
-     */
-    interface ToolsChangedObserver {
-        /**
-         * Called when MCP server tools changed.
-         */
-        void onToolsChanged();
-    }
 }

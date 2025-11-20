@@ -10,9 +10,12 @@ import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
+import modelengine.fel.tool.mcp.server.support.DefaultMcpServer;
 import modelengine.fel.tool.mcp.server.transport.FitMcpSseServerTransportProvider;
+import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fitframework.annotation.Bean;
 import modelengine.fitframework.annotation.Component;
+import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
 
 import java.time.Duration;
@@ -27,7 +30,7 @@ import java.time.Duration;
 public class McpSseServerConfig {
     @Bean
     public FitMcpSseServerTransportProvider fitMcpSseServerTransportProvider(
-            @Value("${mcp.server.keep-alive-interval-seconds}") int keepAliveIntervalSeconds) {
+            @Value("${mcp.server.ping.interval-seconds}") int keepAliveIntervalSeconds) {
         return FitMcpSseServerTransportProvider.builder()
                 .jsonMapper(McpJsonMapper.getDefault())
                 .keepAliveInterval(Duration.ofSeconds(keepAliveIntervalSeconds))
@@ -42,5 +45,11 @@ public class McpSseServerConfig {
                 .capabilities(McpSchema.ServerCapabilities.builder().tools(true).logging().build())
                 .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
                 .build();
+    }
+
+    @Bean("DefaultMcpSseServer")
+    public DefaultMcpServer defaultMcpSseServer(ToolExecuteService toolExecuteService,
+            @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncServer) {
+        return new DefaultMcpServer(toolExecuteService, mcpSyncServer);
     }
 }

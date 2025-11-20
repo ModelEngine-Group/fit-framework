@@ -62,16 +62,11 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
      * @param keepAliveInterval The interval for sending keep-alive messages to clients.
      * @param contextExtractor The contextExtractor to fill in a
      * {@link McpTransportContext}.
-     * @throws IllegalArgumentException if any parameter is null
+     * @throws IllegalArgumentException if any parameter is null.
      */
     private FitMcpSseServerTransportProvider(McpJsonMapper jsonMapper, Duration keepAliveInterval,
             McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor) {
         super(jsonMapper, contextExtractor, keepAliveInterval);
-    }
-
-    @Override
-    protected Logger getLogger() {
-        return logger;
     }
 
     @Override
@@ -103,7 +98,7 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
     /**
      * Returns the list of supported MCP protocol versions.
      *
-     * @return A list of supported protocol version strings
+     * @return A list of supported protocol version strings.
      */
     @Override
     public List<String> protocolVersions() {
@@ -113,7 +108,7 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
     /**
      * Sets the session factory used to create new MCP server sessions.
      *
-     * @param sessionFactory The factory for creating server sessions
+     * @param sessionFactory The factory for creating server sessions.
      */
     @Override
     public void setSessionFactory(McpServerSession.Factory sessionFactory) {
@@ -130,10 +125,10 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
      * <li>Maintains the session in the sessions map</li>
      * </ul>
      *
-     * @param request The incoming server request
-     * @param response The HTTP response for SSE communication
+     * @param request The incoming server request.
+     * @param response The HTTP response for SSE communication.
      * @return A {@link Choir}{@code <}{@link TextEvent}{@code >} object for SSE streaming,
-     * or an error response if the server is shutting down or the connection fails
+     * or an error response if the server is shutting down or the connection fails.
      */
     @GetMapping(path = SSE_ENDPOINT)
     public Object handleSseConnection(HttpClassicServerRequest request, HttpClassicServerResponse response) {
@@ -179,10 +174,10 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
      * <li>Returns appropriate HTTP responses based on the processing result</li>
      * </ul>
      *
-     * @param request The incoming server request containing the JSON-RPC message
-     * @param response The HTTP response to set status code and return data
-     * @param sessionId The session ID from the request parameter
-     * @return An error {@link Entity} if validation fails, or {@code null} on success
+     * @param request The incoming server request containing the JSON-RPC message.
+     * @param response The HTTP response to set status code and return data.
+     * @param sessionId The session ID from the request parameter.
+     * @return An error {@link Entity} if validation fails, or {@code null} on success.
      */
     @PostMapping(path = MESSAGE_ENDPOINT)
     public Object handleMessage(HttpClassicServerRequest request, HttpClassicServerResponse response,
@@ -210,7 +205,7 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
             logger.error("[POST] Failed to deserialize message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
             return Entity.createObject(response,
-                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format").build());
+                    McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR).message("Invalid message format.").build());
         } catch (Exception e) {
             logger.error("[POST] Error handling message. [error={}]", e.getMessage(), e);
             response.statusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.statusCode());
@@ -224,8 +219,8 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
      * The observer removes the session from the sessions map when the connection
      * completes or fails.
      *
-     * @param emitter The SSE emitter to observe
-     * @param sessionId The session ID associated with this emitter
+     * @param emitter The SSE emitter to observe.
+     * @param sessionId The session ID associated with this emitter.
      */
     private void addEmitterObserver(Emitter<TextEvent> emitter, String sessionId) {
         emitter.observe(new Emitter.Observer<TextEvent>() {
@@ -259,14 +254,14 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
      * the existence of the corresponding session in the active sessions map.
      *
      * @param sessionId The {@link String} session ID in request parameter.
-     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails
+     * @param response The {@link HttpClassicServerResponse} to set status code if validation fails.
      * @return An error {@link Entity} if validation fails (either missing session ID or session not found),
-     * {@code null} if validation succeeds
+     * {@code null} if validation succeeds.
      */
     private Object validateRequestSessionId(String sessionId, HttpClassicServerResponse response) {
         if (sessionId.isEmpty()) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createText(response, "Session ID missing in message endpoint");
+            return Entity.createText(response, "Session ID missing in message endpoint.");
         }
         return this.validateSessionExists(sessionId, response);
     }
@@ -316,11 +311,11 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
         /**
          * Sets the JSON object mapper to use for message serialization/deserialization.
          *
-         * @param jsonMapper The object mapper to use
-         * @return This builder instance for method chaining
+         * @param jsonMapper The object mapper to use.
+         * @return This builder instance for method chaining.
          */
         public Builder jsonMapper(McpJsonMapper jsonMapper) {
-            Validation.notNull(jsonMapper, "McpJsonMapper must not be null");
+            Validation.notNull(jsonMapper, "MCP Json mapper must not be null.");
             this.jsonMapper = jsonMapper;
             return this;
         }
@@ -330,8 +325,8 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
          * <p>
          * If not specified, keep-alive pings will be disabled.
          *
-         * @param keepAliveInterval The interval duration for keep-alive pings
-         * @return This builder instance for method chaining
+         * @param keepAliveInterval The interval duration for keep-alive pings.
+         * @return This builder instance for method chaining.
          */
         public Builder keepAliveInterval(Duration keepAliveInterval) {
             this.keepAliveInterval = keepAliveInterval;
@@ -346,11 +341,11 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
          *
          * @param contextExtractor The contextExtractor to fill in a
          * {@link McpTransportContext}.
-         * @return this builder instance
-         * @throws IllegalArgumentException if contextExtractor is null
+         * @return This builder instance.
+         * @throws IllegalArgumentException if contextExtractor is null.
          */
         public Builder contextExtractor(McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor) {
-            Validation.notNull(contextExtractor, "contextExtractor must not be null");
+            Validation.notNull(contextExtractor, "Context extractor must not be null.");
             this.contextExtractor = contextExtractor;
             return this;
         }
@@ -359,11 +354,11 @@ public class FitMcpSseServerTransportProvider extends FitMcpServerTransportProvi
          * Builds a new instance of FitMcpSseServerTransportProvider with the configured
          * settings.
          *
-         * @return A new FitMcpSseServerTransportProvider instance
-         * @throws IllegalStateException if jsonMapper or messageEndpoint is not set
+         * @return A new FitMcpSseServerTransportProvider instance.
+         * @throws IllegalStateException if jsonMapper or messageEndpoint is not set.
          */
         public FitMcpSseServerTransportProvider build() {
-            Validation.notNull(this.jsonMapper, "jsonMapper must be set");
+            Validation.notNull(this.jsonMapper, "Json mapper must be set.");
 
             return new FitMcpSseServerTransportProvider(
                     this.jsonMapper == null ? McpJsonMapper.getDefault() : this.jsonMapper,

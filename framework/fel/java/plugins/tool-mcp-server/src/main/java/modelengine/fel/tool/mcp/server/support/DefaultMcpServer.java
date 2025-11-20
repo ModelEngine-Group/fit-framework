@@ -18,13 +18,10 @@ import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fel.tool.mcp.server.McpServer;
 import modelengine.fel.tool.service.ToolChangedObserver;
 import modelengine.fel.tool.service.ToolExecuteService;
-import modelengine.fitframework.annotation.Component;
-import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.MapUtils;
 import modelengine.fitframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,48 +29,30 @@ import java.util.stream.Collectors;
 
 /**
  * Mcp Server implementing interface {@link McpServer}, {@link ToolChangedObserver}
- * with two MCP Server {@link McpSyncServer} Bean for SSE Server and Streamable Server.
+ * with MCP Server {@link McpSyncServer} implemented with SDK.
  *
  * @author 季聿阶
  * @since 2025-05-15
  */
-@Component
 public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     private static final Logger log = Logger.get(DefaultMcpServer.class);
-    private final McpSyncServer mcpSyncSseServer;
-    private final McpSyncServer mcpSyncStreamableServer;
-
+    private final McpSyncServer mcpSyncServer;
     private final ToolExecuteService toolExecuteService;
-    private final List<ToolsChangedObserver> toolsChangedObservers = new ArrayList<>();
 
     /**
      * Constructs a new instance of the DefaultMcpServer class.
      *
-     * @param toolExecuteService The service used to execute tools when handling tool call requests
-     * @param mcpSyncSseServer The MCP sync server for SSE transport
-     * @param mcpSyncStreamableServer The MCP sync server for Streamable transport
+     * @param toolExecuteService The service used to execute tools when handling tool call requests.
+     * @param mcpSyncServer The MCP sync server.
      */
-    public DefaultMcpServer(ToolExecuteService toolExecuteService,
-            @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncSseServer,
-            @Fit(alias = "McpSyncStreamableServer") McpSyncServer mcpSyncStreamableServer) {
+    public DefaultMcpServer(ToolExecuteService toolExecuteService, McpSyncServer mcpSyncServer) {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
-        this.mcpSyncSseServer = mcpSyncSseServer;
-        this.mcpSyncStreamableServer = mcpSyncStreamableServer;
+        this.mcpSyncServer = mcpSyncServer;
     }
 
     @Override
     public List<Tool> getTools() {
-        return this.mcpSyncStreamableServer.listTools()
-                .stream()
-                .map(this::convertToFelTool)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void registerToolsChangedObserver(ToolsChangedObserver observer) {
-        if (observer != null) {
-            this.toolsChangedObservers.add(observer);
-        }
+        return this.mcpSyncServer.listTools().stream().map(this::convertToFelTool).collect(Collectors.toList());
     }
 
     @Override
@@ -98,15 +77,12 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
         McpServerFeatures.SyncToolSpecification toolSpecification =
                 createToolSpecification(name, description, parameters);
         try {
-            this.mcpSyncSseServer.addTool(toolSpecification);
-            this.mcpSyncStreamableServer.addTool(toolSpecification);
+            this.mcpSyncServer.addTool(toolSpecification);
         } catch (Exception e) {
-            log.error("Failed to added tool to MCP server. [toolName={}]", name);
-            this.mcpSyncSseServer.removeTool(name);
+            log.error("Failed to added tool to MCP server. [toolName={}, error={}]", name, e.getMessage());
             throw e;
         }
         log.info("Tool added to MCP server. [toolName={}, description={}, schema={}]", name, description, parameters);
-        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 
     @Override
@@ -115,19 +91,17 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
             log.warn("Tool removal is ignored: tool name is blank.");
             return;
         }
-        this.mcpSyncSseServer.removeTool(name);
-        this.mcpSyncStreamableServer.removeTool(name);
+        this.mcpSyncServer.removeTool(name);
         log.info("Tool removed from MCP server. [toolName={}]", name);
-        this.toolsChangedObservers.forEach(ToolsChangedObserver::onToolsChanged);
     }
 
     /**
      * Creates a tool specification for the MCP server.
      *
-     * @param name The name of the tool
-     * @param description The description of the tool
-     * @param parameters The parameter schema containing type, properties, and required fields
-     * @return A configured {@link McpServerFeatures.SyncToolSpecification}
+     * @param name The name of the tool.
+     * @param description The description of the tool.
+     * @param parameters The parameter schema containing type, properties, and required fields.
+     * @return A configured {@link McpServerFeatures.SyncToolSpecification}.
      */
     private McpServerFeatures.SyncToolSpecification createToolSpecification(String name, String description,
             Map<String, Object> parameters) {
@@ -148,9 +122,9 @@ public class DefaultMcpServer implements McpServer, ToolChangedObserver {
     /**
      * Executes a tool and handles any exceptions that may occur.
      *
-     * @param toolName The name of the tool to execute
-     * @param request The tool call request containing arguments
-     * @return A {@link McpSchema.CallToolResult} with the execution result or error message
+     * @param toolName The name of the tool to execute.
+     * @param request The tool call request containing arguments.
+     * @return A {@link McpSchema.CallToolResult} with the execution result or error message.
      */
     private McpSchema.CallToolResult executeToolWithErrorHandling(String toolName, McpSchema.CallToolRequest request) {
         try {

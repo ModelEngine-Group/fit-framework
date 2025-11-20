@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 2025-09-30
  */
 public abstract class FitMcpServerTransportProvider<S> {
+    private static final Logger logger = Logger.get(FitMcpServerTransportProvider.class);
     protected final McpJsonMapper jsonMapper;
     protected final McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor;
     protected KeepAliveScheduler keepAliveScheduler;
@@ -47,14 +48,14 @@ public abstract class FitMcpServerTransportProvider<S> {
     /**
      * Constructs a new FitMcpServerTransportProvider instance.
      *
-     * @param jsonMapper The JSON mapper for serialization/deserialization
-     * @param contextExtractor The context extractor for HTTP requests
-     * @param keepAliveInterval The interval for keep-alive messages, or null to disable
+     * @param jsonMapper The JSON mapper for serialization/deserialization.
+     * @param contextExtractor The context extractor for HTTP requests.
+     * @param keepAliveInterval The interval for keep-alive messages, or null to disable.
      */
     protected FitMcpServerTransportProvider(McpJsonMapper jsonMapper,
             McpTransportContextExtractor<HttpClassicServerRequest> contextExtractor, Duration keepAliveInterval) {
-        Validation.notNull(jsonMapper, "McpJsonMapper must not be null");
-        Validation.notNull(contextExtractor, "Context extractor must not be null");
+        Validation.notNull(jsonMapper, "MCP Json mapper must not be null.");
+        Validation.notNull(contextExtractor, "Context extractor must not be null.");
 
         this.jsonMapper = jsonMapper;
         this.contextExtractor = contextExtractor;
@@ -64,42 +65,35 @@ public abstract class FitMcpServerTransportProvider<S> {
     }
 
     /**
-     * Gets static logger instance for this transport provider.
-     *
-     * @return The logger instance
-     */
-    protected abstract Logger getLogger();
-
-    /**
      * Initializes the keep-alive scheduler with the specified interval.
      *
-     * @param keepAliveInterval The interval for keep-alive messages
+     * @param keepAliveInterval The interval for keep-alive messages.
      */
     protected abstract void initKeepAliveScheduler(Duration keepAliveInterval);
 
     /**
      * Gets the session ID from a session object.
      *
-     * @param session The session object
-     * @return The session ID
+     * @param session The session object.
+     * @return The session ID.
      */
     protected abstract String getSessionId(S session);
 
     /**
      * Closes a session gracefully.
      *
-     * @param session The session to close
-     * @return A Mono that completes when the session is closed
+     * @param session The session to close.
+     * @return A Mono that completes when the session is closed.
      */
     protected abstract Mono<Void> closeSession(S session);
 
     /**
      * Sends a notification to a specific session.
      *
-     * @param session The session to send to
-     * @param method The notification method name
-     * @param params The notification parameters
-     * @return A Mono that completes when the notification is sent
+     * @param session The session to send to.
+     * @param method The notification method name.
+     * @param params The notification parameters.
+     * @return A Mono that completes when the notification is sent.
      */
     protected abstract Mono<Void> sendNotificationToSession(S session, String method, Object params);
 
@@ -108,27 +102,26 @@ public abstract class FitMcpServerTransportProvider<S> {
      * If any errors occur during sending to a particular client, they are logged but
      * don't prevent sending to other clients.
      *
-     * @param method The method name for the notification
-     * @param params The parameters for the notification
-     * @return A Mono that completes when the broadcast attempt is finished
+     * @param method The method name for the notification.
+     * @param params The parameters for the notification.
+     * @return A Mono that completes when the broadcast attempt is finished.
      */
     public Mono<Void> notifyClients(String method, Object params) {
         if (this.sessions.isEmpty()) {
-            this.getLogger().debug("No active sessions to broadcast message to");
+            logger.debug("No active sessions to broadcast message to.");
             return Mono.empty();
         }
 
-        this.getLogger().debug("Attempting to broadcast message. [activeSessions={}]", this.sessions.size());
+        logger.debug("Attempting to broadcast message. [activeSessions={}]", this.sessions.size());
 
         return Mono.fromRunnable(() -> this.sessions.values().parallelStream().forEach(session -> {
             try {
                 this.sendNotificationToSession(session, method, params).block();
             } catch (Exception e) {
-                this.getLogger()
-                        .error("Failed to send message to session. [sessionId={}, error={}]",
-                                this.getSessionId(session),
-                                e.getMessage(),
-                                e);
+                logger.error("Failed to send message to session. [sessionId={}, error={}]",
+                        this.getSessionId(session),
+                        e.getMessage(),
+                        e);
             }
         }));
     }
@@ -136,26 +129,25 @@ public abstract class FitMcpServerTransportProvider<S> {
     /**
      * Initiates a graceful shutdown of the transport.
      *
-     * @return A Mono that completes when all cleanup operations are finished
+     * @return A Mono that completes when all cleanup operations are finished.
      */
     public Mono<Void> closeGracefully() {
         this.isClosing = true;
-        this.getLogger().debug("Initiating graceful shutdown. [activeSessions={}]", this.sessions.size());
+        logger.debug("Initiating graceful shutdown. [activeSessions={}]", this.sessions.size());
 
         return Mono.fromRunnable(() -> {
             this.sessions.values().parallelStream().forEach(session -> {
                 try {
                     this.closeSession(session).block();
                 } catch (Exception e) {
-                    this.getLogger()
-                            .error("Failed to close session. [sessionId={}, error={}]",
-                                    this.getSessionId(session),
-                                    e.getMessage(),
-                                    e);
+                    logger.error("Failed to close session. [sessionId={}, error={}]",
+                            this.getSessionId(session),
+                            e.getMessage(),
+                            e);
                 }
             });
 
-            this.getLogger().debug("Graceful shutdown completed");
+            logger.debug("Graceful shutdown completed.");
             this.sessions.clear();
             if (this.keepAliveScheduler != null) {
                 this.keepAliveScheduler.shutdown();
@@ -166,25 +158,25 @@ public abstract class FitMcpServerTransportProvider<S> {
     /**
      * Creates a response indicating the server is shutting down.
      *
-     * @param response The HTTP response
-     * @return An Entity with the shutdown message
+     * @param response The HTTP response.
+     * @return An Entity with the shutdown message.
      */
     protected Object createShuttingDownResponse(HttpClassicServerResponse response) {
         response.statusCode(HttpResponseStatus.SERVICE_UNAVAILABLE.statusCode());
-        return Entity.createText(response, "Server is shutting down");
+        return Entity.createText(response, "Server is shutting down.");
     }
 
     /**
      * Validates that a session exists for the given session ID.
      *
-     * @param sessionId The session ID to validate
-     * @param response The HTTP response to set status code if validation fails
-     * @return An error Entity if validation fails, null if validation succeeds
+     * @param sessionId The session ID to validate.
+     * @param response The HTTP response to set status code if validation fails.
+     * @return An error Entity if validation fails, null if validation succeeds.
      */
     protected Object validateSessionExists(String sessionId, HttpClassicServerResponse response) {
         if (sessionId == null || sessionId.isEmpty()) {
             response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-            return Entity.createText(response, "Session ID missing");
+            return Entity.createText(response, "Session ID missing.");
         }
         if (this.sessions.get(sessionId) == null) {
             response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
@@ -211,46 +203,46 @@ public abstract class FitMcpServerTransportProvider<S> {
         /**
          * Creates a new session transport.
          *
-         * @param sessionId The unique identifier for this session
-         * @param emitter The emitter for sending SSE events
-         * @param response The HTTP response for checking connection status
+         * @param sessionId The unique identifier for this session.
+         * @param emitter The emitter for sending SSE events.
+         * @param response The HTTP response for checking connection status.
          */
         protected AbstractFitMcpSessionTransport(String sessionId, Emitter<TextEvent> emitter,
                 HttpClassicServerResponse response) {
             this.sessionId = sessionId;
             this.emitter = emitter;
             this.response = response;
-            FitMcpServerTransportProvider.this.getLogger()
-                    .info("[SSE] Building SSE emitter. [sessionId={}]", sessionId);
+            FitMcpServerTransportProvider.logger.info("[SSE] Building SSE emitter. [sessionId={}]", sessionId);
         }
 
         /**
          * Sends a JSON-RPC message to the client through the SSE connection.
          * This method is thread-safe and checks if the connection is still active before sending.
          *
-         * @param message The JSON-RPC message to send
-         * @return A Mono that completes when the message has been sent
+         * @param message The JSON-RPC message to send.
+         * @return A Mono that completes when the message has been sent.
          */
         protected Mono<Void> doSendMessage(McpSchema.JSONRPCMessage message, String messageId) {
             return Mono.fromRunnable(() -> {
                 if (this.closed) {
-                    FitMcpServerTransportProvider.this.getLogger()
-                            .info("[SSE] Attempted to send message to closed session. [sessionId={}]", this.sessionId);
+                    FitMcpServerTransportProvider.logger.info(
+                            "[SSE] Attempted to send message to closed session. [sessionId={}]",
+                            this.sessionId);
                     return;
                 }
                 this.lock.lock();
                 try {
                     if (this.closed) {
-                        FitMcpServerTransportProvider.this.getLogger()
-                                .info("[SSE] Session was closed during message send attempt. [sessionId={}]",
-                                        this.sessionId);
+                        FitMcpServerTransportProvider.logger.info(
+                                "[SSE] Session was closed during message send attempt. [sessionId={}]",
+                                this.sessionId);
                         return;
                     }
 
                     if (!this.response.isActive()) {
-                        FitMcpServerTransportProvider.this.getLogger()
-                                .warn("[SSE] Connection inactive detected while sending message. [sessionId={}]",
-                                        this.sessionId);
+                        FitMcpServerTransportProvider.logger.warn(
+                                "[SSE] Connection inactive detected while sending message. [sessionId={}]",
+                                this.sessionId);
                         this.doClose();
                         return;
                     }
@@ -263,25 +255,25 @@ public abstract class FitMcpServerTransportProvider<S> {
                             .build();
                     this.emitter.emit(textEvent);
 
-                    FitMcpServerTransportProvider.this.getLogger()
-                            .info("[SSE] Sending message to session. [sessionId={}, eventId={}, jsonText={}]",
-                                    this.sessionId,
-                                    messageId != null ? messageId : this.sessionId,
-                                    jsonText);
+                    FitMcpServerTransportProvider.logger.info(
+                            "[SSE] Sending message to session. [sessionId={}, eventId={}, jsonText={}]",
+                            this.sessionId,
+                            messageId != null ? messageId : this.sessionId,
+                            jsonText);
                 } catch (Exception e) {
-                    FitMcpServerTransportProvider.this.getLogger()
-                            .error("[SSE] Failed to send message to session. [sessionId={}, error={}]",
-                                    this.sessionId,
-                                    e.getMessage(),
-                                    e);
+                    FitMcpServerTransportProvider.logger.error(
+                            "[SSE] Failed to send message to session. [sessionId={}, error={}]",
+                            this.sessionId,
+                            e.getMessage(),
+                            e);
                     try {
                         this.emitter.fail(e);
                     } catch (Exception errorException) {
-                        FitMcpServerTransportProvider.this.getLogger()
-                                .error("[SSE] Failed to send error to SSE builder. [sessionId={}, error={}]",
-                                        this.sessionId,
-                                        errorException.getMessage(),
-                                        errorException);
+                        FitMcpServerTransportProvider.logger.error(
+                                "[SSE] Failed to send error to SSE builder. [sessionId={}, error={}]",
+                                this.sessionId,
+                                errorException.getMessage(),
+                                errorException);
                     }
                 } finally {
                     this.lock.unlock();
@@ -292,10 +284,10 @@ public abstract class FitMcpServerTransportProvider<S> {
         /**
          * Converts data from one type to another using the configured McpJsonMapper.
          *
-         * @param data The source data object to convert
-         * @param typeRef The target type reference
-         * @param <T> The target type
-         * @return The converted object of type T
+         * @param data The source data object to convert.
+         * @param typeRef The target type reference.
+         * @param <T> The target type.
+         * @return The converted object of type T.
          */
         public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
             return FitMcpServerTransportProvider.this.jsonMapper.convertValue(data, typeRef);
@@ -304,7 +296,7 @@ public abstract class FitMcpServerTransportProvider<S> {
         /**
          * Initiates a graceful shutdown of the transport.
          *
-         * @return A Mono that completes when the shutdown is complete
+         * @return A Mono that completes when the shutdown is complete.
          */
         public Mono<Void> closeGracefully() {
             return Mono.fromRunnable(this::doClose);
@@ -318,23 +310,23 @@ public abstract class FitMcpServerTransportProvider<S> {
             this.lock.lock();
             try {
                 if (this.closed) {
-                    FitMcpServerTransportProvider.this.getLogger()
-                            .info("[SSE] Session transport already closed. [sessionId={}]", this.sessionId);
+                    FitMcpServerTransportProvider.logger.info("[SSE] Session transport already closed. [sessionId={}]",
+                            this.sessionId);
                     return;
                 }
 
                 this.closed = true;
-                FitMcpServerTransportProvider.this.getLogger()
-                        .debug("[SSE] Closing session transport. [sessionId={}]", this.sessionId);
+                FitMcpServerTransportProvider.logger.debug("[SSE] Closing session transport. [sessionId={}]",
+                        this.sessionId);
 
                 this.emitter.complete();
-                FitMcpServerTransportProvider.this.getLogger()
-                        .info("[SSE] Closed SSE builder successfully. [sessionId={}]", this.sessionId);
+                FitMcpServerTransportProvider.logger.info("[SSE] Closed SSE builder successfully. [sessionId={}]",
+                        this.sessionId);
             } catch (Exception e) {
-                FitMcpServerTransportProvider.this.getLogger()
-                        .warn("[SSE] Failed to complete SSE builder. [sessionId={}, error={}]",
-                                this.sessionId,
-                                e.getMessage());
+                FitMcpServerTransportProvider.logger.warn(
+                        "[SSE] Failed to complete SSE builder. [sessionId={}, error={}]",
+                        this.sessionId,
+                        e.getMessage());
             } finally {
                 this.lock.unlock();
             }
