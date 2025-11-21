@@ -10,4 +10,4 @@ mcp:
     ping:
       interval-seconds: 30
     streamable:
-      disallow-delete: False
+      disallow-delete: false
