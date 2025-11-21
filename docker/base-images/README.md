@@ -42,7 +42,7 @@ docker run -d --name fit-server \
   -e FIT_WORKER_ID=my-worker-001 \
   -e FIT_LOG_LEVEL=debug \
   -e JAVA_OPTS="-Xms512m -Xmx2048m" \
-  fit-framework:ubuntu
+  fit-framework:alpine
 ```
 
 ### 挂载目录
@@ -55,7 +55,7 @@ docker run -d --name fit-server \
   -v $(pwd)/logs:/opt/fit-framework/java/logs \
   -v $(pwd)/data:/opt/fit-framework/java/data \
   -v $(pwd)/conf:/opt/fit-framework/java/conf \
-  fit-framework:ubuntu
+  fit-framework:alpine
 ```
 
 ## 🏗️ 基于基础镜像构建应用
@@ -70,7 +70,7 @@ FROM fit-framework:alpine
 COPY --chown=fit:fit my-ai-plugins/ /opt/fit-framework/java/plugins/
 
 # 复制应用配置
-COPY --chown=fit:fit app-config.yml /opt/fit-framework/java/conf/
+COPY --chown=fit:fit app-config.yml /opt/fit-framework/java/conf/fitframework.yml
 
 # 设置应用环境变量
 ENV FIT_WORKER_ID=my-ai-app
@@ -195,7 +195,7 @@ version: '3.8'
 
 services:
   fit-framework:
-    image: fit-framework:ubuntu
+    image: fit-framework:alpine
     ports:
       - "8080:8080"
     environment:
@@ -279,14 +279,14 @@ git clone https://github.com/ModelEngine-Group/fit-framework.git
 cd fit-framework/docker/base-images
 
 # 构建特定操作系统镜像
-cd ubuntu
-./build.sh 3.5.1
+cd alpine
+./build.sh ${fit-version}
 
 # 或批量构建所有镜像
-./build-all.sh 3.5.1
+./build-all.sh ${fit-version}
 
 # 推送到私有仓库
-PUSH_IMAGE=true ./build-all.sh 3.5.1 registry.mycompany.com/
+PUSH_IMAGE=true ./build-all.sh ${fit-version} registry.mycompany.com/
 ```
 
 ### 自定义配置
@@ -330,10 +330,10 @@ PUSH_IMAGE=true ./build-all.sh 3.5.1 registry.mycompany.com/
 REGISTRY_PORT=20000 ./test-e2e.sh alpine
 
 # 使用不同的 FIT 版本
-FIT_VERSION=3.5.4 ./test-e2e.sh alpine
+FIT_VERSION=${fit-version} ./test-e2e.sh alpine
 
 # 组合使用
-REGISTRY_PORT=20000 FIT_VERSION=3.5.4 ./test-e2e.sh alpine
+REGISTRY_PORT=20000 FIT_VERSION=${fit-version} ./test-e2e.sh alpine
 ```
 
 ### 测试成功标志
@@ -346,7 +346,7 @@ REGISTRY_PORT=20000 FIT_VERSION=3.5.4 ./test-e2e.sh alpine
 ==============================================
 
 📊 测试摘要:
-  • 基础镜像: fit-framework:ubuntu (3.5.3)
+  • 基础镜像: fit-framework:ubuntu (${fit-version})
   • 本地仓库: localhost:15000
   • 运行镜像: localhost:15000/fit-framework:ubuntu
   • 容器名称: fit-e2e-app
