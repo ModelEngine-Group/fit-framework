@@ -13,18 +13,17 @@ package modelengine.fel.tool.service;
  * @since 2025-11-20
  */
 public interface ToolChangedObserverRegistry {
-
     /**
      * 注册工具变更观察者。
      *
      * @param observer 待注册的工具变更观察者。
      */
-    void registerToolChangedObserver(ToolChangedObserver observer);
+    void register(ToolChangedObserver observer);
 
     /**
      * 注销工具变更观察者。
      *
      * @param observer 需要注销的工具变更观察者。
      */
-    void unregisterToolChangedObserver(ToolChangedObserver observer);
+    void unregister(ToolChangedObserver observer);
 }

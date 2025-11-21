@@ -9,3 +9,5 @@ mcp:
       timeout-seconds: 60
     ping:
       interval-seconds: 30
+    streamable:
+      disallow-delete: False

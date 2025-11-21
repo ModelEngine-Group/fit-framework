@@ -39,14 +39,14 @@ public class SimpleToolRepository implements ToolRepository, ToolChangedObserver
     private final List<ToolChangedObserver> toolChangedObservers = new ArrayList<>();
 
     @Override
-    public void registerToolChangedObserver(ToolChangedObserver observer) {
+    public void register(ToolChangedObserver observer) {
         if (observer != null) {
             this.toolChangedObservers.add(observer);
         }
     }
 
     @Override
-    public void unregisterToolChangedObserver(ToolChangedObserver observer) {
+    public void unregister(ToolChangedObserver observer) {
         if (observer != null) {
             this.toolChangedObservers.remove(observer);
         }
@@ -61,7 +61,17 @@ public class SimpleToolRepository implements ToolRepository, ToolChangedObserver
         this.toolCache.put(uniqueName, tool);
         log.info("Register tool[uniqueName={}] success.", uniqueName);
         Map<String, Object> parameters = cast(tool.schema().get("parameters"));
-        this.toolChangedObservers.forEach(observer -> observer.onToolAdded(uniqueName, tool.description(), parameters));
+        this.toolChangedObservers.forEach(observer -> {
+            try {
+                observer.onToolAdded(uniqueName, tool.description(), parameters);
+            } catch (Exception e) {
+                log.error("Failed to notify observer of tool added. [observer={}, uniqueName={}, error={}]",
+                        observer.getClass().getName(),
+                        uniqueName,
+                        e.getMessage(),
+                        e);
+            }
+        });
     }
 
     @Override
@@ -72,7 +82,17 @@ public class SimpleToolRepository implements ToolRepository, ToolChangedObserver
         String uniqueName = ToolInfo.identify(namespace, toolName);
         this.toolCache.remove(uniqueName);
         log.info("Unregister tool[uniqueName={}] success.", uniqueName);
-        this.toolChangedObservers.forEach(observer -> observer.onToolRemoved(uniqueName));
+        this.toolChangedObservers.forEach(observer -> {
+            try {
+                observer.onToolRemoved(uniqueName);
+            } catch (Exception e) {
+                log.error("Failed to notify observer of tool removed. [observer={}, uniqueName={}, error={}]",
+                        observer.getClass().getName(),
+                        uniqueName,
+                        e.getMessage(),
+                        e);
+            }
+        });
     }
 
     @Override

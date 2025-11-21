@@ -31,10 +31,12 @@ import java.time.Duration;
 public class McpStreamableServerConfig {
     @Bean
     public FitMcpStreamableServerTransportProvider fitMcpStreamableServerTransportProvider(
-            @Value("${mcp.server.ping.interval-seconds}") int keepAliveIntervalSeconds) {
+            @Value("${mcp.server.ping.interval-seconds}") int keepAliveIntervalSeconds,
+            @Value("${mcp.server.streamable.disallow-delete}") boolean disallowDelete) {
         return FitMcpStreamableServerTransportProvider.builder()
                 .jsonMapper(McpJsonMapper.getDefault())
                 .keepAliveInterval(Duration.ofSeconds(keepAliveIntervalSeconds))
+                .disallowDelete(disallowDelete)
                 .build();
     }
 
@@ -48,7 +50,7 @@ public class McpStreamableServerConfig {
                 .build();
     }
 
-    @Bean("DefaultMcpStreamableServer")
+    @Bean("McpStreamableServer")
     public FitMcpServer defaultMcpStreamableServer(ToolExecuteService toolExecuteService,
             @Fit(alias = "McpSyncStreamableServer") McpSyncServer mcpSyncServer,
             ToolChangedObserverRegistry toolChangedObserverRegistry) {

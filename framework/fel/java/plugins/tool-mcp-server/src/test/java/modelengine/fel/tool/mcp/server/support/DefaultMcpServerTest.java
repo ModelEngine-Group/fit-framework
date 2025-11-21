@@ -45,8 +45,8 @@ public class DefaultMcpServerTest {
         this.toolChangedObserverRegistry = mock(ToolChangedObserverRegistry.class);
         McpStreamableServerConfig streamableConfig = new McpStreamableServerConfig();
         this.mcpSyncServer =
-                streamableConfig.mcpSyncStreamableServer(streamableConfig.fitMcpStreamableServerTransportProvider(30),
-                        10);
+                streamableConfig.mcpSyncStreamableServer(streamableConfig.fitMcpStreamableServerTransportProvider(30,
+                        false), 10);
     }
 
     @Nested

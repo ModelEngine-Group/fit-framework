@@ -48,7 +48,7 @@ public class McpSseServerConfig {
                 .build();
     }
 
-    @Bean("DefaultMcpSseServer")
+    @Bean("McpSseServer")
     public FitMcpServer defaultMcpSseServer(ToolExecuteService toolExecuteService,
             @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncServer,
             ToolChangedObserverRegistry toolChangedObserverRegistry) {

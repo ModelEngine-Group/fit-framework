@@ -52,12 +52,12 @@ public class FitMcpServer implements ToolChangedObserver {
         this.toolExecuteService = notNull(toolExecuteService, "The tool execute service cannot be null.");
         this.mcpSyncServer = mcpSyncServer;
         this.toolChangedObserverRegistry = toolChangedObserverRegistry;
-        this.toolChangedObserverRegistry.registerToolChangedObserver(this);
+        this.toolChangedObserverRegistry.register(this);
     }
 
     @PreDestroy
     public void onDestroy() {
-        this.toolChangedObserverRegistry.unregisterToolChangedObserver(this);
+        this.toolChangedObserverRegistry.unregister(this);
     }
 
     public List<Tool> getTools() {
