@@ -10,212 +10,239 @@
 
 ## 架构概览
 
-### DefaultMcpServer 的双 Bean 管理
+### 核心组件关系
 
-`DefaultMcpServer` 是 MCP Server 的核心实现类，它同时管理两个 MCP 同步服务器 Bean：
+本插件提供了两种独立的 MCP 服务器实例，分别支持不同的传输协议：
 
-1. **McpSyncSseServer** - 用于 SSE (Server-Sent Events) 传输
-2. **McpSyncStreamableServer** - 用于 Streamable 传输
+1. **McpSseServer** - 基于 SSE 传输的服务器实例
+2. **McpStreamableServer** - 基于 Streamable 传输的服务器实例
 
-这两个 Bean 分别由 `McpSseServerConfig` 和 `McpStreamableServerConfig` 配置类创建，并通过 `@Fit(alias = "...")` 注解进行区分注入：
+每个服务器实例由以下三个核心组件构成：
 
-```java
-// McpSseServerConfig.java
-@Bean("McpSyncSseServer")
-public McpSyncServer mcpSyncSseServer(...) { ... }
-
-// McpStreamableServerConfig.java
-@Bean("McpSyncStreamableServer")
-public McpSyncServer mcpSyncStreamableServer(...) { ... }
-
-// FitMcpServer.java
-public DefaultMcpServer(ToolExecuteService toolExecuteService,
-        @Fit(alias = "McpSyncSseServer") McpSyncServer mcpSyncSseServer,
-        @Fit(alias = "McpSyncStreamableServer") McpSyncServer mcpSyncStreamableServer) {
-    ...
-}
+```
+配置类 (McpSseServerConfig / McpStreamableServerConfig)
+  │
+  ├─> TransportProvider (传输层实现)
+  │     ├─> FitMcpSseServerTransportProvider
+  │     └─> FitMcpStreamableServerTransportProvider
+  │
+  ├─> McpSyncServer (MCP SDK 提供的同步服务器)
+  │
+  └─> FitMcpServer (服务器的Fit接口包装，实现工具注册和执行)
 ```
 
-`DefaultMcpServer` 实现了 `McpServer` 和 `ToolChangedObserver` 接口，负责：
-- 统一管理两个传输类型的工具注册和移除
-- 确保两个 MCP 同步服务器保持工具列表同步
-- 处理工具执行请求并返回结果
-- 通知工具变更观察者
+### FitMcpServer - Fit接口的MCP服务器
+
+`FitMcpServer` 是连接 FIT 工具系统与 MCP SDK服务器的核心类，主要职责包括：
+
+- **工具观察**: 实现 `ToolChangedObserver` 接口，监听工具的添加和移除
+- **工具注册**: 将 FIT 工具转换为 MCP 工具规范并注册到 MCP 服务器
+- **工具执行**: 处理来自 MCP 客户端的工具调用请求
+- **生命周期管理**: 在服务销毁时自动注销观察者
+
+每个 `FitMcpServer` 实例持有一个 `McpSyncServer`，通过配置类注入。两个独立的实例（SSE 和 Streamable）分别管理各自的工具列表和执行逻辑。
+
+### FitMcpServerTransportProvider - 传输层基类
+
+`FitMcpServerTransportProvider<S>` 是一个抽象基类，为 SSE 和 Streamable 两种传输方式提供通用功能：
+
+**通用职责**:
+- **会话管理**: 维护客户端会话的生命周期（创建、存储、销毁）
+- **消息序列化**: 使用 `McpJsonMapper` 处理 JSON-RPC 消息的序列化和反序列化
+- **上下文提取**: 从 HTTP 请求中提取传输上下文信息
+- **Keep-Alive**: 支持可选的连接保活机制
+- **优雅关闭**: 提供服务优雅关闭和资源清理
+
+**成员变量**:
+- `jsonMapper` - JSON 序列化器
+- `contextExtractor` - 上下文提取器
+- `keepAliveScheduler` - Keep-Alive 调度器
+- `sessions` - 会话映射表 (ConcurrentHashMap)
+- `isClosing` - 关闭标志
+
+两种传输方式的具体实现继承此基类，泛型参数 `<S>` 指定会话类型。
 
 ---
 
-## FitMcpStreamableServerTransportProvider 类的作用和职责
+## 传输层实现
 
-`FitMcpStreamableServerTransportProvider` 是 MCP 服务端传输层的核心实现类，负责：
+### SSE 传输方式
 
-1. **HTTP 端点处理**: 处理 GET、POST、DELETE 请求，实现 MCP 协议的 HTTP 传输层
-2. **会话管理**: 管理客户端会话的生命周期（创建、维护、销毁）
-3. **SSE 通信**: 通过 Server-Sent Events (SSE) 实现服务端到客户端的实时消息推送
-4. **消息序列化**: 处理 JSON-RPC 消息的序列化和反序列化
-5. **连接保活**: 支持可选的 Keep-Alive 机制
-6. **优雅关闭**: 支持服务的优雅关闭和资源清理
+`FitMcpSseServerTransportProvider` 基于 MCP SDK 的 `HttpServletSseServerTransportProvider` 改造，提供基本的 SSE 传输实现。
 
----
+#### 端点配置
 
-## 类结构概览
+- **GET `/mcp/sse`**: 建立 SSE 连接，用于服务端向客户端推送消息
+- **POST `/mcp/message`**: 接收客户端发送的 JSON-RPC 消息
 
-### 主要成员变量
+#### 特点
 
-| 变量名                  | 类型                                                       | 来源         | 说明                              |
-|----------------------|----------------------------------------------------------|------------|---------------------------------|
-| `MESSAGE_ENDPOINT`   | `String`                                                 | SDK 原始     | 消息端点路径 `/mcp/streamable`        |
-| `disallowDelete`     | `boolean`                                                | SDK 原始     | 是否禁用 DELETE 请求                  |
-| `jsonMapper`         | `McpJsonMapper`                                          | SDK 原始     | JSON 序列化器                       |
-| `contextExtractor`   | `McpTransportContextExtractor<HttpClassicServerRequest>` | **FIT 改造** | 上下文提取器（泛型参数改为 FIT 的 Request 类型） |
-| `keepAliveScheduler` | `KeepAliveScheduler`                                     | SDK 原始     | Keep-Alive 调度器                  |
-| `sessionFactory`     | `McpStreamableServerSession.Factory`                     | SDK 原始     | 会话工厂                            |
-| `sessions`           | `Map<String, McpStreamableServerSession>`                | SDK 原始     | 活跃会话映射表                         |
-| `isClosing`          | `volatile boolean`                                       | SDK 原始     | 关闭标志                            |
+- **会话类型**: 使用 `McpServerSession` 管理客户端会话
+- **会话创建**: 在 GET 请求时创建会话，生成唯一的 session ID
+- **协议版本**: 仅支持 `MCP_2024_11_05`
+- **简洁设计**: 适合简单的服务端到客户端推送场景
 
-### 主要方法
+#### 请求处理流程
 
-| 方法名                | 来源         | 说明                            |
-| --------------------- | ------------ | ------------------------------- |
-| `protocolVersions()`  | SDK 原始     | 返回支持的 MCP 协议版本         |
-| `setSessionFactory()` | SDK 原始     | 设置会话工厂                    |
-| `notifyClients()`     | SDK 原始     | 广播通知到所有客户端            |
-| `closeGracefully()`   | SDK 原始     | 优雅关闭传输层                  |
-| `handleGet()`         | **FIT 改造** | 处理 GET 请求（SSE 连接）       |
-| `handlePost()`        | **FIT 改造** | 处理 POST 请求（JSON-RPC 消息） |
-| `handleDelete()`      | **FIT 改造** | 处理 DELETE 请求（会话删除）    |
-
-### 重构后的辅助方法
-
-为提高代码可读性和可维护性，从原本的 `handleGet()`、`handlePost()`、`handleDelete()` 方法中抽取了以下辅助方法：
-
-#### 验证请求合法性的方法
-
-| 方法名                           | 说明                                                      |
-|-------------------------------|----------------------------------------------------------|
-| `validateGetAcceptHeaders()`  | 验证 GET 请求的 Accept 头，确保包含 `text/event-stream`         |
-| `validatePostAcceptHeaders()` | 验证 POST 请求的 Accept 头，确保包含 `text/event-stream` 和 `application/json` |
-| `validateRequestSessionId()`  | 验证请求的 `mcp-session-id` 头是否存在，以及对应的会话是否存在            |
-
-#### 根据请求类型调用处理逻辑的方法
-
-| 方法名                             | 处理的请求类型 | 说明                                       |
-|---------------------------------|---------|------------------------------------------|
-| `handleReplaySseRequest()`      | GET     | 处理 SSE 消息重放请求，用于断线重连后恢复错过的消息             |
-| `handleEstablishSseRequest()`   | GET     | 处理 SSE 连接建立请求，创建新的持久化 SSE 监听流            |
-| `handleInitializeRequest()`     | POST    | 处理客户端初始化连接请求，创建新的 MCP 会话                 |
-| `handleJsonRpcMessage()`        | POST    | 把非Initialize的客户端消息分流给下面三个方法，包含Session验证。 |
-| `handleJsonRpcResponse()`       | POST    | 处理 JSON-RPC 响应消息（如 Elicitation 中的客户端响应）  |
-| `handleJsonRpcNotification()`   | POST    | 处理 JSON-RPC 通知消息（客户端单向通知）                |
-| `handleJsonRpcRequest()`        | POST    | 处理 JSON-RPC 请求消息，返回 SSE 流式响应             |
-
-### 内部类
-
-| 类名                                 | 来源         | 说明                          |
-|------------------------------------|------------|-----------------------------|
-| `FitStreamableMcpSessionTransport` | **FIT 改造** | 用于SSE 会话`sendMessage()`传输实现 |
-| `Builder`                          | SDK 原始     | 构建器模式                       |
-
----
-
-## SDK 原始逻辑
-
-以下是从 MCP SDK 的 `HttpServletStreamableServerTransportProvider` 类保留的原始逻辑：
-
-### 1. 会话管理核心逻辑
-
-```java
-private final Map<String, McpStreamableServerSession> sessions = new ConcurrentHashMap<>();
-```
-
-- 使用 `ConcurrentHashMap` 存储活跃会话
-- 会话以 `mcp-session-id` 作为键
-
-### 2. 会话工厂设置
-
-```java
-public void setSessionFactory(McpStreamableServerSession.Factory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-}
-```
-
-- 由外部设置会话工厂，用于创建新会话
-
-### 3. 客户端通知
-
-```java
-public Mono<Void> notifyClients(String method, Object params) {
-    // ... 广播逻辑
-}
-```
-
-- 向所有活跃会话并行发送通知
-- 使用 `parallelStream()` 提高效率
-- 单个会话失败不影响其他会话
-
-### 4. 关闭逻辑
-
-```java
-public Mono<Void> closeGracefully() {
-    this.isClosing = true;
-    // ... 关闭所有会话
-    // ... 关闭 keep-alive 调度器
-}
-```
-
-- 设置关闭标志
-- 关闭所有活跃会话
-- 清理资源
-
-## FIT 框架改造核心逻辑
-
-以下是为适配 FIT 框架而新增或改造的部分：
-
-### 1. HTTP 端点处理核心流程（核心改造）
-
-- 请求/响应对象类型变更：
-  - `HttpServletRequest` → `HttpClassicServerRequest`
-  - `HttpServletResponse` → `HttpClassicServerResponse`
-- 返回类型改为通用的 `Object`，支持多种返回形式
-
-#### a. GET 请求处理流程
-
+**GET 请求**:
 1. 检查服务器是否正在关闭
-2. **调用 `validateGetAcceptHeaders()`** - 验证 Accept 头是否包含 `text/event-stream`
-3. **调用 `validateRequestSessionId()`** - 验证 `mcp-session-id` 头是否存在及对应会话是否存在
-4. 提取 `transportContext` 上下文
-5. 获取会话 ID 和会话对象
-6. 检查是否是重放请求（`Last-Event-ID` 头）：
-   - 如果是，**调用 `handleReplaySseRequest()`** - 重放错过的消息
-   - 如果否，**调用 `handleEstablishSseRequest()`** - 建立新的 SSE 监听流
+2. 验证 Accept 头是否包含 `text/event-stream`
+3. 提取传输上下文
+4. 生成会话 ID 并创建新会话
+5. 建立 SSE 监听流，持续推送消息
 
-#### b. POST 请求处理流程
-
+**POST 请求**:
 1. 检查服务器是否正在关闭
-2. **调用 `validatePostAcceptHeaders()`** - 验证 Accept 头包含 `text/event-stream` 和 `application/json`
-3. 提取 `transportContext` 上下文
+2. 验证 Accept 头包含 `application/json`
+3. 验证 `mcp-session-id` 头及会话存在性
+4. 提取传输上下文
+5. 反序列化 JSON-RPC 消息并转发给会话处理
+
+#### 内部实现
+
+- **Transport 类**: `FitSseMcpSessionTransport`
+- **职责**: 封装 SSE 消息发送逻辑，通过 `Emitter<TextEvent>` 发送消息
+
+---
+
+### Streamable 传输方式
+
+`FitMcpStreamableServerTransportProvider` 基于 MCP SDK 的 `HttpServletStreamableServerTransportProvider` 改造，提供功能更丰富的传输实现。
+
+#### 端点配置
+
+- **GET `/mcp/streamable`**: 建立 SSE 连接或重放消息
+- **POST `/mcp/streamable`**: 处理初始化请求和其他 JSON-RPC 消息
+- **DELETE `/mcp/streamable`**: 删除指定会话
+
+#### 特点
+
+- **会话类型**: 使用 `McpStreamableServerSession` 管理客户端会话
+- **会话创建**: 在 POST 初始化请求时创建会话
+- **协议版本**: 支持 `MCP_2024_11_05`、`MCP_2025_03_26`、`MCP_2025_06_18`
+- **消息重放**: 支持断线重连后恢复错过的消息（通过 `Last-Event-ID`）
+- **会话管理**: 提供显式的会话删除机制
+- **功能完整**: 适合需要完整会话管理的复杂场景
+
+#### 请求处理流程
+
+**GET 请求**:
+1. 检查服务器是否正在关闭
+2. 验证 Accept 头是否包含 `text/event-stream`
+3. 验证 `mcp-session-id` 头及会话存在性
+4. 提取传输上下文
+5. 检查是否为重放请求（`Last-Event-ID` 头）：
+   - **重放模式**: 重放错过的消息
+   - **监听模式**: 建立新的 SSE 监听流
+
+**POST 请求**:
+1. 检查服务器是否正在关闭
+2. 验证 Accept 头包含 `text/event-stream` 和 `application/json`
+3. 提取传输上下文
 4. 反序列化 JSON-RPC 消息
-5. 判断是否为初始化请求（`initialize` 方法）：
-   - 如果是，**调用 `handleInitializeRequest()`** - 创建新会话并返回初始化结果
-6. **调用 `validateRequestSessionId()`** - 验证会话（仅非初始化请求）
-7. 获取会话 ID 和会话对象
-8. 根据消息类型分发处理：
-   - `JSONRPCResponse` → **调用 `handleJsonRpcResponse()`**
-   - `JSONRPCNotification` → **调用 `handleJsonRpcNotification()`**
-   - `JSONRPCRequest` → **调用 `handleJsonRpcRequest()`**
+5. 判断消息类型：
+   - **初始化请求**: 创建新会话并返回初始化结果
+   - **其他消息**: 验证会话后分发处理（响应/通知/请求）
 
-#### c. DELETE 请求处理流程
-
+**DELETE 请求**:
 1. 检查服务器是否正在关闭
 2. 检查是否禁用 DELETE 操作
-3. **调用 `validateRequestSessionId()`** - 验证 `mcp-session-id` 头及会话存在性
-4. 提取 `transportContext` 上下文
-5. 获取会话 ID 和会话对象
-6. 删除会话并从会话映射表中移除
+3. 验证 `mcp-session-id` 头及会话存在性
+4. 提取传输上下文
+5. 删除会话并清理资源
 
-### 2. SSE 实现改造（核心改造）
+#### 辅助方法
 
-**原始 SDK**:
+为提高代码可读性，从请求处理方法中抽取了以下辅助方法：
 
+**验证类**:
+- `validateGetAcceptHeaders()` - 验证 GET 请求的 Accept 头
+- `validatePostAcceptHeaders()` - 验证 POST 请求的 Accept 头
+- `validateRequestSessionId()` - 验证会话 ID
+
+**处理类**:
+- `handleReplaySseRequest()` - 处理消息重放请求
+- `handleEstablishSseRequest()` - 处理 SSE 连接建立
+- `handleInitializeRequest()` - 处理初始化请求
+- `handleJsonRpcMessage()` - 分流非初始化消息
+- `handleJsonRpcResponse()` - 处理 JSON-RPC 响应
+- `handleJsonRpcNotification()` - 处理 JSON-RPC 通知
+- `handleJsonRpcRequest()` - 处理 JSON-RPC 请求
+
+#### 内部实现
+
+- **Transport 类**: `FitStreamableMcpSessionTransport`
+- **职责**: 封装 SSE 消息发送逻辑，支持消息重放和连接状态检查
+
+---
+
+## 传输方式对比
+
+### 功能对比表
+
+| 特性 | SSE | Streamable |
+|------|-----|------------|
+| **端点路径** | GET `/mcp/sse`<br>POST `/mcp/message` | GET/POST/DELETE `/mcp/streamable` |
+| **支持的协议版本** | `MCP_2024_11_05` | `MCP_2024_11_05`<br>`MCP_2025_03_26`<br>`MCP_2025_06_18` |
+| **会话类型** | `McpServerSession` | `McpStreamableServerSession` |
+| **会话创建时机** | GET 请求时 | POST 初始化请求时 |
+| **消息重放** | ❌ 不支持 | ✅ 支持 (通过 `Last-Event-ID`) |
+| **显式会话删除** | ❌ 无 DELETE 端点 | ✅ 支持 DELETE 请求 |
+| **Keep-Alive** | ✅ 支持 | ✅ 支持 |
+| **代码复杂度** | 较低 | 较高 |
+| **适用场景** | 简单的单向推送 | 复杂的双向通信和会话管理 |
+
+### 选择建议
+
+**使用 SSE 方式**，当你需要：
+- 简单的服务端到客户端消息推送
+- 最小化的会话管理开销
+- 单一协议版本支持
+
+**使用 Streamable 方式**，当你需要：
+- 完整的会话生命周期管理
+- 断线重连后的消息重放功能
+- 支持多个 MCP 协议版本
+- 显式的会话清理机制
+
+---
+
+## SDK 改造说明
+
+以下是将 MCP SDK 适配到 FIT 框架的通用改造点，两种传输方式均涉及这些改造（详细实现可参考各自的 TransportProvider 类）。
+
+### 1. HTTP 请求/响应对象
+
+**SDK 原始**:
+```java
+HttpServletRequest request
+HttpServletResponse response
+```
+
+**FIT 改造**:
+```java
+HttpClassicServerRequest request
+HttpClassicServerResponse response
+```
+
+**HTTP 头操作**:
+```java
+// 获取 Header
+String accept = request.headers().first(MessageHeaderNames.ACCEPT).orElse("");
+String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
+boolean hasSessionId = request.headers().contains(HttpHeaders.MCP_SESSION_ID);
+
+// 设置 Header
+response.headers().set("Content-Type", MimeType.APPLICATION_JSON.value());
+response.headers().set(HttpHeaders.MCP_SESSION_ID, sessionId);
+
+// 设置状态码
+response.statusCode(HttpResponseStatus.OK.statusCode());
+```
+
+### 2. SSE 事件流实现
+
+**SDK 原始**:
 ```java
 SseEmitter sseEmitter = new SseEmitter();
 sseEmitter.send(SseEmitter.event()
@@ -225,157 +252,168 @@ sseEmitter.send(SseEmitter.event()
 sseEmitter.complete();
 ```
 
-**FIT 框架改造**:
-
+**FIT 改造**:
 ```java
-// 使用 Choir 和 Emitter 实现 SSE
-Choir.<TextEvent>create(emitter -> {
-    // 创建sessionTransport类，用于调用emitter发送消息
+return Choir.<TextEvent>create(emitter -> {
+    // 创建 Transport 封装 emitter
     FitStreamableMcpSessionTransport sessionTransport =
             new FitStreamableMcpSessionTransport(sessionId, emitter, response);
 
-    // session的逻辑是SDK原有的，里面会调用sessionTransport发送事件流
+    // 调用 SDK 的 session 逻辑发送消息
     session.responseStream(jsonrpcRequest, sessionTransport)
             .contextWrite(ctx -> ctx.put(McpTransportContext.KEY, transportContext))
             .block();
 
-    // 监听 Emitter 的生命周期
+    // 监听生命周期
     emitter.observe(new Emitter.Observer<TextEvent>() {
-            @Override
-            public void onEmittedData(TextEvent data) {
-                // 数据发送完成
-            }
-        
-            @Override
-            public void onCompleted() {
-                // SSE 流正常结束
-                listeningStream.close();
-            }
-        
-            @Override
-            public void onFailed(Exception cause) {
-                // SSE 流异常结束
-                listeningStream.close();
-            }
+        @Override
+        public void onEmittedData(TextEvent data) { }
+
+        @Override
+        public void onCompleted() {
+            listeningStream.close();
+        }
+
+        @Override
+        public void onFailed(Exception cause) {
+            listeningStream.close();
+        }
     });
 });
 ```
 
 **关键变化**:
+- 使用 `Choir<TextEvent>` 替代 `SseEmitter`
+- 使用 `Emitter<TextEvent>` 发送事件
+- 使用 `Emitter.Observer` 监听生命周期
 
-- 使用 `Choir<TextEvent>` 返回事件流
-- 使用 `Emitter<TextEvent>` 替代 `SseEmitter` 的发送方法
-- 使用 `Emitter.Observer` 监听 SSE 生命周期事件
+### 3. HTTP 响应创建
 
-### 3. HTTP 响应处理改造
-
-**FIT 特有的响应方式**:
-
-#### 返回纯文本
-
+**返回纯文本**:
 ```java
 response.statusCode(HttpResponseStatus.BAD_REQUEST.statusCode());
-return Entity.createText(response, "Session ID required in mcp-session-id header");
+return Entity.createText(response, "Session ID required");
 ```
 
-#### 返回 JSON 对象
-
+**返回 JSON 对象**:
 ```java
 response.statusCode(HttpResponseStatus.NOT_FOUND.statusCode());
 return Entity.createObject(response, McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
-        .message("Session not found: "+sessionId)
+        .message("Session not found: " + sessionId)
         .build());
 ```
 
-#### 返回 SSE 流（重要改造）
-
+**返回 SSE 流**:
 ```java
-return Choir.<TextEvent> create(emitter ->{
-    // emitter封装在sessionTransport中，被session调用
+return Choir.<TextEvent>create(emitter -> {
     emitter.emit(textEvent);
 });
 ```
 
-### 4. HTTP 头处理改造
+### 4. Transport 实现类
 
-**FIT 框架的 Headers API**:
+两种传输方式都实现了内部 Transport 类，封装 SSE 消息发送逻辑：
 
+**核心职责**:
+- 通过 `Emitter<TextEvent>` 发送 SSE 消息
+- 在 `close()` 时关闭 Emitter
+- 发送前检查连接是否活跃
+
+**连接检查**:
 ```java
-// 获取 Header
-String acceptHeaders = request.headers().first(MessageHeaderNames.ACCEPT).orElse("");
-boolean hasSessionId = request.headers().contains(HttpHeaders.MCP_SESSION_ID);
-String sessionId = request.headers().first(HttpHeaders.MCP_SESSION_ID).orElse("");
+@Override
+public void sendMessage(JSONRPCMessage message) {
+    // 检查连接是否仍然活跃
+    if (!this.response.isActive()) {
+        logger.warn("[SSE] Connection inactive, session: {}", this.sessionId);
+        this.close();
+        return;
+    }
 
-// 设置 Header
-response.headers().set("Content-Type",MimeType.APPLICATION_JSON.value());
-response.headers().set(HttpHeaders.MCP_SESSION_ID, sessionId);
-
-// 设置状态码
-response.statusCode(HttpResponseStatus.OK.statusCode());
-```
-
-**变化**:
-
-- 使用 `request.headers().first(name).orElse(default)` 获取单个 Header
-- 使用 `request.headers().contains(name)` 检查 Header 是否存在
-- 使用 FIT 的 `MessageHeaderNames` 和 `MimeType` 常量
-- 使用 `HttpResponseStatus` 枚举设置状态码
-
-### 5. 内部类 Transport 实现
-
-`FitStreamableMcpSessionTransport` 类的核心职责是发送SSE事件：
-
-- `sendmessage()`方法通过`Emitter<TextEvent>` 发送SSE消息到客户端
-- 保存了当前会话的事件的`Emitter<TextEvent>`，负责close时关闭`Emitter<TextEvent>`
-
-- SSE的`Emitter<TextEvent>`感知不到GET连接是否断开，因此在`sendmessage()`发送前检查GET连接是否活跃
-
-```java
-// 在发送消息前检查连接是否仍然活跃
-if(!this.response.isActive()){
-    logger.warn("[SSE] Connection inactive detected while sending message for session: {}",
-        this.sessionId);
-    this.close();
-    return;
+    // 发送消息
+    String messageJson = jsonMapper.writeValueAsString(message);
+    Event event = new Event(messageId, "message", messageJson);
+    this.emitter.emit(new TextEvent(event.toString()));
 }
 ```
 
 ---
 
-## FitMcpSseServerTransportProvider 简要说明
+## SDK 保留逻辑
 
-`FitMcpSseServerTransportProvider` 是基于 MCP SDK 中的 `HttpServletSseServerTransportProvider` 改造而来的 FIT 框架实现，用于提供 MCP SSE 传输层。
+以下是从 MCP SDK 保留的核心逻辑，两种传输方式共享。
 
-### 与 Streamable 的主要区别
+### 1. 会话存储
 
-`FitMcpSseServerTransportProvider` 的实现与 `FitMcpStreamableServerTransportProvider` 非常相似，主要区别在于：
+```java
+private final Map<String, S> sessions = new ConcurrentHashMap<>();
+```
 
-1. **端点路径**：
-   - SSE: `/mcp/sse` (GET) 和 `/mcp/message` (POST)
-   - Streamable: `/mcp/streamable` (GET/POST/DELETE)
+- 使用线程安全的 `ConcurrentHashMap` 存储会话
+- 键为 `mcp-session-id`，值为会话对象
 
-2. **协议版本支持**：
-   - SSE: 仅支持 `MCP_2024_11_05`
-   - Streamable: 支持 `MCP_2024_11_05`、`MCP_2025_03_26`、`MCP_2025_06_18`
+### 2. 会话工厂
 
-3. **请求处理**：
-   - SSE: GET 请求用于建立 SSE 连接，POST 请求用于发送 JSON-RPC 消息
-   - Streamable: GET 请求用于建立 SSE 连接或重放消息，POST 请求处理初始化和其他 JSON-RPC 消息，DELETE 请求用于删除会话
+```java
+public void setSessionFactory(S.Factory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+}
+```
 
-4. **会话管理**：
-   - SSE: 使用 `McpServerSession`，会话通过 GET 请求建立
-   - Streamable: 使用 `McpStreamableServerSession`，会话通过 POST 初始化请求建立
+- 由外部（MCP SDK）设置会话工厂
+- 用于创建新会话实例
 
-### 核心改造点
+### 3. 客户端通知
 
-与 Streamable 版本类似，SSE 版本也进行了以下 FIT 框架改造：
+```java
+public Mono<Void> notifyClients(String method, Object params) {
+    // 并行向所有活跃会话发送通知
+    sessions.values().parallelStream()
+            .forEach(session -> session.sendNotification(method, params));
+}
+```
 
-- 使用 `HttpClassicServerRequest` 和 `HttpClassicServerResponse` 替代 Servlet API
-- 使用 `Choir<TextEvent>` 和 `Emitter<TextEvent>` 实现 SSE 事件流
-- 使用 FIT 的 HTTP 注解 (`@GetMapping`, `@PostMapping`) 处理请求
-- 使用 `Entity.createText()` 和 `Entity.createObject()` 创建响应
+- 向所有活跃会话并行发送通知
+- 单个会话失败不影响其他会话
 
-详细的实现细节可以参考 `FitMcpStreamableServerTransportProvider` 的相关章节。
+### 4. 优雅关闭
+
+```java
+public Mono<Void> closeGracefully() {
+    this.isClosing = true;
+    // 关闭所有会话
+    // 关闭 keep-alive 调度器
+    // 清理资源
+}
+```
+
+- 设置关闭标志，拒绝新请求
+- 关闭所有活跃会话
+- 清理调度器和其他资源
+
+---
+
+## 配置说明
+
+### SSE 配置类 (McpSseServerConfig)
+
+创建三个组件：
+1. `FitMcpSseServerTransportProvider` - 传输层
+2. `McpSyncSseServer` - MCP 同步服务器
+3. `McpSseServer` - FIT 工具服务器
+
+### Streamable 配置类 (McpStreamableServerConfig)
+
+创建三个组件：
+1. `FitMcpStreamableServerTransportProvider` - 传输层
+2. `McpSyncStreamableServer` - MCP 同步服务器
+3. `McpStreamableServer` - FIT 工具服务器
+
+### 配置参数
+
+- `mcp.server.ping.interval-seconds` - Keep-Alive 间隔（秒）
+- `mcp.server.request.timeout-seconds` - 请求超时时间（秒）
+- `mcp.server.streamable.disallow-delete` - 是否禁用 DELETE 请求（仅 Streamable）
 
 ---
 
@@ -391,4 +429,5 @@ if(!this.response.isActive()){
 | 日期       | 更新内容                          | 负责人 |
 |----------|---------------------------------|-----|
 | 2025-11-04 | 初始版本，从 SDK 改造为 FIT 框架实现        | 黄可欣 |
-| 2025-11-05 | 代码重构，提取9个辅助方法提高可读性和可维护性      | 黄可欣 |
+| 2025-11-05 | 代码重构，提取辅助方法提高可读性和可维护性      | 黄可欣 |
+| 2025-11-21 | 文档重构，调整结构使其与代码保持一致，简化技术术语 | 黄可欣 |
