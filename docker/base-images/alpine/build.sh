@@ -11,7 +11,7 @@ DEFAULT_REGISTRY=""
 # 显示帮助信息
 show_help() {
     cat <<EOF
-FIT Framework ${OS_NAME^} 镜像构建脚本
+FIT Framework Alpine 镜像构建脚本
 
 用法:
   $0 [FIT_VERSION] [REGISTRY]
@@ -45,20 +45,26 @@ check_docker() {
     fi
 }
 
-# 验证FIT Framework版本是否存在
-verify_fit_version() {
+# 下载FIT Framework
+prepare_artifact() {
     local version=$1
-    local url="https://github.com/ModelEngine-Group/fit-framework/releases/download/v${version}/${version}.zip"
+    local script_dir=$(dirname "$0")
+    local project_root=$(cd "$script_dir/.." && pwd)
     
-    echo "🔍 验证FIT Framework版本 ${version}..."
+    # 调用公共下载脚本获取缓存路径
+    local cache_path
+    cache_path=$("$project_root/common/download.sh" "$version")
     
-    if ! curl -s --head "${url}" | head -n 1 | grep -q "200 OK"; then
-        echo "❌ 错误: FIT Framework版本 ${version} 不存在"
-        echo "请检查版本号或访问: https://github.com/ModelEngine-Group/fit-framework/releases"
+    if [[ $? -ne 0 ]] || [[ ! -f "${cache_path}" ]]; then
+        echo "❌ 错误: 准备FIT Framework制品失败"
         exit 1
     fi
     
-    echo "✅ 版本验证通过"
+    echo "✅ FIT Framework ${version} 已就绪: ${cache_path}"
+    
+    # 复制到构建上下文（父目录）
+    # 使用trap确保脚本退出时清理
+    cp "${cache_path}" "${project_root}/${version}.zip"
 }
 
 # 构建镜像
@@ -88,12 +94,13 @@ build_image() {
         build_args+=("${EXTRA_ARGS[@]}")
     fi
     
-    echo "🏗️  构建FIT Framework ${OS_NAME^} 镜像..."
+    echo "🏗️  构建FIT Framework Alpine 镜像..."
     echo "   版本: ${fit_version}"
     echo "   镜像: ${full_image_name}:${fit_version}-${OS_NAME}"
     
     # 执行构建
-    docker build "${build_args[@]}" .
+    # 使用父目录作为构建上下文，以便访问common目录和制品
+    docker build "${build_args[@]}" -f Dockerfile ..
     
     if [[ $? -eq 0 ]]; then
         echo "✅ 镜像构建成功"
@@ -114,10 +121,15 @@ test_image() {
     echo "🧪 测试镜像: ${image_tag}"
     
     # 测试基本启动
-    if docker run --rm "${image_tag}" fit --version; then
+    local version_output
+    if version_output=$(docker run --rm "${image_tag}" fit version 2>&1); then
         echo "✅ 镜像测试通过"
+        echo "   FIT 版本信息:"
+        echo "${version_output}" | sed 's/^/   /'
     else
         echo "❌ 镜像测试失败"
+        echo "   错误信息:"
+        echo "${version_output}" | sed 's/^/   /'
         return 1
     fi
 }
@@ -143,10 +155,29 @@ push_image() {
     fi
 }
 
+# 清理函数
+cleanup() {
+    local version=$1
+    local script_dir=$(dirname "$0")
+    local project_root=$(cd "$script_dir/.." && pwd)
+    
+    if [[ -n "${version}" && -f "${project_root}/${version}.zip" ]]; then
+        # echo "🧹 清理临时文件..."
+        rm -f "${project_root}/${version}.zip"
+    fi
+}
+
 # 主函数
 main() {
     local fit_version=${1:-$DEFAULT_FIT_VERSION}
     local registry=${2:-$DEFAULT_REGISTRY}
+    
+    # ... (help check)
+    
+    # 注册清理钩子
+    trap "cleanup ${fit_version}" EXIT
+    
+    # ... (rest of main)
     
     # 显示帮助
     if [[ "${fit_version}" == "help" ]] || [[ "${fit_version}" == "--help" ]]; then
@@ -162,7 +193,7 @@ main() {
     local full_image_name="${registry}fit-framework"
     
     echo "=============================================="
-    echo "🚀 FIT Framework ${OS_NAME^} 镜像构建"
+    echo "🚀 FIT Framework Alpine 镜像构建"
     echo "=============================================="
     echo "FIT版本: ${fit_version}"
     echo "操作系统: ${OS_NAME}"
@@ -171,7 +202,7 @@ main() {
     
     # 执行构建流程
     check_docker
-    verify_fit_version "${fit_version}"
+    prepare_artifact "${fit_version}"
     build_image "${fit_version}" "${registry}"
     test_image "${full_image_name}:${fit_version}-${OS_NAME}"
     push_image "${full_image_name}" "${fit_version}"

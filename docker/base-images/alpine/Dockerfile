@@ -22,16 +22,18 @@ ENV JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true"
 
 # 安装系统依赖和OpenJDK 17
 RUN apk add --no-cache \
-        openjdk17-jdk \
-        curl \
-        wget \
-        unzip \
-        bash \
-        netcat-openbsd \
-        shadow \
-        su-exec \
-        ca-certificates \
-        tzdata && \
+    openjdk17-jdk \
+    curl \
+    wget \
+    unzip \
+    bash \
+    netcat-openbsd \
+    shadow \
+    su-exec \
+    ca-certificates \
+    tzdata \
+    nodejs \
+    npm && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # 创建fit用户（Alpine使用不同的命令）
@@ -42,9 +44,9 @@ RUN addgroup -g 2000 -S fit && \
 RUN mkdir -p ${FIT_HOME} ${FIT_JAVA_DIR}/{bin,conf,lib,plugins,logs,data,dynamic-plugins} && \
     chown -R fit:fit ${FIT_HOME}
 
-# 下载并安装FIT Framework
+# 复制并安装FIT Framework
+COPY ${FIT_VERSION}.zip /tmp/
 RUN cd /tmp && \
-    wget -q "https://github.com/ModelEngine-Group/fit-framework/releases/download/v${FIT_VERSION}/${FIT_VERSION}.zip" && \
     unzip -q "${FIT_VERSION}.zip" && \
     cp -r ${FIT_VERSION}/* ${FIT_JAVA_DIR}/ && \
     rm -rf "${FIT_VERSION}.zip" ${FIT_VERSION} && \

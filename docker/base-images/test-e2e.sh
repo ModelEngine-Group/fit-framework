@@ -23,7 +23,7 @@ FIT Framework 端到端测试脚本
 环境变量:
   REGISTRY_PORT    本地 Registry 端口 [默认: 15000]
                    脚本会自动检测端口冲突并尝试 +1, +2
-  FIT_VERSION      FIT Framework 版本号 [默认: 3.5.3]
+  FIT_VERSION      FIT Framework 版本号 [默认: 3.6.0]
   DEBUG            显示详细命令 (true|false) [默认: false]
 
 测试流程:
@@ -74,7 +74,7 @@ fi
 
 # 配置
 REGISTRY_PORT="${REGISTRY_PORT:-15000}"
-FIT_VERSION="${FIT_VERSION:-3.5.3}"
+FIT_VERSION="${FIT_VERSION:-3.6.0}"
 BUILD_OS="${1:-alpine}"  # 可选: alpine, debian
 DEBUG="${DEBUG:-false}"  # 设置为 true 显示详细命令
 
@@ -226,24 +226,55 @@ fi
 # ========================================
 log_step "步骤 2/5: 构建 FIT 基础镜像 (${BUILD_OS})"
 
-log_info "构建镜像: fit-framework:${FIT_VERSION}-${BUILD_OS}..."
-log_cmd "docker build --build-arg FIT_VERSION=\"${FIT_VERSION}\" -t \"fit-framework:${FIT_VERSION}-${BUILD_OS}\" -t \"fit-framework:${BUILD_OS}\" -f \"${BUILD_OS}/Dockerfile\" ."
+# 准备制品
+# 构建镜像
+build_image() {
+    log_info "构建 FIT Framework 基础镜像..."
+    
+    # 准备制品
+    local script_dir=$(dirname "$0")
+    local cache_path
+    cache_path=$("$script_dir/common/download.sh" "$FIT_VERSION")
+    
+    if [[ $? -ne 0 ]] || [[ ! -f "${cache_path}" ]]; then
+        log_error "准备 FIT Framework 制品失败"
+        exit 1
+    fi
+    
+    echo "✅ FIT Framework ${FIT_VERSION} 已就绪: ${cache_path}"
+    
+    # 复制到当前目录
+    cp "${cache_path}" "${FIT_VERSION}.zip"
+    trap "rm -f ${FIT_VERSION}.zip; cleanup" EXIT
+    
+    # 构建镜像
+    if [[ "${DEBUG}" == "true" ]]; then
+        if ! docker build \
+            --build-arg FIT_VERSION="${FIT_VERSION}" \
+            -t "fit-framework:${BUILD_OS}" \
+            -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
+            -f "${BUILD_OS}/Dockerfile" \
+            . ; then
+            log_error "镜像构建失败"
+            exit 1
+        fi
+    else
+        if ! docker build --quiet \
+            --build-arg FIT_VERSION="${FIT_VERSION}" \
+            -t "fit-framework:${BUILD_OS}" \
+            -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
+            -f "${BUILD_OS}/Dockerfile" \
+            . > /dev/null; then
+            log_error "镜像构建失败"
+            exit 1
+        fi
+    fi
+    
+    log_info "✓ 镜像构建成功"
+}
 
-if [[ "${DEBUG}" == "true" ]]; then
-    docker build \
-        --build-arg FIT_VERSION="${FIT_VERSION}" \
-        -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
-        -t "fit-framework:${BUILD_OS}" \
-        -f "${BUILD_OS}/Dockerfile" .
-else
-    docker build --quiet \
-        --build-arg FIT_VERSION="${FIT_VERSION}" \
-        -t "fit-framework:${FIT_VERSION}-${BUILD_OS}" \
-        -t "fit-framework:${BUILD_OS}" \
-        -f "${BUILD_OS}/Dockerfile" . > /dev/null
-fi
+build_image
 
-log_info "镜像构建完成"
 docker images fit-framework:${BUILD_OS} --format "  镜像: {{.Repository}}:{{.Tag}} ({{.Size}})"
 
 # ========================================

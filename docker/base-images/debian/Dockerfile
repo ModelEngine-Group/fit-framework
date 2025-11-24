@@ -23,19 +23,24 @@ ENV PATH=${FIT_JAVA_DIR}/bin:${JAVA_HOME}/bin:${PATH}
 ENV JAVA_OPTS="-Xms256m -Xmx1024m -Djava.awt.headless=true"
 
 # 配置APT使用阿里云镜像源
-RUN sed -i 's@//.*deb.debian.org@//mirrors.aliyun.com@g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
-    sed -i 's@//.*deb.debian.org@//mirrors.aliyun.com@g' /etc/apt/sources.list 2>/dev/null || true
+RUN sed -i 's@//.*deb.debian.org@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's@//.*deb.debian.org@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list 2>/dev/null || true
 
 # 安装系统依赖和OpenJDK 17
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        openjdk-17-jdk-headless \
-        curl \
-        wget \
-        unzip \
-        ca-certificates \
-        netcat-traditional \
-        && rm -rf /var/lib/apt/lists/*
+    openjdk-17-jdk \
+    curl \
+    wget \
+    unzip \
+    procps \
+    netcat-openbsd \
+    ca-certificates \
+    tzdata \
+    nodejs \
+    npm && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    rm -rf /var/lib/apt/lists/*
 
 # 创建fit用户
 RUN groupadd -r -g 2000 fit && \
@@ -45,9 +50,9 @@ RUN groupadd -r -g 2000 fit && \
 RUN mkdir -p ${FIT_HOME} ${FIT_JAVA_DIR}/{bin,conf,lib,plugins,logs,data,dynamic-plugins} && \
     chown -R fit:fit ${FIT_HOME}
 
-# 下载并安装FIT Framework
+# 复制并安装FIT Framework
+COPY ${FIT_VERSION}.zip /tmp/
 RUN cd /tmp && \
-    wget -q "https://github.com/ModelEngine-Group/fit-framework/releases/download/v${FIT_VERSION}/${FIT_VERSION}.zip" && \
     unzip -q "${FIT_VERSION}.zip" && \
     cp -r ${FIT_VERSION}/* ${FIT_JAVA_DIR}/ && \
     rm -rf "${FIT_VERSION}.zip" ${FIT_VERSION} && \

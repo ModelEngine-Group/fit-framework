@@ -42,6 +42,13 @@ docker info
 df -h
 ```
 
+### 构建加速机制
+
+本项目采用了**本地缓存机制**来加速构建：
+1. 构建脚本会自动将 `fit-framework.zip` 下载到系统临时目录（如 `/tmp/fit-framework-cache/`）。
+2. `Dockerfile` 使用 `COPY` 指令直接使用本地文件，避免在容器内重复下载。
+3. 构建过程中会自动将制品复制到构建上下文，并在构建完成后自动清理。
+
 ---
 
 ## 快速开始
@@ -52,10 +59,10 @@ df -h
 cd docker/base-images
 ```
 
-### 2. 构建单个镜像（以 Ubuntu 为例）
+### 2. 构建单个镜像（以 Alpine 为例）
 
 ```bash
-cd ubuntu
+cd alpine
 ./build.sh
 ```
 
@@ -67,9 +74,9 @@ docker images | grep fit-framework
 
 输出示例：
 ```
-fit-framework    3.5.3-ubuntu    abc123def456    2 minutes ago    1GB
-fit-framework    ubuntu          abc123def456    2 minutes ago    1GB
-fit-framework    latest-ubuntu   abc123def456    2 minutes ago    1GB
+fit-framework    3.6.0-alpine    abc123def456    2 minutes ago    700MB
+fit-framework    alpine          abc123def456    2 minutes ago    700MB
+fit-framework    latest-alpine   abc123def456    2 minutes ago    700MB
 ```
 
 ---
@@ -89,33 +96,33 @@ cd <os-name>    # alpine, debian
 
 | 参数 | 说明 | 默认值 | 示例 |
 |------|------|--------|------|
-| `FIT_VERSION` | FIT Framework 版本号 | `3.5.3` | `3.5.4` |
+| `FIT_VERSION` | FIT Framework 版本号 | `3.6.0` | `3.6.1` |
 | `REGISTRY` | 镜像仓库前缀（带结尾斜杠）| 无前缀 | `localhost:5000/` |
 
 ### 示例
 
 **1. 使用默认版本构建**
 ```bash
-cd ubuntu
+cd alpine
 ./build.sh
 ```
 
 **2. 指定版本构建**
 ```bash
-cd ubuntu
-./build.sh 3.5.4
+cd alpine
+./build.sh 3.6.1
 ```
 
 **3. 构建并推送到私有仓库**
 ```bash
-cd ubuntu
-PUSH_IMAGE=true ./build.sh 3.5.3 registry.mycompany.com/fit/
+cd alpine
+PUSH_IMAGE=true ./build.sh 3.6.0 registry.mycompany.com/fit/
 ```
 
 **4. 使用本地镜像仓库**
 ```bash
-cd ubuntu
-PUSH_IMAGE=true ./build.sh 3.5.3 localhost:5000/
+cd alpine
+PUSH_IMAGE=true ./build.sh 3.6.0 localhost:5000/
 ```
 
 ### 环境变量
@@ -130,9 +137,9 @@ PUSH_IMAGE=true ./build.sh 3.5.3 localhost:5000/
 构建脚本会自动生成多个标签：
 
 ```
-${REGISTRY}fit-framework:${VERSION}-${OS}      # 例如: fit-framework:3.5.3-ubuntu
-${REGISTRY}fit-framework:${OS}                 # 例如: fit-framework:ubuntu
-${REGISTRY}fit-framework:latest-${OS}          # 仅默认版本，例如: fit-framework:latest-ubuntu
+${REGISTRY}fit-framework:${VERSION}-${OS}      # 例如: fit-framework:3.6.0-alpine
+${REGISTRY}fit-framework:${OS}                 # 例如: fit-framework:alpine
+${REGISTRY}fit-framework:latest-${OS}          # 仅默认版本，例如: fit-framework:latest-alpine
 ```
 
 ---
@@ -157,12 +164,12 @@ cd docker/base-images
 
 **2. 构建指定版本**
 ```bash
-./build_all.sh build 3.5.4
+./build_all.sh build 3.6.1
 ```
 
 **3. 构建并推送到仓库**
 ```bash
-PUSH_IMAGE=true ./build_all.sh build 3.5.3 registry.mycompany.com/fit/
+PUSH_IMAGE=true ./build_all.sh build 3.6.0 registry.mycompany.com/fit/
 ```
 
 **4. 并行构建（加速）**
@@ -188,7 +195,7 @@ ONLY_OS=alpine,debian ./build_all.sh build
 | 变量名 | 说明 | 默认值 | 示例 |
 |--------|------|--------|------|
 | `PARALLEL` | 并行构建数量 | `2` | `4` |
-| `ONLY_OS` | 仅构建的 OS 列表（逗号分隔） | 全部 | `ubuntu,alpine` |
+| `ONLY_OS` | 仅构建的 OS 列表（逗号分隔） | 全部 | `alpine,debian` |
 | `SKIP_OS` | 跳过的 OS 列表（逗号分隔） | 无 | `openeuler` |
 | `PUSH_IMAGE` | 是否推送镜像 | `false` | `true` |
 
@@ -219,13 +226,12 @@ debian       - Debian 12 (稳定可靠)
 ```bash
 cd docker/base-images
 
-# 测试单个操作系统（默认 Ubuntu）
+# 测试单个操作系统（默认 Alpine）
 ./test-e2e.sh
 
 # 测试其他操作系统
 ./test-e2e.sh alpine
 ./test-e2e.sh debian
-./test-e2e.sh rocky
 ```
 
 测试脚本会自动：
@@ -238,10 +244,10 @@ cd docker/base-images
 **自定义配置**：
 ```bash
 # 使用不同端口
-REGISTRY_PORT=20000 ./test-e2e.sh ubuntu
+REGISTRY_PORT=20000 ./test-e2e.sh alpine
 
 # 使用不同版本
-FIT_VERSION=3.5.4 ./test-e2e.sh ubuntu
+FIT_VERSION=3.6.1 ./test-e2e.sh alpine
 ```
 
 详细的测试说明请参考 [README.md](README.md#-测试镜像)。
@@ -251,10 +257,10 @@ FIT_VERSION=3.5.4 ./test-e2e.sh ubuntu
 **1. 测试基础镜像**
 ```bash
 # 运行 FIT 命令
-docker run --rm fit-framework:ubuntu-test fit help
+docker run --rm fit-framework:alpine fit help
 
 # 启动容器
-docker run -d -p 8080:8080 --name fit-test fit-framework:ubuntu-test
+docker run -d -p 8080:8080 --name fit-test fit-framework:alpine
 
 # 查看日志
 docker logs fit-test
@@ -270,7 +276,7 @@ docker rm fit-test
 **2. 测试健康检查**
 ```bash
 # 启动容器
-docker run -d --name fit-test fit-framework:ubuntu-test
+docker run -d --name fit-test fit-framework:alpine
 
 # 等待几秒后检查健康状态
 docker inspect fit-test --format='{{.State.Health.Status}}'
@@ -281,7 +287,7 @@ docker inspect fit-test --format='{{.State.Health.Status}}'
 docker run --rm \
   -e FIT_WORKER_ID=test-worker \
   -e FIT_LOG_LEVEL=debug \
-  fit-framework:ubuntu-test fit help
+  fit-framework:alpine fit help
 ```
 
 ---
@@ -297,13 +303,13 @@ docker login
 
 **2. 构建并推送**
 ```bash
-cd ubuntu
-PUSH_IMAGE=true ./build.sh 3.5.3 modelengine/
+cd alpine
+PUSH_IMAGE=true ./build.sh 3.6.0 modelengine/
 ```
 
 **3. 批量推送所有镜像**
 ```bash
-PUSH_IMAGE=true ./build_all.sh build 3.5.3 modelengine/
+PUSH_IMAGE=true ./build_all.sh build 3.6.0 modelengine/
 ```
 
 ### 发布到私有镜像仓库
@@ -315,14 +321,14 @@ docker login registry.mycompany.com
 
 **2. 构建并推送**
 ```bash
-cd ubuntu
-PUSH_IMAGE=true ./build.sh 3.5.3 registry.mycompany.com/fit/
+cd alpine
+PUSH_IMAGE=true ./build.sh 3.6.0 registry.mycompany.com/fit/
 ```
 
 **3. 验证推送成功**
 ```bash
 # 在另一台机器上拉取
-docker pull registry.mycompany.com/fit/fit-framework:3.5.3-ubuntu
+docker pull registry.mycompany.com/fit/fit-framework:3.6.0-alpine
 ```
 
 ### 发布到阿里云容器镜像服务
@@ -334,8 +340,8 @@ docker login --username=your_username registry.cn-hangzhou.aliyuncs.com
 
 **2. 构建并推送**
 ```bash
-cd ubuntu
-PUSH_IMAGE=true ./build.sh 3.5.3 registry.cn-hangzhou.aliyuncs.com/fit-framework/
+cd alpine
+PUSH_IMAGE=true ./build.sh 3.6.0 registry.cn-hangzhou.aliyuncs.com/fit-framework/
 ```
 
 ---
@@ -403,8 +409,8 @@ open http://localhost:8081
 
 **1. 构建并推送到本地仓库**
 ```bash
-cd docker/base-images/ubuntu
-PUSH_IMAGE=true ./build.sh 3.5.3 localhost:5000/
+cd docker/base-images/alpine
+PUSH_IMAGE=true ./build.sh 3.6.0 localhost:5000/
 ```
 
 **2. 查看本地仓库的镜像**
@@ -419,20 +425,20 @@ curl http://localhost:5000/v2/fit-framework/tags/list
 **3. 拉取测试**
 ```bash
 # 删除本地镜像
-docker rmi localhost:5000/fit-framework:3.5.3-ubuntu
+docker rmi localhost:5000/fit-framework:3.6.0-alpine
 
 # 重新拉取
-docker pull localhost:5000/fit-framework:3.5.3-ubuntu
+docker pull localhost:5000/fit-framework:3.6.0-alpine
 
 # 测试运行
-docker run --rm localhost:5000/fit-framework:3.5.3-ubuntu fit help
+docker run --rm localhost:5000/fit-framework:3.6.0-alpine fit help
 ```
 
 **4. 批量测试所有镜像**
 ```bash
 # 构建并推送所有镜像到本地仓库
 cd docker/base-images
-PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.5.3 localhost:5000/
+PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.6.0 localhost:5000/
 
 # 检查所有镜像
 for os in alpine debian; do
@@ -479,12 +485,12 @@ docker-compose -f /tmp/registry-compose.yml down -v
 ```bash
 # 更新所有 Dockerfile
 for dockerfile in */Dockerfile; do
-  sed -i '' 's/ARG FIT_VERSION=.*/ARG FIT_VERSION=3.5.4/g' "$dockerfile"
+  sed -i '' 's/ARG FIT_VERSION=.*/ARG FIT_VERSION=3.6.1/g' "$dockerfile"
 done
 
 # 更新所有 build.sh
 for buildsh in */build.sh build_all.sh; do
-  sed -i '' 's/DEFAULT_FIT_VERSION=".*/DEFAULT_FIT_VERSION="3.5.4"/g' "$buildsh"
+  sed -i '' 's/DEFAULT_FIT_VERSION=".*/DEFAULT_FIT_VERSION="3.6.1"/g' "$buildsh"
 done
 ```
 
@@ -492,11 +498,11 @@ done
 
 ```bash
 # 测试构建单个镜像
-cd ubuntu
+cd alpine
 ./build.sh
 
 # 测试镜像功能
-docker run --rm fit-framework:ubuntu-test fit help
+docker run --rm fit-framework:alpine fit help
 ```
 
 **步骤 3: 推送到本地 registry 验证**
@@ -506,10 +512,10 @@ docker run --rm fit-framework:ubuntu-test fit help
 docker run -d -p 5000:5000 --name registry registry:2
 
 # 推送到本地
-PUSH_IMAGE=true ./build.sh 3.5.4 localhost:5000/
+PUSH_IMAGE=true ./build.sh 3.6.1 localhost:5000/
 
 # 验证
-docker pull localhost:5000/fit-framework:3.5.4-ubuntu
+docker pull localhost:5000/fit-framework:3.6.1-alpine
 ```
 
 **步骤 4: 登录生产仓库**
@@ -528,23 +534,23 @@ docker login registry.mycompany.com
 cd docker/base-images
 
 # 构建并推送所有镜像
-PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.5.4 modelengine/
+PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.6.1 modelengine/
 
 # 或推送到私有仓库
-PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.5.4 registry.mycompany.com/fit/
+PUSH_IMAGE=true PARALLEL=4 ./build_all.sh build 3.6.1 registry.mycompany.com/fit/
 ```
 
 **步骤 6: 验证发布**
 
 ```bash
 # 在干净的环境中测试
-docker rmi fit-framework:3.5.4-ubuntu
+docker rmi fit-framework:3.6.1-alpine
 
 # 从仓库拉取
-docker pull modelengine/fit-framework:3.5.4-ubuntu
+docker pull modelengine/fit-framework:3.6.1-alpine
 
 # 验证版本和功能
-docker run --rm modelengine/fit-framework:3.5.4-ubuntu fit help
+docker run --rm modelengine/fit-framework:3.6.1-alpine fit help
 ```
 
 **步骤 7: 更新文档**
@@ -555,7 +561,7 @@ docker run --rm modelengine/fit-framework:3.5.4-ubuntu fit help
 
 ```bash
 git add .
-git commit -m "chore(docker): Bump base images to FIT Framework v3.5.4"
+git commit -m "chore(docker): Bump base images to FIT Framework v3.6.1"
 git push
 ```
 
@@ -575,7 +581,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu, alpine, debian, rocky, amazonlinux, openeuler]
+        os: [alpine, debian]
 
     steps:
       - uses: actions/checkout@v3
@@ -617,7 +623,7 @@ ERROR: wget failed to download https://github.com/...
 - 尝试手动下载验证 URL
 
 ```bash
-wget -O /tmp/test.zip "https://github.com/ModelEngine-Group/fit-framework/releases/download/v3.5.3/3.5.3.zip"
+wget -O /tmp/test.zip "https://github.com/ModelEngine-Group/fit-framework/releases/download/v3.6.0/3.6.0.zip"
 unzip -t /tmp/test.zip
 ```
 
@@ -666,11 +672,11 @@ docker system prune -a --volumes
 如果构建时提示下载 URL 不正确，检查 Dockerfile 中的 ARG 声明：
 
 ```dockerfile
-ARG FIT_VERSION=3.5.3
-FROM ubuntu:22.04
+ARG FIT_VERSION=3.6.0
+FROM alpine:3.19
 
 # 必须在 FROM 之后重新声明
-ARG FIT_VERSION=3.5.3
+ARG FIT_VERSION=3.6.0
 ```
 
 ### 日志和调试
@@ -686,8 +692,11 @@ ls -la build-logs/
 
 **调试 Dockerfile**
 ```bash
+# 注意：手动构建前需要先下载制品
+./common/download.sh 3.6.0
+
 # 交互式调试
-docker run -it --rm ubuntu:22.04 bash
+docker run -it --rm alpine:3.19 sh
 
 # 逐步执行 Dockerfile 命令
 # 然后手动执行每一步
@@ -696,10 +705,10 @@ docker run -it --rm ubuntu:22.04 bash
 **检查镜像内容**
 ```bash
 # 查看镜像层
-docker history fit-framework:ubuntu-test
+docker history fit-framework:alpine
 
 # 导出镜像检查
-docker save fit-framework:ubuntu-test | tar -xv
+docker save fit-framework:alpine | tar -xv
 ```
 
 ### 获取帮助
@@ -716,12 +725,8 @@ docker save fit-framework:ubuntu-test | tar -xv
 
 | 操作系统 | 预期大小 | 说明 |
 |----------|----------|------|
-| Ubuntu 22.04 | ~1.0 GB | 包含完整工具链 |
 | Alpine 3.19 | ~700 MB | 最小化镜像 |
 | Debian 12 | ~900 MB | 稳定可靠 |
-| Rocky Linux 9 | ~1.1 GB | 企业级支持 |
-| Amazon Linux 2023 | ~950 MB | AWS 优化 |
-| OpenEuler 22.03 | ~1.2 GB | 国产化支持 |
 
 ### B. 相关资源
 
@@ -739,5 +744,5 @@ docker save fit-framework:ubuntu-test | tar -xv
 
 ---
 
-**最后更新**: 2025-10-14
+**最后更新**: 2025-11-23
 **维护者**: FIT Framework Team

@@ -5,7 +5,7 @@ set -euo pipefail
 # 构建所有支持的操作系统镜像
 
 # 配置
-DEFAULT_FIT_VERSION="3.5.3"
+DEFAULT_FIT_VERSION="3.6.0"
 DEFAULT_REGISTRY=""
 BUILD_LOG_DIR="./build-logs"
 
@@ -15,11 +15,7 @@ OS_LIST=(
     "debian"
 )
 
-# 操作系统描述
-declare -A OS_DESCRIPTIONS=(
-    ["alpine"]="Alpine Linux (轻量级云原生)"
-    ["debian"]="Debian 12 (稳定可靠)"
-)
+
 
 # 显示帮助信息
 show_help() {
@@ -63,7 +59,7 @@ list_os() {
     echo "支持的操作系统列表:"
     echo "===================="
     for os in "${OS_LIST[@]}"; do
-        printf "%-12s - %s\n" "$os" "${OS_DESCRIPTIONS[$os]}"
+        echo "  - $os"
     done
     echo "===================="
     echo "总计: ${#OS_LIST[@]} 个操作系统"
@@ -190,6 +186,7 @@ build_images_parallel() {
     echo "=============================================="
     
     local -a pids=()
+    local -a running_os=()
     local -a success_list=()
     local -a failure_list=()
     local active_jobs=0
@@ -200,6 +197,7 @@ build_images_parallel() {
         local os_name="${os_array[$os_index]}"
         build_single_image "$os_name" "$fit_version" "$registry" &
         pids+=($!)
+        running_os+=("$os_name")
         ((active_jobs++))
         ((os_index++))
     done
@@ -212,7 +210,7 @@ build_images_parallel() {
                 # 任务完成
                 wait "$pid"
                 local exit_code=$?
-                local completed_os="${os_array[$((os_index - active_jobs + i))]}"
+                local completed_os="${running_os[$i]}"
                 
                 if [[ $exit_code -eq 0 ]]; then
                     success_list+=("$completed_os")
@@ -220,8 +218,9 @@ build_images_parallel() {
                     failure_list+=("$completed_os")
                 fi
                 
-                # 移除已完成的PID
+                # 移除已完成的PID和OS记录
                 unset "pids[$i]"
+                unset "running_os[$i]"
                 ((active_jobs--))
                 
                 # 启动新任务（如果还有）
@@ -229,6 +228,7 @@ build_images_parallel() {
                     local next_os="${os_array[$os_index]}"
                     build_single_image "$next_os" "$fit_version" "$registry" &
                     pids+=($!)
+                    running_os+=("$next_os")
                     ((active_jobs++))
                     ((os_index++))
                 fi
@@ -242,8 +242,8 @@ build_images_parallel() {
     echo "=============================================="
     echo "📊 构建结果汇总"
     echo "=============================================="
-    echo "✅ 成功 (${#success_list[@]}): ${success_list[*]}"
-    echo "❌ 失败 (${#failure_list[@]}): ${failure_list[*]}"
+    echo "✅ 成功 (${#success_list[@]}): ${success_list[*]:-}"
+    echo "❌ 失败 (${#failure_list[@]}): ${failure_list[*]:-}"
     
     if [[ ${#failure_list[@]} -gt 0 ]]; then
         echo ""
@@ -257,26 +257,46 @@ build_images_parallel() {
     return 0
 }
 
-# 验证FIT Framework版本
-verify_fit_version() {
+# 准备FIT Framework制品
+prepare_artifact() {
     local version=$1
-    local url="https://github.com/ModelEngine-Group/fit-framework/releases/download/v${version}/${version}.zip"
+    local script_dir=$(dirname "$0")
     
-    echo "🔍 验证FIT Framework版本 ${version}..."
+    # 调用公共下载脚本获取缓存路径
+    local cache_path
+    cache_path=$("$script_dir/common/download.sh" "$version")
     
-    if ! curl -s --head "${url}" | head -n 1 | grep -q "200 OK"; then
-        echo "❌ 错误: FIT Framework版本 ${version} 不存在"
-        echo "请检查版本号或访问: https://github.com/ModelEngine-Group/fit-framework/releases"
+    if [[ $? -ne 0 ]] || [[ ! -f "${cache_path}" ]]; then
+        echo "❌ 错误: 准备FIT Framework制品失败"
         exit 1
     fi
     
-    echo "✅ 版本验证通过"
+    echo "✅ FIT Framework ${version} 已就绪: ${cache_path}"
+    
+    # 复制到当前目录（构建上下文根目录）
+    cp "${cache_path}" "${script_dir}/${version}.zip"
+}
+
+# 清理函数
+cleanup_artifact() {
+    local version=$1
+    local script_dir=$(dirname "$0")
+    
+    if [[ -n "${version}" && -f "${script_dir}/${version}.zip" ]]; then
+        # echo "🧹 清理临时文件..."
+        rm -f "${script_dir}/${version}.zip"
+    fi
 }
 
 # 主构建函数
 build_all() {
     local fit_version=${1:-$DEFAULT_FIT_VERSION}
     local registry=${2:-$DEFAULT_REGISTRY}
+    
+    # 注册清理钩子
+    trap "cleanup_artifact ${fit_version}" EXIT
+    
+    # ... (rest of build_all)
     
     # 规范化registry
     if [[ -n "${registry}" && "${registry}" != */ ]]; then
@@ -292,12 +312,14 @@ build_all() {
     echo "推送镜像: ${PUSH_IMAGE:-false}"
     echo "=============================================="
     
-    # 验证版本
-    verify_fit_version "${fit_version}"
+    # 准备制品
+    prepare_artifact "${fit_version}"
     
     # 获取过滤后的OS列表
-    local -a filtered_os
-    readarray -t filtered_os < <(filter_os_list)
+    local -a filtered_os=()
+    while IFS= read -r line; do
+        filtered_os+=("$line")
+    done < <(filter_os_list)
     
     if [[ ${#filtered_os[@]} -eq 0 ]]; then
         echo "❌ 错误: 没有需要构建的操作系统"
