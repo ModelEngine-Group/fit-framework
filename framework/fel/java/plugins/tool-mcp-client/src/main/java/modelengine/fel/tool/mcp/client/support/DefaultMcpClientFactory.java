@@ -6,6 +6,11 @@
 
 package modelengine.fel.tool.mcp.client.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
+import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.McpClientFactory;
 import modelengine.fitframework.annotation.Component;
@@ -32,7 +37,26 @@ public class DefaultMcpClientFactory implements McpClientFactory {
     }
 
     @Override
+    public McpClient createStreamable(String baseUri, String sseEndpoint) {
+        HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport.builder(baseUri)
+                .jsonMapper(new JacksonMcpJsonMapper(new ObjectMapper()))
+                .endpoint(sseEndpoint)
+                .build();
+        return new DefaultMcpStreamableClient(baseUri, sseEndpoint, this.requestTimeoutSeconds, transport);
+    }
+
+    @Override
+    public McpClient createSse(String baseUri, String sseEndpoint) {
+        HttpClientSseClientTransport transport = HttpClientSseClientTransport.builder(baseUri)
+                .jsonMapper(new JacksonMcpJsonMapper(new ObjectMapper()))
+                .sseEndpoint(sseEndpoint)
+                .build();
+        return new DefaultMcpStreamableClient(baseUri, sseEndpoint, this.requestTimeoutSeconds, transport);
+    }
+
+    @Override
+    @Deprecated
     public McpClient create(String baseUri, String sseEndpoint) {
-        return new DefaultMcpStreamableClient(baseUri, sseEndpoint, requestTimeoutSeconds);
+        return this.createStreamable(baseUri, sseEndpoint);
     }
 }

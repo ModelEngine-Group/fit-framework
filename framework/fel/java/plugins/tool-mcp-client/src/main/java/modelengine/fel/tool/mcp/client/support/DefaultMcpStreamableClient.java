@@ -11,9 +11,8 @@ import static modelengine.fitframework.inspection.Validation.notBlank;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.modelcontextprotocol.client.McpSyncClient;
-import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.json.schema.jackson.DefaultJsonSchemaValidator;
+import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.entity.Tool;
@@ -54,23 +53,18 @@ public class DefaultMcpStreamableClient implements McpClient {
      * @param sseEndpoint The endpoint for the Server-Sent Events (SSE) connection.
      * @param requestTimeoutSeconds The timeout duration of requests. Units: seconds.
      */
-    public DefaultMcpStreamableClient(String baseUri, String sseEndpoint, int requestTimeoutSeconds) {
+    public DefaultMcpStreamableClient(String baseUri, String sseEndpoint, int requestTimeoutSeconds,
+            McpClientTransport transport) {
         this.clientId = UuidUtils.randomUuidString();
         notBlank(baseUri, "The MCP server base URI cannot be blank.");
         notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
         log.info("Creating MCP client. [clientId={}, baseUri={}]", this.clientId, baseUri);
-        ObjectMapper mapper = new ObjectMapper();
-        HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport.builder(baseUri)
-                .jsonMapper(new JacksonMcpJsonMapper(mapper))
-                .endpoint(sseEndpoint)
-                .build();
-
         this.logHandler = new DefaultMcpClientLogHandler(this.clientId);
         this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
                 .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
                 .capabilities(McpSchema.ClientCapabilities.builder().build())
                 .loggingConsumer(this.logHandler::handleLoggingMessage)
-                .jsonSchemaValidator(new DefaultJsonSchemaValidator(mapper))
+                .jsonSchemaValidator(new DefaultJsonSchemaValidator(new ObjectMapper()))
                 .build();
     }
 

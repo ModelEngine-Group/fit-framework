@@ -51,9 +51,17 @@ public class TestController {
      * @return A string indicating that the initialization was successful.
      */
     @PostMapping(path = "/initialize")
-    public String initialize(@RequestQuery(name = "baseUri") String baseUri,
+    public String initializeStreamable(@RequestQuery(name = "baseUri") String baseUri,
             @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
-        this.client = this.mcpClientFactory.create(baseUri, sseEndpoint);
+        this.client = this.mcpClientFactory.createStreamable(baseUri, sseEndpoint);
+        this.client.initialize();
+        return "Initialized";
+    }
+
+    @PostMapping(path = "/initialize-sse")
+    public String initializeSse(@RequestQuery(name = "baseUri") String baseUri,
+            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
+        this.client = this.mcpClientFactory.createSse(baseUri, sseEndpoint);
         this.client.initialize();
         return "Initialized";
     }

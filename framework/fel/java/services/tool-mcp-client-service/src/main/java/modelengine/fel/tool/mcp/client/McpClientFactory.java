@@ -16,11 +16,30 @@ package modelengine.fel.tool.mcp.client;
  */
 public interface McpClientFactory {
     /**
-     * Creates a {@link McpClient} instance.
+     * Creates a {@link McpClient} instance with streamable HTTP transport.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The SSE endpoint of the MCP server.
      * @return The connected {@link McpClient} instance.
      */
-    McpClient create(String baseUri, String sseEndpoint);
+    public McpClient createStreamable(String baseUri, String sseEndpoint);
+
+    /**
+     * Creates a {@link McpClient} instance with SSE transport.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return The connected {@link McpClient} instance.
+     */
+    public McpClient createSse(String baseUri, String sseEndpoint);
+
+    /**
+     * Creates a {@link McpClient} instance with streamable HTTP transport.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return The connected {@link McpClient} instance.
+     */
+    @Deprecated
+    public McpClient create(String baseUri, String sseEndpoint);
 }
