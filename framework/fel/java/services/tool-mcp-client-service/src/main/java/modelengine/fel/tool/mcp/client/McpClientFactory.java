@@ -13,9 +13,8 @@ import modelengine.fitframework.inspection.Nullable;
 import java.util.function.Function;
 
 /**
- * Factory for creating {@link McpClient} instances.
- *
- * <p>Each client connects to a single MCP server.
+ * Factory for creating {@link McpClient} instances with SSE or Streamable HTTP transport.
+ * <p>Each client connects to a single MCP server.</p>
  *
  * @author 季聿阶
  * @since 2025-05-21
