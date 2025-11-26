@@ -4,7 +4,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-package modelengine.fel.tool.mcp.client.support;
+package modelengine.fel.tool.mcp.client.support.handler;
 
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fitframework.log.Logger;

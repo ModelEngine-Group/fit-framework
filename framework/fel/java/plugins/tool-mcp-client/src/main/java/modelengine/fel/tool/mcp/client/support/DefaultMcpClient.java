@@ -15,7 +15,12 @@ import io.modelcontextprotocol.json.schema.jackson.DefaultJsonSchemaValidator;
 import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
+import modelengine.fel.tool.mcp.client.elicitation.ElicitRequest;
+import modelengine.fel.tool.mcp.client.elicitation.ElicitResult;
+import modelengine.fel.tool.mcp.client.support.handler.DefaultMcpClientLogHandler;
+import modelengine.fel.tool.mcp.client.support.handler.DefaultMcpElicitationHandler;
 import modelengine.fel.tool.mcp.entity.Tool;
+import modelengine.fitframework.inspection.Nullable;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.StringUtils;
 import modelengine.fitframework.util.UuidUtils;
@@ -25,6 +30,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -36,36 +42,47 @@ import java.util.stream.Collectors;
  * @author 黄可欣
  * @since 2025-11-03
  */
-public class DefaultMcpStreamableClient implements McpClient {
-    private static final Logger log = Logger.get(DefaultMcpStreamableClient.class);
+public class DefaultMcpClient implements McpClient {
+    private static final Logger log = Logger.get(DefaultMcpClient.class);
 
     private final String clientId;
     private final McpSyncClient mcpSyncClient;
-    private final DefaultMcpClientLogHandler logHandler;
 
     private volatile boolean initialized = false;
     private volatile boolean closed = false;
 
     /**
-     * Constructs a new instance of the DefaultMcpStreamableClient.
+     * Constructs a new instance of the DefaultMcpClient.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The endpoint for the Server-Sent Events (SSE) connection.
      * @param requestTimeoutSeconds The timeout duration of requests. Units: seconds.
      */
-    public DefaultMcpStreamableClient(String baseUri, String sseEndpoint, int requestTimeoutSeconds,
-            McpClientTransport transport) {
+    public DefaultMcpClient(String baseUri, String sseEndpoint, McpClientTransport transport, int requestTimeoutSeconds,
+            @Nullable Function<ElicitRequest, ElicitResult> elicitationHandler) {
         this.clientId = UuidUtils.randomUuidString();
         notBlank(baseUri, "The MCP server base URI cannot be blank.");
         notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
         log.info("Creating MCP client. [clientId={}, baseUri={}]", this.clientId, baseUri);
-        this.logHandler = new DefaultMcpClientLogHandler(this.clientId);
-        this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
-                .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
-                .capabilities(McpSchema.ClientCapabilities.builder().build())
-                .loggingConsumer(this.logHandler::handleLoggingMessage)
-                .jsonSchemaValidator(new DefaultJsonSchemaValidator(new ObjectMapper()))
-                .build();
+        DefaultMcpClientLogHandler logHandler = new DefaultMcpClientLogHandler(this.clientId);
+        if (elicitationHandler != null) {
+            DefaultMcpElicitationHandler mcpElicitationHandler =
+                    new DefaultMcpElicitationHandler(this.clientId, elicitationHandler);
+            this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
+                    .capabilities(McpSchema.ClientCapabilities.builder().elicitation().build())
+                    .loggingConsumer(logHandler::handleLoggingMessage)
+                    .elicitation(mcpElicitationHandler::handleElicitationRequest)
+                    .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
+                    .jsonSchemaValidator(new DefaultJsonSchemaValidator(new ObjectMapper()))
+                    .build();
+        } else {
+            this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
+                    .capabilities(McpSchema.ClientCapabilities.builder().build())
+                    .loggingConsumer(logHandler::handleLoggingMessage)
+                    .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
+                    .jsonSchemaValidator(new DefaultJsonSchemaValidator(new ObjectMapper()))
+                    .build();
+        }
     }
 
     @Override

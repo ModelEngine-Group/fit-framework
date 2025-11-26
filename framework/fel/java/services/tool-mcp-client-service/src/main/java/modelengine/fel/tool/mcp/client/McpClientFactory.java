@@ -6,39 +6,52 @@
 
 package modelengine.fel.tool.mcp.client;
 
+import modelengine.fel.tool.mcp.client.elicitation.ElicitRequest;
+import modelengine.fel.tool.mcp.client.elicitation.ElicitResult;
+import modelengine.fitframework.inspection.Nullable;
+
+import java.util.function.Function;
+
 /**
- * Indicates the factory of {@link McpClient}.
- * <p>
- * Each {@link McpClient} instance created by this factory is designed to connect to a single specified MCP server.
+ * Factory for creating {@link McpClient} instances.
+ *
+ * <p>Each client connects to a single MCP server.
  *
  * @author 季聿阶
  * @since 2025-05-21
  */
 public interface McpClientFactory {
     /**
-     * Creates a {@link McpClient} instance with streamable HTTP transport.
+     * Creates a client with streamable HTTP transport.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return The connected {@link McpClient} instance.
+     * @param elicitationFunction The function to handle {@link ElicitRequest} and return {@link ElicitResult}.
+     * If null, elicitation will not be supported in MCP client.
+     * @return The created {@link McpClient} instance.
      */
-    public McpClient createStreamable(String baseUri, String sseEndpoint);
+    public McpClient createStreamable(String baseUri, String sseEndpoint,
+            @Nullable Function<ElicitRequest, ElicitResult> elicitationFunction);
 
     /**
-     * Creates a {@link McpClient} instance with SSE transport.
+     * Creates a client with SSE transport.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return The connected {@link McpClient} instance.
+     * @param elicitationFunction The function to handle {@link ElicitRequest} and return {@link ElicitResult}.
+     * If null, elicitation will not be supported in MCP client.
+     * @return The created {@link McpClient} instance.
      */
-    public McpClient createSse(String baseUri, String sseEndpoint);
+    public McpClient createSse(String baseUri, String sseEndpoint,
+            @Nullable Function<ElicitRequest, ElicitResult> elicitationFunction);
 
     /**
-     * Creates a {@link McpClient} instance with streamable HTTP transport.
+     * Creates a client with streamable HTTP transport.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The SSE endpoint of the MCP server.
-     * @return The connected {@link McpClient} instance.
+     * @return The created {@link McpClient} instance.
+     * @deprecated Use {@link #createStreamable(String, String, Function)} instead.
      */
     @Deprecated
     public McpClient create(String baseUri, String sseEndpoint);

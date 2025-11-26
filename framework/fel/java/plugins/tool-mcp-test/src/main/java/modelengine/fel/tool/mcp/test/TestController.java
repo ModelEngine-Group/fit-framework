@@ -8,6 +8,7 @@ package modelengine.fel.tool.mcp.test;
 
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.McpClientFactory;
+import modelengine.fel.tool.mcp.client.elicitation.ElicitResult;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fit.http.annotation.GetMapping;
 import modelengine.fit.http.annotation.PostMapping;
@@ -17,6 +18,7 @@ import modelengine.fit.http.annotation.RequestQuery;
 import modelengine.fitframework.annotation.Component;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +55,7 @@ public class TestController {
     @PostMapping(path = "/initialize")
     public String initializeStreamable(@RequestQuery(name = "baseUri") String baseUri,
             @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
-        this.client = this.mcpClientFactory.createStreamable(baseUri, sseEndpoint);
+        this.client = this.mcpClientFactory.createStreamable(baseUri, sseEndpoint, null);
         this.client.initialize();
         return "Initialized";
     }
@@ -61,7 +63,17 @@ public class TestController {
     @PostMapping(path = "/initialize-sse")
     public String initializeSse(@RequestQuery(name = "baseUri") String baseUri,
             @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
-        this.client = this.mcpClientFactory.createSse(baseUri, sseEndpoint);
+        this.client = this.mcpClientFactory.createSse(baseUri, sseEndpoint, null);
+        this.client.initialize();
+        return "Initialized";
+    }
+
+    @PostMapping(path = "/initialize-elicitation")
+    public String initializeElicitation(@RequestQuery(name = "baseUri") String baseUri,
+            @RequestQuery(name = "sseEndpoint") String sseEndpoint) {
+        this.client = this.mcpClientFactory.createStreamable(baseUri,
+                sseEndpoint,
+                request -> new ElicitResult(ElicitResult.Action.ACCEPT, Collections.emptyMap()));
         this.client.initialize();
         return "Initialized";
     }
