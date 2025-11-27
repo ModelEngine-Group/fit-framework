@@ -17,8 +17,8 @@ import io.modelcontextprotocol.spec.McpSchema;
 import modelengine.fel.tool.mcp.client.McpClient;
 import modelengine.fel.tool.mcp.client.elicitation.ElicitRequest;
 import modelengine.fel.tool.mcp.client.elicitation.ElicitResult;
-import modelengine.fel.tool.mcp.client.support.handler.DefaultMcpClientLogHandler;
-import modelengine.fel.tool.mcp.client.support.handler.DefaultMcpElicitationHandler;
+import modelengine.fel.tool.mcp.client.support.handler.McpClientLogHandler;
+import modelengine.fel.tool.mcp.client.support.handler.McpElicitationHandler;
 import modelengine.fel.tool.mcp.entity.Tool;
 import modelengine.fitframework.inspection.Nullable;
 import modelengine.fitframework.log.Logger;
@@ -64,10 +64,10 @@ public class DefaultMcpClient implements McpClient {
         notBlank(baseUri, "The MCP server base URI cannot be blank.");
         notBlank(sseEndpoint, "The MCP server SSE endpoint cannot be blank.");
         log.info("Creating MCP client. [clientId={}, baseUri={}]", this.clientId, baseUri);
-        DefaultMcpClientLogHandler logHandler = new DefaultMcpClientLogHandler(this.clientId);
+        McpClientLogHandler logHandler = new McpClientLogHandler(this.clientId);
         if (elicitationHandler != null) {
-            DefaultMcpElicitationHandler mcpElicitationHandler =
-                    new DefaultMcpElicitationHandler(this.clientId, elicitationHandler);
+            McpElicitationHandler mcpElicitationHandler =
+                    new McpElicitationHandler(this.clientId, elicitationHandler);
             this.mcpSyncClient = io.modelcontextprotocol.client.McpClient.sync(transport)
                     .capabilities(McpSchema.ClientCapabilities.builder().elicitation().build())
                     .loggingConsumer(logHandler::handleLoggingMessage)

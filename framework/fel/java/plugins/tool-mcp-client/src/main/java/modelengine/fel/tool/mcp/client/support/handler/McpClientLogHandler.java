@@ -16,16 +16,16 @@ import modelengine.fitframework.log.Logger;
  * @author 黄可欣
  * @since 2025-11-03
  */
-public class DefaultMcpClientLogHandler {
-    private static final Logger log = Logger.get(DefaultMcpClientLogHandler.class);
+public class McpClientLogHandler {
+    private static final Logger log = Logger.get(McpClientLogHandler.class);
     private final String clientId;
 
     /**
-     * Constructs a new instance of DefaultMcpClientLogHandler.
+     * Constructs a new instance of McpClientLogHandler.
      *
      * @param clientId The unique identifier of the MCP client.
      */
-    public DefaultMcpClientLogHandler(String clientId) {
+    public McpClientLogHandler(String clientId) {
         this.clientId = clientId;
     }
 

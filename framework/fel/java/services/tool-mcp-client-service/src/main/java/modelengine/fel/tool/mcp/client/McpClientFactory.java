@@ -29,7 +29,7 @@ public interface McpClientFactory {
      * If null, elicitation will not be supported in MCP client.
      * @return The created {@link McpClient} instance.
      */
-    public McpClient createStreamable(String baseUri, String sseEndpoint,
+    McpClient createStreamable(String baseUri, String sseEndpoint,
             @Nullable Function<ElicitRequest, ElicitResult> elicitationFunction);
 
     /**
@@ -41,17 +41,39 @@ public interface McpClientFactory {
      * If null, elicitation will not be supported in MCP client.
      * @return The created {@link McpClient} instance.
      */
-    public McpClient createSse(String baseUri, String sseEndpoint,
+    McpClient createSse(String baseUri, String sseEndpoint,
             @Nullable Function<ElicitRequest, ElicitResult> elicitationFunction);
 
     /**
-     * Creates a client with streamable HTTP transport.
+     * Creates a client with streamable HTTP transport (default). No elicitation support.
      *
      * @param baseUri The base URI of the MCP server.
      * @param sseEndpoint The SSE endpoint of the MCP server.
      * @return The created {@link McpClient} instance.
-     * @deprecated Use {@link #createStreamable(String, String, Function)} instead.
      */
-    @Deprecated
-    public McpClient create(String baseUri, String sseEndpoint);
+    default McpClient create(String baseUri, String sseEndpoint) {
+        return this.createStreamable(baseUri, sseEndpoint, null);
+    }
+
+    /**
+     * Creates a client with streamable HTTP transport. No elicitation support.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return The created {@link McpClient} instance.
+     */
+    default McpClient createStreamable(String baseUri, String sseEndpoint) {
+        return this.createStreamable(baseUri, sseEndpoint, null);
+    }
+
+    /**
+     * Creates a client with SSE transport. No elicitation support.
+     *
+     * @param baseUri The base URI of the MCP server.
+     * @param sseEndpoint The SSE endpoint of the MCP server.
+     * @return The created {@link McpClient} instance.
+     */
+    default McpClient createSse(String baseUri, String sseEndpoint) {
+        return this.createSse(baseUri, sseEndpoint, null);
+    }
 }

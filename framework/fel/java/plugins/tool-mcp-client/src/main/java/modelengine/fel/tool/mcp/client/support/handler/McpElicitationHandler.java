@@ -14,16 +14,16 @@ import modelengine.fitframework.log.Logger;
 import java.util.function.Function;
 
 /**
- * Default MCP elicitation handler that delegates to an external handler function.
+ * MCP elicitation handler that delegates to an external handler function.
  *
  * <p>Converts {@link McpSchema.ElicitRequest} to {@link ElicitRequest},
- * calls the user's handler, and converts {@link ElicitResult} back to {@link McpSchema.ElicitResult}.
+ * calls the user's handler, and converts {@link ElicitResult} back to {@link McpSchema.ElicitResult}.</p>
  *
  * @author 黄可欣
  * @since 2025-11-25
  */
-public class DefaultMcpElicitationHandler {
-    private static final Logger log = Logger.get(DefaultMcpElicitationHandler.class);
+public class McpElicitationHandler {
+    private static final Logger log = Logger.get(McpElicitationHandler.class);
     private final String clientId;
     private final Function<ElicitRequest, ElicitResult> elicitationHandler;
 
@@ -34,7 +34,7 @@ public class DefaultMcpElicitationHandler {
      * @param elicitationHandler The user's handler function that processes {@link ElicitRequest}
      * and returns {@link ElicitResult}.
      */
-    public DefaultMcpElicitationHandler(String clientId, Function<ElicitRequest, ElicitResult> elicitationHandler) {
+    public McpElicitationHandler(String clientId, Function<ElicitRequest, ElicitResult> elicitationHandler) {
         this.clientId = clientId;
         this.elicitationHandler = elicitationHandler;
     }

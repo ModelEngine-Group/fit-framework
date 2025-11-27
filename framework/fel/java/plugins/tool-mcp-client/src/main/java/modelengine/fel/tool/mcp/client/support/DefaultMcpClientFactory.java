@@ -60,10 +60,4 @@ public class DefaultMcpClientFactory implements McpClientFactory {
                 .build();
         return new DefaultMcpClient(baseUri, sseEndpoint, transport, this.requestTimeoutSeconds, elicitationHandler);
     }
-
-    @Override
-    @Deprecated
-    public McpClient create(String baseUri, String sseEndpoint) {
-        return this.createStreamable(baseUri, sseEndpoint, null);
-    }
 }
