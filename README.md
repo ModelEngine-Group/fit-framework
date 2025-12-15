@@ -98,12 +98,6 @@ mvn clean install
 build/
 ```
 
-**增加权限**
-
-```
-chmod +x build/bin/*
-```
-
 **启动命令**
 
 ```
