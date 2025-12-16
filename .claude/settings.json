@@ -1,0 +1,62 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(tree:*)",
+      "WebSearch",
+      "WebFetch",
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(mvn:*)",
+      "Bash(npm:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(chmod:*)",
+      "Bash(xargs:*)",
+      "Bash(ls:*)",
+      "Bash(pwd)",
+      "Bash(echo:*)",
+      "Bash(mkdir:*)",
+      "Bash(cd:*)",
+      "Bash(rm -rf build)",
+      "Bash(rm -rf dynamic-plugins)",
+      "Bash(rm -rf target)",
+      "Bash(rm -rf node_modules)",
+      "Bash(rm -rf dist)",
+      "Bash(rm -rf .tmp)",
+      "Bash(rm -rf coverage)",
+      "Bash(rm -rf .pytest_cache)",
+      "Bash(rm -rf __pycache__)",
+      "Bash(rm -f *.log)",
+      "Bash(rm -f *.tmp)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf .)",
+      "Bash(rm -rf ./)",
+      "Bash(rm -rf ..)",
+      "Bash(rm -rf ../)",
+      "Bash(rm -rf *)",
+      "Bash(sudo rm:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(./secrets/**)",
+      "Read(./**/*.key)",
+      "Read(./**/*.pem)",
+      "Read(./**/credentials.*)"
+    ],
+    "ask": [
+      "Bash(git push origin main)",
+      "Bash(git push origin master)",
+      "Bash(git push --force:*)",
+      "Bash(git rebase:*)",
+      "Bash(npm publish:*)",
+      "Bash(mvn deploy:*)"
+    ]
+  }
+}
