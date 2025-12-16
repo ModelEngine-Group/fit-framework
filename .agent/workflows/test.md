@@ -69,8 +69,9 @@ cd dynamic-plugins
 
 ### 5. 清理测试环境
 
-测试完成后，停止 FIT 服务并返回项目根目录：
+测试完成后，停止 FIT 服务并清理动态创建的目录：
 - `run_command("pkill -f fit-discrete-launcher")`
+- `run_command("rm -rf dynamic-plugins build")`
 
 ### 6. 生成测试报告
 

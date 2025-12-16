@@ -76,11 +76,16 @@ curl -s http://localhost:8080/openapi.html
 
 ## 5. 清理测试环境
 
-测试完成后，停止 FIT 服务并返回项目根目录：
+测试完成后，停止 FIT 服务并清理动态创建的目录：
 
 ```bash
-cd ..
 # 停止 FIT 服务（找到进程并终止）
+pkill -f fit-discrete-launcher
+```
+
+```bash
+# 删除动态创建的目录
+rm -rf dynamic-plugins build
 ```
 
 **测试报告：**
