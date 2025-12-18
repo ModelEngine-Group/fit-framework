@@ -187,6 +187,62 @@ Bash("OWNER_GROUP=$(ls -l README.md | awk '{print $3\":\"$4}') && sudo chown $OW
 - 新功能：`[模块名] Add <feature-description>`
 - 功能增强：`[模块名] Enhance <feature-description>`
 
+## Git 提交和版本控制规范
+
+### 规则 3: 禁止自动提交代码
+
+**⚠️ 重要规则（CRITICAL）：**
+
+**绝对不要**自动执行 `git commit` 或 `git add` 命令，除非用户明确使用 `/commit` 命令请求提交。
+
+**原因：**
+- 项目配置了 `/commit` 命令，说明用户希望自己控制提交时机
+- 用户可能需要在提交前进行额外的检查或修改
+- 自动提交会剥夺用户对版本控制的控制权
+
+**正确做法：**
+
+1. **完成代码修改后**
+   - ✅ 告知用户有哪些文件被修改
+   - ✅ 展示修改的内容摘要
+   - ✅ 提醒用户可以使用 `/commit` 命令进行提交
+   - ❌ 不要自动执行 `git add` 或 `git commit`
+
+2. **仅在用户明确请求时才提交**
+   - ✅ 用户运行 `/commit` 命令
+   - ✅ 用户明确说"提交这些修改"、"commit these changes"
+   - ❌ 不要在用户只是让你"修复问题"或"完成任务"时自动提交
+
+3. **示例对比**
+
+   **❌ 错误做法：**
+   ```
+   User: 请修复测试命令的清理步骤
+   Assistant:
+   [修复代码]
+   [自动执行 git add 和 git commit]  # ❌ 错误！
+   ```
+
+   **✅ 正确做法：**
+   ```
+   User: 请修复测试命令的清理步骤
+   Assistant:
+   [修复代码]
+   我已经完成了修复，修改了以下文件：
+   - .claude/commands/test.md
+   - .agent/workflows/test.md
+
+   你可以使用 `/commit` 命令来提交这些修改。
+   # ✅ 正确！等待用户决定何时提交
+   ```
+
+**例外情况：**
+
+只有在以下情况下可以自动提交：
+1. 用户明确说"修复后直接提交"或"fix and commit"
+2. 用户使用了 `/commit` 命令
+3. 某个 workflow 或 slash command 的定义中明确要求自动提交
+
 ## 通用最佳实践
 
 ### 文件操作
@@ -195,6 +251,7 @@ Bash("OWNER_GROUP=$(ls -l README.md | awk '{print $3\":\"$4}') && sudo chown $OW
 - 批量操作后统一修改权限
 
 ### Git 操作
+- **绝对不要自动提交代码**（参见规则 3）
 - 提交前检查 `.github/` 目录中的规范
 - 遵循项目的 commit message 格式
 - PR 描述要完整、清晰

@@ -63,6 +63,7 @@ function start(args) {
     // 初始化参数数组
     const javaArgs = [];
     const programArgs = [];
+    let pluginDir = null; // 默认不设置插件目录
 
     // 如果是 debug 模式，添加 debug 参数
     if (isDebugMode) {
@@ -72,9 +73,23 @@ function start(args) {
     // 跳过第一个参数（start 或 debug）
     const remainingArgs = args.slice(1);
 
-    // 分离 Java 参数和程序参数
+    // 分离 Java 参数、程序参数和插件目录参数
     for (const arg of remainingArgs) {
-        if (arg.startsWith('-')) {
+        if (arg.startsWith('--plugin-dir=')) {
+            // 解析插件目录参数
+            pluginDir = arg.substring('--plugin-dir='.length);
+            // 如果是 '.'，使用当前目录
+            if (pluginDir === '.') {
+                pluginDir = currentDir;
+            } else if (!path.isAbsolute(pluginDir)) {
+                // 如果是相对路径，转换为绝对路径
+                pluginDir = path.join(currentDir, pluginDir);
+            }
+        } else if (arg.startsWith('-D') || arg.startsWith('-X') || arg.startsWith('-agentlib:')) {
+            // Java 系统属性和 JVM 参数
+            javaArgs.push(arg);
+        } else if (arg.startsWith('-')) {
+            // 其他以 - 开头的参数作为 Java 参数
             javaArgs.push(arg);
         } else {
             programArgs.push(arg);
@@ -97,12 +112,15 @@ function start(args) {
     const commandArgs = [
         ...javaArgs,
         `-Dsun.io.useCanonCaches=true`,
-        `-Djdk.tls.client.enableSessionTicketExtension=false`,
-        `-Dplugin.fit.dynamic.plugin.directory=${currentDir}`,
-        '-jar',
-        path.join(jarDir, jarFile),
-        ...programArgs
+        `-Djdk.tls.client.enableSessionTicketExtension=false`
     ];
+
+    // 只有当 pluginDir 被指定时才添加插件目录系统属性
+    if (pluginDir) {
+        commandArgs.push(`-Dplugin.fit.dynamic.plugin.directory=${pluginDir}`);
+    }
+
+    commandArgs.push('-jar', path.join(jarDir, jarFile), ...programArgs);
 
     // 打印运行命令
     console.log(`Running command: ${javaCommand} ${commandArgs.join(' ')}`);
@@ -472,6 +490,16 @@ function help() {
     console.log('  debug        Start the application in debug mode');
     console.log('  version      Display the version number');
     console.log('  help         Display this help message');
+    console.log('\nStart/Debug Options:');
+    console.log('  --plugin-dir=<path>               Specify plugin directory');
+    console.log('                                    - Use "." for current directory');
+    console.log('                                    - Use relative or absolute path');
+    console.log('                                    - If not specified, no plugin directory is set');
+    console.log('\nStart/Debug Examples:');
+    console.log('  fit start                         # Start without plugin directory');
+    console.log('  fit start --plugin-dir=.          # Use current directory as plugin dir');
+    console.log('  fit start --plugin-dir=plugins    # Use relative path');
+    console.log('  fit start --plugin-dir=/path/to/plugins  # Use absolute path');
     console.log('\nInit Usage:');
     console.log('  fit init                          # Interactive mode (recommended)');
     console.log('  fit init <name>                   # Interactive mode with project name');

@@ -28,20 +28,22 @@ mvn clean install
 
 ## 3. 启动 FIT 服务进行集成测试
 
-**关键要求：**
-- `fit` 命令无法在包含 FIT 框架的目录中执行
-- 必须在一个新建的动态插件目录下执行
-
 **启动步骤：**
 
-**创建动态插件目录并启动**
-```bash run_in_background timeout=120000
+**1. 创建动态插件目录**
+```bash
 mkdir -p dynamic-plugins
-cd dynamic-plugins
-../build/bin/fit start
+```
+
+**2. 启动 FIT 服务**
+```bash run_in_background timeout=120000
+build/bin/fit start --plugin-dir=dynamic-plugins
 ```
 
 使用后台运行模式，超时时间设置为 120 秒（2分钟），给服务足够的启动时间。
+
+**说明：**
+- 使用 `--plugin-dir=dynamic-plugins` 参数指定插件目录
 
 **启动成功的判断标准：**
 - 输出日志中包含启动成功的关键信息
@@ -85,7 +87,8 @@ pkill -f fit-discrete-launcher
 
 ```bash
 # 删除动态创建的目录
-rm -rf dynamic-plugins build
+rm -rf build
+rm -rf dynamic-plugins
 ```
 
 **测试报告：**
