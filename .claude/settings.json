@@ -33,8 +33,11 @@
       "Bash(rm -rf coverage)",
       "Bash(rm -rf .pytest_cache)",
       "Bash(rm -rf __pycache__)",
-      "Read(//tmp/claude/tasks/**)",
-      "Read(//tmp/claude/**)"
+      "Bash(.claude/run-test.sh)",
+      "Bash(./.claude/run-test.sh)",
+      "Bash(bash .claude/run-test.sh)",
+      "Bash(sh .claude/run-test.sh)",
+      "Read(//tmp/**)"
     ],
     "deny": [
       "Bash(sudo rm:*)",
