@@ -23,22 +23,18 @@ description: 执行完整的测试流程，包括单元测试、构建验证和�
 
 ### 3. 启动 FIT 服务进行集成测试
 
-**关键要求：**
-- `fit` 命令无法在包含 FIT 框架的目录中执行
-- 必须在一个新建的动态插件目录下执行
-
 **启动步骤：**
 
-创建动态插件目录并启动 FIT 服务：
-```bash
-mkdir -p dynamic-plugins
-cd dynamic-plugins
-../build/bin/fit start
-```
+1. 创建动态插件目录：
+   - `run_command("mkdir -p dynamic-plugins")`
 
-- `run_command("mkdir -p dynamic-plugins && cd dynamic-plugins && ../build/bin/fit start", timeout=120000, run_in_background=true)`
+2. 启动 FIT 服务：
+   - `run_command("build/bin/fit start --plugin-dir=dynamic-plugins", timeout=120000, run_in_background=true)`
 
 使用后台运行模式，超时时间设置为 120 秒（2分钟），给服务足够的启动时间。
+
+**说明：**
+- 使用 `--plugin-dir=dynamic-plugins` 参数指定插件目录
 
 **启动成功的判断标准：**
 - 输出日志中包含启动成功的关键信息
@@ -69,8 +65,10 @@ cd dynamic-plugins
 
 ### 5. 清理测试环境
 
-测试完成后，停止 FIT 服务并返回项目根目录：
+测试完成后，停止 FIT 服务并清理动态创建的目录：
 - `run_command("pkill -f fit-discrete-launcher")`
+- `run_command("rm -rf build")`
+- `run_command("rm -rf dynamic-plugins")`
 
 ### 6. 生成测试报告
 
