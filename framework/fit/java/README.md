@@ -17,6 +17,7 @@ FIT 函数平台是一套支持多语言融合编程、插件化开发、聚散�
 * Maven，推荐版本 Maven 3.8.8+
 * 对 fitframework 构建：在 framework/fit/java 目录下使用 Maven 对框架进行编译：`mvn clean install`
 * 对 您的项目 构建：在您的项目下进行编译：`mvn clean install`
+* 内存版注册中心启动：参考 `../registry-center.md`
 
 #### 0. 依赖
 在系统生成的 pom 文件中，添加 Web 相关的依赖，如下所示：
