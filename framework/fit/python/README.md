@@ -27,7 +27,7 @@ FIT for Python 是基于 FIT Framework 的 Python 运行时与插件开发套件
 ## 配置说明
 
 - 默认配置位于 `conf/`，包括 `application.yml`、`fit.yml`、`fit_startup.yml` 等。
-- 注册中心：`conf/application.yml` 中 `registry-center` 配置为框架发现和加载插件的前置条件，需保证注册中心已启动（可参考 Java 框架的本地注册中心启动方式），并与 `server.addresses` 等参数保持一致。
+- 注册中心：`conf/application.yml` 中 `registry-center` 配置为框架发现和加载插件的前置条件，需保证注册中心已启动并与 `server.addresses` 等参数保持一致。推荐先启动 Java 内存版注册中心，参考 `../registry-center.md`。
 - 如使用直连内存注册中心，默认 `mode: DIRECT`，地址示例 `localhost:8080`；如使用代理/Nacos，请按实际环境调整 `mode`、`addresses`、`protocol` 等字段。
 - 启动前请根据本地环境核对端口、协议及上下文路径，必要时同步修改插件侧的配置文件。
 

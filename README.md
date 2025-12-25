@@ -101,9 +101,7 @@ build/
 **启动命令**
 
 ```
-mkdir dynamic-plugins
-cd dynamic-plugins
-../build/bin/fit start
+./build/bin/fit start
 ```
 
 > 以上编译构建出的 `fit` 命令可以通过系统操作（别名或添加系统路径）来简化输入。
