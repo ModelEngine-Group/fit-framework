@@ -1,0 +1,123 @@
+name: "Bug Fix Workflow"
+description: "Bug修复流程，从问题定位到修复验证"
+version: "1.0.0"
+
+steps:
+  - id: "bug-analysis"
+    name: "问题分析"
+    description: "理解bug现象，定位根本原因"
+
+    required_capabilities:
+      - "debugging"
+      - "code comprehension"
+      - "problem analysis"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长系统性分析和根因定位"
+      - name: "chatgpt"
+        reason: "也可以进行bug分析"
+
+    tasks:
+      - "复现bug（如果可能）"
+      - "阅读相关代码"
+      - "分析调用链和数据流"
+      - "定位根本原因"
+      - "评估影响范围"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/bug-analysis.md"
+        required_sections:
+          - "Bug描述": "现象、复现步骤、预期行为"
+          - "根本原因": "问题的根本原因分析"
+          - "相关代码": "问题代码位置和调用链"
+          - "影响范围": "哪些功能受影响"
+          - "修复思路": "初步的修复方案"
+
+    next_steps:
+      - "bug-fix"
+
+  - id: "bug-fix"
+    name: "问题修复"
+    description: "修复bug并添加测试防止复现"
+
+    required_capabilities:
+      - "code modification"
+      - "testing"
+
+    recommended_agents:
+      - name: "chatgpt"
+        reason: "快速修复和测试编写"
+      - name: "claude"
+        reason: "处理复杂bug修复"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/bug-analysis.md"
+
+    tasks:
+      - "修复bug"
+      - "添加回归测试"
+      - "本地验证修复"
+      - "检查是否有类似问题"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/bug-fix.md"
+        required_sections:
+          - "修复说明": "如何修复的"
+          - "测试验证": "测试结果"
+          - "影响分析": "修改的影响范围"
+
+    next_steps:
+      - "code-review"
+      - "finalize"
+
+  - id: "code-review"
+    name: "修复审查"
+    description: "审查修复是否合理，是否引入新问题"
+
+    required_capabilities:
+      - "code review"
+      - "regression analysis"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长审查和风险评估"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/bug-fix.md"
+
+    tasks:
+      - "审查修复方案"
+      - "检查是否引入新问题"
+      - "评估测试覆盖"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/review.md"
+
+    next_steps:
+      - "finalize"
+
+  - id: "finalize"
+    name: "提交修复"
+    description: "人工确认后提交"
+
+    human_decision: true
+    decision_prompt: "确认提交bug修复？"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "使用 /commit 命令"
+
+    outputs:
+      - description: "Git commit"
+
+human_checkpoints:
+  - step: "bug-fix"
+    checkpoint: "after"
+    description: "确认bug已修复"
+    required: true
+
+  - step: "finalize"
+    checkpoint: "before"
+    description: "最终确认"
+    required: true

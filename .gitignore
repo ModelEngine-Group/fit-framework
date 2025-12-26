@@ -12,6 +12,18 @@ build/
 # Claude Code local settings
 .claude/settings.local.json
 
+# AI Collaboration Workspace (temporary files)
+.ai-workspace/*
+!.ai-workspace/.gitkeep
+!.ai-workspace/README.md
+!.ai-workspace/tasks/.gitkeep
+!.ai-workspace/context/.gitkeep
+!.ai-workspace/logs/.gitkeep
+
+# AI Agents local settings
+.ai-agents/*/local/
+.ai-agents/*/cache/
+
 # Python
 __pycache__/
 *.py[cod]

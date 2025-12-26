@@ -1,0 +1,295 @@
+name: "Feature Development Workflow"
+description: "从需求分析到代码提交的完整功能开发流程"
+version: "1.0.0"
+
+# 重要说明：
+# 这是推荐流程，不是强制规则。
+# 人类可以选择任何AI执行任何步骤，只要满足该步骤的能力要求。
+# 每个步骤完成后应该等待人工确认再继续。
+
+steps:
+  - id: "requirement-analysis"
+    name: "需求分析"
+    description: "理解需求，分析现有代码，识别影响范围"
+
+    # 能力要求（任何满足要求的AI都可以执行）
+    required_capabilities:
+      - "code comprehension"
+      - "system analysis"
+      - "architecture understanding"
+
+    # 推荐的AI（基于擅长领域，仅供参考）
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长系统性分析和架构理解，代码comprehension能力强"
+      - name: "chatgpt"
+        reason: "也具备良好的需求分析能力"
+
+    # 任务清单
+    tasks:
+      - "阅读并理解需求描述"
+      - "搜索相关代码文件（使用 Glob/Grep）"
+      - "分析代码结构和影响范围"
+      - "识别潜在的技术风险和依赖"
+      - "评估工作量和复杂度"
+
+    # 输出要求
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/analysis.md"
+        description: "需求分析报告"
+        required_sections:
+          - "需求理解": "用自己的话重新描述需求，确保理解正确"
+          - "相关文件列表": "列出需要修改的文件及其路径"
+          - "影响范围评估": "分析这个改动会影响哪些模块"
+          - "技术风险": "可能遇到的技术难点和风险"
+          - "依赖关系": "需要的外部依赖或其他模块的配合"
+
+    # 下一步建议（不是强制，仅供参考）
+    next_steps:
+      - "technical-design"
+      - "human-review"  # 建议人工审查需求理解
+
+  - id: "technical-design"
+    name: "技术方案设计"
+    description: "设计实现方案，制定详细的实施计划"
+
+    required_capabilities:
+      - "architecture design"
+      - "planning"
+      - "technical decision making"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长架构设计、技术方案规划和权衡决策"
+      - name: "chatgpt"
+        reason: "也可以进行方案设计"
+
+    # 输入依赖
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/analysis.md"
+        description: "需求分析报告"
+
+    tasks:
+      - "设计技术实现方案"
+      - "选择合适的技术栈和设计模式"
+      - "制定详细的实施步骤"
+      - "列出需要创建/修改的文件清单"
+      - "设计测试策略"
+      - "评估性能和安全影响"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/plan.md"
+        description: "技术方案和实施计划"
+        required_sections:
+          - "技术方案": "详细的实现方案，包括架构设计"
+          - "实施步骤": "分步骤的实施计划，每步做什么"
+          - "文件清单": "需要创建/修改的文件列表"
+          - "测试策略": "如何测试这个功能"
+          - "性能考虑": "性能影响分析和优化建议"
+          - "安全考虑": "安全风险评估和防护措施"
+
+    next_steps:
+      - "human-review"      # 强烈建议人工审查方案
+      - "implementation"
+
+  - id: "implementation"
+    name: "代码实现"
+    description: "根据技术方案编写代码和单元测试"
+
+    required_capabilities:
+      - "code generation"
+      - "testing"
+      - "debugging"
+
+    recommended_agents:
+      - name: "chatgpt"
+        reason: "擅长代码实现、单元测试编写和快速迭代"
+      - name: "cursor"
+        reason: "代码编辑体验好，适合实现"
+      - name: "claude"
+        reason: "也可以实现，特别是复杂业务逻辑"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/plan.md"
+        description: "技术方案和实施计划"
+
+    tasks:
+      - "按照方案实现功能代码"
+      - "编写完整的单元测试"
+      - "本地运行测试验证功能"
+      - "更新相关文档和注释"
+      - "遵循项目编码规范"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/implementation.md"
+        description: "实现报告"
+        required_sections:
+          - "已修改文件列表": "包含文件路径和修改说明"
+          - "关键代码说明": "重要逻辑的解释"
+          - "测试结果": "单元测试运行结果"
+          - "待审查事项": "需要reviewer特别关注的点"
+          - "已知问题": "发现的问题或待优化项"
+
+    next_steps:
+      - "code-review"
+
+  - id: "code-review"
+    name: "代码审查"
+    description: "全面审查代码质量、安全性和性能"
+
+    required_capabilities:
+      - "code review"
+      - "security analysis"
+      - "performance analysis"
+      - "best practices knowledge"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长代码审查、安全分析和性能优化建议"
+      - name: "chatgpt"
+        reason: "也可以进行代码审查"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/implementation.md"
+        description: "实现报告"
+      - command: "git diff"
+        description: "实际的代码变更"
+
+    tasks:
+      - "审查代码质量和编码规范"
+      - "检查安全问题（OWASP Top 10）"
+      - "分析性能影响"
+      - "验证测试覆盖率"
+      - "检查错误处理"
+      - "评估代码可维护性"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/review.md"
+        description: "代码审查报告"
+        required_sections:
+          - "审查结果": "通过 / 需要修改（needs_changes）"
+          - "代码质量": "编码规范、可读性、可维护性评价"
+          - "安全问题": "发现的安全隐患及修复建议"
+          - "性能问题": "性能影响分析和优化建议"
+          - "测试评估": "测试覆盖情况和建议"
+          - "改进建议": "具体的修改建议，分优先级"
+          - "批准状态": "是否批准合并"
+
+    next_steps:
+      - "refinement"  # 如果需要修改
+      - "finalize"    # 如果审查通过
+
+  - id: "refinement"
+    name: "问题修复"
+    description: "根据代码审查意见修复问题和改进代码"
+    condition: "review.status == 'needs_changes'"
+
+    required_capabilities:
+      - "code modification"
+      - "problem solving"
+
+    recommended_agents:
+      - name: "chatgpt"
+        reason: "快速修复问题和代码调整"
+      - name: "claude"
+        reason: "处理复杂重构和架构调整"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/review.md"
+        description: "代码审查报告"
+
+    tasks:
+      - "逐项处理审查意见"
+      - "修复安全问题"
+      - "优化性能问题"
+      - "补充测试用例"
+      - "更新文档"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/refinement.md"
+        description: "修复报告"
+        required_sections:
+          - "已修复问题": "列出已处理的审查意见"
+          - "修改说明": "每项修改的详细说明"
+          - "待讨论事项": "无法处理或有疑问的项目"
+
+    next_steps:
+      - "code-review"  # 重新审查
+
+  - id: "finalize"
+    name: "最终确认与提交"
+    description: "人工最终确认后执行提交"
+
+    required_capabilities:
+      - "git operations"
+      - "commit message writing"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "有 /commit 命令，熟悉项目提交规范"
+      - name: "chatgpt"
+        reason: "也可以执行 git 操作"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/review.md"
+        description: "审查通过的报告"
+
+    tasks:
+      - "等待人工最终确认"
+      - "生成规范的提交信息"
+      - "执行 git commit（仅在人工批准后）"
+      - "清理工作目录"
+      - "移动任务到 completed"
+
+    outputs:
+      - description: "Git commit"
+
+    # 人工决策点（必须等待人工确认）
+    human_decision: true
+    decision_prompt: |
+      是否提交这些变更？
+
+      请检查：
+      - [ ] 代码审查已通过
+      - [ ] 所有测试通过
+      - [ ] 没有安全问题
+      - [ ] 符合项目规范
+
+      确认后可使用 /commit 命令提交
+
+# 人工检查点配置
+human_checkpoints:
+  - step: "requirement-analysis"
+    checkpoint: "after"
+    description: "确认需求理解正确"
+
+  - step: "technical-design"
+    checkpoint: "after"
+    description: "审查技术方案是否合理"
+    required: true  # 必须检查点
+
+  - step: "code-review"
+    checkpoint: "after"
+    description: "确认审查结果和修改建议"
+
+  - step: "finalize"
+    checkpoint: "before"
+    description: "最终确认是否提交"
+    required: true  # 必须检查点
+
+# 注意事项
+notes: |
+  1. 这个流程是**推荐**的最佳实践，不是强制规则
+  2. 人类决定使用哪个AI执行哪个步骤
+  3. 每个步骤完成后应该等待人工确认
+  4. 任何AI都可以通过读取 .ai-workspace/context/ 接手任务
+  5. 保持上下文文档完整，便于AI切换和协作
+  6. 遇到问题可以随时切换到更擅长的AI
+
+# 最佳实践建议
+best_practices:
+  - "分析和设计阶段不要急于实现，充分思考"
+  - "代码实现时严格遵循设计方案"
+  - "代码审查要全面，不放过任何潜在问题"
+  - "修复问题后必须重新审查"
+  - "提交前做最后的人工检查"

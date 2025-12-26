@@ -1,0 +1,122 @@
+name: "Refactoring Workflow"
+description: "代码重构流程，提升代码质量和可维护性"
+version: "1.0.0"
+
+steps:
+  - id: "refactoring-analysis"
+    name: "重构分析"
+    description: "分析代码问题，制定重构计划"
+
+    required_capabilities:
+      - "code comprehension"
+      - "architecture analysis"
+      - "technical decision making"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长架构分析和重构规划"
+
+    tasks:
+      - "识别代码问题（代码异味）"
+      - "分析重构目标"
+      - "评估重构风险"
+      - "制定重构策略"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/refactoring-plan.md"
+        required_sections:
+          - "问题分析": "当前代码的问题"
+          - "重构目标": "期望达到的状态"
+          - "重构策略": "如何重构（步骤）"
+          - "风险评估": "可能的风险和应对"
+          - "测试策略": "如何保证重构不破坏功能"
+
+    next_steps:
+      - "human-review"
+      - "refactoring-implementation"
+
+  - id: "refactoring-implementation"
+    name: "重构实施"
+    description: "执行重构并确保测试通过"
+
+    required_capabilities:
+      - "code refactoring"
+      - "testing"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长复杂重构"
+      - name: "chatgpt"
+        reason: "快速执行简单重构"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/refactoring-plan.md"
+
+    tasks:
+      - "按计划执行重构"
+      - "每步保持测试通过"
+      - "小步快跑，频繁验证"
+      - "更新文档"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/refactoring-result.md"
+        required_sections:
+          - "重构内容": "做了哪些重构"
+          - "测试结果": "所有测试是否通过"
+          - "改进效果": "重构带来的改进"
+
+    next_steps:
+      - "code-review"
+
+  - id: "code-review"
+    name: "重构审查"
+    description: "审查重构是否合理，是否引入问题"
+
+    required_capabilities:
+      - "code review"
+      - "architecture review"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "全面审查重构质量"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/refactoring-result.md"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/review.md"
+
+    next_steps:
+      - "finalize"
+
+  - id: "finalize"
+    name: "提交重构"
+
+    human_decision: true
+    decision_prompt: "确认提交重构？"
+
+    recommended_agents:
+      - name: "claude"
+
+human_checkpoints:
+  - step: "refactoring-analysis"
+    checkpoint: "after"
+    description: "确认重构方案"
+    required: true
+
+  - step: "refactoring-implementation"
+    checkpoint: "after"
+    description: "确认测试通过"
+    required: true
+
+  - step: "finalize"
+    checkpoint: "before"
+    description: "最终确认"
+    required: true
+
+best_practices:
+  - "重构时保持测试通过"
+  - "小步快跑，不要一次改太多"
+  - "先添加测试再重构（如果测试不足）"
+  - "重构和功能开发分开进行"
+  - "提交前跑完整测试套件"
