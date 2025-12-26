@@ -1,49 +1,27 @@
 提交当前变更到 Git。
 
+**此命令已迁移到官方插件，将调用 `commit-commands` 插件。**
+
 **用法：**
-- `/commit` - 交互式提交（会询问提交信息）
-- `/commit <message>` - 直接提交并使用指定消息
+- `/commit` - 创建 Git 提交
+- `/commit-commands:commit` - 直接使用插件命令
+- `/commit-commands:commit-push-pr` - 一键提交+推送+创建PR
 
-**执行步骤：**
+**实际执行：**
+调用 `/commit-commands:commit` 插件命令
 
-1. **查看当前变更**
-   ```
-   git status
-   git diff --stat
-   ```
+**插件功能：**
+- 自动分析变更内容
+- 生成符合规范的提交消息
+- 支持交互式和直接提交模式
+- 添加 Co-Authored-By 签名
+- 自动检测敏感信息
 
-2. **如果有未追踪的文件，询问用户是否添加**
-   - 列出所有 untracked 文件
-   - 排除 `.claude/` 目录
-   - 让用户确认要添加哪些文件
-
-3. **添加文件到暂存区**
-   ```
-   git add <files>
-   ```
-
-4. **创建提交**
-   - 如果用户提供了消息，使用该消息
-   - 如果没有消息，根据变更内容生成合适的提交消息
-   - 提交消息格式遵循项目规范
-   - 添加 Co-Authored-By 签名
-
-   ```
-   git commit -m "$(cat <<'EOF'
-   <提交消息>
-
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-   Co-Authored-By: Claude <noreply@anthropic.com>
-   EOF
-   )"
-   ```
-
-5. **显示提交结果**
-   ```
-   git log -1 --stat
-   git status
-   ```
+**扩展用法：**
+如需一键完成提交→推送→创建PR，使用：
+```
+/commit-commands:commit-push-pr
+```
 
 **注意事项：**
 - 不要提交包含敏感信息的文件（.env, credentials 等）
