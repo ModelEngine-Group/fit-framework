@@ -1,0 +1,96 @@
+name: "Code Review Workflow"
+description: "独立的代码审查流程，用于PR审查或代码质量检查"
+version: "1.0.0"
+
+steps:
+  - id: "review-preparation"
+    name: "审查准备"
+    description: "获取代码变更和相关上下文"
+
+    required_capabilities:
+      - "git operations"
+      - "code comprehension"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "有 /review 命令"
+      - name: "chatgpt"
+        reason: "也可以进行审查准备"
+
+    tasks:
+      - "获取PR或commit的变更"
+      - "理解变更目的"
+      - "识别关键变更点"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/review-prep.md"
+        required_sections:
+          - "变更概述": "这次变更做了什么"
+          - "关键文件": "主要修改的文件"
+          - "审查重点": "需要重点关注的地方"
+
+    next_steps:
+      - "detailed-review"
+
+  - id: "detailed-review"
+    name: "详细审查"
+    description: "全面审查代码质量、安全、性能"
+
+    required_capabilities:
+      - "code review"
+      - "security analysis"
+      - "performance analysis"
+      - "best practices knowledge"
+
+    recommended_agents:
+      - name: "claude"
+        reason: "擅长全面的代码审查"
+
+    inputs:
+      - path: ".ai-workspace/context/{task-id}/review-prep.md"
+
+    tasks:
+      - "代码质量检查"
+      - "安全问题检查（OWASP Top 10）"
+      - "性能影响分析"
+      - "测试覆盖评估"
+      - "编码规范检查"
+      - "文档完整性检查"
+
+    outputs:
+      - path: ".ai-workspace/context/{task-id}/review-report.md"
+        required_sections:
+          - "总体评价": "通过 / 需要修改 / 拒绝"
+          - "优点": "做得好的地方"
+          - "问题清单": "发现的问题（按严重程度分类）"
+          - "安全问题": "安全相关的发现"
+          - "性能建议": "性能优化建议"
+          - "改进建议": "代码改进建议"
+          - "批准建议": "是否建议批准合并"
+
+    next_steps:
+      - "review-feedback"
+
+  - id: "review-feedback"
+    name: "审查反馈"
+    description: "向开发者反馈审查结果"
+
+    human_decision: true
+    decision_prompt: "审查完成，是否发布审查意见？"
+
+    tasks:
+      - "整理审查意见"
+      - "发布审查评论"
+
+human_checkpoints:
+  - step: "detailed-review"
+    checkpoint: "after"
+    description: "确认审查结果"
+    required: true
+
+best_practices:
+  - "审查要全面但不要过于苛刻"
+  - "提出建设性意见，不只是批评"
+  - "严重问题（安全、性能）必须指出"
+  - "编码风格问题可以温和建议"
+  - "给出具体的修改建议，不只是说有问题"
