@@ -118,7 +118,11 @@ public class Tip {
      * @return 表示当前的 {@link Tip}。
      */
     public Tip merge(Tip other) {
-        Validation.notNull(other, "The tip to merge cannot be null.");
+        // 如果 other 为 null，返回当前 Tip（不改变）
+        // 这处理了并发场景中某个分支可能返回 null 的情况
+        if (other == null) {
+            return this;
+        }
         return this.addAll(other.values);
     }
 
