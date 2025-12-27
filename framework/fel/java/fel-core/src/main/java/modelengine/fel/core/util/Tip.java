@@ -118,6 +118,7 @@ public class Tip {
      * @return 表示当前的 {@link Tip}。
      */
     public Tip merge(Tip other) {
+        Validation.notNull(other, "The tip to merge cannot be null.");
         return this.addAll(other.values);
     }
 
