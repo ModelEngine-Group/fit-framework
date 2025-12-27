@@ -596,7 +596,7 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
 
         AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
             // 诊断日志：记录每次reducer调用的详细信息
-            log.debug("[Fork.join reducer] Thread={}, acc={}, data={}, data_is_null={}",
+            log.warn("[DIAGNOSTIC Fork.join reducer] Thread={}, acc={}, data={}, data_is_null={}",
                     Thread.currentThread().getName(),
                     acc,
                     data,
@@ -604,10 +604,10 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
 
             // Tip.merge() 内部会处理 data 为 null 的情况
             if (data == null) {
-                log.warn("[Fork.join reducer] DIAGNOSTIC: Received null data in reducer! acc={}, thread={}",
+                log.warn("[DIAGNOSTIC Fork.join reducer] Received null data in reducer! acc={}, thread={}",
                         acc, Thread.currentThread().getName());
                 // 打印堆栈跟踪以了解调用路径
-                log.warn("[Fork.join reducer] Stack trace:", new RuntimeException("null data diagnostic"));
+                log.warn("[DIAGNOSTIC Fork.join reducer] Stack trace:", new RuntimeException("null data diagnostic"));
             }
             acc.merge(data);
             return acc;
@@ -620,20 +620,20 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
         return node.publisher()
                 .map(input -> {
                     O inputData = input.getData();
-                    log.debug("[getPatternProcessor] Executing pattern={}, inputData={}, thread={}",
+                    log.warn("[DIAGNOSTIC getPatternProcessor] Executing pattern={}, inputData={}, thread={}",
                             pattern.getClass().getSimpleName(),
                             inputData,
                             Thread.currentThread().getName());
 
                     Tip result = AiFlowSession.applyPattern(pattern, inputData, input.getSession());
 
-                    log.debug("[getPatternProcessor] Pattern result={}, result_is_null={}, thread={}",
+                    log.warn("[DIAGNOSTIC getPatternProcessor] Pattern result={}, result_is_null={}, thread={}",
                             result,
                             result == null,
                             Thread.currentThread().getName());
 
                     if (result == null) {
-                        log.error("[getPatternProcessor] CRITICAL: Pattern returned null! pattern={}, inputData={}",
+                        log.error("[DIAGNOSTIC getPatternProcessor] CRITICAL: Pattern returned null! pattern={}, inputData={}",
                                 pattern.getClass().getSimpleName(),
                                 inputData);
                     }
