@@ -6,6 +6,7 @@
 
 package modelengine.fel.engine.activities;
 
+import lombok.extern.slf4j.Slf4j;
 import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.Prompt;
 import modelengine.fel.core.chat.support.ChatMessages;
@@ -65,6 +66,7 @@ import java.util.function.Supplier;
  * @author 易文渊
  * @since 2024-04-28
  */
+@Slf4j
 public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> extends AiActivity<D, RF, F> {
     private final Start<O, D, I, RF> start;
 
@@ -593,7 +595,20 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
         }
 
         AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
+            // 诊断日志：记录每次reducer调用的详细信息
+            log.debug("[Fork.join reducer] Thread={}, acc={}, data={}, data_is_null={}",
+                    Thread.currentThread().getName(),
+                    acc,
+                    data,
+                    data == null);
+
             // Tip.merge() 内部会处理 data 为 null 的情况
+            if (data == null) {
+                log.warn("[Fork.join reducer] DIAGNOSTIC: Received null data in reducer! acc={}, thread={}",
+                        acc, Thread.currentThread().getName());
+                // 打印堆栈跟踪以了解调用路径
+                log.warn("[Fork.join reducer] Stack trace:", new RuntimeException("null data diagnostic"));
+            }
             acc.merge(data);
             return acc;
         });
@@ -603,6 +618,27 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
 
     private Processor<O, Tip> getPatternProcessor(Pattern<O, Tip> pattern, AiState<O, D, O, RF, F> node) {
         return node.publisher()
-                .map(input -> AiFlowSession.applyPattern(pattern, input.getData(), input.getSession()), null);
+                .map(input -> {
+                    O inputData = input.getData();
+                    log.debug("[getPatternProcessor] Executing pattern={}, inputData={}, thread={}",
+                            pattern.getClass().getSimpleName(),
+                            inputData,
+                            Thread.currentThread().getName());
+
+                    Tip result = AiFlowSession.applyPattern(pattern, inputData, input.getSession());
+
+                    log.debug("[getPatternProcessor] Pattern result={}, result_is_null={}, thread={}",
+                            result,
+                            result == null,
+                            Thread.currentThread().getName());
+
+                    if (result == null) {
+                        log.error("[getPatternProcessor] CRITICAL: Pattern returned null! pattern={}, inputData={}",
+                                pattern.getClass().getSimpleName(),
+                                inputData);
+                    }
+
+                    return result;
+                }, null);
     }
 }
