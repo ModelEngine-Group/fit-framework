@@ -595,22 +595,15 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
         }
 
         AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
-            // 诊断日志：记录每次reducer调用的详细信息
-            log.warn("[DIAGNOSTIC Fork.join reducer] Thread={}, acc={}, data={}, data_is_null={}",
-                    Thread.currentThread().getName(),
-                    acc,
-                    data,
-                    data == null);
-
-            // Tip.merge() 内部会处理 data 为 null 的情况
+            // 防御性处理：Fork 的某些分支可能返回 null（特别是并发场景下的竞态条件）
+            // 参考：https://github.com/ModelEngine-Group/fit-framework/issues/247
             if (data == null) {
-                log.warn("[DIAGNOSTIC Fork.join reducer] Received null data in reducer! acc={}, thread={}",
+                log.warn("Fork.join reducer received null data, this may indicate a race condition. " +
+                        "Keeping accumulator unchanged. acc={}, thread={}",
                         acc, Thread.currentThread().getName());
-                // 打印堆栈跟踪以了解调用路径
-                log.warn("[DIAGNOSTIC Fork.join reducer] Stack trace:", new RuntimeException("null data diagnostic"));
+                return acc;  // 保持累加器不变，避免 NPE
             }
-            acc.merge(data);
-            return acc;
+            return acc.merge(data);
         });
         ((Processor<?, ?>) state.publisher()).displayAs("runnableParallel");
         return state;
@@ -618,27 +611,6 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
 
     private Processor<O, Tip> getPatternProcessor(Pattern<O, Tip> pattern, AiState<O, D, O, RF, F> node) {
         return node.publisher()
-                .map(input -> {
-                    O inputData = input.getData();
-                    log.warn("[DIAGNOSTIC getPatternProcessor] Executing pattern={}, inputData={}, thread={}",
-                            pattern.getClass().getSimpleName(),
-                            inputData,
-                            Thread.currentThread().getName());
-
-                    Tip result = AiFlowSession.applyPattern(pattern, inputData, input.getSession());
-
-                    log.warn("[DIAGNOSTIC getPatternProcessor] Pattern result={}, result_is_null={}, thread={}",
-                            result,
-                            result == null,
-                            Thread.currentThread().getName());
-
-                    if (result == null) {
-                        log.error("[DIAGNOSTIC getPatternProcessor] CRITICAL: Pattern returned null! pattern={}, inputData={}",
-                                pattern.getClass().getSimpleName(),
-                                inputData);
-                    }
-
-                    return result;
-                }, null);
+                .map(input -> AiFlowSession.applyPattern(pattern, input.getData(), input.getSession()), null);
     }
 }
