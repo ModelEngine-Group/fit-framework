@@ -98,7 +98,7 @@ public class PatternTest {
         assertThat(converse.offer("1+2").await().text()).isEqualTo("2+2=4\n2+3=5\n1+2=");
     }
 
-    @RepeatedTest(50)
+    @RepeatedTest(500)
     @DisplayName("【复现测试】强制触发 runnableParallel 的竞态条件 NPE")
     void shouldReproduceNPEInRunnableParallel() {
         // 慢分支：模拟 fewShot() 的延迟，增大竞态窗口
@@ -130,7 +130,7 @@ public class PatternTest {
         assertThat(result).contains("fast-value", "slow-value");
     }
 
-    @RepeatedTest(20)
+    @RepeatedTest(500)
     @DisplayName("【复现测试】使用原测试配置重复运行")
     void shouldReproduceOriginalTestFailure() {
         // 使用原始失败测试的完全相同配置
