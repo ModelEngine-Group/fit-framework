@@ -81,8 +81,8 @@ public class PatternTest {
         assertThat(answer1.toString()).isEqualTo("answer question1 from context with my history");
     }
 
-    @Test
-    @DisplayName("测试 ExampleSelector")
+    @RepeatedTest(1000)
+    @DisplayName("测试 ExampleSelector - 重复运行以复现 NPE")
     void shouldOkWhenAiFlowWithExampleSelector() {
         Example[] examples = {new DefaultExample("2+2", "4"), new DefaultExample("2+3", "5")};
         Conversation<String, Prompt> converse = AiFlows.<String>create()
@@ -96,62 +96,6 @@ public class PatternTest {
                 .close()
                 .converse();
         assertThat(converse.offer("1+2").await().text()).isEqualTo("2+2=4\n2+3=5\n1+2=");
-    }
-
-    @RepeatedTest(500)
-    @DisplayName("【复现测试】强制触发 runnableParallel 的竞态条件 NPE")
-    void shouldReproduceNPEInRunnableParallel() {
-        // 慢分支：模拟 fewShot() 的延迟，增大竞态窗口
-        modelengine.fel.engine.operators.patterns.SyncTipper<String> slowBranch = arg -> {
-            try {
-                Thread.sleep(200);  // 200ms 延迟
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            return Tip.from("slow", "slow-value");
-        };
-
-        // 快分支：模拟 question() 的快速返回
-        modelengine.fel.engine.operators.patterns.SyncTipper<String> fastBranch = arg -> {
-            return Tip.from("fast", "fast-value");
-        };
-
-        // 执行并发聚合
-        Conversation<String, Prompt> converse = AiFlows.<String>create()
-                .runnableParallel(fastBranch, slowBranch)
-                .prompt(Prompts.human("{{fast}} {{slow}}"))
-                .close()
-                .converse();
-
-        // 在修复前：这里应该偶发抛出 NullPointerException
-        // 在修复后：这里应该稳定通过
-        String result = converse.offer("test").await().text();
-
-        assertThat(result).contains("fast-value", "slow-value");
-    }
-
-    @RepeatedTest(500)
-    @DisplayName("【复现测试】使用原测试配置重复运行")
-    void shouldReproduceOriginalTestFailure() {
-        // 使用原始失败测试的完全相同配置
-        Example[] examples = {new DefaultExample("2+2", "4"), new DefaultExample("2+3", "5")};
-
-        Conversation<String, Prompt> converse = AiFlows.<String>create()
-                .runnableParallel(
-                        question(),
-                        fewShot(ExampleSelector.builder()
-                                .template("{{q}}={{a}}", "q", "a")
-                                .delimiter("\n")
-                                .example(examples)
-                                .build()))
-                .prompt(Prompts.human("{{examples}}\n{{question}}="))
-                .close()
-                .converse();
-
-        // 在修复前：偶发 NPE
-        // 在修复后：稳定通过
-        assertThat(converse.offer("1+2").await().text())
-                .isEqualTo("2+2=4\n2+3=5\n1+2=");
     }
 
     @Test
