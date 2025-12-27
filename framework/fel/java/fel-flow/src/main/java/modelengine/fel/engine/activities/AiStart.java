@@ -596,14 +596,13 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
 
         AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
             // 防御性处理：Fork 的某些分支可能返回 null（特别是并发场景下的竞态条件）
-            // 参考：https://github.com/ModelEngine-Group/fit-framework/issues/247
+            // Tip.merge() 会处理 null 情况，参考：https://github.com/ModelEngine-Group/fit-framework/issues/247
             if (data == null) {
-                log.warn("Fork.join reducer received null data, this may indicate a race condition. " +
-                        "Keeping accumulator unchanged. acc={}, thread={}",
+                log.warn("Fork.join reducer received null data in iteration, this may indicate a race condition. " +
+                        "Tip.merge() will handle this defensively. acc={}, thread={}",
                         acc, Thread.currentThread().getName());
-                return acc;  // 保持累加器不变，避免 NPE
             }
-            return acc.merge(data);
+            return acc.merge(data);  // Tip.merge() 内部会处理 null，返回 this
         });
         ((Processor<?, ?>) state.publisher()).displayAs("runnableParallel");
         return state;
