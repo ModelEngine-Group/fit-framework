@@ -6,7 +6,6 @@
 
 package modelengine.fel.engine.activities;
 
-import lombok.extern.slf4j.Slf4j;
 import modelengine.fel.core.chat.ChatMessage;
 import modelengine.fel.core.chat.Prompt;
 import modelengine.fel.core.chat.support.ChatMessages;
@@ -46,6 +45,7 @@ import modelengine.fit.waterflow.domain.stream.reactive.Processor;
 import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
 import modelengine.fit.waterflow.domain.utils.Tuple;
 import modelengine.fitframework.inspection.Validation;
+import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -66,8 +66,8 @@ import java.util.function.Supplier;
  * @author 易文渊
  * @since 2024-04-28
  */
-@Slf4j
 public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> extends AiActivity<D, RF, F> {
+    private static final Logger log = Logger.get(AiStart.class);
     private final Start<O, D, I, RF> start;
 
     /**
