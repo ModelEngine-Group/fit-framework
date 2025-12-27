@@ -118,9 +118,14 @@ public class Tip {
      * @return 表示当前的 {@link Tip}。
      */
     public Tip merge(Tip other) {
+        // 诊断：直接打印到 System.err 以确保能看到
+        System.err.println("[DIAGNOSTIC Tip.merge] Called with other=" + other + ", other_is_null=" + (other == null) + ", thread=" + Thread.currentThread().getName());
+
         // 如果 other 为 null，返回当前 Tip（不改变）
         // 这处理了并发场景中某个分支可能返回 null 的情况
         if (other == null) {
+            System.err.println("[DIAGNOSTIC Tip.merge] WARNING: other is null! Returning this=" + this);
+            new RuntimeException("Tip.merge called with null - stack trace").printStackTrace(System.err);
             return this;
         }
         return this.addAll(other.values);
