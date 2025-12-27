@@ -593,11 +593,8 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
         }
 
         AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
-            // 过滤 Fork 返回的 null 值（前 N-1 个分支）
-            // 只有当所有分支完成时，data 才是最终聚合结果
-            if (data != null) {
-                acc.merge(data);
-            }
+            // Tip.merge() 内部会处理 data 为 null 的情况
+            acc.merge(data);
             return acc;
         });
         ((Processor<?, ?>) state.publisher()).displayAs("runnableParallel");
