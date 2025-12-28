@@ -95,7 +95,7 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
                 }
 
                 // === DIAGNOSTIC #1: Fork.join wrapper 调用 processor 之前 ===
-                Object inputData = input.getData();
+                O inputData = input.getData();
                 System.err.println(String.format(
                     "[DIAG-Fork:96-BEFORE] key=%s, thread=%s, branchCount=%d/%d, acc.first=%s, input.getData=%s, input.getData_is_null=%b",
                     key, Thread.currentThread().getName(), acc.second(), forkNumber.get(),
