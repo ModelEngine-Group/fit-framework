@@ -93,7 +93,24 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
                         acc = Tuple.from((R) "", 0);
                     }
                 }
-                acc = Tuple.from(processor.process(acc.first(), input.getData()), acc.second() + 1);
+
+                // === DIAGNOSTIC #1: Fork.join wrapper 调用 processor 之前 ===
+                Object inputData = input.getData();
+                System.err.println(String.format(
+                    "[DIAG-Fork:96-BEFORE] key=%s, thread=%s, branchCount=%d/%d, acc.first=%s, input.getData=%s, input.getData_is_null=%b",
+                    key, Thread.currentThread().getName(), acc.second(), forkNumber.get(),
+                    acc.first(), inputData, (inputData == null)
+                ));
+
+                R processedResult = processor.process(acc.first(), inputData);
+
+                // === DIAGNOSTIC #2: Fork.join wrapper 调用 processor 之后 ===
+                System.err.println(String.format(
+                    "[DIAG-Fork:96-AFTER] key=%s, thread=%s, processedResult=%s, processedResult_is_null=%b",
+                    key, Thread.currentThread().getName(), processedResult, (processedResult == null)
+                ));
+
+                acc = Tuple.from(processedResult, acc.second() + 1);
                 accs.put(key, acc);
 
                 if (acc.second() == forkNumber.get()) {

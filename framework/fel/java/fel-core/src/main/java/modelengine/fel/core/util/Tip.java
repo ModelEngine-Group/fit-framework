@@ -118,12 +118,31 @@ public class Tip {
      * @return 表示当前的 {@link Tip}。
      */
     public Tip merge(Tip other) {
+        // === DIAGNOSTIC #5: Tip.merge() 开始 ===
+        System.err.println(String.format(
+            "[DIAG-Tip.merge-START] thread=%s, this=%s, other=%s, other_is_null=%b",
+            Thread.currentThread().getName(), this, other, (other == null)
+        ));
+
         // 防御性处理：在并发场景下，Fork.join() 可能传入 null
         // 参考：https://github.com/ModelEngine-Group/fit-framework/issues/247
         if (other == null) {
+            System.err.println(String.format(
+                "[DIAG-Tip.merge-NULL] thread=%s, other is null, returning this=%s",
+                Thread.currentThread().getName(), this
+            ));
             return this;
         }
-        return this.addAll(other.values);
+
+        Tip result = this.addAll(other.values);
+
+        // === DIAGNOSTIC #6: Tip.merge() 结束 ===
+        System.err.println(String.format(
+            "[DIAG-Tip.merge-END] thread=%s, result=%s",
+            Thread.currentThread().getName(), result
+        ));
+
+        return result;
     }
 
     /**

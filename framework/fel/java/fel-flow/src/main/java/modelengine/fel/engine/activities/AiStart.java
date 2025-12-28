@@ -595,14 +595,21 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
         }
 
         AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
-            // 防御性处理：Fork 的某些分支可能返回 null（特别是并发场景下的竞态条件）
-            // Tip.merge() 会处理 null 情况，参考：https://github.com/ModelEngine-Group/fit-framework/issues/247
-            if (data == null) {
-                log.warn("Fork.join reducer received null data in iteration, this may indicate a race condition. " +
-                        "Tip.merge() will handle this defensively. acc={}, thread={}",
-                        acc, Thread.currentThread().getName());
-            }
-            return acc.merge(data);  // Tip.merge() 内部会处理 null，返回 this
+            // === DIAGNOSTIC #3: AiStart reducer 调用 merge 之前 ===
+            System.err.println(String.format(
+                "[DIAG-AiStart:605-BEFORE] thread=%s, acc=%s, data=%s, data_is_null=%b",
+                Thread.currentThread().getName(), acc, data, (data == null)
+            ));
+
+            Tip mergeResult = acc.merge(data);  // Tip.merge() 内部会处理 null
+
+            // === DIAGNOSTIC #4: AiStart reducer 调用 merge 之后 ===
+            System.err.println(String.format(
+                "[DIAG-AiStart:605-AFTER] thread=%s, mergeResult=%s",
+                Thread.currentThread().getName(), mergeResult
+            ));
+
+            return mergeResult;
         });
         ((Processor<?, ?>) state.publisher()).displayAs("runnableParallel");
         return state;
