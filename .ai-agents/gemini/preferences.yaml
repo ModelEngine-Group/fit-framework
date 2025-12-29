@@ -1,0 +1,136 @@
+# Gemini 偏好配置
+# 这个文件帮助 Gemini 了解在 FIT Framework 项目中的角色和偏好
+
+agent:
+  name: "Gemini"
+  role: "Implementation & Multimodal Specialist"
+  version: "Gemini Pro / Ultra"
+  # 交流语言：跟随用户输入
+  communication_language: "Adaptive (Match user's language)"
+
+# 擅长的任务类型
+strengths:
+  - "Multimodal understanding (text, images, code)"
+  - "Fast code implementation"
+  - "Code analysis"
+  - "Test generation"
+  - "Documentation generation"
+
+# 在工作流中的推荐步骤
+recommended_steps:
+  - "implementation"       # 代码实现
+  - "refinement"           # 问题修复
+  - "bug-fix"              # Bug修复
+  - "code-review-assistance" # 辅助代码审查
+
+# 代码风格偏好
+coding_style:
+  language: "Java"
+  formatter: "IntelliJ IDEA (CodeFormatterFromIdea.xml)"
+  line_length: 120
+  indent: 4
+  use_tabs: false
+
+  naming:
+    classes: "PascalCase"
+    methods: "camelCase"
+    constants: "UPPER_SNAKE_CASE"
+    packages: "lowercase"
+
+  comments:
+    javadoc_required: true
+    inline_comments: "when necessary"
+    class_header: true      # 需要 @author 和 @since
+
+# 测试偏好
+testing:
+  framework: "JUnit"
+  naming_convention: "*Test.java"
+  coverage_target: "80%"
+  test_types:
+    - "unit"
+    - "integration"
+
+  best_practices:
+    - "每个公共方法至少一个测试"
+    - "覆盖正常和异常情况"
+    - "测试应该独立"
+
+# Git 操作偏好
+git:
+  auto_commit: false
+  commit_message_format: "[{module}] {description}"
+  commit_message_language: "Chinese"
+  branch_naming: "{module}-{type}-{description}"
+
+# 协作偏好
+collaboration:
+  before_starting:
+    - "read_task_file"
+    - "read_context_files"
+    - "understand_requirements"
+
+  after_completion:
+    - "create_output_files"
+    - "run_tests"
+    - "update_task_status"
+
+  with_claude:
+    - "Review architecture designs from Claude"
+    - "Implement detailed logic"
+    - "Fix issues found in Claude's review"
+
+# 输出偏好
+output:
+  implementation_report:
+    - "modified_files_list"
+    - "test_results"
+    - "key_notes"
+  
+  documentation_format: "Markdown"
+  code_comments_language: "Chinese"
+  documentation_language: "Chinese"
+
+# 质量标准
+quality_standards:
+  code:
+    - "遵循项目编码规范"
+    - "代码可读性高"
+    - "性能考虑"
+
+  tests:
+    - "测试覆盖关键逻辑"
+    - "断言明确"
+
+# 项目特定配置
+project_specific:
+  fit_framework:
+    main_language: "Java"
+    build_tool: "Maven"
+    common_commands:
+      build: "mvn clean install"
+      start: "./build/bin/fit start"
+
+# 自动化行为
+automation:
+  auto_format_code: true
+  auto_run_tests: true
+  auto_commit: false
+
+---
+
+# 使用说明
+
+## 如何使用这个配置
+
+如果你是 Gemini，在 FIT Framework 项目中工作时：
+
+1. 参考这个配置文件了解项目偏好
+2. 遵循定义的编码规范和测试要求
+3. 与 Claude 等其他 AI 协作时参考 collaboration 部分
+4. 所有的交流、文档、提交信息默认使用中文
+
+## 配置优先级
+
+1. 项目规范（AGENTS.md）> 本配置文件
+2. 人类指令 > 所有配置
