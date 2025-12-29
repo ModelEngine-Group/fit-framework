@@ -9,6 +9,9 @@
 target/
 build/
 
+# Gemini
+.gemini-clipboard/
+
 # Claude Code local settings
 .claude/settings.local.json
 
