@@ -41,10 +41,14 @@ import modelengine.fit.http.annotation.RequestParam;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
+import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.serialization.ObjectSerializer;
-import modelengine.fitframework.util.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +61,7 @@ import java.util.stream.Collectors;
 @Component
 @RequestMapping("/ai/example")
 public class RetrievalExampleController {
+    private static final Logger log = Logger.get(RetrievalExampleController.class);
     private static final String REWRITE_PROMPT =
             "作为一个向量检索助手，你的任务是结合历史记录，为”原问题“生成”检索词“，" + "生成的问题要求指向对象清晰明确，并与“原问题语言相同。\n\n"
                     + "历史记录：\n---\n" + DEFAULT_HISTORY_KEY + "---\n原问题：{{query}}\n检索词：";
@@ -85,22 +90,27 @@ public class RetrievalExampleController {
                 .others(node -> node.map(tip -> tip.freeze().get("query").text()))
                 .retrieve(new DefaultVectorRetriever(vectorStore, SearchOption.custom().topK(1).build()))
                 .synthesize(docs -> Content.from(docs.stream().map(Document::text).collect(Collectors.joining("\n\n"))))
-                .close();
+                .close(__ -> log.info("Retrieve flow completed."));
 
         AiProcessFlow<File, List<Document>> indexFlow = AiFlows.<File>create()
                 .load(new JsonFileSource(serializer, StringTemplate.create("{{question}}: {{answer}}")))
                 .index(vectorStore)
                 .close();
-        File file = FileUtils.file(this.getClass().getClassLoader().getResource("data.json"));
+        File file = extractResourceToTempFile("data.json");
         notNull(file, "The data cannot be null.");
-        indexFlow.converse().offer(file);
+        indexFlow.converse()
+                .doOnError(e -> log.info("Index build error. [error={}]", e.getMessage(), e))
+                .doOnFinally(() -> log.info("Index build successfully."))
+                .offer(file);
 
         this.ragFlow = AiFlows.<String>create()
+                .just(query -> log.info("RAG flow start. [query={}]", query))
                 .map(query -> Tip.from("query", query))
                 .runnableParallel(value("context", retrieveFlow), passThrough())
                 .prompt(Prompts.history(), Prompts.human(CHAT_PROMPT))
+                .just(__ -> log.info("LLM start generation."))
                 .generate(chatFlowModel)
-                .close();
+                .close(__ -> log.info("RAG flow completed."));
     }
 
     /**
@@ -115,5 +125,25 @@ public class RetrievalExampleController {
         this.memory.add(new HumanMessage(query));
         this.memory.add(aiMessage);
         return aiMessage;
+    }
+
+    /**
+     * 从 JAR 中提取资源到临时文件。
+     *
+     * @param resourceName 表示资源名称的 {@link String}。
+     * @return 表示临时文件的 {@link File}。
+     */
+    private File extractResourceToTempFile(String resourceName) {
+        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resourceName)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Resource not found: " + resourceName);
+            }
+            File tempFile = File.createTempFile("data-", ".json");
+            tempFile.deleteOnExit();
+            Files.copy(inputStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to extract resource: " + resourceName, e);
+        }
     }
 }

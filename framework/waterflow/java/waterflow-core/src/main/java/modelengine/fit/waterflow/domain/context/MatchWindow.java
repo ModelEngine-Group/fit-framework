@@ -47,12 +47,14 @@ public class MatchWindow extends Window {
      * @return 返回创建的MatchWindow对象
      */
     public static synchronized MatchWindow from(Window source, UUID id, Object data) {
-        MatchWindow window = all.get(id.toString());
+        // Use composite key: sessionId + UUID to prevent cross-session pollution
+        String cacheKey = source.getSession().getId() + ":" + id.toString();
+        MatchWindow window = all.get(cacheKey);
         if (window == null) {
             window = new MatchWindow(source, id, data);
             FlowSession session = new FlowSession(source.getSession());
             session.setWindow(window);
-            all.put(id.toString(), window);
+            all.put(cacheKey, window);
         }
         WindowToken token = window.createToken();
         token.beginConsume();
