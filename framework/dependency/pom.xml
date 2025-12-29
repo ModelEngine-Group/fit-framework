@@ -55,6 +55,7 @@
         <byte-buddy.version>1.18.2</byte-buddy.version>
         <druid.version>1.2.25</druid.version>
         <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.60</fastjson2.version>
         <guava.version>32.0.1-jre</guava.version>
         <hanlp.version>portable-1.8.4</hanlp.version>
         <lombok.version>1.18.36</lombok.version>
@@ -464,6 +465,11 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
