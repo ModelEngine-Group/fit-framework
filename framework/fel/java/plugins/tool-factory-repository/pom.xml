@@ -39,7 +39,7 @@
                 <version>${fit.version}</version>
                 <configuration>
                     <category>system</category>
-                    <level>5</level>
+                    <level>4</level>
                 </configuration>
                 <executions>
                     <execution>
