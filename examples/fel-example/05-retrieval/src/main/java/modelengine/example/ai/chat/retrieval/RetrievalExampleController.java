@@ -43,12 +43,9 @@ import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
 import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.serialization.ObjectSerializer;
+import modelengine.fitframework.util.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,7 +93,7 @@ public class RetrievalExampleController {
                 .load(new JsonFileSource(serializer, StringTemplate.create("{{question}}: {{answer}}")))
                 .index(vectorStore)
                 .close();
-        File file = extractResourceToTempFile("data.json");
+        File file = FileUtils.file(this.getClass().getClassLoader().getResource("data.json"));
         notNull(file, "The data cannot be null.");
         indexFlow.converse()
                 .doOnError(e -> log.info("Index build error. [error={}]", e.getMessage(), e))
@@ -125,25 +122,5 @@ public class RetrievalExampleController {
         this.memory.add(new HumanMessage(query));
         this.memory.add(aiMessage);
         return aiMessage;
-    }
-
-    /**
-     * 从 JAR 中提取资源到临时文件。
-     *
-     * @param resourceName 表示资源名称的 {@link String}。
-     * @return 表示临时文件的 {@link File}。
-     */
-    private File extractResourceToTempFile(String resourceName) {
-        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resourceName)) {
-            if (inputStream == null) {
-                throw new IllegalArgumentException("Resource not found: " + resourceName);
-            }
-            File tempFile = File.createTempFile("data-", ".json");
-            tempFile.deleteOnExit();
-            Files.copy(inputStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            return tempFile;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to extract resource: " + resourceName, e);
-        }
     }
 }
