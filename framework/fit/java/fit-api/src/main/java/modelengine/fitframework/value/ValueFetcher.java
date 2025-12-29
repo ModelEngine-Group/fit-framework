@@ -40,6 +40,9 @@ public interface ValueFetcher {
      * +---------------------+--------------+---------------------+
      * </pre>
      * 任意输入对象都可以转换为键值对的形式。
+     * <p><strong>注意：</strong>当 {@code object} 为 {@link String} 时，默认按普通字符串处理，不会自动解析 JSON 文本。
+     * 如果需要从 JSON 字符串中取值，请调用方先使用 {@link modelengine.fitframework.serialization.ObjectSerializer}
+     * 将其反序列化为对象，再调用本方法。</p>
      * 
      * @param object 表示指定对象的 {@link Object}。
      * @param propertyPath 表示待获取属性的路径的 {@link String}。
