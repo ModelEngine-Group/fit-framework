@@ -24,7 +24,7 @@
 ```
 插件启动顺序（29个插件）
 │
-├─ Category 1: SYSTEM (id=1) ─────────── 第一优先级，先启动所有系统插件
+├─ 阶段1: SYSTEM 插件启动
 │  │
 │  ├─ Level 4 (22个)
 │  │  ├─ FIT 内置插件 (20个，详见FIT文档)
@@ -40,8 +40,8 @@
 │  └─ Level 7 (1个)
 │     └─ fel-model-openai-plugin
 │
-└─ Category 2: USER (id=2) ─────────── 第二优先级，再启动所有用户插件
-   │
+└─ 阶段2: USER 插件启动
+
    ├─ Level 1 (1个)
    │  └─ fel-tokenizer-hanlp-plugin
    │

@@ -16,23 +16,25 @@
 ### 整体启动阶段
 
 ```
-FIT 框架启动流程
+FIT 框架插件启动顺序
 │
-├─ 阶段0: 运行时初始化
-│  └─ 注册系统 Bean（配置、AOP、Broker等）
-│
-├─ 阶段1: SYSTEM 插件启动（按 level 排序）
+├─ 阶段1: SYSTEM 插件启动
+│  │
 │  ├─ Level 4 (22个) 
 │  │  ├─ FIT 内置插件（20个）
 │  │  └─ FEL 工具仓库（2个）
+│  │
 │  ├─ Level 5 (4个)
 │  │  └─ FEL 工具链（fel-tool-discoverer等）
+│  │
 │  └─ Level 7 (1个)
 │     └─ FEL 模型集成（fel-model-openai-plugin）
 │
-└─ 阶段2: USER 插件启动（按 level 排序）
+└─ 阶段2: USER 插件启动
+   │
    ├─ Level 1 (1个)
    │  └─ FEL 用户插件（fel-tokenizer-hanlp-plugin）
+   │
    └─ Level 4 (1个)
       └─ FEL 用户插件（fel-langchain-runnable）
 ```
