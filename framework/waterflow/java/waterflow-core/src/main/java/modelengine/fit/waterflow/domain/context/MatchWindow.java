@@ -82,4 +82,23 @@ public class MatchWindow extends Window {
     public boolean fulfilled() {
         return this.from.isComplete() && this.from.isOngoing();
     }
+
+    @Override
+    public void tryFinish() {
+        super.tryFinish();
+        // 当 MatchWindow 完全完成时，从缓存中移除以防止内存泄漏
+        if (this.isDone()) {
+            cleanup();
+        }
+    }
+
+    /**
+     * 从缓存中移除当前 MatchWindow
+     */
+    private void cleanup() {
+        if (this.getSession() != null) {
+            String cacheKey = this.getSession().getId() + ":" + this.key().toString();
+            all.remove(cacheKey);
+        }
+    }
 }
