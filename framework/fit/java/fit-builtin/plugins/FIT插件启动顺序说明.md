@@ -7,15 +7,49 @@
 - **20 个**会自动输出到 `build/plugins/` 目录
 - **2 个**不在 `build/plugins/` 目录中（需单独配置）
 
-所有 FIT 插件均配置为 **Level 4, category=system**，在应用启动的第二批加载。
+所有 FIT 插件均配置为 **category=SYSTEM, level=4**。
 
 ---
 
-## 自动添加的FIT插件（20个）
+## 启动顺序说明
 
-### Level 4 - 自动加载的插件
+### 整体启动阶段
 
-这 20 个插件会在构建时自动复制到 `build/plugins/` 目录，按**文件名字母顺序**加载：
+```
+FIT 框架启动流程
+│
+├─ 阶段0: 运行时初始化
+│  └─ 注册系统 Bean（配置、AOP、Broker等）
+│
+├─ 阶段1: SYSTEM 插件启动（按 level 排序）
+│  ├─ Level 4 (22个) 
+│  │  ├─ FIT 内置插件（20个）
+│  │  └─ FEL 工具仓库（2个）
+│  ├─ Level 5 (4个)
+│  │  └─ FEL 工具链（fel-tool-discoverer等）
+│  └─ Level 7 (1个)
+│     └─ FEL 模型集成（fel-model-openai-plugin）
+│
+└─ 阶段2: USER 插件启动（按 level 排序）
+   ├─ Level 1 (1个)
+   │  └─ FEL 用户插件（fel-tokenizer-hanlp-plugin）
+   └─ Level 4 (1个)
+      └─ FEL 用户插件（fel-langchain-runnable）
+```
+
+**FIT 内置插件在 SYSTEM Level 4，与 FEL 工具仓库插件一起，是所有插件中最先启动的一批。**
+
+### 启动规则
+
+- **category=SYSTEM (id=1) 的插件先于 USER (id=2) 插件加载**
+- **相同 category 内，level 数值越小，启动优先级越高**
+- **相同 category 和 level 的插件，加载顺序不确定**
+
+---
+
+## 自动添加的FIT插件
+
+这 20 个插件会在构建时自动复制到 `build/plugins/` 目录（插件均配置为 category=SYSTEM, level=4）：
 
 | 序号 | 插件名称                                  | 说明                |
 |----|---------------------------------------|-------------------|
@@ -40,33 +74,31 @@
 | 19 | `fit-validation-hibernate-javax`      | Javax 验证          |
 | 20 | `fit-value-fastjson`                  | Fastjson 支持       |
 
+**注意**: 表格中的序号仅用于标识，不代表实际加载顺序。相同 category 和 level 的插件之间的加载顺序是不确定的。
+
 ---
 
-## 需要手动添加的插件（2个）
+## 需要手动添加的插件
 
-以下插件在源码中定义，但**不会自动输出**到 `build/plugins/` 目录，需要手动添加：
+以下插件在源码中定义，但**不会自动输出**到 `build/plugins/` 目录，需要手动添加（插件均配置为 category=SYSTEM, level=4）：
 
 ### 1. fit-dynamic-plugin-mvn
 
-| 属性           | 值                                                               |
-|--------------|-----------------------------------------------------------------|
-| **插件名**      | fit-dynamic-plugin-mvn                                          |
-| **Level**    | 4                                                               |
-| **Category** | system                                                          |
-| **源码路径**     | `framework/fit/java/fit-builtin/plugins/fit-dynamic-plugin-mvn` |
-| **说明**       | Maven 动态插件加载器                                                   |
-| **用途**       | 从 Maven 仓库动态加载插件                                                |
+| 属性       | 值                                                               |
+|----------|-----------------------------------------------------------------|
+| **插件名**  | fit-dynamic-plugin-mvn                                          |
+| **源码路径** | `framework/fit/java/fit-builtin/plugins/fit-dynamic-plugin-mvn` |
+| **说明**   | Maven 动态插件加载器                                                   |
+| **用途**   | 从 Maven 仓库动态加载插件                                                |
 
 ### 2. fit-service-coordination-nacos
 
-| 属性           | 值                                                                       |
-|--------------|-------------------------------------------------------------------------|
-| **插件名**      | fit-service-coordination-nacos                                          |
-| **Level**    | 4                                                                       |
-| **Category** | system                                                                  |
-| **源码路径**     | `framework/fit/java/fit-builtin/plugins/fit-service-coordination-nacos` |
-| **说明**       | Nacos 服务协调实现                                                            |
-| **用途**       | 使用 Nacos 进行服务注册和发现                                                      |
+| 属性       | 值                                                                       |
+|----------|-------------------------------------------------------------------------|
+| **插件名**  | fit-service-coordination-nacos                                          |
+| **源码路径** | `framework/fit/java/fit-builtin/plugins/fit-service-coordination-nacos` |
+| **说明**   | Nacos 服务协调实现                                                            |
+| **用途**   | 使用 Nacos 进行服务注册和发现                                                      |
 
 ---
 
