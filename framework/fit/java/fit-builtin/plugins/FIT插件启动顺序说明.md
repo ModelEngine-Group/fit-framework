@@ -20,32 +20,23 @@ FIT 框架插件启动顺序
 │
 ├─ 阶段1: SYSTEM 插件启动
 │  │
-│  ├─ Level 4 (22个) 
-│  │  ├─ FIT 内置插件（20个）
-│  │  └─ FEL 工具仓库（2个）
-│  │
-│  ├─ Level 5 (4个)
-│  │  └─ FEL 工具链（fel-tool-discoverer等）
-│  │
-│  └─ Level 7 (1个)
-│     └─ FEL 模型集成（fel-model-openai-plugin）
+│  └─ Level 4 (20个自动输出 + 2个可选)
+│     └─ FIT 内置插件
 │
 └─ 阶段2: USER 插件启动
-   │
-   ├─ Level 1 (1个)
-   │  └─ FEL 用户插件（fel-tokenizer-hanlp-plugin）
-   │
-   └─ Level 4 (1个)
-      └─ FEL 用户插件（fel-langchain-runnable）
 ```
 
-**FIT 内置插件在 SYSTEM Level 4，与 FEL 工具仓库插件一起，是所有插件中最先启动的一批。**
+**FIT 内置插件均配置为 SYSTEM Level 4，为应用层插件提供基础服务。**
 
 ### 启动规则
 
 - **category=SYSTEM (id=1) 的插件先于 USER (id=2) 插件加载**
 - **相同 category 内，level 数值越小，启动优先级越高**
 - **相同 category 和 level 的插件，加载顺序不确定**
+
+**默认值**：
+- 未指定 category 时，默认为 **category=USER**
+- 未指定 level 时，默认为 **level=4**
 
 ---
 

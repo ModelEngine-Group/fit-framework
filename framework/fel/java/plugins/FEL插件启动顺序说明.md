@@ -15,6 +15,11 @@
 - **相同 category 内，level 数值越小，启动优先级越高**
 - **相同 category 和 level 的插件，加载顺序不确定**
 
+**默认值**：
+
+- 未指定 category 时，默认为 **category=USER**
+- 未指定 level 时，默认为 **level=4**
+
 ---
 
 ## 启动流程图
@@ -26,14 +31,14 @@
 │
 ├─ 阶段1: SYSTEM 插件启动
 │  │
-│  ├─ Level 4 (22个)
+│  ├─ Level 4 (21个)
 │  │  ├─ FIT 内置插件 (20个，详见FIT文档)
-│  │  ├─ fel-tool-factory-repository
 │  │  └─ fel-tool-repository-simple
 │  │
-│  ├─ Level 5 (4个)
+│  ├─ Level 5 (5个)
 │  │  ├─ fel-tool-discoverer
 │  │  ├─ fel-tool-executor
+│  │  ├─ fel-tool-factory-repository
 │  │  ├─ fel-tool-mcp-client
 │  │  └─ fel-tool-mcp-server
 │  │
@@ -51,33 +56,40 @@
 
 ---
 
+## 插件依赖关系
+
+### 启动时依赖
+
+| 依赖方插件                           | 被依赖插件                                  | 依赖说明                                       |
+|---------------------------------|----------------------------------------|--------------------------------------------|
+| `fel-tool-discoverer` (Level 5) | `fel-tool-repository-simple` (Level 4) | 在 `onPluginStarted()` 回调时调用 `addTool()` 方法 |
+
+---
+
 ## FEL插件清单
 
 ### 阶段1: SYSTEM 插件
 
-#### category=SYSTEM, level=4 (2个)
+#### category=SYSTEM, level=4 (1个)
 
-| 插件名称                          | 说明         |
-|-------------------------------|------------|
-| `fel-tool-factory-repository` | 工具工厂仓库     |
-| `fel-tool-repository-simple`  | 工具仓库（简单实现） |
+| 插件名称                         | 说明         |
+|------------------------------|------------|
+| `fel-tool-repository-simple` | 工具仓库（简单实现） |
 
-**FIT 内置插件**: Level 4 还包含 20 个 FIT 框架内置插件（category=SYSTEM），提供 HTTP 服务、序列化、验证、服务发现等核心功能。详见 `framework/fit/java/fit-builtin/plugins/FIT插件启动顺序说明.md`
-
-**启动时机**: 第一批启动，提供基础工具仓库能力。
+**FIT 内置插件**: Level 4 还包含 20 个 FIT 框架内置插件（category=SYSTEM），提供 HTTP 服务、序列化、验证、服务发现等核心功能。详见
+`framework/fit/java/fit-builtin/plugins/FIT插件启动顺序说明.md`
 
 ---
 
-#### category=SYSTEM, level=5 (4个)
+#### category=SYSTEM, level=5 (5个)
 
-| 插件名称                  | 说明      |
-|-----------------------|---------|
-| `fel-tool-discoverer` | 工具发现器   |
-| `fel-tool-executor`   | 工具执行器   |
-| `fel-tool-mcp-client` | MCP 客户端 |
-| `fel-tool-mcp-server` | MCP 服务端 |
-
-**启动时机**: Level 4 的工具仓库加载完成后启动。这些插件依赖 Level 4 的 `fel-tool-repository-simple` 和 `fel-tool-factory-repository`，提供工具发现、执行和 MCP 协议支持。
+| 插件名称                          | 说明      |
+|-------------------------------|---------|
+| `fel-tool-discoverer`         | 工具发现器   |
+| `fel-tool-executor`           | 工具执行器   |
+| `fel-tool-factory-repository` | 工具工厂仓库  |
+| `fel-tool-mcp-client`         | MCP 客户端 |
+| `fel-tool-mcp-server`         | MCP 服务端 |
 
 ---
 
@@ -86,8 +98,6 @@
 | 插件名称                      | 说明          |
 |---------------------------|-------------|
 | `fel-model-openai-plugin` | OpenAI 模型集成 |
-
-**启动时机**: 所有 SYSTEM 插件中最后启动，确保基础设施和工具链完全就绪。
 
 ---
 
@@ -99,8 +109,6 @@
 |------------------------------|-----------|
 | `fel-tokenizer-hanlp-plugin` | HanLP 分词器 |
 
-**启动时机**: 所有 SYSTEM 插件启动完成后，USER 插件中最先加载，提供基础分词功能。
-
 ---
 
 #### category=USER, level=4 (1个)
@@ -108,5 +116,3 @@
 | 插件名称                     | 说明              |
 |--------------------------|-----------------|
 | `fel-langchain-runnable` | LangChain 运行时支持 |
-
-**启动时机**: USER 插件中 Level 1 启动完成后加载。
