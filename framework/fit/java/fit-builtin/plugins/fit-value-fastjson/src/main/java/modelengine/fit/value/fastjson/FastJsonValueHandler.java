@@ -6,7 +6,7 @@
 
 package modelengine.fit.value.fastjson;
 
-import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson2.JSONPath;
 
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.util.StringUtils;

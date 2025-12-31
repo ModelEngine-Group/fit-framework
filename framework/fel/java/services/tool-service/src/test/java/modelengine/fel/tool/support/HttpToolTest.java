@@ -25,6 +25,7 @@ import modelengine.fitframework.serialization.ObjectSerializer;
 import modelengine.fitframework.util.IoUtils;
 import modelengine.fitframework.util.MapBuilder;
 import modelengine.fitframework.util.StringUtils;
+import modelengine.fitframework.util.TypeUtils;
 import modelengine.fitframework.value.ValueFetcher;
 
 import org.junit.jupiter.api.AfterAll;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.HashMap;
@@ -124,6 +126,12 @@ public class HttpToolTest {
         return factory.create(info, toolMetadata);
     }
 
+    private static Map<String, Object> deserializeJsonObject(String json) {
+        ObjectSerializer jsonSerializer = new JacksonObjectSerializer(null, null, null, true);
+        Type objectType = TypeUtils.parameterized(Map.class, new Type[] {String.class, Object.class});
+        return jsonSerializer.deserialize(json, objectType);
+    }
+
     @Test
     @DisplayName("测试返回值为 Map 成功")
     void shouldReturnMap() {
@@ -186,7 +194,8 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("basic-auth.json");
         Tool tool = createTool(info);
 
-        boolean result = cast(tool.execute("{\"name\":\"testuser\", \"pwd\":\"testpass\"}"));
+        Map<String, Object> args = deserializeJsonObject("{\"name\":\"testuser\", \"pwd\":\"testpass\"}");
+        boolean result = cast(tool.execute(args));
         assertThat(result).isEqualTo(true);
     }
 
@@ -196,7 +205,8 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("api-key-auth.json");
         Tool tool = createTool(info);
 
-        boolean result = cast(tool.execute("{\"name\":\"ApiKey\", \"pwd\":\"ApiKeyValue\"}"));
+        Map<String, Object> args = deserializeJsonObject("{\"name\":\"ApiKey\", \"pwd\":\"ApiKeyValue\"}");
+        boolean result = cast(tool.execute(args));
         assertThat(result).isEqualTo(true);
     }
 
@@ -206,7 +216,8 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("api-key-query-auth.json");
         Tool tool = createTool(info);
 
-        boolean result = cast(tool.execute("{\"name\":\"ApiKey\", \"pwd\":\"ApiKeyValue\"}"));
+        Map<String, Object> args = deserializeJsonObject("{\"name\":\"ApiKey\", \"pwd\":\"ApiKeyValue\"}");
+        boolean result = cast(tool.execute(args));
         assertThat(result).isEqualTo(true);
     }
 
@@ -216,7 +227,8 @@ public class HttpToolTest {
         Tool.Info info = readToolInfo("bearer-auth.json");
         Tool tool = createTool(info);
 
-        boolean result = cast(tool.execute("{\"name\":\"test666666666\", \"pwd\":\"invalid\"}"));
+        Map<String, Object> args = deserializeJsonObject("{\"name\":\"test666666666\", \"pwd\":\"invalid\"}");
+        boolean result = cast(tool.execute(args));
         assertThat(result).isEqualTo(true);
     }
 }

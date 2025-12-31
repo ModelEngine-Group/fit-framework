@@ -17,11 +17,6 @@
     </description>
     <url>https://github.com/ModelEngine-Group/fit-framework</url>
 
-    <properties>
-        <!-- Third-party versions -->
-        <fastjson.version>1.2.83</fastjson.version>
-    </properties>
-
     <dependencies>
         <!-- FIT core -->
         <dependency>
@@ -35,9 +30,8 @@
 
         <!-- Fastjson -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
         </dependency>
 
         <!-- Test -->
