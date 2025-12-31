@@ -1,8 +1,8 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fit.value.fastjson;
 
@@ -75,6 +75,29 @@ public class FastJsonValueFetcherTest {
         @DisplayName("当 propertyPath 不为空时，返回 null")
         void shouldReturnNullGivenPropertyPathIsNotEmpty() {
             Object actual = FastJsonValueFetcherTest.this.fetcher.fetch(this.object, "k");
+            assertThat(actual).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("当 object 为 JSON 字符串时")
+    class GivenObjectIsJsonString {
+        private Object object;
+
+        @BeforeEach
+        void setup() {
+            this.object = "{\"k1\":{\"k2\":\"v\"}}";
+        }
+
+        @AfterEach
+        void teardown() {
+            this.object = null;
+        }
+
+        @Test
+        @DisplayName("当 propertyPath 不为空时，不自动解析 JSON 字符串")
+        void shouldReturnNullGivenPropertyPathIsNotEmpty() {
+            Object actual = FastJsonValueFetcherTest.this.fetcher.fetch(this.object, "k1.k2");
             assertThat(actual).isNull();
         }
     }
