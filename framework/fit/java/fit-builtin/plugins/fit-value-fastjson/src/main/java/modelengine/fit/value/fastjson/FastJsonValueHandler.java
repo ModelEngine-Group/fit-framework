@@ -1,11 +1,12 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
- *  This file is a part of the ModelEngine Project.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2024-2025 Huawei Technologies Co., Ltd. All rights reserved.
+ * This file is a part of the ModelEngine Project.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ */
 
 package modelengine.fit.value.fastjson;
 
+import com.alibaba.fastjson2.JSONException;
 import com.alibaba.fastjson2.JSONPath;
 
 import modelengine.fitframework.annotation.Component;
@@ -21,15 +22,25 @@ import modelengine.fitframework.value.ValueSetter;
  */
 @Component
 public class FastJsonValueHandler implements ValueFetcher, ValueSetter {
+    private static final String $ = "$";
+
     @Override
     public Object fetch(Object object, String propertyPath) {
         if (object == null) {
             return null;
         }
-        if (StringUtils.isBlank(propertyPath)) {
+        if (isObjectSelf(propertyPath)) {
             return object;
-        } else {
+        }
+        if (object instanceof String) {
+            return null;
+        }
+        try {
             return JSONPath.eval(object, this.getParsedPath(propertyPath));
+        } catch (JSONException e) {
+            throw new IllegalArgumentException(StringUtils.format(
+                    "Failed to fetch value by JSONPath. [propertyPath={0}]",
+                    propertyPath), e);
         }
     }
 
@@ -38,20 +49,32 @@ public class FastJsonValueHandler implements ValueFetcher, ValueSetter {
         if (object == null) {
             return null;
         }
-        if (StringUtils.isBlank(propertyPath)) {
+        if (isObjectSelf(propertyPath)) {
             return value;
         }
-        JSONPath.set(object, this.getParsedPath(propertyPath), value);
-        return object;
+        if (object instanceof String) {
+            return object;
+        }
+        try {
+            JSONPath.set(object, this.getParsedPath(propertyPath), value);
+            return object;
+        } catch (JSONException e) {
+            throw new IllegalArgumentException(StringUtils.format("Failed to set value by JSONPath. [propertyPath={0}]",
+                    propertyPath), e);
+        }
+    }
+
+    private static boolean isObjectSelf(String propertyPath) {
+        return StringUtils.isBlank(propertyPath) || $.equals(propertyPath);
     }
 
     private String getParsedPath(String propertyPath) {
-        if (propertyPath.startsWith("$")) {
+        if (propertyPath.startsWith($)) {
             return propertyPath;
         } else if (propertyPath.startsWith("[")) {
-            return "$" + propertyPath;
+            return $ + propertyPath;
         } else {
-            return "$." + propertyPath;
+            return $ + "." + propertyPath;
         }
     }
 }
