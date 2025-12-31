@@ -189,7 +189,69 @@ Bash("OWNER_GROUP=$(ls -l README.md | awk '{print $3\":\"$4}') && sudo chown $OW
 
 ## Git 提交和版本控制规范
 
-### 规则 3: 禁止自动提交代码
+### 规则 3: Commit Message 格式规范
+
+**⚠️ 重要规则（CRITICAL）：**
+
+本项目的提交信息**必须使用中文作为核心内容**，遵循以下格式：
+
+**标准格式：**
+```
+<type>: <中文描述>
+
+<可选的详细说明>
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Type 类型（使用英文）：**
+- `feat`: 新功能
+- `fix`: Bug 修复
+- `docs`: 文档更新
+- `style`: 代码格式调整（不影响代码逻辑）
+- `refactor`: 重构（既不是新功能也不是 Bug 修复）
+- `perf`: 性能优化
+- `test`: 测试相关
+- `chore`: 构建过程或辅助工具的变动（包括依赖升级）
+- `revert`: 回滚之前的提交
+
+**子类型（可选）：**
+- `chore(deps)`: 依赖升级，格式：`chore(deps): 升级 <package> 到 v<version>`
+
+**示例：**
+```bash
+# 新功能
+feat: 添加用户认证功能
+
+# Bug 修复
+fix: 修复登录失败的问题
+
+# 文档更新
+docs: 更新 API 文档
+
+# 依赖升级
+chore(deps): 升级 fastjson2 到 v2.0.60
+
+# 代码重构
+refactor: 重构用户服务模块
+
+# 性能优化
+perf: 优化数据库查询性能
+
+# 构建相关
+chore: 更新构建脚本
+```
+
+**强制要求：**
+1. 描述部分**必须使用中文**
+2. Type 类型使用英文小写
+3. 描述要简洁明了，概括核心变更
+4. 多个变更应该分多次提交
+5. 必须在提交消息末尾添加 Claude Code 签名
+
+### 规则 4: 禁止自动提交代码
 
 **⚠️ 重要规则（CRITICAL）：**
 
