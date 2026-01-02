@@ -19,8 +19,10 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 LOG_FILE="/tmp/maven-build-${TIMESTAMP}.log"
 echo "构建日志保存到: $LOG_FILE"
 
-mvn clean install > "$LOG_FILE" 2>&1
+cd framework
+mvn clean install -pl '!ohscript' > "$LOG_FILE" 2>&1
 BUILD_STATUS=$?
+cd ..
 
 # 只显示最后 100 行（包含构建摘要）
 echo "========== 构建摘要 =========="
