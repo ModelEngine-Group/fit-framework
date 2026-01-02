@@ -38,6 +38,10 @@ import java.util.function.Supplier;
 public class MockMvcListener implements TestListener {
     private static final Set<String> DEFAULT_SCAN_PACKAGES =
             new HashSet<>(Arrays.asList("modelengine.fit.server", "modelengine.fit.http"));
+    private static final String TIMEOUT_PROPERTY_KEY = "fit.test.mockmvc.startup.timeout";
+    private static final long DEFAULT_STARTUP_TIMEOUT = 30_000L;
+    private static final long MIN_STARTUP_TIMEOUT = 1_000L;
+    private static final long MAX_STARTUP_TIMEOUT = 600_000L;
 
     private final int port;
 
@@ -71,14 +75,60 @@ public class MockMvcListener implements TestListener {
         }
         MockMvc mockMvc = new MockMvc(this.port);
         context.plugin().container().registry().register(mockMvc);
+        long timeout = this.getStartupTimeout();
+        long startTime = System.currentTimeMillis();
         boolean started = this.isStarted(mockMvc);
         while (!started) {
+            long elapsed = System.currentTimeMillis() - startTime;
+            if (elapsed > timeout) {
+                throw new IllegalStateException(this.buildTimeoutErrorMessage(elapsed, this.port));
+            }
             ThreadUtils.sleep(100);
             started = this.isStarted(mockMvc);
         }
     }
 
-    private boolean isStarted(MockMvc mockMvc) {
+    private long getStartupTimeout() {
+        String timeoutStr = System.getProperty(TIMEOUT_PROPERTY_KEY);
+        if (StringUtils.isNotBlank(timeoutStr)) {
+            try {
+                long timeout = Long.parseLong(timeoutStr);
+                if (timeout < MIN_STARTUP_TIMEOUT) {
+                    return DEFAULT_STARTUP_TIMEOUT;
+                }
+                if (timeout > MAX_STARTUP_TIMEOUT) {
+                    return MAX_STARTUP_TIMEOUT;
+                }
+                return timeout;
+            } catch (NumberFormatException e) {
+                return DEFAULT_STARTUP_TIMEOUT;
+            }
+        }
+        return DEFAULT_STARTUP_TIMEOUT;
+    }
+
+    private String buildTimeoutErrorMessage(long elapsed, int port) {
+        return StringUtils.format("""
+                        Mock MVC server failed to start within {0}ms. [port={1}]
+                        
+                        Possible causes:
+                        1. Port {1} is already in use by another process
+                        2. Network configuration issues
+                        3. Server startup is slower than expected in this environment
+                        
+                        Troubleshooting steps:
+                        - Check if port {1} is in use:
+                          * macOS/Linux: lsof -i :{1}
+                          * Windows: netstat -ano | findstr :{1}
+                        - Check server logs for detailed error messages
+                        - If running in a slow environment, increase timeout:
+                          mvn test -D{2}=60000""",
+                elapsed,
+                port,
+                TIMEOUT_PROPERTY_KEY);
+    }
+
+    protected boolean isStarted(MockMvc mockMvc) {
         MockRequestBuilder builder = MockMvcRequestBuilders.get(MockController.PATH).responseType(String.class);
         try (HttpClassicClientResponse<String> response = mockMvc.perform(builder)) {
             String content = response.textEntity()
