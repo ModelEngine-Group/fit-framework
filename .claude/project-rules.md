@@ -398,9 +398,130 @@ Slash commands 支持参数传递，参数使用空格分隔：
 
 ---
 
+## 版权年份管理规范
+
+### 规则 5: 版权年份更新（CRITICAL）
+
+**⚠️ 重要规则**：修改任意带版权头的文件时，**必须同步更新版权年份到当前年份**。
+
+**强制要求：**
+
+1. **动态获取当前年份**
+   - **绝对不要**硬编码年份（如 2026）
+   - **必须**使用系统命令获取当前年份
+
+   ```bash
+   # 获取当前年份
+   CURRENT_YEAR=$(date +%Y)
+   echo $CURRENT_YEAR
+   ```
+
+2. **版权头格式检测与更新**
+
+   常见格式：
+
+   **格式 1：年份范围**
+   ```
+   Copyright (C) 2024-2025 FIT Framework
+   ↓ 更新为
+   Copyright (C) 2024-2026 FIT Framework  # 假设当前年份为 2026
+   ```
+
+   **格式 2：单一年份**
+   ```
+   Copyright (C) 2024 FIT Framework
+   ↓ 更新为
+   Copyright (C) 2024-2026 FIT Framework  # 假设当前年份为 2026
+   ```
+
+   **格式 3：Java 文件头**
+   ```java
+   /*
+    * Copyright (C) 2024-2025 FIT Framework
+    * All rights reserved.
+    */
+   ↓ 更新为
+   /*
+    * Copyright (C) 2024-2026 FIT Framework
+    * All rights reserved.
+    */
+   ```
+
+3. **自动化更新流程**
+
+   **标准流程（必须遵循）：**
+
+   **⚠️ 重要**：只更新**当前修改的文件**，不要批量更新所有文件！
+
+   ```bash
+   # 步骤 1: 获取当前年份
+   CURRENT_YEAR=$(date +%Y)
+
+   # 步骤 2: 检查当前修改的文件是否有版权头
+   grep -l "Copyright" <current_modified_file>
+
+   # 步骤 3: 检查版权年份
+   grep "Copyright.*[0-9]\{4\}" <current_modified_file>
+
+   # 步骤 4: 如果年份不是最新的，使用 Edit 工具更新
+   # 将 2024-2025 更新为 2024-<CURRENT_YEAR>
+   # 或将 2024 更新为 2024-<CURRENT_YEAR>
+   ```
+
+4. **仅更新当前修改的文件**
+
+   **原则**：
+   - ✅ 只更新你正在修改的文件
+   - ❌ 不要批量更新项目中所有文件
+   - ✅ 一次只处理一个文件的版权头
+   - ❌ 不要使用 find 批量查找和替换
+
+   **示例（仅供参考，查看当前修改了哪些文件）**：
+
+   ```bash
+   # 查看当前修改的文件
+   git status --short
+
+   # 查看某个修改文件的版权头
+   grep "Copyright" <specific_file_you_modified>
+   ```
+
+5. **检查清单**
+
+   - [ ] 使用 `date +%Y` 命令动态获取当前年份
+   - [ ] 检查修改的文件是否包含版权头
+   - [ ] 如果包含版权头，检查年份是否为当前年份
+   - [ ] 如果不是，使用 Edit 工具更新版权年份
+   - [ ] **绝对不要**在代码中写死年份（如 2026）
+   - [ ] 保持版权头的其他内容不变，只更新年份
+
+**完整示例：**
+
+```bash
+# ❌ 错误做法：硬编码年份
+Edit(file_path, old_string="2024-2025", new_string="2024-2026")  # 硬编码 2026！
+
+# ✅ 正确做法：动态获取年份
+# 步骤 1: 先获取当前年份
+CURRENT_YEAR=$(date +%Y)
+
+# 步骤 2: 使用变量更新版权头
+# 在 Edit 工具调用前，确保知道当前年份
+# 例如当前年份为 2026：
+Edit(file_path, old_string="Copyright (C) 2024-2025", new_string="Copyright (C) 2024-2026")
+# 或
+Edit(file_path, old_string="Copyright (C) 2024", new_string="Copyright (C) 2024-2026")
+```
+
+**为什么必须这样做：**
+- 确保版权声明的准确性和法律有效性
+- 遵循项目规范，保持一致性
+- 避免年份过时导致的合规问题
+- 动态获取年份确保在任何时间点执行都是正确的
+
 ## AI 协作任务识别和处理规则
 
-### 规则 4: 任务语义识别（CRITICAL）
+### 规则 6: 任务语义识别（CRITICAL）
 
 **⚠️ 重要规则**：当用户使用自然语言描述任务时，AI 必须进行语义分析并自动查找相关任务。
 
