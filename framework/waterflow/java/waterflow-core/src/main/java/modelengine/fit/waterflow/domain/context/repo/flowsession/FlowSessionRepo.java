@@ -8,6 +8,7 @@ package modelengine.fit.waterflow.domain.context.repo.flowsession;
 
 import modelengine.fit.waterflow.domain.context.FlatMapSourceWindow;
 import modelengine.fit.waterflow.domain.context.FlowSession;
+import modelengine.fit.waterflow.domain.context.MatchWindow;
 import modelengine.fit.waterflow.domain.context.Window;
 import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo;
 import modelengine.fitframework.inspection.Validation;
@@ -91,6 +92,19 @@ public class FlowSessionRepo {
     }
 
     /**
+     * 获取 MatchWindow 缓存 Map，用于存储和检索 MatchWindow 实例
+     *
+     * @param flowId The unique identifier of the flow.
+     * @param session The current session context.
+     * @return MatchWindow 缓存 Map
+     */
+    public static Map<UUID, MatchWindow> getMatchWindowCache(String flowId, FlowSession session) {
+        Validation.notNull(flowId, "Flow id cannot be null.");
+        Validation.notNull(session, "Session cannot be null.");
+        return getFlowSessionCache(flowId, session).getMatchWindowCache();
+    }
+
+    /**
      * Releases all resources associated with a specific flow session.
      *
      * @param flowId The unique identifier of the flow.
@@ -137,6 +151,12 @@ public class FlowSessionRepo {
          */
         private final Map<UUID, FlatMapSourceWindow> flatMapSourceWindows = new ConcurrentHashMap<>();
 
+        /**
+         * 记录流程中条件匹配节点产生的窗口信息，用于将同一批数据汇聚。
+         * 其中索引为 match window 的唯一标识。
+         */
+        private final Map<UUID, MatchWindow> matchWindows = new ConcurrentHashMap<>();
+
         private final Map<String, Integer> accOrders = new ConcurrentHashMap<>();
 
         private FlowSession getNextToSession(FlowSession session) {
@@ -163,6 +183,10 @@ public class FlowSessionRepo {
                 newWindow.getSession().begin();
                 return newWindow;
             });
+        }
+
+        private Map<UUID, MatchWindow> getMatchWindowCache() {
+            return this.matchWindows;
         }
 
         private int getNextAccOrder(String nodeId) {

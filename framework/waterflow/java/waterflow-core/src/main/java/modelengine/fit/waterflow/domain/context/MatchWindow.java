@@ -6,12 +6,13 @@
 
 package modelengine.fit.waterflow.domain.context;
 
+import modelengine.fit.waterflow.domain.context.repo.flowsession.FlowSessionRepo;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -21,8 +22,6 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 public class MatchWindow extends Window {
-    private static final Map<String, MatchWindow> all = new ConcurrentHashMap<>();
-
     private final Set<MatchWindow> arms = new HashSet<>();
 
     /**
@@ -41,22 +40,26 @@ public class MatchWindow extends Window {
     /**
      * 创建一个MatchWindow
      *
+     * @param flowId 流程ID
      * @param source 源窗口
      * @param id 窗口ID
      * @param data 窗口数据
      * @return 返回创建的MatchWindow对象
      */
-    public static synchronized MatchWindow from(Window source, UUID id, Object data) {
-        MatchWindow window = all.get(id.toString());
+    public static synchronized MatchWindow from(String flowId, Window source, UUID id, Object data) {
+        // 从 FlowSessionRepo 获取缓存
+        Map<UUID, MatchWindow> cache = FlowSessionRepo.getMatchWindowCache(flowId, source.getSession());
+
+        MatchWindow window = cache.get(id);
         if (window == null) {
             window = new MatchWindow(source, id, data);
             FlowSession session = new FlowSession(source.getSession());
             session.setWindow(window);
-            all.put(id.toString(), window);
+            cache.put(id, window);
         }
         WindowToken token = window.createToken();
         token.beginConsume();
-        List<MatchWindow> arms = all.values().stream().filter(t -> t.from == source).collect(Collectors.toList());
+        List<MatchWindow> arms = cache.values().stream().filter(t -> t.from == source).collect(Collectors.toList());
         for (MatchWindow a : arms) {
             a.setArms(arms);
         }

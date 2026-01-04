@@ -50,8 +50,8 @@ public class MatchHappen<O, D, I, F extends Flow<D>> {
             Operators.BranchProcessor<O, D, I, F> processor) {
         UUID id = UUID.randomUUID();
         State<I, D, I, F> branchStart = new State<>(this.node.publisher()
-                .just(input -> input.setSession(
-                        MatchWindow.from(input.getWindow(), id, input.getData()).getSession()), whether)
+                .just(input -> input.setSession(MatchWindow.from(this.node.processor.getStreamId(),
+                        input.getWindow(), id, input.getData()).getSession()), whether)
                 .displayAs(SpecialDisplayNode.BRANCH.name()), this.node.getFlow());
         State<O, D, ?, F> branch = processor.process(branchStart);
         this.branches.add(branch);
