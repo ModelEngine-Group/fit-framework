@@ -66,7 +66,6 @@
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
     "jdtls-lsp@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
