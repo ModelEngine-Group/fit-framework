@@ -21,6 +21,7 @@ This repo hosts the FIT framework and related engines.
 - Java formatting uses the IntelliJ profile `CodeFormatterFromIdea.xml`.
 - Public/protected Java APIs require Javadoc with `@param`/`@return` tags.
 - Class headers must include `@author` and `@since yyyy-MM-dd`.
+- When modifying any file with a copyright header, you **must first obtain the current year using the system command `date +%Y`**, then update the copyright year accordingly (e.g., if current year is 2026: `2024-2025` → `2024-2026`, `2024` → `2024-2026`).
 - Branch naming follows module prefixes and intent, e.g. `fit-feature-xxx`, `waterflow-bugfix-yyy`.
 
 ## Testing Guidelines

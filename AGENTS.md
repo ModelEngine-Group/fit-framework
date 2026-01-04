@@ -21,6 +21,7 @@
 - Java 格式化使用 IntelliJ 配置 `CodeFormatterFromIdea.xml`。
 - 公共/受保护的 Java API 需要 Javadoc，并包含 `@param`/`@return`。
 - 类头需包含 `@author` 与 `@since yyyy-MM-dd`。
+- 修改任意带版权头的文件时，需同步更新版权年份到当前年份。**必须先通过系统命令 `date +%Y` 获取当前年份**，然后根据版权头格式更新（例如若当前年份为 2026：`2024-2025` → `2024-2026`，`2024` → `2024-2026`）。
 - 分支命名使用模块前缀与意图，例如 `fit-feature-xxx`、`waterflow-bugfix-yyy`。
 
 ## 测试规范
