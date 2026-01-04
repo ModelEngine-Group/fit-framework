@@ -226,6 +226,8 @@ node0-->node1{{=}}
 
 ## 验证
 
+- 在IDEA中运行`DemoApplication`
+
 - 在浏览器栏输入：`http://localhost:8080/ai/example/chat?query=请介绍一下黑神话悟空`
 
 ```json

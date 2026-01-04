@@ -271,7 +271,57 @@ Flows.<Integer>create()
 
 向流中投递数据。这里需要注意，流的运行是异步的，offer返回的是这次运行的实例ID。
 
-## 使用限制 
+## 核心机制
+
+### FlowSessionCache 会话缓存管理
+
+FlowSessionCache 是 waterflow 的核心资源管理机制，负责统一管理流程执行过程中产生的所有会话相关资源，确保同一批数据的正确汇聚和资源的自动释放。
+
+#### 缓存结构
+
+FlowSessionCache 按照 `flowId -> sessionId -> FlowSessionCache` 的层级结构组织，每个流程会话维护独立的缓存实例，内部管理以下资源：
+
+1. **Session 流转缓存（nextToSessions）**
+   - 记录每个节点向下游节点流转数据时使用的 session
+   - 以当前窗口的唯一标识（UUID）为索引
+   - 确保同一批数据在节点间流转时使用相同的 session 进行汇聚
+
+2. **Emitter 处理缓存（nextEmitterHandleSessions）**
+   - 专门用于处理 emitter 操作的 session 缓存
+   - 为发射器操作提供独立的会话上下文
+
+3. **FlatMap 窗口缓存（flatMapSourceWindows）**
+   - 记录 flatMap 节点产生的源窗口信息
+   - 以窗口唯一标识为索引存储 `FlatMapSourceWindow` 实例
+   - 用于将 flatMap 操作产生的多个输出数据与原始输入关联
+
+4. **Match 窗口缓存（matchWindows）**
+   - 记录条件匹配节点（`conditions`）产生的窗口信息
+   - 以 MatchWindow 的唯一标识为索引
+   - 用于将条件分支产生的数据进行汇聚
+
+5. **累加器顺序缓存（accOrders）**
+   - 记录每个节点的累加操作顺序编号
+   - 以节点 ID 为索引，存储递增的序号
+
+#### 资源管理机制
+
+**自动创建与复用**
+- 首次访问某个流程会话时，FlowSessionCache 自动创建并初始化
+- 相同窗口/会话标识的资源会被复用，避免重复创建
+- 通过 `FlowSessionRepo` 提供的静态方法访问各类缓存资源
+
+**会话隔离**
+- 不同流程（flowId）的缓存完全隔离
+- 同一流程的不同会话（sessionId）也拥有独立的缓存空间
+- 避免跨会话或跨流程的数据污染
+
+**生命周期管理**
+- 会话结束时调用 `FlowSessionRepo.release(flowId, session)` 自动释放所有关联资源
+- 当某个流程的所有会话都释放后，自动清理该流程的缓存映射
+- 无需在各个窗口或会话类中实现清理逻辑，避免内存泄漏
+
+## 使用限制
 
 1. 在编排流程时需要保证节点流转上没有死循环，否则处于死循环的数据将一致在这些节点上循环流转。
 2. 数据流转的线程池最大是100个，每个节点最大同时处理16个批次的数据，每个批次的数据在每个节点上串行执行。超过限制的数据将排队等待执行。

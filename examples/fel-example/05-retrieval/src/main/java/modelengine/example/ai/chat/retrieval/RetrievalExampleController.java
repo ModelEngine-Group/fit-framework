@@ -41,6 +41,7 @@ import modelengine.fit.http.annotation.RequestParam;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.annotation.Fit;
 import modelengine.fitframework.annotation.Value;
+import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.serialization.ObjectSerializer;
 import modelengine.fitframework.util.FileUtils;
 
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 @Component
 @RequestMapping("/ai/example")
 public class RetrievalExampleController {
+    private static final Logger log = Logger.get(RetrievalExampleController.class);
     private static final String REWRITE_PROMPT =
             "作为一个向量检索助手，你的任务是结合历史记录，为”原问题“生成”检索词“，" + "生成的问题要求指向对象清晰明确，并与“原问题语言相同。\n\n"
                     + "历史记录：\n---\n" + DEFAULT_HISTORY_KEY + "---\n原问题：{{query}}\n检索词：";
@@ -85,7 +87,7 @@ public class RetrievalExampleController {
                 .others(node -> node.map(tip -> tip.freeze().get("query").text()))
                 .retrieve(new DefaultVectorRetriever(vectorStore, SearchOption.custom().topK(1).build()))
                 .synthesize(docs -> Content.from(docs.stream().map(Document::text).collect(Collectors.joining("\n\n"))))
-                .close();
+                .close(__ -> log.info("Retrieve flow completed."));
 
         AiProcessFlow<File, List<Document>> indexFlow = AiFlows.<File>create()
                 .load(new JsonFileSource(serializer, StringTemplate.create("{{question}}: {{answer}}")))
@@ -93,14 +95,19 @@ public class RetrievalExampleController {
                 .close();
         File file = FileUtils.file(this.getClass().getClassLoader().getResource("data.json"));
         notNull(file, "The data cannot be null.");
-        indexFlow.converse().offer(file);
+        indexFlow.converse()
+                .doOnError(e -> log.info("Index build error. [error={}]", e.getMessage(), e))
+                .doOnFinally(() -> log.info("Index build successfully."))
+                .offer(file);
 
         this.ragFlow = AiFlows.<String>create()
+                .just(query -> log.info("RAG flow start. [query={}]", query))
                 .map(query -> Tip.from("query", query))
                 .runnableParallel(value("context", retrieveFlow), passThrough())
                 .prompt(Prompts.history(), Prompts.human(CHAT_PROMPT))
+                .just(__ -> log.info("LLM start generation."))
                 .generate(chatFlowModel)
-                .close();
+                .close(__ -> log.info("RAG flow completed."));
     }
 
     /**
