@@ -50,6 +50,24 @@ public interface HttpClassicServer extends HttpResource {
     boolean isStarted();
 
     /**
+     * 获取 HTTP 服务实际绑定的端口。
+     * <p>注意：此方法应在服务器启动后（{@link #isStarted()} 返回 {@code true}）调用。</p>
+     * <p>如果在 {@link #bind(int)} 时传入 {@code 0}，此方法返回操作系统自动分配的实际端口。</p>
+     *
+     * @return 表示 HTTP 服务实际绑定的端口号，未绑定或未启动时返回 {@code 0}。
+     */
+    int getActualHttpPort();
+
+    /**
+     * 获取 HTTPS 服务实际绑定的端口。
+     * <p>注意：此方法应在服务器启动后（{@link #isStarted()} 返回 {@code true}）调用。</p>
+     * <p>如果在 {@link #bind(int, boolean)} 时传入 {@code 0}，此方法返回操作系统自动分配的实际端口。</p>
+     *
+     * @return 表示 HTTPS 服务实际绑定的端口号，未绑定或未启动时返回 {@code 0}。
+     */
+    int getActualHttpsPort();
+
+    /**
      * 停止 Http 服务器。
      */
     void stop();

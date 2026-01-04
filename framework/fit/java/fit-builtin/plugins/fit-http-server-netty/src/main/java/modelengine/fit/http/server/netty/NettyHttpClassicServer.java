@@ -6,7 +6,7 @@
 
 package modelengine.fit.http.server.netty;
 
-import static modelengine.fitframework.inspection.Validation.greaterThan;
+import static modelengine.fitframework.inspection.Validation.greaterThanOrEquals;
 import static modelengine.fitframework.inspection.Validation.isTrue;
 import static modelengine.fitframework.inspection.Validation.lessThanOrEquals;
 import static modelengine.fitframework.inspection.Validation.notNull;
@@ -52,6 +52,7 @@ import modelengine.fitframework.util.ThreadUtils;
 import modelengine.fitframework.value.ValueFetcher;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -94,8 +95,10 @@ public class NettyHttpClassicServer implements HttpClassicServer {
                 log.error("Failed to start netty http server.", exception);
             }));
     private final ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    private volatile int httpPort;
-    private volatile int httpsPort;
+    private volatile int httpPort = 0;
+    private volatile int httpsPort = 0;
+    private volatile boolean httpBound = false;
+    private volatile boolean httpsBound = false;
     private final boolean isGracefulExit;
     private volatile boolean isStarted = false;
     private final Lock lock = LockUtils.newReentrantLock();
@@ -131,9 +134,9 @@ public class NettyHttpClassicServer implements HttpClassicServer {
             return this;
         }
         if (isSecure) {
-            this.httpsPort = greaterThan(port,
+            this.httpsPort = greaterThanOrEquals(port,
                     0,
-                    "The port to bind to netty http server cannot be less than 1. [port={0}, isSecure={1}]",
+                    "The port to bind to netty http server cannot be negative. [port={0}, isSecure={1}]",
                     port,
                     true);
             this.httpsPort = lessThanOrEquals(port,
@@ -141,10 +144,11 @@ public class NettyHttpClassicServer implements HttpClassicServer {
                     "The port to bind to netty http server cannot be more than 65535. [port={0}, isSecure={1}]",
                     port,
                     true);
+            this.httpsBound = true;
         } else {
-            this.httpPort = greaterThan(port,
+            this.httpPort = greaterThanOrEquals(port,
                     0,
-                    "The port to bind to netty http server cannot be less than 1. [port={0}, isSecure={1}]",
+                    "The port to bind to netty http server cannot be negative. [port={0}, isSecure={1}]",
                     port,
                     false);
             this.httpPort = lessThanOrEquals(port,
@@ -152,6 +156,7 @@ public class NettyHttpClassicServer implements HttpClassicServer {
                     "The port to bind to netty http server cannot be more than 65535. [port={0}, isSecure={1}]",
                     port,
                     false);
+            this.httpBound = true;
         }
         return this;
     }
@@ -161,7 +166,7 @@ public class NettyHttpClassicServer implements HttpClassicServer {
         if (this.isStarted) {
             return;
         }
-        isTrue(this.httpPort > 0 || this.httpsPort > 0,
+        isTrue(this.httpBound || this.httpsBound,
                 "At least 1 port should be bound to netty http server. [httpPort={0}, httpsPort={1}]",
                 this.httpPort,
                 this.httpsPort);
@@ -175,6 +180,22 @@ public class NettyHttpClassicServer implements HttpClassicServer {
     @Override
     public boolean isStarted() {
         return this.isStarted;
+    }
+
+    @Override
+    public int getActualHttpPort() {
+        if (!this.isStarted || !this.httpBound) {
+            return 0;
+        }
+        return Math.max(this.httpPort, 0);
+    }
+
+    @Override
+    public int getActualHttpsPort() {
+        if (!this.isStarted || !this.httpsBound) {
+            return 0;
+        }
+        return Math.max(this.httpsPort, 0);
     }
 
     @Override
@@ -202,27 +223,32 @@ public class NettyHttpClassicServer implements HttpClassicServer {
         EventLoopGroup workerGroup = this.createWorkerGroup();
         try {
             SSLContext sslContext = null;
-            if (this.httpsPort > 0 && this.httpsConfig.isSslEnabled()) {
+            if (this.httpsBound && this.httpsConfig != null && this.httpsConfig.isSslEnabled()) {
                 sslContext = this.createSslContext();
             }
-            ChannelHandler channelHandler = new ChannelInitializerHandler(this,
-                    this.getAssemblerConfig(),
-                    this.httpsPort,
-                    sslContext,
-                    this.httpsConfig);
+            ChannelHandler channelHandler =
+                    new ChannelInitializerHandler(this, this.getAssemblerConfig(), sslContext, this.httpsConfig);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(channelHandler);
-            this.logServerStarted();
-            if (this.httpPort > 0) {
+            if (this.httpBound) {
                 Channel channel = serverBootstrap.bind(this.httpPort).sync().channel();
                 this.channelGroup.add(channel);
+                if (this.httpPort == 0) {
+                    this.httpPort = ((InetSocketAddress) channel.localAddress()).getPort();
+                    log.info("HTTP server bound to auto-assigned port: {}", this.httpPort);
+                }
             }
-            if (this.httpsPort > 0) {
+            if (this.httpsBound) {
                 Channel channel = serverBootstrap.bind(this.httpsPort).sync().channel();
                 this.channelGroup.add(channel);
+                if (this.httpsPort == 0) {
+                    this.httpsPort = ((InetSocketAddress) channel.localAddress()).getPort();
+                    log.info("HTTPS server bound to auto-assigned port: {}", this.httpsPort);
+                }
             }
+            this.logServerStarted();
             ChannelGroupFuture channelFutures = this.channelGroup.newCloseFuture();
             this.isStarted = true;
             channelFutures.sync();
@@ -353,7 +379,7 @@ public class NettyHttpClassicServer implements HttpClassicServer {
                                 "TLS_AES_128_CCM_SHA256"))
                 .build();
 
-        private final int httpsPort;
+        private final NettyHttpClassicServer server;
         private final SSLContext sslContext;
         private final ServerConfig.Secure httpsConfig;
         private final ProtocolUpgrader upgrader;
@@ -361,9 +387,9 @@ public class NettyHttpClassicServer implements HttpClassicServer {
         private final HttpClassicRequestAssembler assembler;
         private final HttpClassicRequestAssembler secureAssembler;
 
-        ChannelInitializerHandler(HttpClassicServer server, HttpClassicRequestAssembler.Config assemblerConfig,
-                int httpsPort, SSLContext sslContext, ServerConfig.Secure httpsConfig) {
-            this.httpsPort = httpsPort;
+        ChannelInitializerHandler(NettyHttpClassicServer server, HttpClassicRequestAssembler.Config assemblerConfig,
+                SSLContext sslContext, ServerConfig.Secure httpsConfig) {
+            this.server = server;
             this.sslContext = sslContext;
             this.httpsConfig = httpsConfig;
             this.upgrader = new ProtocolUpgrader(server,
@@ -381,7 +407,8 @@ public class NettyHttpClassicServer implements HttpClassicServer {
         @Override
         protected void initChannel(SocketChannel ch) {
             ChannelPipeline pipeline = ch.pipeline();
-            if (ch.localAddress().getPort() == this.httpsPort && this.sslContext != null
+            int httpsPort = this.server.httpsPort;
+            if (ch.localAddress().getPort() == httpsPort && this.sslContext != null && this.httpsConfig != null
                     && this.httpsConfig.isSslEnabled()) {
                 pipeline.addLast(new SslHandler(this.buildSslEngine(this.sslContext, this.httpsConfig)));
                 pipeline.addLast(new HttpServerCodec());

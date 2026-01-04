@@ -6,7 +6,7 @@
 
 package modelengine.fit.server.http;
 
-import static modelengine.fitframework.inspection.Validation.greaterThan;
+import static modelengine.fitframework.inspection.Validation.greaterThanOrEquals;
 import static modelengine.fitframework.inspection.Validation.notNull;
 
 import modelengine.fit.http.server.HttpClassicServer;
@@ -67,7 +67,7 @@ public class FitHttpServer implements FitServer, FitRuntimeStartedObserver {
         if (this.httpsOpen) {
             Optional<ServerConfig.Secure> secure = httpConfig.secure();
             this.httpsPort = secure.flatMap(ServerConfig.Secure::port).orElse(DEFAULT_HTTPS_PORT);
-            greaterThan(this.httpsPort, 0, "The server https port must be positive.");
+            greaterThanOrEquals(this.httpsPort, 0, "The server https port must be non-negative.");
             log.debug("Config 'server.https.port' is {}.", this.httpsPort);
             this.toRegisterHttpsPort = secure.flatMap(ServerConfig.Secure::toRegisterPort).orElse(this.httpsPort);
             log.debug("Config 'server.https.to-register-port' is {}.", this.toRegisterHttpsPort);
@@ -78,7 +78,7 @@ public class FitHttpServer implements FitServer, FitRuntimeStartedObserver {
         this.httpOpen = httpConfig.isProtocolEnabled() || !this.httpsOpen;
         if (this.httpOpen) {
             this.httpPort = httpConfig.port().orElse(DEFAULT_HTTP_PORT);
-            greaterThan(this.httpPort, 0, "The server http port must be positive.");
+            greaterThanOrEquals(this.httpPort, 0, "The server http port must be non-negative.");
             log.debug("Config 'server.http.port' is {}.", this.httpPort);
             this.toRegisterHttpPort = httpConfig.toRegisterPort().orElse(this.httpPort);
             log.debug("Config 'server.http.to-register-port' is {}.", this.toRegisterHttpPort);

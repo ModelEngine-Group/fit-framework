@@ -29,9 +29,11 @@ import modelengine.fitframework.test.annotation.EnableMockMvc;
 import modelengine.fitframework.test.domain.TestContext;
 import modelengine.fitframework.test.domain.mvc.MockMvc;
 import modelengine.fitframework.util.DisposedCallback;
+import modelengine.fit.http.server.HttpClassicServer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -59,12 +61,13 @@ class MockMvcListenerTest {
         int port = 65530;
         System.setProperty(TIMEOUT_KEY, "1000");
         StubBeanRegistry registry = new StubBeanRegistry();
-        TestContext context = createContext(registry);
+        HttpClassicServer server = mockHttpServer(false, 0);
+        TestContext context = createContext(registry, server);
         MockMvcListener listener = new MockMvcListenerStub(port, () -> false);
 
         assertThatThrownBy(() -> listener.beforeTestClass(context)).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Mock MVC server failed to start within")
-                .hasMessageContaining("port=" + port)
+                .hasMessageContaining("auto-assigned port")
                 .hasMessageContaining(TIMEOUT_KEY);
     }
 
@@ -73,7 +76,8 @@ class MockMvcListenerTest {
         int port = 65531;
         System.setProperty(TIMEOUT_KEY, "1000");
         StubBeanRegistry registry = new StubBeanRegistry();
-        TestContext context = createContext(registry);
+        HttpClassicServer server = mockHttpServer(true, port);
+        TestContext context = createContext(registry, server);
         MockMvcListener listener = new MockMvcListenerStub(port, new DelayedStart(150));
 
         listener.beforeTestClass(context);
@@ -106,12 +110,24 @@ class MockMvcListenerTest {
     }
 
     private TestContext createContext(StubBeanRegistry registry) {
-        StubRootPlugin plugin = new StubRootPlugin(registry);
+        StubRootPlugin plugin = new StubRootPlugin(registry, mockHttpServer(false, 0));
         return new TestContext(MockMvcEnabledTest.class, plugin, Collections.emptyList());
     }
 
+    private TestContext createContext(StubBeanRegistry registry, HttpClassicServer server) {
+        StubRootPlugin plugin = new StubRootPlugin(registry, server);
+        return new TestContext(MockMvcEnabledTest.class, plugin, Collections.emptyList());
+    }
+
+    private static HttpClassicServer mockHttpServer(boolean started, int port) {
+        HttpClassicServer server = Mockito.mock(HttpClassicServer.class);
+        Mockito.when(server.isStarted()).thenReturn(started);
+        Mockito.when(server.getActualHttpPort()).thenReturn(port);
+        return server;
+    }
+
     private long readStartupTimeout() throws Exception {
-        MockMvcListener listener = new MockMvcListener(8080);
+        MockMvcListener listener = new MockMvcListener();
         Method method = MockMvcListener.class.getDeclaredMethod("getStartupTimeout");
         method.setAccessible(true);
         return (long) method.invoke(listener);
@@ -121,12 +137,12 @@ class MockMvcListenerTest {
         private final java.util.function.BooleanSupplier startedSupplier;
 
         private MockMvcListenerStub(int port, java.util.function.BooleanSupplier startedSupplier) {
-            super(port);
+            super();
             this.startedSupplier = startedSupplier;
         }
 
         @Override
-        protected boolean isStarted(MockMvc mockMvc) {
+        protected boolean isStarted(MockMvc mockMvc, int port) {
             return this.startedSupplier.getAsBoolean();
         }
     }
@@ -191,10 +207,12 @@ class MockMvcListenerTest {
     private static final class StubBeanContainer implements BeanContainer {
         private final StubRootPlugin plugin;
         private final StubBeanRegistry registry;
+        private final HttpClassicServer server;
 
-        private StubBeanContainer(StubRootPlugin plugin, StubBeanRegistry registry) {
+        private StubBeanContainer(StubRootPlugin plugin, StubBeanRegistry registry, HttpClassicServer server) {
             this.plugin = plugin;
             this.registry = registry;
+            this.server = server;
         }
 
         @Override
@@ -264,7 +282,7 @@ class MockMvcListenerTest {
 
         @Override
         public Beans beans() {
-            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+            return new StubBeans(this.server);
         }
 
         @Override
@@ -297,8 +315,8 @@ class MockMvcListenerTest {
     private static final class StubRootPlugin implements RootPlugin {
         private final StubBeanContainer container;
 
-        private StubRootPlugin(StubBeanRegistry registry) {
-            this.container = new StubBeanContainer(this, registry);
+        private StubRootPlugin(StubBeanRegistry registry, HttpClassicServer server) {
+            this.container = new StubBeanContainer(this, registry, server);
         }
 
         @Override
@@ -411,6 +429,67 @@ class MockMvcListenerTest {
 
         @Override
         public void unsubscribe(DisposedCallback callback) {}
+    }
+
+    private static final class StubBeans implements BeanContainer.Beans {
+        private final HttpClassicServer server;
+
+        private StubBeans(HttpClassicServer server) {
+            this.server = server;
+        }
+
+        @Override
+        public <T> T get(Class<T> beanClass, Object... initialArguments) {
+            if (beanClass.isInstance(this.server)) {
+                return beanClass.cast(this.server);
+            }
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> T get(Type beanType, Object... initialArguments) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> T get(String beanName, Object... initialArguments) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> T lookup(Class<T> beanClass, Object... initialArguments) {
+            return get(beanClass, initialArguments);
+        }
+
+        @Override
+        public <T> T lookup(Type beanType, Object... initialArguments) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> T lookup(String beanName, Object... initialArguments) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> java.util.Map<String, T> list(Class<T> beanClass) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> java.util.Map<String, T> list(Type beanType) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> java.util.Map<String, T> all(Class<T> beanClass) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
+
+        @Override
+        public <T> java.util.Map<String, T> all(Type beanType) {
+            throw new UnsupportedOperationException("Not needed for MockMvcListenerTest.");
+        }
     }
 
     private static final class StubPluginCollection implements PluginCollection {
