@@ -19,7 +19,6 @@ import modelengine.fitframework.test.domain.listener.ScanPackageListener;
 import modelengine.fitframework.test.domain.listener.SqlExecuteListener;
 import modelengine.fitframework.test.domain.listener.TestListener;
 import modelengine.fitframework.test.domain.resolver.TestContextConfiguration;
-import modelengine.fitframework.test.domain.util.TestUtils;
 import modelengine.fitframework.util.ThreadUtils;
 
 import java.lang.reflect.Method;
@@ -52,12 +51,12 @@ public class DefaultFitTestService implements FitTestService {
      */
     public DefaultFitTestService(Class<?> clazz) {
         Validation.notNull(clazz, "The test class to create fit test manager cannot be null.");
-        int port = TestUtils.getLocalAvailablePort();
+        int port = 0;
         List<TestListener> listeners = Arrays.asList(new ResolverListener(),
                 new ScanPackageListener(),
                 new InjectFieldTestListener.ByFit(),
                 new InjectFieldTestListener.BySpy(),
-                new MockMvcListener(port),
+                new MockMvcListener(),
                 new DataSourceListener(),
                 new SqlExecuteListener(),
                 new MybatisTestListener());
