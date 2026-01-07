@@ -12,9 +12,11 @@ import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo
 import modelengine.fit.waterflow.domain.context.repo.flowsession.FlowSessionRepo;
 import modelengine.fit.waterflow.domain.emitters.EmitterListener;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 数据发布者
@@ -150,8 +152,9 @@ public interface Publisher<I> extends StreamIdentity, EmitterListener<I, FlowSes
      * offer
      *
      * @param contexts contexts
+     * @param preSendCallback 在数据发送到下一个节点前触发当前节点完成回调操作
      */
-    void offer(List<FlowContext<I>> contexts);
+    void offer(List<FlowContext<I>> contexts, Consumer<PreSendCallbackInfo<I>> preSendCallback);
 
     /**
      * offer

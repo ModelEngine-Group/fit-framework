@@ -85,4 +85,28 @@ public interface FlowTraceRepo {
      * @param status trace状态 {@link FlowTraceStatus}
      */
     void updateStatus(List<String> ids, String status);
+
+    /**
+     * 查找运行中的链路标识。
+     *
+     * @param applications 应用标识列表。
+     * @return 链路标识列表。
+     */
+    List<String> findRunningTrace(List<String> applications);
+
+    /**
+     * 根据traceId删除trace
+     *
+     * @param traceIds traceId列表
+     */
+    void deleteByIdList(List<String> traceIds);
+
+    /**
+     * 查询超期并且已完成的链路唯一标识。
+     *
+     * @param expiredDays 表示超期天数的 {@code int}。
+     * @param limit 表示查询限制的 {@code int}。
+     * @return 表示链路唯一标识列表的 {@link List}{@code <}{@link String}{@code >}。
+     */
+    List<String> getExpiredTrace(int expiredDays, int limit);
 }

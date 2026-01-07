@@ -11,10 +11,16 @@ import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextMess
 import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo;
 import modelengine.fit.waterflow.domain.context.repo.flowlock.FlowLocks;
 import modelengine.fit.waterflow.domain.enums.FlowNodeType;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
+import modelengine.fit.waterflow.domain.stream.operators.Operators;
+import modelengine.fit.waterflow.domain.stream.reactive.Subscription;
 import modelengine.fit.waterflow.domain.utils.UUIDUtil;
 import modelengine.fitframework.util.CollectionUtils;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -30,13 +36,17 @@ public class ConditionsNode<I> extends Node<I, I> {
      * 1->1处理节点
      *
      * @param streamId stream流程ID
+     * @param processor 对应处理器
      * @param repo 上下文持久化repo，默认在内存
      * @param messenger 上下文事件发送器，默认在内存
      * @param locks 流程锁
      */
-    public ConditionsNode(String streamId, FlowContextRepo repo, FlowContextMessenger messenger, FlowLocks locks) {
-        super(streamId, FlowContext::getData, repo, messenger, locks, () -> initFrom(streamId, repo, messenger, locks));
-        super.id = "condition:" + UUIDUtil.uuid();
+    public ConditionsNode(String streamId, Operators.Just<FlowContext<I>> processor, FlowContextRepo repo,
+            FlowContextMessenger messenger, FlowLocks locks) {
+        super(streamId, i -> {
+            processor.process(i);
+            return i.getData();
+        }, repo, messenger, locks, () -> initFrom(streamId, repo, messenger, locks));
     }
 
     /**
@@ -44,14 +54,15 @@ public class ConditionsNode<I> extends Node<I, I> {
      *
      * @param streamId stream流程ID
      * @param nodeId stream流程节点ID
+     * @param processor 对应处理器
      * @param repo 上下文持久化repo，默认在内存
      * @param messenger 上下文事件发送器，默认在内存
      * @param locks 流程锁
      * @param nodeType 节点类型
      */
-    public ConditionsNode(String streamId, String nodeId, FlowContextRepo repo, FlowContextMessenger messenger,
-            FlowLocks locks, FlowNodeType nodeType) {
-        this(streamId, repo, messenger, locks);
+    public ConditionsNode(String streamId, String nodeId, Operators.Just<FlowContext<I>> processor,
+            FlowContextRepo repo, FlowContextMessenger messenger, FlowLocks locks, FlowNodeType nodeType) {
+        this(streamId, processor, repo, messenger, locks);
         this.id = nodeId;
         this.nodeType = nodeType;
     }
@@ -77,12 +88,19 @@ public class ConditionsNode<I> extends Node<I, I> {
         }
 
         @Override
-        public void offer(List<FlowContext<I>> contexts) {
-            this.getSubscriptions().forEach(subscription -> {
+        public void offer(List<FlowContext<I>> contexts, Consumer<PreSendCallbackInfo<I>> preSendCallback) {
+            Map<Subscription<I>, List<FlowContext<I>>> matchedContexts = new LinkedHashMap<>();
+            this.getSubscriptions().forEach(w -> {
                 List<FlowContext<I>> matched = contexts.stream()
-                        .filter(context -> subscription.getWhether().is(context.getData()))
+                        .filter(c -> w.getWhether().is(c.getData()))
+                        .peek(c -> c.setNextPositionId(w.getId()))
                         .collect(Collectors.toList());
                 matched.forEach(contexts::remove);
+                matchedContexts.put(w, matched);
+            });
+            PreSendCallbackInfo<I> callbackInfo = new PreSendCallbackInfo<>(matchedContexts, contexts);
+            preSendCallback.accept(callbackInfo);
+            matchedContexts.forEach((subscription, matched) -> {
                 // For order-sensitive data, directly synchronously executes the next conditional branch node.
                 if (CollectionUtils.isNotEmpty(matched) && matched.get(0).getSession().preserved()) {
                     subscription.process(matched);

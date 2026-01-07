@@ -853,7 +853,7 @@ class WaterFlowsTest {
             }).error((error, retryable, contexts) -> {
                 contexts.get(0).getData().first(120);
                 contexts.forEach(context -> context.setStatus(READY));
-                retryable.retry(contexts);
+                retryable.retry(error, contexts);
             }).close(callback -> output.set(callback.get().getData())).offer(new TestData());
             FlowsTestUtil.waitUntil(() -> output.get() != null, 2000);
             assertEquals(120, output.get().first);
@@ -869,7 +869,7 @@ class WaterFlowsTest {
             }).close(callback -> output.set(callback.get().getData()), (exception, retryable, contexts) -> {
                 ObjectUtils.<TestData>cast(contexts.get(0).getData()).first(120);
                 contexts.forEach(context -> context.setStatus(READY));
-                retryable.retry(contexts);
+                retryable.retry(exception, contexts);
             }).offer(new TestData());
             FlowsTestUtil.waitFortyMillis(Collections::emptyList);
             assertEquals(120, output.get().first);

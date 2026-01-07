@@ -44,6 +44,10 @@ public class Blocks {
          * @param contexts 待处理的contexts列表
          */
         public void process(List<FlowContext<I>> contexts) {
+            contexts.forEach(context -> context.getTraceId()
+                    .forEach(traceId -> this.target.getFlowContextRepo()
+                            .getTraceOwner()
+                            .own(traceId, context.getSession().getId())));
             this.target.accept(ProcessType.PROCESS, contexts);
         }
     }

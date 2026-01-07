@@ -255,7 +255,7 @@ public class Window implements Completable {
             cs.add(completeContext);
             List contexts = node.getProcessMode().process(node, cs);
             if (node instanceof Processor) {
-                ((Processor<?, ?>) node).offer(contexts);
+                ((Processor<?, ?>) node).offer(contexts, __ -> {});
             }
             completeContext = null;
         }

@@ -15,6 +15,7 @@ import modelengine.fitframework.thread.DefaultThreadFactory;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,26 +32,12 @@ public final class FlowExecutors {
 
     private static final Logger LOG = Logger.get(FlowExecutors.class);
 
-    private static final ThreadPoolExecutor THREAD_POOL;
+    private static final PriorityThreadPool THREAD_POOL;
 
     private static AtomicInteger currentConcurrency = new AtomicInteger(0);
 
     static {
-        ThreadPoolExecutor newPool = ThreadPoolExecutor.custom()
-                .threadPoolName("flow-node-thread-pool")
-                .corePoolSize(CORE_THREAD_COUNT)
-                .maximumPoolSize(MAX_THREAD_COUNT)
-                .workQueueCapacity(0)
-                .keepAliveTime(60L, SECONDS)
-                .isDaemonThread(true)
-                .exceptionHandler((thread, throwable) -> {
-                    LOG.error("The node pool run failed, error cause: {}, message: {}.", throwable.getCause(),
-                            throwable.getMessage());
-                    LOG.debug("The node pool run failed details: ", throwable);
-                })
-                .rejectedExecutionHandler(new AbortPolicy())
-                .build();
-        THREAD_POOL = newPool;
+        THREAD_POOL = PriorityThreadPool.build("flow-node-thread-pool", CORE_THREAD_COUNT, MAX_THREAD_COUNT);
     }
 
     /**
@@ -58,7 +45,7 @@ public final class FlowExecutors {
      *
      * @return 线程池对象
      */
-    public static ThreadPoolExecutor getThreadPool() {
+    public static PriorityThreadPool getThreadPool() {
         return THREAD_POOL;
     }
 

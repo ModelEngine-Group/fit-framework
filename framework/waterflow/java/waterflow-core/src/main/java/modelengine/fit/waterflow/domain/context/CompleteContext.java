@@ -27,7 +27,7 @@ public class CompleteContext extends FlowContext {
      */
     public CompleteContext(FlowContext context, String position) {
         super(context.getStreamId(), context.getRootId(), null, context.getTraceId(), position,
-                context.getParallel(), context.getParallelMode(), context.getSession());
+                context.getParallel(), context.getParallelMode(), context.getSession(), context.getCreateAt());
         this.batchId = context.getBatchId();
         this.setIndex(Constants.NOT_PRESERVED_INDEX);
     }
