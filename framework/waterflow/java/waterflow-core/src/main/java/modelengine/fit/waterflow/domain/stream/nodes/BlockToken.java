@@ -44,7 +44,7 @@ public abstract class BlockToken<T> extends IdGenerator {
             }
         }
         List<FlowContext<T>> cloned = verified.stream()
-                .map(context -> context.generate(context.getData(), context.getPosition())
+                .map(context -> context.generate(context.getData(), context.getPosition(), context.getCreateAt())
                         .batchId(context.getBatchId()))
                 .collect(Collectors.toList());
         this.publisher.getFlowContextRepo().save(cloned);
@@ -52,7 +52,9 @@ public abstract class BlockToken<T> extends IdGenerator {
                 .collect(Collectors.groupingBy(item -> item.getSession().getId(), LinkedHashMap::new,
                         Collectors.toList()))
                 .values()
-                .forEach(this.publisher::offer);
+                .forEach(contexts -> {
+                    this.publisher.offer(contexts, __ -> {});
+                });
     }
 
     /**

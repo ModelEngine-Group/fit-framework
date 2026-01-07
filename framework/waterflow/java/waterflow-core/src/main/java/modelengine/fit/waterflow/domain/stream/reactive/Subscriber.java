@@ -11,10 +11,12 @@ import modelengine.fit.waterflow.domain.context.FlowSession;
 import modelengine.fit.waterflow.domain.context.repo.flowcontext.FlowContextRepo;
 import modelengine.fit.waterflow.domain.emitters.Emitter;
 import modelengine.fit.waterflow.domain.enums.ProcessType;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 import modelengine.fit.waterflow.domain.stream.nodes.Blocks;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 数据接受者，processor数据在接收者处的处理方式
@@ -104,8 +106,9 @@ public interface Subscriber<I, O> extends StreamIdentity, Emitter<O, FlowSession
      * onNext
      *
      * @param batchId batchId
+     * @param preSendCallback 在数据发送到下一个节点前触发当前节点完成回调操作
      */
-    void onNext(String batchId);
+    void onNext(String batchId, Consumer<PreSendCallbackInfo<O>> preSendCallback);
 
     /**
      * afterProcess
@@ -157,6 +160,27 @@ public interface Subscriber<I, O> extends StreamIdentity, Emitter<O, FlowSession
      * @param handler handler
      */
     void onGlobalError(Operators.ErrorHandler handler);
+
+    /**
+     * 设置获取节点执行前信息的回调
+     *
+     * @param handler handler
+     */
+    void onGlobalBefore(Operators.Just<Callback<FlowContext<I>>> handler);
+
+    /**
+     * 设置获取节点执行后信息的回调
+     *
+     * @param handler handler
+     */
+    void onGlobalAfter(Operators.Just<Callback<FlowContext<O>>> handler);
+
+    /**
+     * 设置节点优先级
+     *
+     * @param order 优先级
+     */
+    void setOrder(int order);
 
     /**
      * 获取错误处理器列表

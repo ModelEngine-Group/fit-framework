@@ -8,16 +8,20 @@ package modelengine.fit.waterflow.domain.context.repo.flowcontext;
 
 import modelengine.fit.waterflow.domain.context.FlowContext;
 import modelengine.fit.waterflow.domain.context.FlowTrace;
+import modelengine.fit.waterflow.domain.context.TraceOwner;
 import modelengine.fit.waterflow.domain.enums.FlowNodeStatus;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
+import modelengine.fitframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +36,55 @@ public class FlowContextMemoRepo implements FlowContextRepo {
     private final ConcurrentLinkedHashMap<String, FlowContext> contextsMap = new ConcurrentLinkedHashMap<>();
 
     private final boolean isReserveTerminal;
+
+    private final TraceOwner traceOwner = new TraceOwner() {
+        @Override
+        public void own(String traceId, String transId) {
+        }
+
+        @Override
+        public boolean tryOwn(String traceId, String transId) {
+            return true;
+        }
+
+        @Override
+        public void release(String traceId) {
+        }
+
+        @Override
+        public boolean isOwn(String traceId) {
+            return true;
+        }
+
+        @Override
+        public boolean isAnyOwn(Set<String> traceIds) {
+            return true;
+        }
+
+        @Override
+        public List<String> getTraces() {
+            return List.of();
+        }
+
+        @Override
+        public List<String> getTraces(String targetTransId) {
+            return List.of();
+        }
+
+        @Override
+        public void removeInvalidTrace(Lock invalidLock) {
+        }
+
+        @Override
+        public boolean isInProtectTime(String traceId) {
+            return false;
+        }
+    };
+
+    @Override
+    public TraceOwner getTraceOwner() {
+        return this.traceOwner;
+    }
 
     /**
      * 构造方法
@@ -75,6 +128,11 @@ public class FlowContextMemoRepo implements FlowContextRepo {
     }
 
     @Override
+    public <T> List<FlowContext<T>> findWithoutFlowDataByTraceId(String traceId) {
+        throw new IllegalStateException("Not support");
+    }
+
+    @Override
     public <T> List<FlowContext<T>> getContextsByTrace(String traceId) {
         return query(stream -> stream
                 .filter(context -> context.getTraceId().contains(traceId)));
@@ -91,6 +149,21 @@ public class FlowContextMemoRepo implements FlowContextRepo {
                 this.contextsMap.remove(context.getId());
             } else {
                 this.contextsMap.put(context.getId(), context);
+            }
+        });
+    }
+
+    @Override
+    public <T> void updateFlowDataAndToBatch(List<FlowContext<T>> contexts) {
+        save(contexts);
+    }
+
+    @Override
+    public synchronized <T> void updateFlowData(Map<String, T> flowDataList) {
+        flowDataList.forEach((contextId, data) -> {
+            FlowContext<T> flowContext = ObjectUtils.cast(this.contextsMap.get(contextId));
+            if (flowContext != null) {
+                flowContext.setData(data);
             }
         });
     }
@@ -123,6 +196,14 @@ public class FlowContextMemoRepo implements FlowContextRepo {
     @Override
     public <T> List<FlowContext<T>> getByIds(List<String> ids) {
         return ids.stream().map(i -> (FlowContext<T>) contextsMap.get(i)).collect(Collectors.toList());
+    }
+
+    @Override
+    public <T> List<FlowContext<T>> getByToBatch(List<String> toBatchIds) {
+        return query(stream -> stream
+                .filter(context -> context.getStatus().equals(FlowNodeStatus.PENDING))
+                .filter(FlowContext::isSent)
+                .filter(context -> toBatchIds.contains(context.getToBatch())));
     }
 
     @Override

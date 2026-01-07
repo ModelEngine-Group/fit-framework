@@ -14,6 +14,7 @@ import modelengine.fit.waterflow.domain.context.repo.flowlock.FlowLocks;
 import modelengine.fit.waterflow.domain.enums.FlowNodeType;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
 import modelengine.fit.waterflow.domain.flow.Flow;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.domain.stream.reactive.NodeDisplay;
 import modelengine.fit.waterflow.domain.stream.reactive.Processor;
@@ -24,6 +25,7 @@ import modelengine.fit.waterflow.domain.utils.Identity;
 import modelengine.fitframework.inspection.Validation;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -176,8 +178,8 @@ public class Node<T, R> extends To<T, R> implements Processor<T, R>, Identity {
     }
 
     @Override
-    public void offer(List<FlowContext<R>> contexts) {
-        this.publisher.offer(contexts);
+    public void offer(List<FlowContext<R>> contexts, Consumer<PreSendCallbackInfo<R>> preSendCallback) {
+        this.publisher.offer(contexts, preSendCallback);
     }
 
     @Override
@@ -215,10 +217,11 @@ public class Node<T, R> extends To<T, R> implements Processor<T, R>, Identity {
      * 把该publisher里所有的数据都publish到subscription
      *
      * @param batchId 批次id
+     * @param preSendCallback 在数据发送到下一个节点前触发当前节点完成回调操作
      */
     @Override
-    public void onNext(String batchId) {
-        this.publisher.offer(this.nextContexts(batchId));
+    public void onNext(String batchId, Consumer<PreSendCallbackInfo<R>> preSendCallback) {
+        this.publisher.offer(this.nextContexts(batchId), preSendCallback);
     }
 
     /**

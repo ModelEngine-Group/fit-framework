@@ -50,10 +50,11 @@ public interface FlowContextMessenger {
     /**
      * 发送回调函数事件到引擎外部
      *
+     * @param callback 回调函数.
      * @param contexts 流程实例执行过程产生的contexts
      * @param <I> 流程实例执行时的入参数据类型，用于泛型推倒
      */
-    <I> void sendCallback(List<FlowContext<I>> contexts);
+    <I> void sendCallback(Object callback, List<FlowContext<I>> contexts);
 
     /**
      * Directly processes a list of flow contexts through the specified subscriber.

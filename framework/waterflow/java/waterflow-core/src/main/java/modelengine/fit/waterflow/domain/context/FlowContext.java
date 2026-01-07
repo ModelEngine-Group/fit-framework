@@ -143,6 +143,13 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
     private Integer index;
 
     /**
+     * 当前context接下来要走到位置：可以是连线或者节点id
+     */
+    @Setter
+    @Getter
+    private String nextPositionId;
+
+    /**
      * 创建一个 {@link FlowContext} 实例。
      *
      * @param streamId 表示所处流唯一标识的 {@link String}。
@@ -154,7 +161,7 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
      */
     public FlowContext(String streamId, String rootId, T data, Set<String> traceId, String position,
             FlowSession session) {
-        this(streamId, rootId, data, traceId, position, "", "", session);
+        this(streamId, rootId, data, traceId, position, "", "", session, LocalDateTime.now());
     }
 
     /**
@@ -167,10 +174,11 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
      * @param position 表示上下文当前所处的位置的 {@link String}。
      * @param parallel 表示并行节点唯一标识的 {@link String}。
      * @param parallelMode 表示并行模式的 {@link String}。
+     * @param createAt 表示创建时间的 {@link LocalDateTime}。
      * @param session 表示上下文会话信息的 {@link FlowSession}。
      */
     public FlowContext(String streamId, String rootId, T data, Set<String> traceId, String position, String parallel,
-            String parallelMode, FlowSession session) {
+            String parallelMode, FlowSession session, LocalDateTime createAt) {
         this.streamId = streamId;
         this.rootId = rootId;
         this.data = data;
@@ -179,7 +187,7 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
         this.position = position;
         this.parallel = parallel;
         this.parallelMode = parallelMode;
-        this.createAt = LocalDateTime.now();
+        this.createAt = createAt;
         this.session = session;
         this.index = this.createIndex(); // 0起始，说明保序
     }
@@ -266,9 +274,10 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
      * @param <R> 表示返回值类型的泛型参数。
      * @param data 表示处理后数据的 {@link R}。
      * @param position 表示处理后所处的节点的 {@link String}。
+     * @param createAt 表示创建时间的 {@link LocalDateTime}。
      * @return 表示新的上下文的 {@link FlowContext}{@code <}{@link R}{@code >}。
      */
-    public <R> FlowContext<R> generate(R data, String position) {
+    public <R> FlowContext<R> generate(R data, String position, LocalDateTime createAt) {
         FlowContext<R> context = new FlowContext<>(this.streamId,
                 this.rootId,
                 data,
@@ -276,7 +285,8 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
                 this.position,
                 this.parallel,
                 this.parallelMode,
-                this.session);
+                this.session,
+                createAt);
         context.position = position;
         context.previous = this.id;
         context.batchId = this.batchId;
@@ -293,7 +303,9 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
      * @return 表示新的上下文的 {@link List}{@code <}{@link FlowContext}{@code <}{@link R}{@code >}{@code >}。
      */
     public <R> List<FlowContext<R>> generate(List<R> dataList, String position) {
-        return dataList.stream().map(data -> this.generate(data, position)).collect(Collectors.toList());
+        return dataList.stream()
+                .map(data -> this.generate(data, position, LocalDateTime.now()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -312,7 +324,8 @@ public class FlowContext<T> extends IdGenerator implements StateContext {
                 this.position,
                 this.parallel,
                 this.parallelMode,
-                this.session);
+                this.session,
+                LocalDateTime.now());
         context.previous = this.previous;
         context.status = this.status;
         context.id = id;

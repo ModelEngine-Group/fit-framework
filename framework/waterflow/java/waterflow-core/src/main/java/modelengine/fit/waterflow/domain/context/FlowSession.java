@@ -76,7 +76,7 @@ public class FlowSession extends IdGenerator implements StateContext {
      * @param preserved 是否保序
      */
     public FlowSession(boolean preserved) {
-        this(UUID.randomUUID().toString(), preserved);
+        this.preserved = preserved;
     }
 
     /**

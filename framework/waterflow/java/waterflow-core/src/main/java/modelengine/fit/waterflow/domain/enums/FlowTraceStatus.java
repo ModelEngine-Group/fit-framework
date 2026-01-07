@@ -40,6 +40,11 @@ public enum FlowTraceStatus {
     ERROR,
 
     /**
+     * 部分失败
+     */
+    PARTIAL_ERROR,
+
+    /**
      * 已终止
      */
     TERMINATE;

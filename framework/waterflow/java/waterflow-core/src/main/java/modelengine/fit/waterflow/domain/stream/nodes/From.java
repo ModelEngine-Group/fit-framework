@@ -7,6 +7,7 @@
 package modelengine.fit.waterflow.domain.stream.nodes;
 
 import static modelengine.fit.waterflow.ErrorCodes.FLOW_ENGINE_INVALID_MANUAL_TASK;
+import static modelengine.fit.waterflow.ErrorCodes.FLOW_ENGINE_INVALID_NODE_ID;
 
 import modelengine.fit.waterflow.domain.context.FlatMapSourceWindow;
 import modelengine.fit.waterflow.domain.context.FlatMapWindow;
@@ -23,6 +24,7 @@ import modelengine.fit.waterflow.domain.enums.FlowTraceStatus;
 import modelengine.fit.waterflow.domain.enums.ParallelMode;
 import modelengine.fit.waterflow.domain.enums.SpecialDisplayNode;
 import modelengine.fit.waterflow.domain.states.DataStart;
+import modelengine.fit.waterflow.domain.stream.callbacks.PreSendCallbackInfo;
 import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.domain.stream.reactive.Processor;
 import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
@@ -41,9 +43,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -124,7 +129,7 @@ public class From<I> extends IdGenerator implements Publisher<I> {
      */
     @Override
     public Processor<I, I> conditions(Operators.Whether<I> whether) {
-        ConditionsNode<I> node = new ConditionsNode<>(this.getStreamId(), repo, messenger, locks);
+        ConditionsNode<I> node = new ConditionsNode<>(this.getStreamId(), i -> {}, repo, messenger, locks);
         this.subscribe(node, whether);
         return node.displayAs(SpecialDisplayNode.CONDITION.name());
     }
@@ -257,6 +262,7 @@ public class From<I> extends IdGenerator implements Publisher<I> {
      */
     public String offer(I[] data, FlowSession session) {
         FlowTrace trace = new FlowTrace();
+        this.repo.getTraceOwner().own(trace.getId(), session.getId());
         Set<String> traceId = new HashSet<>();
         traceId.add(trace.getId());
         Window window = session.begin();
@@ -266,9 +272,9 @@ public class From<I> extends IdGenerator implements Publisher<I> {
             window.createToken();
             return context;
         }).collect(Collectors.toList());
-        List<FlowContext<I>> after = this.startNodeMarkAsHandled(contexts, trace);
-        after.forEach(this::generateIndex);
-        this.offer(after);
+        List<FlowContext<I>> afters = this.startNodeMarkAsHandled(contexts, trace);
+        afters.forEach(this::generateIndex);
+        this.offer(afters, __ -> {});
         return trace.getId();
     }
 
@@ -320,9 +326,10 @@ public class From<I> extends IdGenerator implements Publisher<I> {
      * 这个数据可以来源于数据最开始，也可以是接受者处理完的数据
      *
      * @param contexts 数据上下文，里面有要处理的数据，还有其他流处理状态信息
+     * @param preSendCallback 在数据发送到下一个节点前触发当前节点完成回调操作
      */
     @Override
-    public void offer(List<FlowContext<I>> contexts) {
+    public void offer(List<FlowContext<I>> contexts, Consumer<PreSendCallbackInfo<I>> preSendCallback) {
         if (CollectionUtils.isEmpty(contexts)) {
             return;
         }
@@ -346,9 +353,26 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         }
 
         // qualifiedWhens表示的与from节点连接的所有事件，条件节点符合条件的事件在这里筛选，在事件上处理需要下发的context
-        qualifiedWhens.forEach(when -> when.cache(contexts.stream()
-                .filter(context -> when.getWhether().is(context.getData()))
-                .collect(Collectors.toList())));
+        java.util.Map<Subscription<I>, List<FlowContext<I>>> matchedContexts = new LinkedHashMap<>();
+        Set<FlowContext<I>> matchedContextSet = new HashSet<>();
+        qualifiedWhens.forEach(
+                w -> {
+                    List<FlowContext<I>> afterContexts = contexts
+                            .stream()
+                            .filter(c -> w.getWhether().is(c.getData()))
+                            .peek(c -> c.setNextPositionId(w.getId()))
+                            .collect(Collectors.toList());
+                    matchedContexts.put(w, afterContexts);
+                    matchedContextSet.addAll(afterContexts);
+                }
+        );
+        List<FlowContext<I>> unMatchedContexts = contexts
+                .stream()
+                .filter(c -> !matchedContextSet.contains(c))
+                .collect(Collectors.toList());
+        PreSendCallbackInfo<I> callbackInfo = new PreSendCallbackInfo<>(matchedContexts, unMatchedContexts);
+        preSendCallback.accept(callbackInfo);
+        matchedContexts.forEach(Subscription::cache);
     }
 
     /**
@@ -472,7 +496,7 @@ public class From<I> extends IdGenerator implements Publisher<I> {
             context.setStatus(FlowNodeStatus.ARCHIVED);
         });
         List<FlowContext<I>> afterList = preList.stream().map(pre -> {
-            FlowContext<I> after = pre.generate(pre.getData(), pre.getPosition()).batchId(toBatchId);
+            FlowContext<I> after = pre.generate(pre.getData(), pre.getPosition(), pre.getCreateAt()).batchId(toBatchId);
             trace.getContextPool().add(after.getId());
             return after;
         }).collect(Collectors.toList());
@@ -480,5 +504,66 @@ public class From<I> extends IdGenerator implements Publisher<I> {
         repo.save(afterList);
         repo.save(preList);
         return afterList;
+    }
+
+    /**
+     * 通过订阅节点Id查找订阅节点
+     *
+     * @param nodeId 节点Id
+     * @return 订阅节点
+     */
+    public To<I, Object> getSubscriber(String nodeId) {
+        return ObjectUtils.cast(findNode(this, nodeId)
+                .orElseThrow(() -> new WaterflowException(FLOW_ENGINE_INVALID_NODE_ID, nodeId)));
+    }
+
+    /**
+     * findNodeFromFlow
+     *
+     * @param from from
+     * @param nodeMetaId nodeMetaId
+     * @return Node The Target Node.
+     */
+    public Node<?, ?> findNodeFromFlow(From<I> from, String nodeMetaId) {
+        return (Node<?, ?>) findNode(this, nodeMetaId).orElse(null);
+    }
+
+    /**
+     * findNode
+     *
+     * @param from from
+     * @param nodeMetaId nodeMetaId
+     * @return Optional<To> To object
+     */
+    private static Optional<To<?, ?>> findNode(From<?> from, String nodeMetaId) {
+        ArrayDeque<Subscriber<?, ?>> nodesQueue = new ArrayDeque<>();
+        Set<String> visited = new HashSet<>();
+        for (Subscription<?> s : from.getSubscriptions()) {
+            Subscriber<?, Object> to = s.getTo();
+            nodesQueue.addLast(to);
+            visited.add(to.getId());
+            if (to.getId().equals(nodeMetaId)) {
+                return Optional.of((To<?, ?>) to);
+            }
+        }
+
+        while (!nodesQueue.isEmpty()) {
+            Subscriber<?, ?> cur = nodesQueue.removeFirst();
+            if (!(cur instanceof Node<?, ?>)) {
+                continue;
+            }
+            Node<?, ?> curNode = (Node<?, ?>) cur;
+            for (Subscription<?> s : curNode.getSubscriptions()) {
+                Subscriber<?, Object> to = s.getTo();
+                if (!visited.contains(to.getId())) {
+                    nodesQueue.offer(to);
+                    visited.add(to.getId());
+                }
+                if (to.getId().equals(nodeMetaId)) {
+                    return Optional.of((To<?, ?>) to);
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
