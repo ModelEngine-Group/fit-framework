@@ -37,21 +37,49 @@ FIT for Python 是基于 FIT Framework 的 Python 运行时与插件开发套件
 
 ## 环境准备
 
-需要在 Python 3.9 及以上版本安装 `requirements.txt` 中的第三方依赖，当前依赖如下：
+### Python 版本要求
+
+**当前测试版本：Python 3.9.25**
+
+项目已配置 `.python-version` 文件指定版本。如使用 pyenv，会自动切换到对应版本。
+
+**版本兼容性说明：**
+- 依赖包（特别是 numpy==1.25.2）已针对 Python 3.9 进行测试
+- 更高版本（如 3.14+）可能存在兼容性问题
+- 升级 Python 版本时，请同步更新 `requirements.txt` 中的依赖版本
+
+### 安装依赖
+
+需要安装 `requirements.txt` 中的第三方依赖，当前依赖如下：
 
 ```python
 numpy==1.25.2
 PyYAML==6.0.1
-requests==2.31.0
-tornado==6.3.2
+requests==2.32.4
+tornado==6.5.0
 ```
 
 推荐在虚拟环境中安装依赖：
 ```bash
-python -m venv .venv   # 创建虚拟环境
+# 方法 1：使用 python3.9（推荐）
+python3.9 -m venv .venv   # 创建虚拟环境
 source .venv/bin/activate   # Windows 可执行 .\.venv\Scripts\activate
 pip install -r requirements.txt
+
+# 方法 2：使用 pyenv（自动读取 .python-version）
+pyenv install 3.9.25  # 首次使用需安装
+eval "$(pyenv init -)"
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 方法 3：使用系统默认 python3
+python3 -m venv .venv  # 确保 python3 版本 >= 3.9
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
+
+**注意：** 虚拟环境激活后，`python` 命令即可直接使用，无需输入 `python3`。
 
 ## 快速开始
 
