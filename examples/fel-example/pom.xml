@@ -16,8 +16,8 @@
         <java.version>17</java.version>
 
         <!-- Framework versions -->
-        <fit.version>3.6.2-SNAPSHOT</fit.version>
-        <fel.version>3.6.2-SNAPSHOT</fel.version>
+        <fit.version>3.6.3-SNAPSHOT</fit.version>
+        <fel.version>3.6.3-SNAPSHOT</fel.version>
 
         <!-- Maven plugin versions -->
         <maven.antrun.version>3.1.0</maven.antrun.version>

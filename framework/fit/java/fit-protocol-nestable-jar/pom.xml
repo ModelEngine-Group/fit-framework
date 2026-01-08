@@ -6,7 +6,7 @@
     <parent>
         <artifactId>fitframework-parent</artifactId>
         <groupId>org.fitframework</groupId>
-        <version>3.6.2-SNAPSHOT</version>
+        <version>3.6.3-SNAPSHOT</version>
     </parent>
 
     <!-- This artifactId cannot be modified, as it is used for dependency repackaging in fit-maven-plugin. -->

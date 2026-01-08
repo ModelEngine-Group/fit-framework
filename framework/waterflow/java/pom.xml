@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework.waterflow</groupId>
     <artifactId>waterflow-parent</artifactId>
-    <version>3.6.2-SNAPSHOT</version>
+    <version>3.6.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Waterflow Parent</name>
@@ -48,7 +48,7 @@
         <java.version>17</java.version>
 
         <!-- Framework version -->
-        <fit.version>3.6.2-SNAPSHOT</fit.version>
+        <fit.version>3.6.3-SNAPSHOT</fit.version>
 
         <!-- Maven plugin versions -->
         <maven.antrun.version>3.1.0</maven.antrun.version>

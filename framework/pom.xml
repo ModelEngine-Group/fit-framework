@@ -5,7 +5,7 @@
 
     <groupId>org.fitframework</groupId>
     <artifactId>framework-parent</artifactId>
-    <version>3.6.2-SNAPSHOT</version>
+    <version>3.6.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Framework Parent</name>

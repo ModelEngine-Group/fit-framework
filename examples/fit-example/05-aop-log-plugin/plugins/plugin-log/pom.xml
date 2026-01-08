@@ -12,7 +12,7 @@
     <artifactId>plugin-log</artifactId>
 
     <properties>
-        <fit.version>3.6.2-SNAPSHOT</fit.version>
+        <fit.version>3.6.3-SNAPSHOT</fit.version>
         <maven.compiler.version>3.14.0</maven.compiler.version>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.fitframework</groupId>
             <artifactId>fit-api</artifactId>
-            <version>3.6.2-SNAPSHOT</version>
+            <version>3.6.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fitframework.fel</groupId>
         <artifactId>fel-plugin-parent</artifactId>
-        <version>3.6.2-SNAPSHOT</version>
+        <version>3.6.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>fel-langchain-runnable</artifactId>
