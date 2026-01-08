@@ -51,7 +51,7 @@ mvn clean install
 
 ```
 build/
-├── fit-discrete-launcher-3.6.2-SNAPSHOT.jar
+├── fit-discrete-launcher-3.6.2.jar
 └── bin/
     ├── fit       # Unix/Linux/macOS 启动脚本
     ├── fit.js    # Node.js 核心脚本
@@ -194,7 +194,7 @@ java -Xmx1g -Dplugin.path=/custom/path \
   -Dsun.io.useCanonCaches=true \
   -Djdk.tls.client.enableSessionTicketExtension=false \
   -Dplugin.fit.dynamic.plugin.directory=/current/working/directory \
-  -jar fit-discrete-launcher-3.6.2-SNAPSHOT.jar \
+  -jar fit-discrete-launcher-3.6.2.jar \
   myapp config.yaml
 ```
 

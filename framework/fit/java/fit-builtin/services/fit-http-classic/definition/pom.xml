@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fitframework.service</groupId>
         <artifactId>fit-http-classic-parent</artifactId>
-        <version>3.6.2-SNAPSHOT</version>
+        <version>3.6.2</version>
     </parent>
 
     <artifactId>fit-http-classic</artifactId>
