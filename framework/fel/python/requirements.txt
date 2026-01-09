@@ -1,4 +1,4 @@
 llama-index==0.12.46
-langchain-core==0.3.68
+langchain-core==0.3.81
 langchain_community==0.3.27
 langchain-openai==0.3.28
