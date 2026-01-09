@@ -1,10 +1,10 @@
 ---
-name: "review"
+name: "review-task"
 description: "审查任务实现并输出代码审查报告"
-usage: "/review <task-id> [--pr-number]"
+usage: "/review-task <task-id> [--pr-number]"
 ---
 
-# Review Command
+# Review Task Command
 
 ## 功能说明
 
@@ -194,7 +194,7 @@ usage: "/review <task-id> [--pr-number]"
 例如：
 - 如果无阻塞问题：使用 /commit 提交代码
 - 如果有需要修改项：修复问题后重新审查
-- 如果需要重大修改：回到 /implement 重新实施
+- 如果需要重大修改：回到 /implement-task 重新实施
 ```
 
 ## 参数说明
@@ -208,7 +208,7 @@ usage: "/review <task-id> [--pr-number]"
 
 ```bash
 # 在完成代码实施后，对任务进行审查
-/review TASK-20251227-104654
+/review-task TASK-20251227-104654
 ```
 
 **预期输出**：
@@ -232,7 +232,7 @@ usage: "/review <task-id> [--pr-number]"
 
 ```bash
 # 如果已创建 PR，可以调用专业审查工具
-/review TASK-20251227-104654 --pr-number 123
+/review-task TASK-20251227-104654 --pr-number 123
 ```
 
 这会在基础审查后，额外调用 `/pr-review-toolkit:review-pr` 进行多维度深度审查。
@@ -244,19 +244,19 @@ usage: "/review <task-id> [--pr-number]"
 /analyze-issue 207
 
 # 2. 设计技术方案
-/plan TASK-20251227-104654
+/plan-task TASK-20251227-104654
 
 # 3. 实施功能
-/implement TASK-20251227-104654
+/implement-task TASK-20251227-104654
 
 # 4. 代码审查 ← 当前步骤
-/review TASK-20251227-104654
+/review-task TASK-20251227-104654
 
 # 5. 如果审查通过，提交代码
 /commit
 
 # 6. 创建 Pull Request
-/pr
+/create-pr
 ```
 
 ## 注意事项
@@ -281,7 +281,7 @@ usage: "/review <task-id> [--pr-number]"
 
 ## 相关命令
 
-- `/implement <task-id>` - 实施任务（前置步骤）
+- `/implement-task <task-id>` - 实施任务（前置步骤）
 - `/commit` - 提交代码（后续步骤）
 - `/code-review:code-review <pr-number>` - 深度 PR 审查
 - `/pr-review-toolkit:review-pr` - 专业多维度审查
@@ -289,5 +289,5 @@ usage: "/review <task-id> [--pr-number]"
 ## 错误处理
 
 - 任务不存在：提示 "任务 {task-id} 不存在"
-- 缺少实现报告：提示 "实现报告不存在，请先执行 /implement"
+- 缺少实现报告：提示 "实现报告不存在，请先执行 /implement-task"
 - PR 不存在：提示 "PR #{number} 不存在，请检查 PR 编号"

@@ -32,8 +32,8 @@ usage: "/sync-issue <task-id>"
 
 检查并读取以下文件（如果存在）：
 - `.ai-workspace/context/{task-id}/analysis.md` - 需求分析
-- `.ai-workspace/context/{task-id}/plan.md` - 技术方案
-- `.ai-workspace/context/{task-id}/implementation.md` - 实现报告
+- `.ai-workspace/context/{task-id}/plan-task.md` - 技术方案
+- `.ai-workspace/context/{task-id}/implement-taskation.md` - 实现报告
 - `.ai-workspace/context/{task-id}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
@@ -70,7 +70,7 @@ usage: "/sync-issue <task-id>"
 
 - 任务文件: `.ai-workspace/tasks/active/{task-id}.md`
 - 需求分析: `.ai-workspace/context/{task-id}/analysis.md`
-- 技术方案: `.ai-workspace/context/{task-id}/plan.md`
+- 技术方案: `.ai-workspace/context/{task-id}/plan-task.md`
 
 ---
 *由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
@@ -152,7 +152,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 ### 🎯 下一步
 
 1. 人工审查需求分析（建议）
-2. 设计技术方案（使用 `/plan TASK-20251227-104654`）
+2. 设计技术方案（使用 `/plan-task TASK-20251227-104654`）
 
 ---
 *由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
@@ -185,7 +185,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 
 请审查技术方案是否合理，审查通过后使用：
 ```
-/implement TASK-20251227-104654
+/implement-task TASK-20251227-104654
 ```
 
 ---
@@ -261,8 +261,8 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 ## 相关命令
 
 - `/analyze-issue <number>` - 分析 Issue 并创建任务
-- `/plan <task-id>` - 设计技术方案
-- `/implement <task-id>` - 实施任务
+- `/plan-task <task-id>` - 设计技术方案
+- `/implement-task <task-id>` - 实施任务
 - `/task-status <task-id>` - 查看任务状态
 
 ## 错误处理
