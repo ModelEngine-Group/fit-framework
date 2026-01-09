@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,9 +40,9 @@ import java.util.Optional;
 @DisplayName("测试 TextStreamChoir")
 class TextStreamChoirTest {
     private static class TestSubscriber<T> extends EmptySubscriber<T> {
-        private final ArrayList<String> records;
+        private final List<String> records;
 
-        public TestSubscriber(ArrayList<String> records) {
+        public TestSubscriber(List<String> records) {
             this.records = records;
         }
 
@@ -95,7 +97,7 @@ class TextStreamChoirTest {
             stringEmitter.complete();
         });
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 200);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -112,7 +114,7 @@ class TextStreamChoirTest {
         Emitter<String> emitter = new DefaultEmitter<>();
         Choir<String> convertedChoir = Choir.fromEmitter(emitter);
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 200);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -140,7 +142,7 @@ class TextStreamChoirTest {
             }).start();
         });
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 200);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -164,7 +166,7 @@ class TextStreamChoirTest {
             stringEmitter.complete();
         });
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 500);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -177,7 +179,7 @@ class TextStreamChoirTest {
         Emitter<String> emitter = new DefaultEmitter<>();
         Choir<String> convertedChoir = Choir.fromEmitter(emitter);
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 400);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -194,7 +196,7 @@ class TextStreamChoirTest {
             stringEmitter.fail(new RuntimeException(""));
         });
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 200);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -211,7 +213,7 @@ class TextStreamChoirTest {
         Emitter<String> emitter = new DefaultEmitter<>();
         Choir<String> convertedChoir = Choir.fromEmitter(emitter);
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 200);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
@@ -239,7 +241,7 @@ class TextStreamChoirTest {
             }).start();
         });
         TextStreamChoir<String> textStreamChoir = createStringTextStreamChoir(convertedChoir, 200);
-        ArrayList<String> records = new ArrayList<>();
+        List<String> records = Collections.synchronizedList(new ArrayList<>());
         Subscriber<String> mySubscriber = new TestSubscriber<>(records);
         textStreamChoir.subscribe(mySubscriber);
         records.add("after subscribe");
