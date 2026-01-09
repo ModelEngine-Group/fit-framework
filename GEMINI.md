@@ -14,7 +14,7 @@
 - `mvn clean install`（仓库根目录）：构建全部模块并运行测试，产物输出到 `build/`。
 - `cd framework/fit/java && mvn clean install`：仅构建 Java FIT 框架。
 - `./build/bin/fit start`：启动 Java 运行时（依赖 Node.js）；默认端口 `8080`。
-- `./.claude/run-test.sh`：完整验证流程（构建、启动、健康检查）。
+- `./.ai-agents/scripts/run-test.sh`：完整验证流程（构建、启动、健康检查）。
 
 ## 编码风格与命名规范
 
