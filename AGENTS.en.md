@@ -14,7 +14,7 @@ This repo hosts the FIT framework and related engines.
 - `mvn clean install` (repo root): builds all modules and runs tests; outputs to `build/`.
 - `cd framework/fit/java && mvn clean install`: builds the Java FIT framework only.
 - `./build/bin/fit start`: starts the Java runtime (uses Node.js); default port `8080`.
-- `./.claude/run-test.sh`: full CI-like flow (build, start, health checks).
+- `./.ai-agents/scripts/run-test.sh`: full CI-like flow (build, start, health checks).
 
 ## Coding Style & Naming Conventions
 

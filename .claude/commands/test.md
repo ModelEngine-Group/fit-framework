@@ -7,7 +7,7 @@
 
 使用自动化测试脚本执行完整的测试流程：
 ```bash timeout=900000
-./.claude/run-test.sh
+./.ai-agents/scripts/run-test.sh
 ```
 
 **测试流程包括：**

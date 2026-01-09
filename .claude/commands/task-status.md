@@ -111,14 +111,14 @@ usage: "/task-status <task-id>"
 **如果在需求分析阶段**：
 ```
 继续完成需求分析，完成后使用：
-/plan {task-id}
+/plan-task {task-id}
 ```
 
 **如果需求分析完成，等待人工审查**：
 ```
 ⚠️  等待人工审查需求分析
 审查通过后使用：
-/plan {task-id}
+/plan-task {task-id}
 ```
 
 **如果在技术方案设计阶段**：
@@ -130,19 +130,19 @@ usage: "/task-status <task-id>"
 ```
 ⚠️  等待人工审查技术方案
 审查通过后使用：
-/implement {task-id}
+/implement-task {task-id}
 ```
 
 **如果在代码实现阶段**：
 ```
 继续完成代码实现，完成后使用：
-/review {task-id}
+/review-task {task-id}
 ```
 
 **如果实现完成，待审查**：
 ```
 使用以下命令进行代码审查：
-/review {task-id}
+/review-task {task-id}
 ```
 
 **如果审查完成，待提交**：
@@ -178,8 +178,8 @@ usage: "/task-status <task-id>"
 ## 相关命令
 
 - `/analyze-issue <number>` - 分析 Issue
-- `/plan <task-id>` - 设计技术方案
-- `/implement <task-id>` - 实施任务
+- `/plan-task <task-id>` - 设计技术方案
+- `/implement-task <task-id>` - 实施任务
 
 ## 错误处理
 

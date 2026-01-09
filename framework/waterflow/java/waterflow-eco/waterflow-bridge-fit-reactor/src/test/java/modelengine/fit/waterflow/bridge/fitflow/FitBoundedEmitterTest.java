@@ -22,6 +22,7 @@ import modelengine.fitframework.flowable.Publisher;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -80,7 +81,7 @@ class FitBoundedEmitterTest {
     @Test
     void testFlatMap() {
         AtomicBoolean end = new AtomicBoolean(false);
-        List<Integer> result = new ArrayList<>();
+        List<Integer> result = Collections.synchronizedList(new ArrayList<>());
         FlowSession session = new FlowSession();
         Window window = session.begin();
         ProcessFlow<Integer> flow = Flows.<Integer>create().flatMap(input -> {

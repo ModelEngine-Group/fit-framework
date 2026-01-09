@@ -95,7 +95,7 @@ gh issue view <issue-number> --json number,title,body,labels
 
 **下一步**：
 审查需求分析后，使用以下命令设计技术方案：
-/plan {task-id}
+/plan-task {task-id}
 ```
 
 ## 参数说明
@@ -130,7 +130,7 @@ gh issue view <issue-number> --json number,title,body,labels
 
 ## 相关命令
 
-- `/plan <task-id>` - 设计技术方案
+- `/plan-task <task-id>` - 设计技术方案
 - `/task-status <task-id>` - 查看任务状态
 
 ## 错误处理

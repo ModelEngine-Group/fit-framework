@@ -1,14 +1,14 @@
 ---
-name: "plan"
+name: "plan-task"
 description: "为任务设计技术方案并输出实施计划"
-usage: "/plan <task-id>"
+usage: "/plan-task <task-id>"
 ---
 
-# Plan Command
+# Plan Task Command
 
 ## 功能说明
 
-为指定任务设计技术方案，输出详细的实施计划到 `.ai-workspace/context/` 目录。
+为指定任务设计技术方案,输出详细的实施计划到 `.ai-workspace/context/` 目录。
 
 ## 执行流程
 
@@ -134,7 +134,7 @@ usage: "/plan <task-id>"
 ⚠️  **人工审查检查点** - 请审查技术方案是否合理
 
 审查通过后，使用以下命令开始实施：
-/implement {task-id}
+/implement-task {task-id}
 ```
 
 ## 参数说明
@@ -145,7 +145,7 @@ usage: "/plan <task-id>"
 
 ```bash
 # 为任务设计技术方案
-/plan TASK-20251227-104654
+/plan-task TASK-20251227-104654
 ```
 
 ## 注意事项
@@ -172,7 +172,7 @@ usage: "/plan <task-id>"
 ## 相关命令
 
 - `/analyze-issue <number>` - 分析 Issue（前置步骤）
-- `/implement <task-id>` - 实施任务（后续步骤）
+- `/implement-task <task-id>` - 实施任务（后续步骤）
 - `/task-status <task-id>` - 查看任务状态
 
 ## 错误处理

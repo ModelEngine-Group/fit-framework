@@ -1,10 +1,10 @@
 ---
-name: "implement"
+name: "implement-task"
 description: "根据技术方案实施任务并输出实现报告"
-usage: "/implement <task-id>"
+usage: "/implement-task <task-id>"
 ---
 
-# Implement Command
+# Implement Task Command
 
 ## 功能说明
 
@@ -143,7 +143,7 @@ pytest                        # Python 项目
 
 **下一步**：
 使用以下命令进行代码审查：
-/review {task-id}
+/review-task {task-id}
 
 或使用项目的 code-review 插件：
 /code-review:code-review
@@ -157,7 +157,7 @@ pytest                        # Python 项目
 
 ```bash
 # 实施任务
-/implement TASK-20251227-104654
+/implement-task TASK-20251227-104654
 ```
 
 ## 注意事项
@@ -188,13 +188,13 @@ pytest                        # Python 项目
 
 ## 相关命令
 
-- `/plan <task-id>` - 设计技术方案（前置步骤）
-- `/review <task-id>` 或 `/code-review:code-review` - 代码审查（后续步骤）
+- `/plan-task <task-id>` - 设计技术方案（前置步骤）
+- `/review-task <task-id>` 或 `/code-review:code-review` - 代码审查（后续步骤）
 - `/task-status <task-id>` - 查看任务状态
 
 ## 错误处理
 
 - 任务不存在：提示 "任务 {task-id} 不存在"
-- 缺少技术方案：提示 "技术方案不存在，请先执行 /plan"
+- 缺少技术方案：提示 "技术方案不存在，请先执行 /plan-task"
 - 测试失败：输出测试错误，询问是否继续
 - 编译失败：输出编译错误，停止实施
