@@ -29,10 +29,10 @@ assigned_to: {当前处理的AI或空}
 
 请阅读以下文件了解任务完整上下文：
 
-- [ ] `.ai-workspace/context/{task-id}/analysis.md` - 需求分析
-- [ ] `.ai-workspace/context/{task-id}/plan.md` - 技术方案
-- [ ] `.ai-workspace/context/{task-id}/implementation.md` - 实现报告
-- [ ] `.ai-workspace/context/{task-id}/review.md` - 审查报告
+- [ ] `.ai-workspace/active/{task-id}/analysis.md` - 需求分析
+- [ ] `.ai-workspace/active/{task-id}/plan.md` - 技术方案
+- [ ] `.ai-workspace/active/{task-id}/implementation.md` - 实现报告
+- [ ] `.ai-workspace/active/{task-id}/review.md` - 审查报告
 
 ## 相关资源
 
@@ -76,12 +76,12 @@ assigned_to: {当前处理的AI或空}
 
 ### 输入文件
 
-- `.ai-workspace/context/{task-id}/{input-file}.md`
+- `.ai-workspace/active/{task-id}/{input-file}.md`
 
 ### 输出要求
 
 完成后创建/更新：
-- `.ai-workspace/context/{task-id}/{output-file}.md`
+- `.ai-workspace/active/{task-id}/{output-file}.md`
 
 包含以下章节：
 - {section-1}
@@ -138,7 +138,7 @@ assigned_to: {当前处理的AI或空}
 
 ### 遇到问题怎么办
 
-1. 将任务移到 `.ai-workspace/tasks/blocked/`
+1. 将任务目录移到 `.ai-workspace/blocked/`
 2. 在任务中添加"阻塞原因"章节
 3. 说明遇到的问题和需要的帮助
 4. 通知人类用户

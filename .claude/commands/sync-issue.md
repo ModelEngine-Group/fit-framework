@@ -14,10 +14,13 @@ usage: "/sync-issue <task-id>"
 
 ### 1. 验证任务存在
 
-检查任务文件是否存在：
-- 查找 `.ai-workspace/tasks/active/{task-id}.md`
-- 如果不存在，检查 `completed/` 和 `blocked/` 目录
+按以下优先级搜索任务：
+- 查找 `.ai-workspace/active/{task-id}/task.md`（优先）
+- 如果不存在，查找 `.ai-workspace/blocked/{task-id}/task.md`
+- 如果不存在，查找 `.ai-workspace/completed/{task-id}/task.md`
 - 如果都不存在，提示用户任务不存在
+
+找到后记录任务状态（status）和任务目录路径（task_dir）。
 
 ### 2. 读取任务信息
 
@@ -31,10 +34,10 @@ usage: "/sync-issue <task-id>"
 ### 3. 读取上下文文件
 
 检查并读取以下文件（如果存在）：
-- `.ai-workspace/context/{task-id}/analysis.md` - 需求分析
-- `.ai-workspace/context/{task-id}/plan-task.md` - 技术方案
-- `.ai-workspace/context/{task-id}/implement-taskation.md` - 实现报告
-- `.ai-workspace/context/{task-id}/review.md` - 审查报告
+- `{task_dir}/analysis.md` - 需求分析
+- `{task_dir}/plan.md` - 技术方案
+- `{task_dir}/implementation.md` - 实现报告
+- `{task_dir}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
 
@@ -68,9 +71,9 @@ usage: "/sync-issue <task-id>"
 
 ### 📂 相关文件
 
-- 任务文件: `.ai-workspace/tasks/active/{task-id}.md`
-- 需求分析: `.ai-workspace/context/{task-id}/analysis.md`
-- 技术方案: `.ai-workspace/context/{task-id}/plan-task.md`
+- 任务文件: `.ai-workspace/{status}/{task-id}/task.md`
+- 需求分析: `.ai-workspace/{status}/{task-id}/analysis.md`
+- 技术方案: `.ai-workspace/{status}/{task-id}/plan.md`
 
 ---
 *由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*

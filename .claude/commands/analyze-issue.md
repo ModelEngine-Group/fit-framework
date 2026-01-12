@@ -8,7 +8,7 @@ usage: "/analyze-issue <issue-number>"
 
 ## 功能说明
 
-分析指定的 GitHub Issue，创建任务并输出需求分析文档到 `.ai-workspace/context/` 目录。
+分析指定的 GitHub Issue，创建任务并输出需求分析文档。
 
 ## 执行流程
 
@@ -18,14 +18,13 @@ usage: "/analyze-issue <issue-number>"
 gh issue view <issue-number> --json number,title,body,labels
 ```
 
-### 2. 创建任务文件
+### 2. 创建任务目录和文件
 
 检查是否已存在该 Issue 的任务：
-- 在 `.ai-workspace/tasks/active/` 中搜索相关任务
+- 在 `.ai-workspace/active/` 中搜索相关任务
 - 如果找到，询问是否重新分析
-- 如果没有，使用 `.ai-agents/templates/task.md` 模板创建新任务
-
-任务文件命名：`TASK-{yyyyMMdd-HHmmss}.md`
+- 如果没有，创建任务目录：`.ai-workspace/active/TASK-{yyyyMMdd-HHmmss}/`
+- 使用 `.ai-agents/templates/task.md` 模板创建任务文件：`task.md`
 
 ### 3. 执行需求分析
 
@@ -40,7 +39,7 @@ gh issue view <issue-number> --json number,title,body,labels
 
 ### 4. 输出分析文档
 
-创建 `.ai-workspace/context/{task-id}/analysis.md`，必须包含以下章节：
+创建 `.ai-workspace/active/{task-id}/analysis.md`，必须包含以下章节：
 
 ```markdown
 # 需求分析报告
@@ -72,7 +71,7 @@ gh issue view <issue-number> --json number,title,body,labels
 
 ### 5. 更新任务状态
 
-更新 `.ai-workspace/tasks/active/{task-id}.md`：
+更新 `.ai-workspace/active/{task-id}/task.md`：
 - `current_step`: requirement-analysis
 - `assigned_to`: claude
 - `updated_at`: {当前时间}
@@ -90,8 +89,8 @@ gh issue view <issue-number> --json number,title,body,labels
 - 工作流: feature-development
 
 **输出文件**：
-- 任务文件: .ai-workspace/tasks/active/{task-id}.md
-- 分析文档: .ai-workspace/context/{task-id}/analysis.md
+- 任务文件: .ai-workspace/active/{task-id}/task.md
+- 分析文档: .ai-workspace/active/{task-id}/analysis.md
 
 **下一步**：
 审查需求分析后，使用以下命令设计技术方案：

@@ -132,7 +132,7 @@ gh api --method PATCH \
 ### 7. 记录到任务（如果存在）
 
 检查是否有相关的安全分析任务：
-- 搜索 `.ai-workspace/tasks/` 中包含 `security_alert_number: <alert-number>` 的任务
+- 搜索 `.ai-workspace/active/`、`.ai-workspace/blocked/`、`.ai-workspace/completed/` 中包含 `security_alert_number: <alert-number>` 的任务
 - 如果找到，在任务文件中添加关闭记录：
 
 ```yaml

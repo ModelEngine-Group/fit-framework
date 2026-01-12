@@ -8,7 +8,7 @@ usage: "/analyze-security <alert-number>"
 
 ## 功能说明
 
-分析指定的 Dependabot 安全告警，评估安全风险并创建修复任务，输出安全分析文档到 `.ai-workspace/context/` 目录。
+分析指定的 Dependabot 安全告警，评估安全风险并创建修复任务，输出安全分析文档。
 
 ## 执行流程
 
@@ -38,7 +38,7 @@ gh api repos/{owner}/{repo}/dependabot/alerts/<alert-number>
 ### 2. 创建任务文件
 
 检查是否已存在该安全告警的任务：
-- 在 `.ai-workspace/tasks/active/` 中搜索相关任务
+- 在 `.ai-workspace/active/` 中搜索相关任务
 - 如果找到，询问是否重新分析
 - 如果没有，使用 `.ai-agents/templates/task.md` 模板创建新任务
 
@@ -83,7 +83,7 @@ ghsa_id: <GHSA-ID>
 
 ### 5. 输出分析文档
 
-创建 `.ai-workspace/context/{task-id}/security-analysis.md`，必须包含以下章节：
+创建 `{task_dir}/security-analysis.md`，必须包含以下章节：
 
 ```markdown
 # 安全告警分析报告
@@ -163,7 +163,7 @@ ghsa_id: <GHSA-ID>
 
 ### 6. 更新任务状态
 
-更新 `.ai-workspace/tasks/active/{task-id}.md`：
+更新 `.ai-workspace/active/{task-id}/task.md`：
 - `current_step`: security-analysis
 - `assigned_to`: claude
 - `updated_at`: {当前时间}
@@ -186,8 +186,8 @@ ghsa_id: <GHSA-ID>
 - 风险等级: {高/中/低}
 
 **输出文件**:
-- 任务文件: .ai-workspace/tasks/active/{task-id}.md
-- 分析文档: .ai-workspace/context/{task-id}/security-analysis.md
+- 任务文件: .ai-workspace/active/{task-id}/task.md
+- 分析文档: {task_dir}/security-analysis.md
 
 **修复建议**: {简短的修复建议摘要}
 

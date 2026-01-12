@@ -8,7 +8,7 @@
 
 ```bash
 # 复制任务模板
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/TASK-{yyyyMMdd}-{task-id}.md
+cp .ai-agents/templates/task.md .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md
 ```
 
 编辑任务文件，填写：
@@ -20,13 +20,13 @@ cp .ai-agents/templates/task.md .ai-workspace/tasks/active/TASK-{yyyyMMdd}-{task
 
 在 Claude Code 中：
 ```
-请分析 .ai-workspace/tasks/active/TASK-{yyyyMMdd}-{task-id}.md 中的任务
+请分析 .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md 中的任务
 ```
 
 Claude 会：
 1. 读取任务描述
 2. 分析相关代码
-3. 创建需求分析报告：`.ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/analysis.md`
+3. 创建需求分析报告：`.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/analysis.md`
 
 ### 3. Claude 设计技术方案
 
@@ -35,7 +35,7 @@ Claude 会：
 ```
 
 Claude 会创建：
-- `.ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/plan.md`
+- `.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/plan.md`
 
 **人工检查点**：审查方案是否合理
 
@@ -43,15 +43,15 @@ Claude 会创建：
 
 在 ChatGPT/Cursor 中：
 ```
-请根据 .ai-workspace/tasks/active/TASK-{yyyyMMdd}-{task-id}.md 实现代码。
-参考方案：.ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/plan.md
+请根据 .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md 实现代码。
+参考方案：.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/plan.md
 ```
 
 ChatGPT 会：
 1. 读取任务和方案
 2. 编写代码实现
 3. 编写单元测试
-4. 创建实现报告：`.ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/implementation.md`
+4. 创建实现报告：`.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/implementation.md`
 
 ### 5. 切换回 Claude 审查代码
 
@@ -63,7 +63,7 @@ ChatGPT 会：
 Claude 会：
 1. 读取实现报告
 2. 审查代码变更
-3. 创建审查报告：`.ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/review.md`
+3. 创建审查报告：`.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/review.md`
 
 ### 6. 根据审查结果决定
 
@@ -83,7 +83,7 @@ Claude 会：
 
 ```bash
 # 1. 创建 Bug 任务
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/BUG-{yyyyMMdd}-{task-id}.md
+cp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/task.md
 # 编辑：type: bugfix, workflow: bug-fix
 
 # 2. Claude 分析 Bug
@@ -96,14 +96,14 @@ cp .ai-agents/templates/task.md .ai-workspace/tasks/active/BUG-{yyyyMMdd}-{task-
 "请审查 BUG-{yyyyMMdd}-{task-id} 的修复"
 
 # 5. 提交
-/commitcp .ai-agents/templates/task.md .ai-workspace/tasks/active/BUG-{yyyyMMdd}-{task-id}.md
+/commitcp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/task.md
 ```
 
 ### 场景 2：代码审查
 
 ```bash
 # 1. 创建审查任务
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/REVIEW-PR-{task-id}.md
+cp .ai-agents/templates/task.md .ai-workspace/active/REVIEW-PR-{task-id}/task.md
 # 编辑：type: review, workflow: code-review
 
 # 2. Claude 执行审查
@@ -118,7 +118,7 @@ cp .ai-agents/templates/task.md .ai-workspace/tasks/active/REVIEW-PR-{task-id}.m
 
 ```bash
 # 1. 创建重构任务
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/REFACTOR-{yyyyMMdd}-{task-id}.md
+cp .ai-agents/templates/task.md .ai-workspace/active/REFACTOR-{yyyyMMdd}-{task-id}/task.md
 # 编辑：type: refactor, workflow: refactoring
 
 # 2. Claude 分析和规划
@@ -191,14 +191,14 @@ REVIEW-PR-{pr-number}.md  # PR审查
 
 **解决方案**：明确指定任务文件
 ```
-请处理 .ai-workspace/tasks/active/TASK-{yyyyMMdd}-{task-id}.md
+请处理 .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md
 ```
 
 ### 问题 2：上下文丢失
 
 **解决方案**：检查 context 目录
 ```bash
-ls -la .ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/
+ls -la .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/
 ```
 
 确保每个步骤都创建了输出文件。
@@ -207,7 +207,7 @@ ls -la .ai-workspace/context/TASK-{yyyyMMdd}-{task-id}/
 
 **解决方案**：查看任务文件
 ```bash
-cat .ai-workspace/tasks/active/TASK-{yyyyMMdd}-{task-id}.md
+cat .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md
 ```
 
 检查 `current_step` 和 `assigned_to` 字段。

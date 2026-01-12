@@ -21,7 +21,7 @@
 当人类切换到 Gemini 时：
 
 ```
-请根据 .ai-workspace/tasks/active/TASK-{id}.md 继续工作
+请根据 .ai-workspace/active/TASK-{id}/task.md 继续工作
 ```
 
 Gemini 应该：
@@ -65,7 +65,7 @@ Gemini 应该：
 ### 5. 完成任务后
 
 完成任务后，Gemini 应该：
-1. 创建输出文件到 `.ai-workspace/context/{task-id}/`
+1. 创建输出文件到 `.ai-workspace/active/{task-id}/`
 2. 更新任务状态
 3. 说明完成情况
 

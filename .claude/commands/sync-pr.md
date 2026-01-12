@@ -15,7 +15,7 @@ usage: "/sync-pr <task-id>"
 ### 1. 验证任务存在
 
 检查任务文件是否存在：
-- 查找 `.ai-workspace/tasks/active/{task-id}.md`
+- 查找 `.ai-workspace/active/{task-id}/task.md`
 - 如果不存在，检查 `completed/` 和 `blocked/` 目录
 - 如果都不存在，提示用户任务不存在
 
@@ -32,10 +32,10 @@ usage: "/sync-pr <task-id>"
 ### 3. 读取上下文文件
 
 检查并读取以下文件（如果存在）：
-- `.ai-workspace/context/{task-id}/analysis.md` - 需求分析
-- `.ai-workspace/context/{task-id}/plan.md` - 技术方案
-- `.ai-workspace/context/{task-id}/implementation.md` - 实现报告
-- `.ai-workspace/context/{task-id}/review.md` - 审查报告
+- `{task_dir}/analysis.md` - 需求分析
+- `{task_dir}/plan.md` - 技术方案
+- `{task_dir}/implementation.md` - 实现报告
+- `{task_dir}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
 
@@ -75,10 +75,10 @@ usage: "/sync-pr <task-id>"
 
 ### 📂 相关文档
 
-- 任务文件: `.ai-workspace/tasks/active/{task-id}.md`
-- 需求分析: `.ai-workspace/context/{task-id}/analysis.md`
-- 技术方案: `.ai-workspace/context/{task-id}/plan.md`
-- 实现报告: `.ai-workspace/context/{task-id}/implementation.md`
+- 任务文件: `.ai-workspace/active/{task-id}/task.md`
+- 需求分析: `{task_dir}/analysis.md`
+- 技术方案: `{task_dir}/plan.md`
+- 实现报告: `{task_dir}/implementation.md`
 
 ---
 *由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
@@ -188,10 +188,10 @@ https://github.com/{owner}/{repo}/pull/{pr-number}
 
 ### 📂 相关文档
 
-- 任务文件: `.ai-workspace/tasks/active/TASK-20251227-104654.md`
-- 需求分析: `.ai-workspace/context/TASK-20251227-104654/analysis.md`
-- 技术方案: `.ai-workspace/context/TASK-20251227-104654/plan.md`
-- 实现报告: `.ai-workspace/context/TASK-20251227-104654/implementation.md`
+- 任务文件: `.ai-workspace/active/TASK-20251227-104654/task.md`
+- 需求分析: `.ai-workspace/active/TASK-20251227-104654/analysis.md`
+- 技术方案: `.ai-workspace/active/TASK-20251227-104654/plan.md`
+- 实现报告: `.ai-workspace/active/TASK-20251227-104654/implementation.md`
 
 ---
 *由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*

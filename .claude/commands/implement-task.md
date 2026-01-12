@@ -8,15 +8,15 @@ usage: "/implement-task <task-id>"
 
 ## 功能说明
 
-根据技术方案实施任务，编写代码和测试，输出实现报告到 `.ai-workspace/context/` 目录。
+根据技术方案实施任务，编写代码和测试，输出实现报告。
 
 ## 执行流程
 
 ### 1. 验证前置条件
 
 检查必需文件：
-- `.ai-workspace/tasks/active/{task-id}.md` - 任务文件
-- `.ai-workspace/context/{task-id}/plan.md` - 技术方案
+- `.ai-workspace/active/{task-id}/task.md` - 任务文件
+- `{task_dir}/plan.md` - 技术方案
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -58,7 +58,7 @@ pytest                        # Python 项目
 
 ### 5. 输出实现报告
 
-创建 `.ai-workspace/context/{task-id}/implementation.md`，必须包含以下章节：
+创建 `{task_dir}/implementation.md`，必须包含以下章节：
 
 ```markdown
 # 实现报告
@@ -120,7 +120,7 @@ pytest                        # Python 项目
 
 ### 6. 更新任务状态
 
-更新 `.ai-workspace/tasks/active/{task-id}.md`：
+更新 `.ai-workspace/active/{task-id}/task.md`：
 - `current_step`: implementation
 - `assigned_to`: {当前 AI}
 - `updated_at`: {当前时间}
@@ -139,7 +139,7 @@ pytest                        # Python 项目
 - 测试通过: {数量}/{总数}
 
 **输出文件**：
-- 实现报告: .ai-workspace/context/{task-id}/implementation.md
+- 实现报告: {task_dir}/implementation.md
 
 **下一步**：
 使用以下命令进行代码审查：

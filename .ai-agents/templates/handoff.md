@@ -65,8 +65,8 @@
 ### 输入资源
 
 接手的AI需要读取：
-- [ ] `.ai-workspace/tasks/active/TASK-{id}.md` - 任务文件
-- [ ] `.ai-workspace/context/{task-id}/{file}.md` - 上下文文件
+- [ ] `.ai-workspace/active/TASK-{id}/task.md` - 任务文件
+- [ ] `.ai-workspace/active/{task-id}/{file}.md` - 上下文文件
 - [ ] {其他相关文件}
 
 ## 上下文说明

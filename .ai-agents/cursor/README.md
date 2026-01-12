@@ -14,7 +14,7 @@ Cursor 是一个 AI 驱动的代码编辑器，基于 VSCode，集成了多种 A
 
 1. 读取 `AGENTS.md`（项目根目录）了解项目基本信息
 2. 读取 `.ai-agents/README.md` 了解协作流程
-3. 读取 `.ai-workspace/tasks/active/` 中的任务
+3. 读取 `.ai-workspace/active/` 中的任务
 
 ### 2. 在 Cursor 中工作
 
@@ -50,13 +50,13 @@ Cursor 特别适合：
 
 ```
 # 查看当前任务
-cat .ai-workspace/tasks/active/TASK-{id}.md
+cat .ai-workspace/active/TASK-{id}/task.md
 
 # 查看技术方案
-cat .ai-workspace/context/{task-id}/plan.md
+cat .ai-workspace/active/{task-id}/plan.md
 
 # 完成后创建实现报告
-# 编辑 .ai-workspace/context/{task-id}/implementation.md
+# 编辑 .ai-workspace/active/{task-id}/implementation.md
 ```
 
 ### 5. 配置建议

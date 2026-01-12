@@ -8,19 +8,23 @@ usage: "/plan-task <task-id>"
 
 ## 功能说明
 
-为指定任务设计技术方案,输出详细的实施计划到 `.ai-workspace/context/` 目录。
+为指定任务设计技术方案,输出详细的实施计划。
 
 ## 执行流程
 
-### 1. 验证任务存在
+### 1. 查找任务文件
 
-检查任务文件是否存在：
-- 查找 `.ai-workspace/tasks/active/{task-id}.md`
-- 如果不存在，提示用户任务不存在
+按以下优先级搜索任务：
+- 查找 `.ai-workspace/active/{task-id}/task.md`（优先）
+- 如果不存在，查找 `.ai-workspace/blocked/{task-id}/task.md`
+- 如果不存在，查找 `.ai-workspace/completed/{task-id}/task.md`
+- 如果都不存在，提示用户任务不存在
+
+找到后记录任务状态（status）和任务目录路径（task_dir）。
 
 ### 2. 读取需求分析
 
-读取 `.ai-workspace/context/{task-id}/analysis.md`：
+读取 `{task_dir}/analysis.md`：
 - 如果不存在，提示用户需要先执行需求分析
 - 如果存在，读取并理解需求
 
@@ -38,7 +42,7 @@ usage: "/plan-task <task-id>"
 
 ### 4. 输出方案文档
 
-创建 `.ai-workspace/context/{task-id}/plan.md`，必须包含以下章节：
+创建 `{task_dir}/plan.md`，必须包含以下章节：
 
 ```markdown
 # 技术方案和实施计划
@@ -109,7 +113,7 @@ usage: "/plan-task <task-id>"
 
 ### 5. 更新任务状态
 
-更新 `.ai-workspace/tasks/active/{task-id}.md`：
+更新 `.ai-workspace/active/{task-id}/task.md`：
 - `current_step`: technical-design
 - `assigned_to`: claude
 - `updated_at`: {当前时间}
@@ -128,7 +132,7 @@ usage: "/plan-task <task-id>"
 - 风险等级: {等级}
 
 **输出文件**：
-- 方案文档: .ai-workspace/context/{task-id}/plan.md
+- 方案文档: {task_dir}/plan.md
 
 **下一步**：
 ⚠️  **人工审查检查点** - 请审查技术方案是否合理
