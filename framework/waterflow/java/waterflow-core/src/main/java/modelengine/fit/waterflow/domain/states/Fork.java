@@ -12,6 +12,7 @@ import modelengine.fit.waterflow.domain.stream.operators.Operators;
 import modelengine.fit.waterflow.domain.stream.reactive.Processor;
 import modelengine.fit.waterflow.domain.stream.reactive.Publisher;
 import modelengine.fit.waterflow.domain.utils.Tuple;
+import modelengine.fitframework.log.Logger;
 import modelengine.fitframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ import java.util.function.Supplier;
  * @since 1.0
  */
 public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
+    private static final Logger LOG = Logger.get(Fork.class);
+
     private final State<I, D, I, F> node;
 
     private final List<State<O, D, ?, F>> forks = new ArrayList<>();
@@ -94,21 +97,25 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
                     }
                 }
 
-                // === DIAGNOSTIC #1: Fork.join wrapper 调用 processor 之前 ===
+                // Issue #247: 智能处理并发场景下的 null 数据
+                // 在某些竞态条件下，FlowContext.data 可能为 null
                 O inputData = input.getData();
-                System.err.println(String.format(
-                    "[DIAG-Fork:96-BEFORE] key=%s, thread=%s, branchCount=%d/%d, acc.first=%s, input.getData=%s, input.getData_is_null=%b",
-                    key, Thread.currentThread().getName(), acc.second(), forkNumber.get(),
-                    acc.first(), inputData, (inputData == null)
-                ));
+                if (inputData == null) {
+                    LOG.warn("[Fork.join] Received null FlowContext.data. "
+                            + "key={}, session={}, thread={}, branch={}/{}, acc={}",
+                            key, input.getSession().getId(), Thread.currentThread().getName(),
+                            acc.second() + 1, forkNumber.get(), acc.first());
+
+                    // 跳过此分支，不更新累加器
+                    // 如果是最后一个分支，返回已有数据（避免整个流程失败）
+                    if (acc.second() + 1 == forkNumber.get()) {
+                        accs.remove(key);
+                        return acc.first();
+                    }
+                    return null;
+                }
 
                 R processedResult = processor.process(acc.first(), inputData);
-
-                // === DIAGNOSTIC #2: Fork.join wrapper 调用 processor 之后 ===
-                System.err.println(String.format(
-                    "[DIAG-Fork:96-AFTER] key=%s, thread=%s, processedResult=%s, processedResult_is_null=%b",
-                    key, Thread.currentThread().getName(), processedResult, (processedResult == null)
-                ));
 
                 acc = Tuple.from(processedResult, acc.second() + 1);
                 accs.put(key, acc);

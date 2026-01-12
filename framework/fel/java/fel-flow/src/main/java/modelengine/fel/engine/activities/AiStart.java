@@ -594,23 +594,7 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
                     .orElseGet(() -> new AiParallel<>(this.start.parallel(), mineFlow).fork(branchProcessor));
         }
 
-        AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
-            // === DIAGNOSTIC #3: AiStart reducer 调用 merge 之前 ===
-            System.err.println(String.format(
-                "[DIAG-AiStart:605-BEFORE] thread=%s, acc=%s, data=%s, data_is_null=%b",
-                Thread.currentThread().getName(), acc, data, (data == null)
-            ));
-
-            Tip mergeResult = acc.merge(data);  // Tip.merge() 内部会处理 null
-
-            // === DIAGNOSTIC #4: AiStart reducer 调用 merge 之后 ===
-            System.err.println(String.format(
-                "[DIAG-AiStart:605-AFTER] thread=%s, mergeResult=%s",
-                Thread.currentThread().getName(), mergeResult
-            ));
-
-            return mergeResult;
-        });
+        AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> acc.merge(data));
         ((Processor<?, ?>) state.publisher()).displayAs("runnableParallel");
         return state;
     }
