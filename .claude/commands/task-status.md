@@ -14,7 +14,7 @@ usage: "/task-status <task-id>"
 
 ### 1. 读取任务文件
 
-读取 `.ai-workspace/tasks/active/{task-id}.md`（如果任务已完成，也检查 `completed/` 目录）
+读取 `.ai-workspace/active/{task-id}/task.md`（如果任务已完成，也检查 `completed/` 目录）
 
 ### 2. 检查上下文文件
 
@@ -68,8 +68,8 @@ usage: "/task-status <task-id>"
 ❌ review.md (未创建)
 
 **文件路径**：
-- 任务文件: .ai-workspace/tasks/active/{task-id}.md
-- 上下文目录: .ai-workspace/context/{task-id}/
+- 任务文件: .ai-workspace/active/{task-id}/task.md
+- 上下文目录: {task_dir}/
 
 **下一步建议**：
 {根据当前状态给出建议}

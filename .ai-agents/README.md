@@ -23,16 +23,19 @@
     └── README.md
 
 .ai-workspace/              # 工作目录（临时文件，被 git ignore）
-├── tasks/                  # 任务状态跟踪
-│   ├── active/            # 进行中的任务
-│   ├── blocked/           # 被阻塞的任务
-│   └── completed/         # 已完成的任务
-├── context/               # 任务上下文共享
-│   └── {task-id}/        # 每个任务的上下文
-│       ├── analysis.md
-│       ├── plan.md
-│       ├── implementation.md
-│       └── review.md
+├── active/                 # 进行中的任务
+│   └── {task-id}/
+│       ├── task.md        # 任务主文件
+│       ├── analysis.md    # 需求分析
+│       ├── plan.md        # 技术方案
+│       ├── implementation.md  # 实现报告
+│       └── review.md      # 审查报告
+├── completed/             # 已完成的任务
+│   └── {task-id}/
+│       └── task.md + context files
+├── blocked/               # 被阻塞的任务
+│   └── {task-id}/
+│       └── task.md + context files
 └── logs/                  # 执行日志
 ```
 
@@ -42,19 +45,19 @@
 
 1. **需求分析**（推荐：Claude）
    - 理解需求，分析现有代码
-   - 输出：`.ai-workspace/context/{task-id}/analysis.md`
+   - 输出：`.ai-workspace/active/{task-id}/analysis.md`
 
 2. **方案设计**（推荐：Claude）
    - 设计技术方案，制定计划
-   - 输出：`.ai-workspace/context/{task-id}/plan.md`
+   - 输出：`.ai-workspace/active/{task-id}/plan.md`
 
 3. **代码实现**（推荐：ChatGPT/Gemini/Cursor）
    - 根据方案编写代码和测试
-   - 输出：`.ai-workspace/context/{task-id}/implementation.md`
+   - 输出：`.ai-workspace/active/{task-id}/implementation.md`
 
 4. **代码审查**（推荐：Claude）
    - 审查代码质量、安全性、性能
-   - 输出：`.ai-workspace/context/{task-id}/review.md`
+   - 输出：`.ai-workspace/active/{task-id}/review.md`
 
 5. **问题修复**（任意 AI）
    - 根据审查意见修复问题
@@ -110,8 +113,8 @@
 ### 灵活切换 AI
 
 任何 AI 都可以通过读取以下内容接手任务：
-- 任务文件：`.ai-workspace/tasks/active/{task-id}.md`
-- 上下文：`.ai-workspace/context/{task-id}/`
+- 任务文件：`.ai-workspace/active/{task-id}/task.md`
+- 上下文：`.ai-workspace/active/{task-id}/`
 
 ## 🚀 快速开始
 
@@ -119,10 +122,10 @@
 
 ```bash
 # 复制任务模板
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/TASK-{task-id}.md
+cp .ai-agents/templates/task.md .ai-workspace/active/TASK-{task-id}/task.md
 
 # 编辑任务描述
-vim .ai-workspace/tasks/active/TASK-{task-id}.md
+vim .ai-workspace/active/TASK-{task-id}/task.md
 ```
 
 ### 2. 使用 AI 分析
@@ -144,7 +147,7 @@ Claude 会：
 
 在 Cursor/ChatGPT/Gemini 中：
 ```
-根据 .ai-workspace/tasks/active/TASK-{task-id}.md 实现代码
+根据 .ai-workspace/active/TASK-{task-id}/task.md 实现代码
 ```
 
 AI 会：
@@ -237,7 +240,7 @@ GPT 和 Cursor 的配置在 `.ai-agents/gpt/` 目录。
 
 ### 上下文管理
 
-- `.ai-workspace/context/` 包含任务的完整上下文
+- `.ai-workspace/{status}/{task-id}/` 包含任务的完整上下文
 - 切换 AI 时，新的 AI 会读取这些文件了解进度
 - 保持文档完整和准确，便于协作
 

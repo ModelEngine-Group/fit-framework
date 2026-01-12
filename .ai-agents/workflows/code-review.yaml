@@ -23,7 +23,7 @@ steps:
       - "识别关键变更点"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/review-prep.md"
+      - path: ".ai-workspace/{status}/{task-id}/review-prep.md"
         required_sections:
           - "变更概述": "这次变更做了什么"
           - "关键文件": "主要修改的文件"
@@ -47,7 +47,7 @@ steps:
         reason: "擅长全面的代码审查"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/review-prep.md"
+      - path: ".ai-workspace/{status}/{task-id}/review-prep.md"
 
     tasks:
       - "代码质量检查"
@@ -58,7 +58,7 @@ steps:
       - "文档完整性检查"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/review-report.md"
+      - path: ".ai-workspace/{status}/{task-id}/review-report.md"
         required_sections:
           - "总体评价": "通过 / 需要修改 / 拒绝"
           - "优点": "做得好的地方"

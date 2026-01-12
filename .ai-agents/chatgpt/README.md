@@ -21,7 +21,7 @@
 当人类切换到 ChatGPT 时：
 
 ```
-请根据 .ai-workspace/tasks/active/TASK-{id}.md 继续工作
+请根据 .ai-workspace/active/TASK-{id}/task.md 继续工作
 ```
 
 ChatGPT 应该：
@@ -42,7 +42,7 @@ ChatGPT 擅长的任务：
 
 **示例提示词**:
 ```
-请根据 .ai-workspace/context/TASK-{id}/plan.md 中的方案实现代码。
+请根据 .ai-workspace/active/TASK-{id}/plan.md 中的方案实现代码。
 需要包括：
 1. 功能实现
 2. 单元测试
@@ -66,7 +66,7 @@ ChatGPT 擅长的任务：
 
 完成任务后，ChatGPT 应该：
 
-1. 创建输出文件到 `.ai-workspace/context/{task-id}/`
+1. 创建输出文件到 `.ai-workspace/active/{task-id}/`
 2. 更新任务状态
 3. 说明完成情况和需要注意的事项
 
@@ -171,10 +171,10 @@ ChatGPT 和 Gemini 可以互为替代：
 ## 常见问题
 
 ### Q: 如何知道现在该做什么？
-A: 查看 `.ai-workspace/tasks/active/` 下的任务文件
+A: 查看 `.ai-workspace/active/` 下的任务目录
 
 ### Q: 找不到上下文信息？
-A: 检查 `.ai-workspace/context/{task-id}/` 目录
+A: 检查 `.ai-workspace/active/{task-id}/` 目录
 
 ### Q: 任务文件中的 workflow 是什么？
 A: 查看 `.ai-agents/workflows/{workflow}.yaml` 了解完整流程

@@ -35,7 +35,7 @@ steps:
 
     # 输出要求
     outputs:
-      - path: ".ai-workspace/context/{task-id}/analysis.md"
+      - path: ".ai-workspace/{status}/{task-id}/analysis.md"
         description: "需求分析报告"
         required_sections:
           - "需求理解": "用自己的话重新描述需求，确保理解正确"
@@ -66,7 +66,7 @@ steps:
 
     # 输入依赖
     inputs:
-      - path: ".ai-workspace/context/{task-id}/analysis.md"
+      - path: ".ai-workspace/{status}/{task-id}/analysis.md"
         description: "需求分析报告"
 
     tasks:
@@ -78,7 +78,7 @@ steps:
       - "评估性能和安全影响"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/plan.md"
+      - path: ".ai-workspace/{status}/{task-id}/plan.md"
         description: "技术方案和实施计划"
         required_sections:
           - "技术方案": "详细的实现方案，包括架构设计"
@@ -110,7 +110,7 @@ steps:
         reason: "也可以实现，特别是复杂业务逻辑"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/plan.md"
+      - path: ".ai-workspace/{status}/{task-id}/plan.md"
         description: "技术方案和实施计划"
 
     tasks:
@@ -121,7 +121,7 @@ steps:
       - "遵循项目编码规范"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/implementation.md"
+      - path: ".ai-workspace/{status}/{task-id}/implementation.md"
         description: "实现报告"
         required_sections:
           - "已修改文件列表": "包含文件路径和修改说明"
@@ -150,7 +150,7 @@ steps:
         reason: "也可以进行代码审查"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/implementation.md"
+      - path: ".ai-workspace/{status}/{task-id}/implementation.md"
         description: "实现报告"
       - command: "git diff"
         description: "实际的代码变更"
@@ -164,7 +164,7 @@ steps:
       - "评估代码可维护性"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/review.md"
+      - path: ".ai-workspace/{status}/{task-id}/review.md"
         description: "代码审查报告"
         required_sections:
           - "审查结果": "通过 / 需要修改（needs_changes）"
@@ -195,7 +195,7 @@ steps:
         reason: "处理复杂重构和架构调整"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/review.md"
+      - path: ".ai-workspace/{status}/{task-id}/review.md"
         description: "代码审查报告"
 
     tasks:
@@ -206,7 +206,7 @@ steps:
       - "更新文档"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/refinement.md"
+      - path: ".ai-workspace/{status}/{task-id}/refinement.md"
         description: "修复报告"
         required_sections:
           - "已修复问题": "列出已处理的审查意见"
@@ -231,7 +231,7 @@ steps:
         reason: "也可以执行 git 操作"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/review.md"
+      - path: ".ai-workspace/{status}/{task-id}/review.md"
         description: "审查通过的报告"
 
     tasks:
@@ -282,7 +282,7 @@ notes: |
   1. 这个流程是**推荐**的最佳实践，不是强制规则
   2. 人类决定使用哪个AI执行哪个步骤
   3. 每个步骤完成后应该等待人工确认
-  4. 任何AI都可以通过读取 .ai-workspace/context/ 接手任务
+  4. 任何AI都可以通过读取 .ai-workspace/{status}/{task-id}/ 接手任务
   5. 保持上下文文档完整，便于AI切换和协作
   6. 遇到问题可以随时切换到更擅长的AI
 

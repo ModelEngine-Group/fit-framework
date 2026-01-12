@@ -562,15 +562,15 @@ Edit(file_path, old_string="Copyright (C) 2024", new_string="Copyright (C) 2024-
    - 按关键词搜索任务标题和描述
 
    **查找路径**：
-   - `.ai-workspace/tasks/active/` - 优先查找活动任务
-   - `.ai-workspace/tasks/completed/` - 其次查找已完成任务
-   - `.ai-workspace/tasks/blocked/` - 最后查找被阻塞任务
+   - `.ai-workspace/active/` - 优先查找活动任务
+   - `.ai-workspace/completed/` - 其次查找已完成任务
+   - `.ai-workspace/blocked/` - 最后查找被阻塞任务
 
 3. **自动执行**：执行标准协作流程
 
    - 读取任务文件和已有上下文
    - 按照 `.ai-agents/workflows/` 定义的工作流执行
-   - 输出到标准位置（`.ai-workspace/context/{task-id}/`）
+   - 输出到标准位置（`.ai-workspace/active/{task-id}/`）
    - 更新任务状态
 
 4. **明确告知**：向用户说明识别结果
@@ -598,7 +598,7 @@ AI 行为：
 7. 告知用户：
    "✅ 识别为需求分析任务
    已为 Issue #207 创建任务 TASK-20251227-104654
-   分析文档：.ai-workspace/context/TASK-20251227-104654/analysis.md
+   分析文档：.ai-workspace/active/TASK-20251227-104654/analysis.md
    下一步：/plan TASK-20251227-104654"
 ```
 
@@ -617,7 +617,7 @@ AI 行为：
 7. 告知用户：
    "✅ 识别为技术方案设计任务
    任务：TASK-20251227-104654
-   方案文档：.ai-workspace/context/TASK-20251227-104654/plan.md
+   方案文档：.ai-workspace/active/TASK-20251227-104654/plan.md
    下一步：等待人工审查后执行 /implement TASK-20251227-104654"
 ```
 

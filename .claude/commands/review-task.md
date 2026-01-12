@@ -8,15 +8,15 @@ usage: "/review-task <task-id> [--pr-number]"
 
 ## 功能说明
 
-审查任务的代码实现，检查代码质量、规范合规性、测试覆盖等，输出审查报告到 `.ai-workspace/context/` 目录。
+审查任务的代码实现，检查代码质量、规范合规性、测试覆盖等，输出审查报告。
 
 ## 执行流程
 
 ### 1. 验证前置条件
 
 检查必需文件：
-- `.ai-workspace/tasks/active/{task-id}.md` - 任务文件
-- `.ai-workspace/context/{task-id}/implementation.md` - 实现报告
+- `.ai-workspace/active/{task-id}/task.md` - 任务文件
+- `{task_dir}/implementation.md` - 实现报告
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -68,7 +68,7 @@ usage: "/review-task <task-id> [--pr-number]"
 
 ### 5. 输出审查报告
 
-创建 `.ai-workspace/context/{task-id}/review.md`，必须包含以下章节：
+创建 `{task_dir}/review.md`，必须包含以下章节：
 
 ```markdown
 # 代码审查报告
@@ -166,7 +166,7 @@ usage: "/review-task <task-id> [--pr-number]"
 
 ### 6. 更新任务状态
 
-更新 `.ai-workspace/tasks/active/{task-id}.md`：
+更新 `.ai-workspace/active/{task-id}/task.md`：
 - `current_step`: code-review
 - `assigned_to`: {审查者}
 - `updated_at`: {当前时间}
@@ -186,7 +186,7 @@ usage: "/review-task <task-id> [--pr-number]"
 - 总体评价: {评价}
 
 **输出文件**：
-- 审查报告: .ai-workspace/context/{task-id}/review.md
+- 审查报告: {task_dir}/review.md
 
 **下一步**：
 {根据审查结果给出建议}
@@ -222,7 +222,7 @@ usage: "/review-task <task-id> [--pr-number]"
 - 总体评价: 需要修改
 
 **输出文件**：
-- 审查报告: .ai-workspace/context/TASK-20251227-104654/review.md
+- 审查报告: .ai-workspace/active/TASK-20251227-104654/review.md
 
 **下一步**：
 发现 2 个必须修复的问题，请修复后重新审查

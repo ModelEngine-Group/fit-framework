@@ -23,7 +23,7 @@ steps:
       - "制定重构策略"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/refactoring-plan.md"
+      - path: ".ai-workspace/{status}/{task-id}/refactoring-plan.md"
         required_sections:
           - "问题分析": "当前代码的问题"
           - "重构目标": "期望达到的状态"
@@ -50,7 +50,7 @@ steps:
         reason: "快速执行简单重构"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/refactoring-plan.md"
+      - path: ".ai-workspace/{status}/{task-id}/refactoring-plan.md"
 
     tasks:
       - "按计划执行重构"
@@ -59,7 +59,7 @@ steps:
       - "更新文档"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/refactoring-result.md"
+      - path: ".ai-workspace/{status}/{task-id}/refactoring-result.md"
         required_sections:
           - "重构内容": "做了哪些重构"
           - "测试结果": "所有测试是否通过"
@@ -81,10 +81,10 @@ steps:
         reason: "全面审查重构质量"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/refactoring-result.md"
+      - path: ".ai-workspace/{status}/{task-id}/refactoring-result.md"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/review.md"
+      - path: ".ai-workspace/{status}/{task-id}/review.md"
 
     next_steps:
       - "finalize"

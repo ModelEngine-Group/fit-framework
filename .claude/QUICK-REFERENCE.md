@@ -123,13 +123,13 @@
 /analyze-issue 207
 
 # 2. 审查需求分析（人工）
-# 查看 .ai-workspace/context/TASK-xxx/analysis.md
+# 查看 .ai-workspace/active/TASK-xxx/analysis.md
 
 # 3. 设计技术方案
 /plan TASK-xxx
 
 # 4. 审查技术方案（人工）⚠️  必需
-# 查看 .ai-workspace/context/TASK-xxx/plan.md
+# 查看 .ai-workspace/active/TASK-xxx/plan.md
 
 # 5. 同步进度到 Issue（可选，推荐在重要节点）
 /sync-issue TASK-xxx
@@ -182,16 +182,16 @@
 
 ### 任务文件
 
-- 活动任务：`.ai-workspace/tasks/active/TASK-xxx.md`
-- 已完成：`.ai-workspace/tasks/completed/TASK-xxx.md`
-- 已阻塞：`.ai-workspace/tasks/blocked/TASK-xxx.md`
+- 活动任务：`.ai-workspace/active/TASK-xxx/task.md`
+- 已完成：`.ai-workspace/completed/TASK-xxx.md`
+- 已阻塞：`.ai-workspace/blocked/TASK-xxx.md`
 
 ### 上下文文件
 
-- 需求分析：`.ai-workspace/context/TASK-xxx/analysis.md`
-- 技术方案：`.ai-workspace/context/TASK-xxx/plan.md`
-- 实现报告：`.ai-workspace/context/TASK-xxx/implementation.md`
-- 审查报告：`.ai-workspace/context/TASK-xxx/review.md`
+- 需求分析：`.ai-workspace/active/TASK-xxx/analysis.md`
+- 技术方案：`.ai-workspace/active/TASK-xxx/plan.md`
+- 实现报告：`.ai-workspace/active/TASK-xxx/implementation.md`
+- 审查报告：`.ai-workspace/active/TASK-xxx/review.md`
 
 ## ⚠️  人工检查点
 
@@ -235,10 +235,10 @@
 
 ```bash
 # 查看活动任务列表
-ls .ai-workspace/tasks/active/
+ls .ai-workspace/active/
 
 # 或通过 Issue 号查找
-grep -r "#207" .ai-workspace/tasks/active/
+grep -r "#207" .ai-workspace/active/
 ```
 
 ### Q: 可以跳过某些步骤吗？

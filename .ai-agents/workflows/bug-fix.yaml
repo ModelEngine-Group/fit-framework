@@ -26,7 +26,7 @@ steps:
       - "评估影响范围"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/bug-analysis.md"
+      - path: ".ai-workspace/{status}/{task-id}/bug-analysis.md"
         required_sections:
           - "Bug描述": "现象、复现步骤、预期行为"
           - "根本原因": "问题的根本原因分析"
@@ -52,7 +52,7 @@ steps:
         reason: "处理复杂bug修复"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/bug-analysis.md"
+      - path: ".ai-workspace/{status}/{task-id}/bug-analysis.md"
 
     tasks:
       - "修复bug"
@@ -61,7 +61,7 @@ steps:
       - "检查是否有类似问题"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/bug-fix.md"
+      - path: ".ai-workspace/{status}/{task-id}/bug-fix.md"
         required_sections:
           - "修复说明": "如何修复的"
           - "测试验证": "测试结果"
@@ -84,7 +84,7 @@ steps:
         reason: "擅长审查和风险评估"
 
     inputs:
-      - path: ".ai-workspace/context/{task-id}/bug-fix.md"
+      - path: ".ai-workspace/{status}/{task-id}/bug-fix.md"
 
     tasks:
       - "审查修复方案"
@@ -92,7 +92,7 @@ steps:
       - "评估测试覆盖"
 
     outputs:
-      - path: ".ai-workspace/context/{task-id}/review.md"
+      - path: ".ai-workspace/{status}/{task-id}/review.md"
 
     next_steps:
       - "finalize"
