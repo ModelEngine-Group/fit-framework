@@ -81,9 +81,26 @@ public class PatternTest {
         assertThat(answer1.toString()).isEqualTo("answer question1 from context with my history");
     }
 
-    @RepeatedTest(1000)
-    @DisplayName("测试 ExampleSelector - 重复运行以复现 NPE")
+    @Test
+    @DisplayName("测试 ExampleSelector")
     void shouldOkWhenAiFlowWithExampleSelector() {
+        Example[] examples = {new DefaultExample("2+2", "4"), new DefaultExample("2+3", "5")};
+        Conversation<String, Prompt> converse = AiFlows.<String>create()
+                .runnableParallel(question(),
+                        fewShot(ExampleSelector.builder()
+                                .template("{{q}}={{a}}", "q", "a")
+                                .delimiter("\n")
+                                .example(examples)
+                                .build()))
+                .prompt(Prompts.human("{{examples}}\n{{question}}="))
+                .close()
+                .converse();
+        assertThat(converse.offer("1+2").await().text()).isEqualTo("2+2=4\n2+3=5\n1+2=");
+    }
+
+    @RepeatedTest(1000)
+    @DisplayName("测试 RunnableParallel 并发稳定性")
+    void shouldStableWhenRunnableParallelUnderConcurrency() {
         Example[] examples = {new DefaultExample("2+2", "4"), new DefaultExample("2+3", "5")};
         Conversation<String, Prompt> converse = AiFlows.<String>create()
                 .runnableParallel(question(),

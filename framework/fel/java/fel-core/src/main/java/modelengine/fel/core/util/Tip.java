@@ -118,7 +118,6 @@ public class Tip {
      * @return 表示当前的 {@link Tip}。
      */
     public Tip merge(Tip other) {
-        // Issue #247: 防御性处理，在并发场景下 Fork.join() 可能传入 null
         if (other == null) {
             return this;
         }
