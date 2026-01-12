@@ -10,6 +10,10 @@ usage: "/implement-task <task-id>"
 
 根据技术方案实施任务，编写代码和测试，输出实现报告。
 
+## ⚠️ CRITICAL: 状态更新要求
+
+执行此命令后，你**必须**立即更新任务状态。参见规则 7。
+
 ## 执行流程
 
 ### 1. 验证前置条件
@@ -148,6 +152,20 @@ pytest                        # Python 项目
 或使用项目的 code-review 插件：
 /code-review:code-review
 ```
+
+## ✅ 完成检查清单
+
+执行此命令后，确认：
+
+- [ ] 已完成所有代码实施
+- [ ] 已创建实现报告 `{task_dir}/implementation.md`
+- [ ] 已更新 task.md 中的 `current_step` 为 implementation
+- [ ] 已更新 task.md 中的 `updated_at` 为当前时间
+- [ ] 已更新 task.md 中的 `assigned_to` 为你的名字
+- [ ] 已在"工作流进度"中标记 technical-design 为完成 ✅
+- [ ] 已在"工作流进度"中标记 implementation 为进行中
+- [ ] 已在 task.md 中标记 implementation.md 为已完成
+- [ ] 已告知用户下一步操作（/review-task）
 
 ## 参数说明
 

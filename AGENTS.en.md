@@ -56,52 +56,85 @@ This project supports collaboration among multiple AI tools (Claude, GPT, Cursor
   - `cursor/` - Cursor-specific config
 
 - **`.ai-workspace/`** - Collaboration workspace (temporary, gitignored)
-  - `tasks/active/` - Tasks in progress
-  - `tasks/blocked/` - Blocked tasks
-  - `tasks/completed/` - Completed tasks
-  - `context/{task-id}/` - Task context files
+  - `active/` - Tasks in progress (with task files and context)
+  - `blocked/` - Blocked tasks
+  - `completed/` - Completed tasks
+  - `logs/` - Collaboration logs and records
 
 ### Standard Collaboration Flow
 
 Recommended (but not mandatory) workflow:
 
 1. **Requirement Analysis** (Recommended: Claude)
+   - Use `/analyze-issue <issue-number>` command
    - Understand requirements, analyze code, assess impact
-   - Output: `context/{task-id}/analysis.md`
+   - Output: `active/{task-id}/analysis.md`
 
 2. **Technical Design** (Recommended: Claude)
+   - Use `/plan-task <task-id>` command
    - Design technical solution, create implementation plan
-   - Output: `context/{task-id}/plan.md`
+   - Output: `active/{task-id}/plan.md`
    - ⚠️ **Human Checkpoint**: Review the plan
 
 3. **Implementation** (Recommended: ChatGPT/Gemini/Cursor)
+   - Use `/implement-task <task-id>` command
    - Write code and unit tests
-   - Output: `context/{task-id}/implementation.md`
+   - Output: `active/{task-id}/implementation.md`
 
 4. **Code Review** (Recommended: Claude)
+   - Use `/review-task <task-id>` command
    - Review quality, security, performance
-   - Output: `context/{task-id}/review.md`
+   - Output: `active/{task-id}/review.md`
 
 5. **Refinement** (Any AI)
+   - Use `/refinement-task <task-id>` command
    - Address review comments
+   - Output: `active/{task-id}/refinement-report.md`
 
-6. **Finalize** (Human confirmation)
-   - ⚠️ **Human Checkpoint**: Confirm before commit
+6. **Task Completion** (Recommended: Claude)
+   - Use `/complete-task <task-id>` command
+   - ⚠️ **Human Checkpoint**: Confirm before archiving
+   - Task moved to `completed/` directory
+
+7. **Blocking Handling** (Special cases)
+   - Use `/block-task <task-id> --reason <reason>` command
+   - Task moved to `blocked/` directory
+   - Record blocking reason and needed help
 
 ### Task Tracking
 
-Create a task:
+**Use Slash Commands to create and manage tasks**:
 ```bash
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/TASK-$(date +%Y%m%d-%H%M%S).md
+# Analyze Issue and create task
+/analyze-issue <issue-number>
+
+# View task status
+/task-status <task-id>
+
+# Sync to GitHub Issue
+/sync-issue <issue-number>
+```
+
+**Task directory structure**:
+```
+.ai-workspace/
+├── active/TASK-{timestamp}/      # Tasks in progress
+│   ├── task.md                   # Task metadata
+│   ├── analysis.md               # Requirements analysis
+│   ├── plan.md                   # Technical design
+│   ├── implementation.md         # Implementation report
+│   └── review.md                 # Code review report
+├── blocked/TASK-{timestamp}/     # Blocked tasks
+└── completed/TASK-{timestamp}/   # Completed tasks
 ```
 
 AI picks up task:
-- Read task file: `.ai-workspace/tasks/active/TASK-*.md`
-- Read context: `.ai-workspace/context/{task-id}/`
+- Read task file: `.ai-workspace/active/{task-id}/task.md`
+- Read context files: `active/{task-id}/`
 - Complete task checklist
-- Create output files
+- Update task status (CRITICAL: see Rule 7)
 
-AI handoff: Any AI can take over by reading the context directory.
+AI handoff: Any AI can take over by reading the task directory.
 
 ### AI Capabilities Reference
 
@@ -115,8 +148,11 @@ AI handoff: Any AI can take over by reading the context directory.
 ### Detailed Documentation
 
 - Collaboration Guide: `.ai-agents/README.md`
+- Quick Start: `.ai-agents/QUICKSTART.md`
 - Workflow Definitions: `.ai-agents/workflows/`
 - Claude Config: `.claude/README.md`
+- Claude Project Rules: `.claude/project-rules.md` (includes Rule 7: Task Status Management)
+- Claude Command Reference: `.claude/commands/`
 - ChatGPT Config: `.ai-agents/chatgpt/README.md`
 - Gemini Config: `.ai-agents/gemini/README.md`
 

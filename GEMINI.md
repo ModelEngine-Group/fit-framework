@@ -21,6 +21,7 @@
 - Java 格式化使用 IntelliJ 配置 `CodeFormatterFromIdea.xml`。
 - 公共/受保护的 Java API 需要 Javadoc，并包含 `@param`/`@return`。
 - 类头需包含 `@author` 与 `@since yyyy-MM-dd`。
+- 修改任意带版权头的文件时，需同步更新版权年份到当前年份。**必须先通过系统命令 `date +%Y` 获取当前年份**，然后根据版权头格式更新（例如若当前年份为 2026：`2024-2025` → `2024-2026`，`2024` → `2024-2026`）。
 - 分支命名使用模块前缀与意图，例如 `fit-feature-xxx`、`waterflow-bugfix-yyy`。
 
 ## 测试规范
@@ -55,52 +56,85 @@
   - `cursor/` - Cursor 专用配置
 
 - **`.ai-workspace/`** - 协作工作区（临时文件，已 ignore）
-  - `tasks/active/` - 进行中的任务
-  - `tasks/blocked/` - 被阻塞的任务
-  - `tasks/completed/` - 已完成的任务
-  - `context/{task-id}/` - 任务上下文文件
+  - `active/` - 进行中的任务（包含任务文件和上下文）
+  - `blocked/` - 被阻塞的任务
+  - `completed/` - 已完成的任务
+  - `logs/` - 协作日志和记录
 
 ### 标准协作流程
 
 推荐（但非强制）的工作流程：
 
 1. **需求分析**（推荐：Claude）
+   - 使用 `/analyze-issue <issue-number>` 命令
    - 理解需求，分析代码，评估影响
-   - 输出：`context/{task-id}/analysis.md`
+   - 输出：`active/{task-id}/analysis.md`
 
 2. **方案设计**（推荐：Claude）
+   - 使用 `/plan-task <task-id>` 命令
    - 设计技术方案，制定实施计划
-   - 输出：`context/{task-id}/plan.md`
+   - 输出：`active/{task-id}/plan.md`
    - ⚠️ **人工检查点**：审查方案
 
 3. **代码实现**（推荐：ChatGPT/Gemini/Cursor）
+   - 使用 `/implement-task <task-id>` 命令
    - 编写代码和单元测试
-   - 输出：`context/{task-id}/implementation.md`
+   - 输出：`active/{task-id}/implementation.md`
 
 4. **代码审查**（推荐：Claude）
+   - 使用 `/review-task <task-id>` 命令
    - 审查质量、安全、性能
-   - 输出：`context/{task-id}/review.md`
+   - 输出：`active/{task-id}/review.md`
 
 5. **问题修复**（任意 AI）
-   - 根据审查意见改进
+   - 使用 `/refinement-task <task-id>` 命令
+   - 根据审查意见改进代码
+   - 输出：`active/{task-id}/refinement-report.md`
 
-6. **最终提交**（人工确认）
-   - ⚠️ **人工检查点**：确认后提交
+6. **任务归档**（推荐：Claude）
+   - 使用 `/complete-task <task-id>` 命令
+   - ⚠️ **人工检查点**：确认后归档
+   - 任务移动到 `completed/` 目录
+
+7. **阻塞处理**（特殊情况）
+   - 使用 `/block-task <task-id> --reason <原因>` 命令
+   - 任务移动到 `blocked/` 目录
+   - 记录阻塞原因和需要的帮助
 
 ### 任务跟踪
 
-创建任务：
+**使用 Slash Commands 创建和管理任务**：
 ```bash
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/TASK-$(date +%Y%m%d-%H%M%S).md
+# 分析 Issue 并创建任务
+/analyze-issue <issue-number>
+
+# 查看任务状态
+/task-status <task-id>
+
+# 同步到 GitHub Issue
+/sync-issue <issue-number>
+```
+
+**任务目录结构**：
+```
+.ai-workspace/
+├── active/TASK-{timestamp}/      # 进行中的任务
+│   ├── task.md                   # 任务元数据
+│   ├── analysis.md               # 需求分析
+│   ├── plan.md                   # 技术方案
+│   ├── implementation.md         # 实现报告
+│   └── review.md                 # 审查报告
+├── blocked/TASK-{timestamp}/     # 被阻塞的任务
+└── completed/TASK-{timestamp}/   # 已完成的任务
 ```
 
 AI 接手任务：
-- 读取任务文件：`.ai-workspace/tasks/active/TASK-*.md`
-- 读取上下文：`.ai-workspace/context/{task-id}/`
+- 读取任务文件：`.ai-workspace/active/{task-id}/task.md`
+- 读取上下文文件：`active/{task-id}/`
 - 完成任务清单
-- 创建输出文件
+- 更新任务状态（CRITICAL：参见规则 7）
 
-AI 切换：任何 AI 都可以通过读取 context 目录接手任务。
+AI 切换：任何 AI 都可以通过读取任务目录接手任务。
 
 ### AI 能力参考
 
@@ -114,10 +148,13 @@ AI 切换：任何 AI 都可以通过读取 context 目录接手任务。
 ### 详细文档
 
 - 协作总指南：`.ai-agents/README.md`
+- 快速开始：`.ai-agents/QUICKSTART.md`
 - 工作流定义：`.ai-agents/workflows/`
 - Claude 配置：`.claude/README.md`
-- ChatGPT Config: `.ai-agents/chatgpt/README.md`
-- Gemini Config: `.ai-agents/gemini/README.md`
+- Claude 项目规则：`.claude/project-rules.md`（包含规则 7：任务状态管理规范）
+- Claude 命令参考：`.claude/commands/`
+- ChatGPT 配置：`.ai-agents/chatgpt/README.md`
+- Gemini 配置：`.ai-agents/gemini/README.md`
 
 ### 基于标准
 

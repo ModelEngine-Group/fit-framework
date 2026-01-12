@@ -10,6 +10,10 @@ usage: "/review-task <task-id> [--pr-number]"
 
 审查任务的代码实现，检查代码质量、规范合规性、测试覆盖等，输出审查报告。
 
+## ⚠️ CRITICAL: 状态更新要求
+
+执行此命令后，你**必须**立即更新任务状态。参见规则 7。
+
 ## 执行流程
 
 ### 1. 验证前置条件
@@ -196,6 +200,22 @@ usage: "/review-task <task-id> [--pr-number]"
 - 如果有需要修改项：修复问题后重新审查
 - 如果需要重大修改：回到 /implement-task 重新实施
 ```
+
+## ✅ 完成检查清单
+
+执行此命令后，确认：
+
+- [ ] 已完成代码审查
+- [ ] 已创建审查报告 `{task_dir}/review.md`
+- [ ] 已更新 task.md 中的 `current_step` 为 code-review
+- [ ] 已更新 task.md 中的 `updated_at` 为当前时间
+- [ ] 已更新 task.md 中的 `assigned_to` 为你的名字（审查者）
+- [ ] 已在"工作流进度"中标记 implementation 为完成 ✅
+- [ ] 已在"工作流进度"中标记 code-review 为进行中
+- [ ] 已在 task.md 中标记 review.md 为已完成
+- [ ] 已告知用户下一步操作（根据审查结果）
+- [ ] 如果审查通过，告知用户可以使用 /commit 提交
+- [ ] 如果需要修复，告知用户使用 /refinement-task 修复问题
 
 ## 参数说明
 
