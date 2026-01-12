@@ -10,6 +10,10 @@ usage: "/analyze-issue <issue-number>"
 
 分析指定的 GitHub Issue，创建任务并输出需求分析文档。
 
+## ⚠️ CRITICAL: 状态更新要求
+
+执行此命令后，你**必须**立即更新任务状态。参见规则 7。
+
 ## 执行流程
 
 ### 1. 获取 Issue 信息
@@ -96,6 +100,19 @@ gh issue view <issue-number> --json number,title,body,labels
 审查需求分析后，使用以下命令设计技术方案：
 /plan-task {task-id}
 ```
+
+## ✅ 完成检查清单
+
+执行此命令后，确认：
+
+- [ ] 已创建任务文件 `.ai-workspace/active/{task-id}/task.md`
+- [ ] 已创建分析文档 `.ai-workspace/active/{task-id}/analysis.md`
+- [ ] 已更新 task.md 中的 `current_step` 为 requirement-analysis
+- [ ] 已更新 task.md 中的 `updated_at` 为当前时间
+- [ ] 已更新 task.md 中的 `assigned_to` 为你的名字
+- [ ] 已在"工作流进度"中标记 requirement-analysis 为完成 ✅
+- [ ] 已告知用户下一步操作（/plan-task）
+- [ ] 如果有关联 Issue，已在 task.md 中记录 Issue 编号
 
 ## 参数说明
 

@@ -10,6 +10,10 @@ usage: "/plan-task <task-id>"
 
 为指定任务设计技术方案,输出详细的实施计划。
 
+## ⚠️ CRITICAL: 状态更新要求
+
+执行此命令后，你**必须**立即更新任务状态。参见规则 7。
+
 ## 执行流程
 
 ### 1. 查找任务文件
@@ -140,6 +144,19 @@ usage: "/plan-task <task-id>"
 审查通过后，使用以下命令开始实施：
 /implement-task {task-id}
 ```
+
+## ✅ 完成检查清单
+
+执行此命令后，确认：
+
+- [ ] 已创建方案文档 `{task_dir}/plan.md`
+- [ ] 已更新 task.md 中的 `current_step` 为 technical-design
+- [ ] 已更新 task.md 中的 `updated_at` 为当前时间
+- [ ] 已更新 task.md 中的 `assigned_to` 为你的名字
+- [ ] 已在"工作流进度"中标记 requirement-analysis 为完成 ✅
+- [ ] 已在"工作流进度"中标记 technical-design 为进行中
+- [ ] 已在 task.md 中标记 plan.md 为已完成
+- [ ] 已告知用户这是人工检查点，需要审查后再继续
 
 ## 参数说明
 

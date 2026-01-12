@@ -638,3 +638,153 @@ AI 行为：
 4. **保持一致性**：
    - 无论通过命令还是自然语言，输出格式保持一致
    - 使用相同的文件路径和命名规范
+
+---
+
+## 规则 7: 任务状态管理规范（CRITICAL）
+
+### 强制要求
+
+你**必须**在执行以下命令后立即更新任务状态。这是一个 **CRITICAL** 规则，违反此规则是不可接受的。
+
+| 命令 | 必须更新的字段 | 必须执行的操作 |
+|------|---------------|---------------|
+| `/analyze-issue` | `current_step`, `updated_at`, `assigned_to` | 创建任务文件 |
+| `/plan-task` | `current_step`, `updated_at` | 标记分析完成，进入技术设计 |
+| `/implement-task` | `current_step`, `updated_at` | 标记方案完成，进入代码实施 |
+| `/review-task` | `current_step`, `updated_at` | 标记实现完成，进入代码审查 |
+| `/refinement-task` | `current_step`, `updated_at` | 记录修复情况，标记为修复中 |
+| `/complete-task` | `status`, `completed_at`, `updated_at` | 移动到 `completed` 目录 |
+| `/block-task` | `status`, `blocked_at`, `blocked_reason`, `updated_at` | 移动到 `blocked` 目录 |
+| `/commit` | `updated_at` | 记录提交信息 |
+
+### 状态更新检查清单
+
+每次完成命令后，必须确认：
+
+- [ ] `task.md` 中的 `current_step` 已更新
+- [ ] `task.md` 中的 `updated_at` 已更新为当前时间（格式：`yyyy-MM-dd HH:mm:ss`）
+- [ ] `task.md` 中的 `assigned_to` 已更新为你的名字
+- [ ] "工作流进度" 部分已标记当前步骤为完成 ✅
+- [ ] 如果任务完成，已执行 `/complete-task` 归档
+- [ ] 如果任务阻塞，已执行 `/block-task` 并说明原因
+
+### 状态字段说明
+
+**基本状态字段**：
+```yaml
+status: active | blocked | completed  # 任务整体状态
+current_step: {step-id}               # 当前所在步骤
+created_at: {yyyy-MM-dd HH:mm:ss}     # 创建时间
+updated_at: {yyyy-MM-dd HH:mm:ss}     # 最后更新时间
+assigned_to: {ai-name}                # 当前负责的 AI
+```
+
+**完成状态字段**（仅当 status = completed）：
+```yaml
+completed_at: {yyyy-MM-dd HH:mm:ss}   # 完成时间
+```
+
+**阻塞状态字段**（仅当 status = blocked）：
+```yaml
+blocked_at: {yyyy-MM-dd HH:mm:ss}     # 阻塞时间
+blocked_by: {ai-name}                 # 标记阻塞的 AI
+blocked_reason: {简短描述}             # 阻塞原因
+```
+
+### 工作流进度标记
+
+在 `task.md` 的 "工作流进度" 部分，必须使用以下格式：
+
+```markdown
+## 工作流进度
+
+根据 `.ai-agents/workflows/{workflow-name}.yaml`:
+
+- [x] requirement-analysis (claude, 2026-01-03)
+- [x] technical-design (claude, 2026-01-03)
+- [x] implementation (claude, 2026-01-04)
+- [x] code-review (claude, 2026-01-04)
+- [ ] finalize (待执行)
+```
+
+**标记规则**：
+- 已完成的步骤：`[x] {step-name} ({ai-name}, {date})`
+- 正在进行的步骤：`[x] {step-name} (进行中)`
+- 未开始的步骤：`[ ] {step-name} (待执行)`
+
+### 违反规则的后果
+
+如果你忘记更新状态，将导致：
+
+1. **追踪失败**：人类无法追踪任务进度
+2. **接手困难**：其他 AI 无法接手任务
+3. **任务遗失**：任务可能被遗忘在 `active` 目录中
+4. **报告不准确**：无法生成准确的进度报告
+5. **工作流混乱**：工作流程无法正常流转
+
+**这是一个 CRITICAL 规则，违反此规则会严重影响项目协作效率。**
+
+### 最佳实践
+
+1. **立即更新**：
+   - 不要延迟。完成命令后，第一件事就是更新状态
+   - 不要批量更新。每个命令执行后立即更新
+
+2. **完整更新**：
+   - 更新所有必需的字段
+   - 更新工作流进度标记
+   - 如果有输出文件，在 task.md 中标记为已完成
+
+3. **准确记录**：
+   - `updated_at` 必须是当前实际时间
+   - `assigned_to` 必须是你的名字（claude / chatgpt / gemini 等）
+   - `current_step` 必须与实际步骤一致
+
+4. **及时归档**：
+   - 任务完成后，立即使用 `/complete-task` 归档
+   - 任务阻塞后，立即使用 `/block-task` 标记
+   - 不要让已完成的任务停留在 `active` 目录
+
+5. **使用检查清单**：
+   - 每个命令文件末尾都有"完成检查清单"
+   - 执行命令后，逐项检查
+   - 确认所有项目都已完成
+
+### 示例
+
+**正确示例**：
+
+```yaml
+# 执行 /implement-task TASK-20260103-135501 后
+id: TASK-20260103-135501
+status: active
+current_step: implementation
+created_at: 2026-01-03 13:55:01
+updated_at: 2026-01-04 10:30:15  # 立即更新为当前时间
+assigned_to: claude
+```
+
+**错误示例**：
+
+```yaml
+# 执行 /implement-task 后忘记更新
+id: TASK-20260103-135501
+status: active
+current_step: technical-design  # ❌ 未更新为 implementation
+updated_at: 2026-01-03 14:22:11  # ❌ 未更新为当前时间
+assigned_to: claude
+```
+
+### 相关命令
+
+- `/task-status` - 查看任务当前状态
+- `/complete-task` - 标记任务完成并归档
+- `/block-task` - 标记任务阻塞
+- `/sync-issue` - 同步状态到 GitHub Issue
+
+### 参考资料
+
+- 任务模板：`.ai-agents/templates/task.md`
+- 工作流定义：`.ai-agents/workflows/`
+- 命令文档：`.claude/commands/`
