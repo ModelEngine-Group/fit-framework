@@ -99,19 +99,14 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
 
                 // Issue #247: 智能处理并发场景下的 null 数据
                 // 在某些竞态条件下，FlowContext.data 可能为 null
+                // 此时不更新分支计数，等待正确的数据到来
                 O inputData = input.getData();
                 if (inputData == null) {
-                    LOG.warn("[Fork.join] Received null FlowContext.data. "
+                    LOG.warn("[Fork.join] Received null FlowContext.data, skipping. "
                             + "key={}, session={}, thread={}, branch={}/{}, acc={}",
                             key, input.getSession().getId(), Thread.currentThread().getName(),
                             acc.second() + 1, forkNumber.get(), acc.first());
-
-                    // 跳过此分支，不更新累加器
-                    // 如果是最后一个分支，返回已有数据（避免整个流程失败）
-                    if (acc.second() + 1 == forkNumber.get()) {
-                        accs.remove(key);
-                        return acc.first();
-                    }
+                    // 返回 null 表示聚合未完成，等待有效数据
                     return null;
                 }
 
