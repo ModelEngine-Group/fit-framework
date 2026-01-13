@@ -592,10 +592,7 @@ public class AiStart<O, D, I, RF extends Flow<D>, F extends AiFlow<D, RF>> exten
                     .orElseGet(() -> new AiParallel<>(this.start.parallel(), mineFlow).fork(branchProcessor));
         }
 
-        AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> {
-            acc.merge(data);
-            return acc;
-        });
+        AiState<Tip, D, Tip, RF, F> state = aiFork.join(Tip::new, (acc, data) -> acc.merge(data));
         ((Processor<?, ?>) state.publisher()).displayAs("runnableParallel");
         return state;
     }
