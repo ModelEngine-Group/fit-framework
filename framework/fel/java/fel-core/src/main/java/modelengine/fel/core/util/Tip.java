@@ -118,6 +118,9 @@ public class Tip {
      * @return 表示当前的 {@link Tip}。
      */
     public Tip merge(Tip other) {
+        if (other == null) {
+            return this;
+        }
         return this.addAll(other.values);
     }
 

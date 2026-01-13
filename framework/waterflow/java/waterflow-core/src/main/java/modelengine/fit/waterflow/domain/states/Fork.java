@@ -93,7 +93,13 @@ public class Fork<O, D, I, F extends Flow<D>> extends Activity<D, F> {
                         acc = Tuple.from((R) "", 0);
                     }
                 }
-                acc = Tuple.from(processor.process(acc.first(), input.getData()), acc.second() + 1);
+
+                O inputData = input.getData();
+                if (inputData == null) {
+                    return null;
+                }
+                R processedResult = processor.process(acc.first(), inputData);
+                acc = Tuple.from(processedResult, acc.second() + 1);
                 accs.put(key, acc);
 
                 if (acc.second() == forkNumber.get()) {

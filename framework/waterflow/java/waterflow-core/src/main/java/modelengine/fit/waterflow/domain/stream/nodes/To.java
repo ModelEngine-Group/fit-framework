@@ -937,7 +937,9 @@ public class To<I, O> extends IdGenerator implements Subscriber<I, O> {
                             nextSession.getWindow().complete();
                         }
                     } else {
-                        peekedToken.finishConsume();
+                        if (peekedToken != null) {
+                            peekedToken.finishConsume();
+                        }
                         if (window.isDone()) {
                             window.tryFinish();
                         }
