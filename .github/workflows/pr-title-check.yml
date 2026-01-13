@@ -1,0 +1,44 @@
+name: PR Title Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5.5.2
+        with:
+          # 允许的提交类型
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            chore
+            build
+            ci
+            revert
+
+          # 不限制 scope，允许任意模块名
+          # requireScope: false - scope 是可选的
+
+          # 标题描述长度 5-100 字符
+          subjectPattern: '^.{5,100}$'
+          subjectPatternError: '标题描述长度应在 5-100 字符之间'
+
+          # 禁用首字母大写检查（兼容中文）
+          enforceSingleSentence: false
+
+          # 支持 WIP 前缀标记进行中的工作
+          wip: true
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
