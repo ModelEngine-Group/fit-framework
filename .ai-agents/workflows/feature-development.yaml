@@ -22,8 +22,8 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "擅长系统性分析和架构理解，代码comprehension能力强"
-      - name: "chatgpt"
-        reason: "也具备良好的需求分析能力"
+      - name: "gemini"
+        reason: "超大上下文窗口，适合分析大规模代码库"
 
     # 任务清单
     tasks:
@@ -61,7 +61,7 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "擅长架构设计、技术方案规划和权衡决策"
-      - name: "chatgpt"
+      - name: "gemini"
         reason: "也可以进行方案设计"
 
     # 输入依赖
@@ -102,10 +102,10 @@ steps:
       - "debugging"
 
     recommended_agents:
-      - name: "chatgpt"
+      - name: "codex"
         reason: "擅长代码实现、单元测试编写和快速迭代"
-      - name: "cursor"
-        reason: "代码编辑体验好，适合实现"
+      - name: "gemini"
+        reason: "超大上下文窗口，适合大规模代码实现"
       - name: "claude"
         reason: "也可以实现，特别是复杂业务逻辑"
 
@@ -146,7 +146,7 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "擅长代码审查、安全分析和性能优化建议"
-      - name: "chatgpt"
+      - name: "gemini"
         reason: "也可以进行代码审查"
 
     inputs:
@@ -189,9 +189,9 @@ steps:
       - "problem solving"
 
     recommended_agents:
-      - name: "chatgpt"
+      - name: "codex"
         reason: "快速修复问题和代码调整"
-      - name: "claude"
+      - name: "gemini"
         reason: "处理复杂重构和架构调整"
 
     inputs:
@@ -227,7 +227,7 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "有 /commit 命令，熟悉项目提交规范"
-      - name: "chatgpt"
+      - name: "codex"
         reason: "也可以执行 git 操作"
 
     inputs:

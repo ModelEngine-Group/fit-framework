@@ -46,7 +46,7 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "擅长复杂重构"
-      - name: "chatgpt"
+      - name: "codex"
         reason: "快速执行简单重构"
 
     inputs:

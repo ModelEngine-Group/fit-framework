@@ -1,16 +1,16 @@
-# ChatGPT 配置说明
+# Codex 配置说明
 
-本目录包含 ChatGPT 在 FIT Framework 项目中的配置。
+本目录包含 Codex (OpenAI/ChatGPT) 在 FIT Framework 项目中的配置。
 
 ## 配置文件
 
-- `preferences.yaml` - ChatGPT 的偏好配置
+- `preferences.yaml` - Codex 的偏好配置
 
-## 使用 ChatGPT 参与协作
+## 使用 Codex 参与协作
 
 ### 1. 读取项目配置
 
-在开始工作前，ChatGPT 应该：
+在开始工作前，Codex 应该：
 
 1. 读取 `AGENTS.md`（项目根目录）了解项目基本信息
 2. 读取 `.ai-agents/README.md` 了解协作流程
@@ -18,15 +18,15 @@
 
 ### 2. 接手任务
 
-当人类切换到 ChatGPT 时：
+当人类切换到 Codex 时：
 
 ```
 请根据 .ai-workspace/active/TASK-{id}/task.md 继续工作
 ```
 
-ChatGPT 应该：
+Codex 应该：
 1. 读取任务文件
-2. 读取相关的上下文文件（context/{task-id}/）
+2. 读取相关的上下文文件（`.ai-workspace/active/{task-id}/`）
 3. 理解当前进度和下一步要做什么
 4. 开始执行任务
 
@@ -34,7 +34,7 @@ ChatGPT 应该：
 
 #### 代码实现
 
-ChatGPT 擅长的任务：
+Codex 擅长的任务：
 - 根据设计方案编写代码
 - 编写单元测试
 - 重构代码
@@ -64,7 +64,7 @@ ChatGPT 擅长的任务：
 
 ### 4. 完成任务后
 
-完成任务后，ChatGPT 应该：
+完成任务后，Codex 应该：
 
 1. 创建输出文件到 `.ai-workspace/active/{task-id}/`
 2. 更新任务状态
@@ -86,28 +86,32 @@ ChatGPT 擅长的任务：
 - ...
 
 ## 下一步建议
-建议切换到 Claude 进行代码审查
+建议切换到 ClaudeCode 进行代码审查
 ```
 
-## ChatGPT 的优势
+## Codex 的优势
 
-在 FIT Framework 项目中，ChatGPT 擅长：
+在 FIT Framework 项目中，Codex (OpenAI/ChatGPT) 擅长：
 
 1. **快速代码实现**
    - 根据设计方案快速编写代码
    - 遵循现有代码风格
+   - 代码生成效率高
 
 2. **单元测试编写**
    - 生成全面的测试用例
    - 覆盖边界情况
+   - 测试代码质量好
 
 3. **代码重构**
    - 小范围的代码优化
    - 提取方法、简化逻辑
+   - 快速迭代
 
 4. **Bug修复**
    - 快速定位和修复问题
    - 添加回归测试
+   - 高效排错
 
 5. **文档编写**
    - API 文档
@@ -116,29 +120,30 @@ ChatGPT 擅长的任务：
 
 ## 与其他 AI 协作
 
-### 与 Claude 配合
+### 与 ClaudeCode 配合
 
 典型流程：
-1. **Claude** 分析需求，设计方案
-2. **ChatGPT** 实现代码和测试
-3. **Claude** 审查代码
-4. **ChatGPT** 修复问题（如果有）
-5. **Claude** 最终确认和提交
+1. **ClaudeCode** 分析需求，设计方案
+2. **Codex** 实现代码和测试
+3. **ClaudeCode** 审查代码
+4. **Codex** 修复问题（如果有）
+5. **ClaudeCode** 最终确认和提交
 
-### 与 Gemini 配合
+### 与 GeminiCli 配合
 
-ChatGPT 和 Gemini 可以互为替代：
+Codex 和 GeminiCli 可以互为替代或协作：
 - 根据任务特点选择更合适的 AI
 - 都擅长代码实现和测试编写
+- Codex 更适合快速迭代，GeminiCli 更适合大规模分析
 
 ### 交接要点
 
-从 Claude 接手时：
-- 仔细阅读 plan.md 理解设计意图
+从 ClaudeCode 接手时：
+- 仔细阅读 `plan.md` 理解设计意图
 - 严格按照方案实现，不要擅自改动设计
 - 有疑问及时询问
 
-交接给 Claude 时：
+交接给 ClaudeCode 时：
 - 说明实现细节和关键决策
 - 列出需要重点审查的地方
 - 标注已知问题或待优化项
@@ -168,6 +173,20 @@ ChatGPT 和 Gemini 可以互为替代：
 - 例如：`[fit] 修复某问题`
 - 不要自动提交，等待人工确认
 
+## Codex vs GeminiCli 选择建议
+
+**优先选择 Codex**：
+- 快速迭代和原型开发
+- 单一功能的实现
+- 需要快速生成大量代码
+- 小到中等规模的修改
+
+**优先选择 GeminiCli**：
+- 大规模代码库分析
+- 需要全局重构
+- 超大上下文场景（2M tokens）
+- 跨多个模块的复杂改动
+
 ## 常见问题
 
 ### Q: 如何知道现在该做什么？
@@ -179,8 +198,11 @@ A: 检查 `.ai-workspace/active/{task-id}/` 目录
 ### Q: 任务文件中的 workflow 是什么？
 A: 查看 `.ai-agents/workflows/{workflow}.yaml` 了解完整流程
 
-### Q: 需要切换到其他 AI吗？
+### Q: 需要切换到其他 AI 吗？
 A: 根据任务类型和 workflow 中的推荐，但最终由人类决定
+
+### Q: Codex 和 GeminiCli 有什么区别？
+A: Codex 擅长快速代码生成，GeminiCli 擅长大规模分析（超大上下文窗口）
 
 ## 参考资料
 
@@ -188,3 +210,10 @@ A: 根据任务类型和 workflow 中的推荐，但最终由人类决定
 - 协作指南：`.ai-agents/README.md`
 - 工作流定义：`.ai-agents/workflows/`
 - 任务模板：`.ai-agents/templates/`
+- 快速开始：`.ai-agents/QUICKSTART.md`
+
+## 版本信息
+
+**配置版本**: 2.0.0
+**AI 名称**: Codex (OpenAI/ChatGPT)
+**定位**: 执行型专家 - 快速代码实现和测试编写

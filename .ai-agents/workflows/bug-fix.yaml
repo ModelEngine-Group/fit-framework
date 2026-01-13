@@ -15,8 +15,8 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "擅长系统性分析和根因定位"
-      - name: "chatgpt"
-        reason: "也可以进行bug分析"
+      - name: "gemini"
+        reason: "超大上下文窗口，适合复杂bug分析"
 
     tasks:
       - "复现bug（如果可能）"
@@ -46,9 +46,9 @@ steps:
       - "testing"
 
     recommended_agents:
-      - name: "chatgpt"
+      - name: "codex"
         reason: "快速修复和测试编写"
-      - name: "claude"
+      - name: "gemini"
         reason: "处理复杂bug修复"
 
     inputs:

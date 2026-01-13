@@ -1,6 +1,6 @@
 # 多 AI 协作快速开始指南
 
-本指南帮助你快速上手 FIT Framework 的多 AI 协作功能。
+本指南帮助你快速上手 FIT Framework 的多 AI 协作功能（支持 ClaudeCode、Codex、GeminiCli）。
 
 ## 🚀 5分钟快速开始
 
@@ -16,51 +16,57 @@ cp .ai-agents/templates/task.md .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/t
 - 任务描述
 - 选择工作流（feature-development/bug-fix/code-review/refactoring）
 
-### 2. 使用 Claude 分析需求
+### 2. 使用 ClaudeCode 分析需求
 
 在 Claude Code 中：
 ```
 请分析 .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md 中的任务
 ```
 
-Claude 会：
+ClaudeCode 会：
 1. 读取任务描述
 2. 分析相关代码
 3. 创建需求分析报告：`.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/analysis.md`
 
-### 3. Claude 设计技术方案
+### 3. ClaudeCode 设计技术方案
 
 ```
 请为 TASK-{yyyyMMdd}-{task-id} 设计技术方案
 ```
 
-Claude 会创建：
+ClaudeCode 会创建：
 - `.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/plan.md`
 
 **人工检查点**：审查方案是否合理
 
-### 4. 切换到 ChatGPT 实现代码
+### 4. 切换到 Codex/GeminiCli 实现代码
 
-在 ChatGPT/Cursor 中：
+**使用 Codex (OpenAI/ChatGPT)**：
 ```
 请根据 .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md 实现代码。
 参考方案：.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/plan.md
 ```
 
-ChatGPT 会：
+**或使用 GeminiCli**：
+```
+请根据 .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md 实现代码。
+参考方案：.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/plan.md
+```
+
+AI 会：
 1. 读取任务和方案
 2. 编写代码实现
 3. 编写单元测试
 4. 创建实现报告：`.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/implementation.md`
 
-### 5. 切换回 Claude 审查代码
+### 5. 切换回 ClaudeCode 审查代码
 
 在 Claude Code 中：
 ```
 请审查 TASK-{yyyyMMdd}-{task-id} 的实现
 ```
 
-Claude 会：
+ClaudeCode 会：
 1. 读取实现报告
 2. 审查代码变更
 3. 创建审查报告：`.ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/review.md`
@@ -73,7 +79,7 @@ Claude 会：
 ```
 
 **如果需要修改**：
-切换到 ChatGPT 修复问题，然后重新审查。
+切换到 Codex 或 GeminiCli 修复问题，然后重新审查。
 
 ---
 
@@ -86,17 +92,17 @@ Claude 会：
 cp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/task.md
 # 编辑：type: bugfix, workflow: bug-fix
 
-# 2. Claude 分析 Bug
+# 2. ClaudeCode 分析 Bug
 "请分析 BUG-{yyyyMMdd}-{task-id} 中的问题"
 
-# 3. ChatGPT 修复 Bug
+# 3. Codex/GeminiCli 修复 Bug
 "请修复 BUG-{yyyyMMdd}-{task-id}"
 
-# 4. Claude 审查修复
+# 4. ClaudeCode 审查修复
 "请审查 BUG-{yyyyMMdd}-{task-id} 的修复"
 
 # 5. 提交
-/commitcp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/task.md
+/commit
 ```
 
 ### 场景 2：代码审查
@@ -106,7 +112,7 @@ cp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/ta
 cp .ai-agents/templates/task.md .ai-workspace/active/REVIEW-PR-{task-id}/task.md
 # 编辑：type: review, workflow: code-review
 
-# 2. Claude 执行审查
+# 2. ClaudeCode 执行审查
 /review {task-id}
 # 或
 "请审查 PR #{task-id}"
@@ -121,12 +127,12 @@ cp .ai-agents/templates/task.md .ai-workspace/active/REVIEW-PR-{task-id}/task.md
 cp .ai-agents/templates/task.md .ai-workspace/active/REFACTOR-{yyyyMMdd}-{task-id}/task.md
 # 编辑：type: refactor, workflow: refactoring
 
-# 2. Claude 分析和规划
+# 2. ClaudeCode 分析和规划
 "请分析 REFACTOR-{yyyyMMdd}-{task-id} 并制定重构计划"
 
 # 3. 审查重构计划（重要！）
 
-# 4. Claude 或 ChatGPT 执行重构
+# 4. ClaudeCode 或 Codex/GeminiCli 执行重构
 "请执行 REFACTOR-{yyyyMMdd}-{task-id} 的重构"
 
 # 5. 审查 + 提交
@@ -164,17 +170,23 @@ REVIEW-PR-{pr-number}.md  # PR审查
 
 ### 4. AI 切换时机
 
-**切换到 Claude**：
+**切换到 ClaudeCode**：
 - 需要系统性分析
 - 代码审查
 - 架构设计
 - 安全审计
 
-**切换到 ChatGPT**：
+**切换到 Codex (OpenAI/ChatGPT)**：
 - 快速实现功能
 - 编写单元测试
 - 修复简单问题
-- 代码重构
+- 快速迭代开发
+
+**切换到 GeminiCli (Google Gemini)**：
+- 大规模代码分析
+- 全局重构
+- 复杂问题修复
+- 需要超大上下文的任务
 
 ### 5. 灵活应对
 
@@ -226,9 +238,9 @@ cat .ai-agents/workflows/feature-development.yaml
 - **协作总指南**：`.ai-agents/README.md`
 - **工作流定义**：`.ai-agents/workflows/`
 - **任务模板**：`.ai-agents/templates/`
-- **Claude 配置**：`.claude/README.md`
-- **ChatGPT 配置**：`.ai-agents/chatgpt/README.md`
-- **Gemini 配置**：`.ai-agents/gemini/README.md`
+- **ClaudeCode 配置**：`.claude/README.md`
+- **Codex 配置**：`.ai-agents/codex/README.md`
+- **GeminiCli 配置**：`.ai-agents/gemini/README.md`
 
 ---
 
@@ -239,6 +251,26 @@ cat .ai-agents/workflows/feature-development.yaml
 3. **人工确认**：关键步骤一定要人工审查
 4. **定期清理**：完成的任务可以移到 completed 目录
 5. **灵活调整**：根据实际情况调整工作流
+6. **发挥优势**：根据各 AI 的优势选择合适的工具
+
+---
+
+## 🤖 三个 AI 的特点
+
+**ClaudeCode** - 思考型专家
+- 擅长：需求分析、方案设计、代码审查、安全审计
+- 特点：深度推理、系统性思考、架构能力强
+- 配置：`.claude/` 目录
+
+**Codex** (OpenAI/ChatGPT) - 执行型专家
+- 擅长：代码实现、快速迭代、单元测试
+- 特点：代码生成速度快、补全准确
+- 配置：`.ai-agents/codex/` 目录
+
+**GeminiCli** (Google Gemini) - 全能型专家
+- 擅长：大规模代码分析、复杂问题修复
+- 特点：超大上下文窗口（2M tokens）
+- 配置：`.ai-agents/gemini/` 目录
 
 ---
 

@@ -14,7 +14,7 @@ steps:
     recommended_agents:
       - name: "claude"
         reason: "有 /review 命令"
-      - name: "chatgpt"
+      - name: "gemini"
         reason: "也可以进行审查准备"
 
     tasks:
