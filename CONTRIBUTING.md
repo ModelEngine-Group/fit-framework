@@ -86,10 +86,27 @@ exec git-hooks/check-utf8-encoding.sh
 
 ### 提交信息格式
 
-- 用简短的语句描述提交的主要内容，不要太长，建议 20 个字以内，需要使用中文，结尾不需要句号。
-- 如有必要，在简短的描述后添加一个空行，然后补充详细说明，可以使用多行来描述。
-- 说明中可以包括问题的原因、解决方法和影响范围等。
-- 样例：`修复某问题`。
+我们采用 [Conventional Commits](https://www.conventionalcommits.org/) 规范，格式如下：
+`<type>(<scope>): <subject>`
+
+- **type（类型）**：
+  - `feat`: 新功能 (feature)
+  - `fix`: 问题修复 (bug fix)
+  - `docs`: 文档变更 (documentation)
+  - `style`: 代码格式 (formatting, missing semi colons, etc; no code change)
+  - `refactor`: 代码重构 (neither fixes a bug nor adds a feature)
+  - `perf`: 性能优化 (performance)
+  - `test`: 测试相关 (adding missing tests)
+  - `chore`: 构建过程或辅助工具变动 (maintain)
+- **scope（范围/模块）**：对应项目模块名，如 `fit`, `waterflow`, `fel`, `framework`, `ohscript` 等。如果涉及多个模块或全局变动，可以使用 `*` 或留空。
+- **subject（描述）**：简短描述主要内容，建议 20 个字以内，需要使用中文，结尾不需要句号。
+
+如有必要，在简短的描述后添加一个空行，然后补充详细说明，可以使用多行来描述（包括问题原因、解决方法和影响范围等）。
+
+**样例：**
+- `feat(fit): 支持 HTTPS 双向认证`
+- `fix(waterflow): 修复调度引擎的空指针异常`
+- `docs(framework): 修正快速开始指南中的拼写错误`
 
 ## 代码审查
 
