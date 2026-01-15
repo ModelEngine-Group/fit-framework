@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(tree:*)",
+      "Bash(date:*)",
       "WebSearch",
       "WebFetch",
       "Bash(gh:*)",
