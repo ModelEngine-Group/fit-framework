@@ -16,7 +16,7 @@ FIT for Python 是基于 FIT Framework 的 Python 运行时与插件开发套件
 - `plugin/`：本地插件工程根目录，使用 CLI 生成与构建。
 - `conf/`：框架及插件相关配置。
 - `bootstrap/`：运行时启动与配置加载的底层实现。
-- `requirements.txt`：运行时依赖列表。
+- `pyproject.toml`：项目配置与运行时依赖列表。
 - `fit_common_struct/`：框架通用数据结构与工具。
 - `fit_flowable/`：流程/可流式组件相关实现。
 - `fit_py_nacos_registry/`：Nacos 注册中心适配。
@@ -44,56 +44,68 @@ FIT for Python 是基于 FIT Framework 的 Python 运行时与插件开发套件
 项目已配置 `.python-version` 文件指定版本。如使用 pyenv，会自动切换到对应版本。
 
 **版本兼容性说明：**
-- 依赖包（特别是 numpy==1.25.2）已针对 Python 3.9 进行测试
+- 依赖包（特别是 numpy>=1.25.2）已针对 Python 3.9 进行测试
 - 更高版本（如 3.14+）可能存在兼容性问题
-- 升级 Python 版本时，请同步更新 `requirements.txt` 中的依赖版本
+- 升级 Python 版本时，请同步更新 `pyproject.toml` 中的依赖版本
 
 ### 安装依赖
 
-需要安装 `requirements.txt` 中的第三方依赖，当前依赖如下：
+本项目使用 **uv** 作为依赖管理工具，提供更快的依赖解析和安装速度。当前依赖如下（定义在 `pyproject.toml` 中）：
 
-```python
-numpy==1.25.2
-PyYAML==6.0.1
-requests==2.32.4
-tornado==6.5.0
+```toml
+numpy>=1.25.2,<2.0.0
+pyyaml>=6.0.1,<7.0.0
+requests>=2.32.4,<3.0.0
+tornado>=6.5.0,<7.0.0
 ```
 
-推荐在虚拟环境中安装依赖：
+#### 安装 uv
+
+如果还没有安装 uv，请先安装：
+
 ```bash
-# 方法 1：使用 python3.9（推荐）
-python3.9 -m venv .venv   # 创建虚拟环境
-source .venv/bin/activate   # Windows 可执行 .\.venv\Scripts\activate
-pip install -r requirements.txt
+# macOS
+brew install uv
 
-# 方法 2：使用 pyenv（自动读取 .python-version）
-pyenv install 3.9.25  # 首次使用需安装
-eval "$(pyenv init -)"
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 方法 3：使用系统默认 python3
-python3 -m venv .venv  # 确保 python3 版本 >= 3.9
-source .venv/bin/activate
-pip install -r requirements.txt
+# Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# 或使用 pip 安装
+pip install uv
 ```
 
-**注意：** 虚拟环境激活后，`python` 命令即可直接使用，无需输入 `python3`。
+#### 使用 uv 安装依赖
+
+推荐使用 uv 管理虚拟环境和依赖：
+
+```bash
+# 使用 uv sync
+# uv 会自动创建虚拟环境并安装所有依赖
+uv sync
+```
+
+**注意：**
+- uv 会自动管理虚拟环境，默认创建在 `.venv` 目录
+- 使用 `uv sync` 时会自动激活虚拟环境并安装依赖
+- 虚拟环境激活后，`python` 命令即可直接使用
 
 ## 快速开始
 
 1. 进入工程根目录：`cd framework/fit/python`。
-2. 创建并激活虚拟环境，安装依赖：同上所示。
+2. 安装依赖：执行 `uv sync` 自动创建虚拟环境并安装所有依赖。
 3. 按需修改 `conf/application.yml` 中的 `registry-center` 和端口配置。
-4. 启动：`python -m fitframework`，观察终端或 `fit_framework.log` 是否有错误。
+4. 启动：`uv run python -m fitframework`，观察终端或 `fit_framework.log` 是否有错误。
 5. 健康检查：按下文 curl 示例确认返回 `OK`。
 
 ## 启动框架
 
 在项目根目录执行：
 ```bash
-python -m fitframework
+# 使用 uv 运行
+uv run python -m fitframework
 ```
 默认会启动本地服务并按配置加载插件；进程前台运行，终端保持开启即可。
 
@@ -115,12 +127,12 @@ curl --request GET \
 
 1. 初始化插件工程（在项目根目录）：
    ```bash
-   python -m fit_cli init your_plugin_name
+   uv run python -m fit_cli init your_plugin_name
    ```
 2. 开发完成后构建与打包：
    ```bash
-   python -m fit_cli build your_plugin_name
-   python -m fit_cli package your_plugin_name
+   uv run python -m fit_cli build your_plugin_name
+   uv run python -m fit_cli package your_plugin_name
    ```
    生成的产物位于 `plugin/your_plugin_name/build/`。
 
@@ -130,5 +142,6 @@ curl --request GET \
 
 - 启动报端口占用：调整 `conf/fit_startup.yml` 或 `application.yml` 中的端口后重启。
 - 注册中心连通性：确认 `registry-center.addresses` 可达，必要时先用 curl/ping 验证。
-- 重新安装依赖：在已激活虚拟环境中执行 `pip install -r requirements.txt --force-reinstall`。
+- 重新安装依赖：执行 `uv sync --reinstall` 重新安装所有依赖。
+- 清理并重建环境：删除 `.venv` 目录后重新执行 `uv sync`。
 - 停止服务：直接中断前台进程（Ctrl+C），或关闭终端会话。

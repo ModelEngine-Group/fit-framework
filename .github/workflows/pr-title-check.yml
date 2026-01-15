@@ -5,7 +5,8 @@ on:
     types: [opened, edited, synchronize]
 
 permissions:
-  pull-requests: read
+  pull-requests: write
+  statuses: write
 
 jobs:
   validate:
@@ -33,9 +34,6 @@ jobs:
           # 标题描述长度 5-100 字符
           subjectPattern: '^.{5,100}$'
           subjectPatternError: '标题描述长度应在 5-100 字符之间'
-
-          # 禁用首字母大写检查（兼容中文）
-          enforceSingleSentence: false
 
           # 支持 WIP 前缀标记进行中的工作
           wip: true

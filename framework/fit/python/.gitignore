@@ -11,6 +11,7 @@ fit_plugin_cli.egg-info
 __pycache__
 plugin/*
 !plugin/fit_py*/
+.venv/
 
 *.tar
 *.zip
