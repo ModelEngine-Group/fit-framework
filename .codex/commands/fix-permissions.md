@@ -49,7 +49,7 @@
    find . \( -type f -o -type d \) -print0 2>/dev/null | xargs -0 ls -ld 2>/dev/null | awk '{print $3":"$4}' | sort | uniq -c | sort -rn
 
    # 抽查几个之前有问题的文件
-   ls -ld ./.claude/settings.local.json ./framework/.claude/settings.local.json
+   ls -ld ./.codex/settings.local.json ./framework/.codex/settings.local.json
    ```
 
 6. **生成检查报告**
@@ -60,7 +60,7 @@
 
 **规范说明：**
 
-根据 `.claude/project-rules.md` 中的规则 1：
+根据 `.codex/project-rules.md` 中的规则 1：
 - 所有文件必须设置正确的所有者权限
 - 不要硬编码用户名和用户组
 - 动态从 `README.md` 等参考文件获取权限信息
@@ -84,5 +84,5 @@
 - 确保当前用户在 sudoers 列表中
 
 **参考文档：**
-- 项目规则：`.claude/project-rules.md` (规则 1)
+- 项目规则：`.codex/project-rules.md` (规则 1)
 - 动态获取权限方法的详细说明
