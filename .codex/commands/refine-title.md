@@ -6,6 +6,20 @@ usage: "/refine-title <id>"
 
 # Refine Title Command
 
+
+## 使用前：选择目标仓库
+
+这些命令作为全局 prompts 使用时，不会自动定位仓库。请先确定目标仓库并在执行前切换到仓库根目录，或在命令前包一层 `cd`：
+
+```bash
+REPO=/path/to/repo
+cd "$REPO"
+# 或
+(cd "$REPO" && <command>)
+```
+
+文中所有路径示例默认以仓库根目录为基准。
+
 ## 功能说明
 
 针对指定的 GitHub Issue 或 PR，读取其详细描述（Body）、标签（Labels）以及代码变更（如果是 PR），深度理解其意图，然后生成符合 `type(scope): subject` 规范的新标题并执行修改。

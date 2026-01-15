@@ -6,6 +6,20 @@ usage: "/implement-task <task-id>"
 
 # Implement Task Command
 
+
+## 使用前：选择目标仓库
+
+这些命令作为全局 prompts 使用时，不会自动定位仓库。请先确定目标仓库并在执行前切换到仓库根目录，或在命令前包一层 `cd`：
+
+```bash
+REPO=/path/to/repo
+cd "$REPO"
+# 或
+(cd "$REPO" && <command>)
+```
+
+文中所有路径示例默认以仓库根目录为基准。
+
 ## 功能说明
 
 根据技术方案实施任务，编写代码和测试，输出实现报告。

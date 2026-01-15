@@ -6,6 +6,20 @@ usage: "/refinement-task <task-id>"
 
 # Refinement Task Command
 
+
+## 使用前：选择目标仓库
+
+这些命令作为全局 prompts 使用时，不会自动定位仓库。请先确定目标仓库并在执行前切换到仓库根目录，或在命令前包一层 `cd`：
+
+```bash
+REPO=/path/to/repo
+cd "$REPO"
+# 或
+(cd "$REPO" && <command>)
+```
+
+文中所有路径示例默认以仓库根目录为基准。
+
 ## 功能说明
 
 处理代码审查中发现的问题，修复代码后重新进入审查流程。此命令用于 code-review 步骤发现需要修改的情况。

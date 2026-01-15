@@ -1,3 +1,17 @@
+
+## 使用前：选择目标仓库
+
+这些命令作为全局 prompts 使用时，不会自动定位仓库。请先确定目标仓库并在执行前切换到仓库根目录，或在命令前包一层 `cd`：
+
+```bash
+REPO=/path/to/repo
+cd "$REPO"
+# 或
+(cd "$REPO" && <command>)
+```
+
+文中所有路径示例默认以仓库根目录为基准。
+
 检查并修复项目中所有文件和文件夹的权限，确保符合项目规范。
 
 **用法：**
@@ -48,8 +62,8 @@
    # 统计修复后的权限分布
    find . \( -type f -o -type d \) -print0 2>/dev/null | xargs -0 ls -ld 2>/dev/null | awk '{print $3":"$4}' | sort | uniq -c | sort -rn
 
-   # 抽查几个之前有问题的文件
-   ls -ld ./.codex/settings.local.json ./framework/.codex/settings.local.json
+   # 抽查几个之前有问题的文件或目录
+   ls -ld README.md ./.codex/commands
    ```
 
 6. **生成检查报告**
@@ -60,7 +74,7 @@
 
 **规范说明：**
 
-根据 `.codex/project-rules.md` 中的规则 1：
+根据项目权限规范：
 - 所有文件必须设置正确的所有者权限
 - 不要硬编码用户名和用户组
 - 动态从 `README.md` 等参考文件获取权限信息
@@ -84,5 +98,5 @@
 - 确保当前用户在 sudoers 列表中
 
 **参考文档：**
-- 项目规则：`.codex/project-rules.md` (规则 1)
+- 项目规则：AGENTS.md / .ai-agents/README.md
 - 动态获取权限方法的详细说明
