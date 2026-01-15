@@ -1,7 +1,7 @@
 ---
 name: "create-pr"
 description: "创建 Pull Request"
-usage: "/create-pr [branch-name]"
+usage: "/create-pr <target-branch>"
 ---
 
 # Create PR Command
@@ -15,21 +15,21 @@ usage: "/create-pr [branch-name]"
 
 ## 功能说明
 
-创建 Pull Request 到指定分支，默认目标分支为 3.6.x。
+创建 Pull Request 到指定分支。目标分支必须由用户明确提供。
 
 ## 用法
 
-- `/create-pr` - 创建PR到默认分支 3.6.x
 - `/create-pr main` - 创建PR到 main 分支
-- `/create-pr <branch-name>` - 创建PR到指定分支
+- `/create-pr 3.6.x` - 创建PR到 3.6.x 分支
+- `/create-pr <target-branch>` - 创建PR到指定目标分支
 
 ## 执行步骤
 
-### 1. 解析目标分支
+### 1. 确认目标分支
 
-- 如果用户提供了参数（如 `main`, `3.5.x`, `develop` 等），使用该参数作为目标分支
-- 如果没有参数，默认使用 `3.6.x` 作为目标分支
-- 从命令参数中提取分支名：命令格式为 `/create-pr <branch>`，参数部分即为分支名
+- 目标分支必须由用户明确提供（如 `main`, `3.5.x`, `develop`）
+- 如果未提供目标分支，提示用户补充并停止执行
+- 命令格式为 `/create-pr <target-branch>`，参数部分即为合入的目标分支
 
 ### 2. 读取 PR 模板
 
