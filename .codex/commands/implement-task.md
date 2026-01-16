@@ -154,10 +154,7 @@ pytest                        # Python 项目
 
 **下一步**：
 使用以下命令进行代码审查：
-/review-task {task-id}
-
-或使用项目的 code-review 插件：
-/code-review:code-review
+/prompts:review-task {task-id}
 ```
 
 ## ✅ 完成检查清单
@@ -213,9 +210,9 @@ pytest                        # Python 项目
 
 ## 相关命令
 
-- `/plan-task <task-id>` - 设计技术方案（前置步骤）
-- `/review-task <task-id>` 或 `/code-review:code-review` - 代码审查（后续步骤）
-- `/task-status <task-id>` - 查看任务状态
+- `/prompts:plan-task <task-id>` - 设计技术方案（前置步骤）
+- `/prompts:review-task <task-id>` - 代码审查（后续步骤）
+- `/prompts:task-status <task-id>` - 查看任务状态
 
 ## 错误处理
 

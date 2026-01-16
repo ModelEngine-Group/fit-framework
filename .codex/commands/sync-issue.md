@@ -228,12 +228,12 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 
 使用以下命令进行代码审查：
 ```
-/code-review:code-review
+/prompts:review-task <task-id>
 ```
 
 或手动审查后提交：
 ```
-/commit
+/prompts:commit
 ```
 
 ---

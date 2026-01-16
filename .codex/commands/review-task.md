@@ -58,14 +58,17 @@ usage: "/review-task <task-id> [--pr-number]"
 3. **提供建议**：不仅指出问题，还要提供改进建议
 4. **分级处理**：区分必须修复和建议优化
 
-### 4. 调用专业审查工具（可选）
+### 4. 调用专业审查工具（可选，仅适用于 Claude Code）
 
-如果需要更深度的审查，可以调用：
+⚠️ **注意**：以下工具仅在 **Claude Code 环境**中可用。如果你在使用 **Codex CLI**，请**跳过此步骤**，依赖步骤 3 中的手动审查清单进行完整审查。
+
+**如果使用 Claude Code**，可以调用以下插件进行更深度的审查：
 
 **方案1：快速审查**（推荐用于日常 PR）
 ```bash
 /code-review:code-review <pr-number>
 ```
+（Claude Code 插件，Codex CLI 不支持）
 - 5个并行 Sonnet 代理
 - CLAUDE.md 规范合规性
 - Bug 检测与历史上下文分析
@@ -74,8 +77,11 @@ usage: "/review-task <task-id> [--pr-number]"
 ```bash
 /pr-review-toolkit:review-pr
 ```
+（Claude Code 插件，Codex CLI 不支持）
 - 6个专业审查代理
 - 代码注释准确性、测试覆盖、错误处理、类型设计等多维度审查
+
+**Codex CLI 用户**：请使用步骤 3 中的手动审查清单，这已经涵盖了代码审查的所有重要方面。
 
 ### 5. 输出审查报告
 
@@ -308,10 +314,14 @@ usage: "/review-task <task-id> [--pr-number]"
 
 ## 相关命令
 
-- `/implement-task <task-id>` - 实施任务（前置步骤）
-- `/commit` - 提交代码（后续步骤）
-- `/code-review:code-review <pr-number>` - 深度 PR 审查
-- `/pr-review-toolkit:review-pr` - 专业多维度审查
+**Codex CLI 命令**：
+- `/prompts:implement-task <task-id>` - 实施任务（前置步骤）
+- `/prompts:commit` - 提交代码（后续步骤）
+- `/prompts:refinement-task <task-id>` - 修复审查发现的问题
+
+**Claude Code 环境下可选**：
+- `/code-review:code-review <pr-number>` - 深度 PR 审查（插件）
+- `/pr-review-toolkit:review-pr` - 专业多维度审查（插件）
 
 ## 错误处理
 

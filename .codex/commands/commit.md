@@ -1,32 +1,23 @@
 提交当前变更到 Git。
 
-**此命令已迁移到官方插件，将调用 `commit-commands` 插件。**
+**此命令提供 Git 提交的最佳实践指南。**
 
 **用法：**
-- `/commit` - 创建 Git 提交
-- `/commit-commands:commit` - 直接使用插件命令
-- `/commit-commands:commit-push-pr` - 一键提交+推送+创建PR
+- `/prompts:commit` - 查看提交指南
 
-**实际执行：**
-调用 `/commit-commands:commit` 插件命令
+**功能说明：**
 
-**插件功能：**
-- 自动分析变更内容
-- 生成符合规范的提交消息
-- 支持交互式和直接提交模式
-- 添加 Co-Authored-By 签名
-- 自动检测敏感信息
-
-**扩展用法：**
-如需一键完成提交→推送→创建PR，使用：
-```
-/commit-commands:commit-push-pr
-```
+本命令会引导你完成以下步骤：
+1. 检查并更新版权头年份（CRITICAL）
+2. 分析变更内容并生成提交信息
+3. 执行 Git 提交操作
+4. 更新任务状态（如适用）
 
 **注意事项：**
 - 不要提交包含敏感信息的文件（.env, credentials 等）
 - 确保提交消息清晰描述了变更内容
 - 遵循项目的 commit message 规范
+- 提交前必须检查版权头年份（见下文）
 
 ---
 
@@ -230,8 +221,8 @@ grep "Copyright" src/main/java/com/fit/Example.java
 如果提交后需要创建 Pull Request：
 
 **建议流程**：
-1. 使用 `/commit-commands:commit-push-pr` 一键完成提交+推送+创建PR
-2. 或手动推送后使用 `gh pr create`
+1. 手动推送分支：`git push origin <branch-name>`
+2. 使用 `gh pr create` 创建 PR
 3. PR 创建后，更新任务状态
 
 **必须更新**：
@@ -247,3 +238,177 @@ grep "Copyright" src/main/java/com/fit/Example.java
 - 已完成的任务可能被遗忘在 `active` 目录
 
 **这是一个 CRITICAL 要求，必须遵守。**
+
+---
+
+## 执行 Git 提交
+
+在完成版权头检查后，执行以下步骤进行提交。
+
+### 步骤 1：查看变更
+
+```bash
+# 查看工作区状态
+git status
+
+# 查看已暂存的变更
+git diff --cached
+
+# 如果还没暂存，先暂存文件
+git add <file-path>
+```
+
+### 步骤 2：分析变更并生成提交信息
+
+参考最近的提交风格：
+```bash
+# 查看最近 10 个提交
+git log -10 --oneline
+
+# 查看最近的提交消息格式
+git log -3 --format="%s"
+```
+
+**提交消息格式建议**：
+- 使用项目规范的格式（如 Conventional Commits）
+- 第一行简明扼要（50字符以内）
+- 如需详细说明，空一行后添加正文
+- 说明改动的原因，而非改动的内容
+
+### 步骤 3：创建提交
+
+使用 HEREDOC 格式保证提交消息格式正确：
+
+```bash
+git commit -m "$(cat <<'EOF'
+<type>(<scope>): <subject>
+
+<body>
+
+Co-Authored-By: Codex CLI <noreply@openai.com>
+EOF
+)"
+```
+
+**示例**：
+```bash
+git commit -m "$(cat <<'EOF'
+docs: 更新 Codex 命令配置说明
+
+- 移除对 Claude Code 插件的引用
+- 添加基于 Git 命令的实际操作步骤
+- 保留版权头检查和任务状态更新规则
+
+Co-Authored-By: Codex CLI <noreply@openai.com>
+EOF
+)"
+```
+
+### 步骤 4：验证提交
+
+```bash
+# 查看最后一次提交
+git log -1
+
+# 查看提交的内容
+git show HEAD
+```
+
+### 步骤 5：推送到远程（如需要）
+
+```bash
+# 推送到远程分支
+git push origin <branch-name>
+
+# 如果是新分支，使用 -u 设置上游
+git push -u origin <branch-name>
+```
+
+---
+
+## 完整示例
+
+以下是完整的提交流程示例：
+
+```bash
+# 1. 获取当前年份
+CURRENT_YEAR=$(date +%Y)
+echo "当前年份: $CURRENT_YEAR"
+
+# 2. 查看修改的文件
+git status --short
+
+# 3. 检查版权头（假设修改了 Example.java）
+grep "Copyright" src/main/java/com/fit/Example.java
+
+# 4. 如需要，更新版权头（使用 Edit 工具）
+
+# 5. 暂存文件
+git add src/main/java/com/fit/Example.java
+
+# 6. 查看暂存的变更
+git diff --cached
+
+# 7. 参考最近的提交格式
+git log -3 --oneline
+
+# 8. 创建提交
+git commit -m "$(cat <<'EOF'
+feat(core): 添加用户认证功能
+
+- 实现 JWT 令牌生成和验证
+- 添加登录和登出接口
+- 更新相关测试用例
+
+Co-Authored-By: Codex CLI <noreply@openai.com>
+EOF
+)"
+
+# 9. 验证提交
+git log -1
+
+# 10. 推送到远程
+git push origin feature/user-auth
+```
+
+---
+
+## 相关命令
+
+- `/prompts:review-task <task-id>` - 代码审查（提交前）
+- `/prompts:create-pr <target-branch>` - 创建 Pull Request（提交后）
+- `/prompts:complete-task <task-id>` - 归档任务（工作完成后）
+
+---
+
+## 常见问题
+
+### Q: 如何撤销上一次提交？
+
+```bash
+# 撤销提交但保留更改
+git reset --soft HEAD~1
+
+# 撤销提交并删除更改
+git reset --hard HEAD~1
+```
+
+### Q: 如何修改上一次提交消息？
+
+```bash
+# 如果还没推送到远程
+git commit --amend
+
+# 修改提交消息后强制推送（谨慎使用）
+git push --force origin <branch-name>
+```
+
+### Q: 提交后发现遗漏了文件怎么办？
+
+```bash
+# 暂存遗漏的文件
+git add <forgotten-file>
+
+# 追加到上一次提交（如果还没推送）
+git commit --amend --no-edit
+```
