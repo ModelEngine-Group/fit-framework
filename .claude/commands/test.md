@@ -1,3 +1,13 @@
+---
+name: "test"
+description: "执行完整的测试流程"
+usage: "/test"
+---
+
+# Test Command
+
+## 功能说明
+
 执行完整的测试流程，包括单元测试、构建验证和集成测试。
 
 **用法：**

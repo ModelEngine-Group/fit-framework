@@ -1,3 +1,11 @@
+---
+name: "commit"
+description: "提交当前变更到 Git"
+usage: "/commit"
+---
+
+# Commit Command
+
 提交当前变更到 Git。
 
 **此命令已迁移到官方插件，将调用 `commit-commands` 插件。**

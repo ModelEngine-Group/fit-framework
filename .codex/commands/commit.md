@@ -1,3 +1,11 @@
+---
+name: "commit"
+description: "提交当前变更到 Git（提供最佳实践指南）"
+usage: "/prompts:commit"
+---
+
+# Commit Command
+
 提交当前变更到 Git。
 
 **此命令提供 Git 提交的最佳实践指南。**
