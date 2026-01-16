@@ -1,11 +1,10 @@
 ---
-name: "create-pr"
-description: "创建 Pull Request"
-usage: "/create-pr <target-branch>"
+description: 创建 Pull Request
+usage: /create-pr <target-branch>
+argument-hint: <target-branch>
 ---
 
 # Create PR Command
-
 
 ## 使用前：自动识别仓库
 

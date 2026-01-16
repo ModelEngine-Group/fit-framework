@@ -1,11 +1,10 @@
 ---
-name: "analyze-security"
-description: "分析 Dependabot 安全告警并创建修复任务"
-usage: "/analyze-security <alert-number>"
+description: 分析 Dependabot 安全告警并创建修复任务
+usage: /analyze-security <alert-number>
+argument-hint: <alert-number>
 ---
 
 # Analyze Security Command
-
 
 ## 使用前：自动识别仓库
 

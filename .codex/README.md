@@ -19,67 +19,71 @@ bash .codex/scripts/install-prompts.sh
 - 这些 prompts 以"仓库根目录"为默认上下文。
 - 作为全局 prompts 使用时，请先切换到目标仓库或显式指定路径（详见各命令文件中的"使用前：选择目标仓库"）。
 
-## 与 Claude Code 的区别
+## Prompt 文件格式规范
 
-本目录中的命令配置是为 **Codex CLI** 设计的，与 Claude Code 存在以下重要区别：
+本目录下的 prompts 采用混合格式，既符合 Codex 官方规范，又保留完整的使用示例：
 
-### 1. 插件系统
+### 混合格式（兼容官方标准）
 
-**Claude Code**：
-- 支持官方插件系统（在 `.claude/settings.json` 中配置）
-- 可以使用 `/plugin-name:command-name` 格式调用插件
-- 提供自动化的代码审查、提交管理等功能
-- 示例：`/commit-commands:commit`, `/code-review:code-review`
-
-**Codex CLI**：
-- **没有官方插件系统**，仅支持 prompts
-- 使用 `/prompts:command-name` 格式调用
-- 命令以文档化的最佳实践指南为主
-- 需要手动执行 Git 命令和代码审查
-
-### 2. 命令调用格式
-
-| 系统 | 调用格式 | 示例 |
-|------|---------|------|
-| Claude Code | `/command` 或 `/plugin:command` | `/commit`, `/code-review:code-review` |
-| Codex CLI | `/prompts:command` | `/prompts:commit`, `/prompts:review-task` |
-
-### 3. 自动化程度
-
-**Claude Code**：
-- `/commit` 可以自动分析变更、生成提交消息、执行提交
-- `/code-review` 自动运行多个并行代理进行深度审查
-- 提供一键式工作流（如 `/commit-commands:commit-push-pr`）
-
-**Codex CLI**：
-- 提供详细的操作步骤和检查清单
-- 需要手动执行 Git 命令（参考命令文档中的示例）
-- 代码审查依赖手动检查清单
-
-### 4. 文档中的标记
-
-在本目录的命令文件中，你会看到以下标记：
-
-```markdown
-⚠️ **注意**：以下工具仅在 Claude Code 环境中可用。
-如果你在使用 Codex CLI，请跳过此步骤...
-
-（Claude Code 插件，Codex CLI 不支持）
+```yaml
+---
+description: 命令的功能描述
+usage: /prompts:command-name <参数>
+argument-hint: <参数>
+---
 ```
 
-这些标记表明某些功能仅适用于 Claude Code，Codex CLI 用户应使用文档中提供的替代方法。
+### 字段说明
 
-### 5. 推荐使用场景
+- **description** (必需): 描述 prompt 的功能，使用中文
+- **usage** (推荐): 完整的使用示例，包含命令名和参数
+  - 格式：`/prompts:command-name <参数>`
+  - 提供完整的调用示例供参考
+- **argument-hint** (可选): 仅参数部分的描述（Codex 官方格式）
+  - 使用 `<param>` 表示必需参数
+  - 使用 `[param]` 表示可选参数
+  - 使用 `[--flag=<value>]` 表示可选标志参数
+  - 仅包含参数部分，不含命令名称
 
-**使用 Claude Code（`.claude/` 配置）当**：
-- 需要快速自动化的代码审查和提交流程
-- 在团队中使用 Claude Code 作为标准工具
-- 希望利用官方插件的高级功能
+### 调用方式
 
-**使用 Codex CLI（`.codex/` 配置）当**：
-- 使用 OpenAI 的 Codex CLI 工具
-- 需要详细的操作指南和检查清单
-- 希望更好地理解每个步骤的具体操作
+- 在 Codex CLI 中使用 `/prompts:filename` 调用（不含 .md 扩展名）
+- 例如：`/prompts:analyze-issue <issue-number>`
+
+### 示例
+
+**有参数的命令**：
+```yaml
+---
+description: 分析 GitHub Issue 并创建需求分析文档
+usage: /prompts:analyze-issue <issue-number>
+argument-hint: <issue-number>
+---
+```
+
+**有多个参数的命令**：
+```yaml
+---
+description: 升级项目依赖
+usage: /prompts:upgrade-dependency <package-name> <from-version> <to-version>
+argument-hint: <package-name> <from-version> <to-version>
+---
+```
+
+**无参数的命令**：
+```yaml
+---
+description: 执行完整的测试流程
+usage: /prompts:test
+---
+```
+
+### 格式说明
+
+- ✅ 兼容 Codex 官方格式（使用 `argument-hint`）
+- ✅ 保留完整使用示例（使用 `usage`）
+- ✅ 文件名即为 prompt 名称，无需 `name` 字段
+- ✅ 所有字段值不使用引号
 
 ## 可用命令列表
 
@@ -108,7 +112,6 @@ bash .codex/scripts/install-prompts.sh
 - `close-security` - 关闭 Dependabot 安全告警（需提供合理理由）
 
 **其他**：
-- `fix-permissions` - 检查并修复项目文件权限
 - `test` - 执行完整的测试流程
 
 ## 常见问题

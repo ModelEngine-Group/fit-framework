@@ -1,11 +1,10 @@
 ---
-name: "sync-pr"
-description: "将任务处理进度同步到 Pull Request 评论"
-usage: "/sync-pr <task-id>"
+description: 将任务处理进度同步到 Pull Request 评论
+usage: /sync-pr <task-id>
+argument-hint: <task-id>
 ---
 
 # Sync PR Command
-
 
 ## 使用前：自动识别仓库
 

@@ -1,11 +1,10 @@
 ---
-name: "refinement-task"
-description: "处理代码审查反馈并修复问题"
-usage: "/refinement-task <task-id>"
+description: 处理代码审查反馈并修复问题
+usage: /refinement-task <task-id>
+argument-hint: <task-id>
 ---
 
 # Refinement Task Command
-
 
 ## 使用前：自动识别仓库
 

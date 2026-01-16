@@ -1,11 +1,10 @@
 ---
-name: "implement-task"
-description: "根据技术方案实施任务并输出实现报告"
-usage: "/implement-task <task-id>"
+description: 根据技术方案实施任务并输出实现报告
+usage: /implement-task <task-id>
+argument-hint: <task-id>
 ---
 
 # Implement Task Command
-
 
 ## 使用前：自动识别仓库
 

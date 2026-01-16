@@ -1,11 +1,10 @@
 ---
-name: "complete-task"
-description: "标记任务完成并归档到 completed 目录"
-usage: "/complete-task <task-id>"
+description: 标记任务完成并归档到 completed 目录
+usage: /complete-task <task-id>
+argument-hint: <task-id>
 ---
 
 # Complete Task Command
-
 
 ## 使用前：自动识别仓库
 

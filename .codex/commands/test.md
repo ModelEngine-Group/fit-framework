@@ -1,7 +1,6 @@
 ---
-name: "test"
-description: "执行完整的测试流程"
-usage: "/prompts:test"
+description: 执行完整的测试流程
+usage: /prompts:test
 ---
 
 # Test Command

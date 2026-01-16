@@ -1,11 +1,10 @@
 ---
-name: "refine-title"
-description: "深度分析 Issue 或 PR 内容，并将其标题重构为 Conventional Commits 格式"
-usage: "/refine-title <id>"
+description: 深度分析 Issue 或 PR 内容，并将其标题重构为 Conventional Commits 格式
+usage: /refine-title <id>
+argument-hint: <id>
 ---
 
 # Refine Title Command
-
 
 ## 使用前：自动识别仓库
 

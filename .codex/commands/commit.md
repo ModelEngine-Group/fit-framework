@@ -1,7 +1,6 @@
 ---
-name: "commit"
-description: "提交当前变更到 Git（提供最佳实践指南）"
-usage: "/prompts:commit"
+description: 提交当前变更到 Git（提供最佳实践指南）
+usage: /prompts:commit
 ---
 
 # Commit Command

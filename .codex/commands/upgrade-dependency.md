@@ -1,11 +1,10 @@
 ---
-name: "upgrade-dependency"
-description: "升级项目依赖"
-usage: "/upgrade-dependency <package-name> <from-version> <to-version>"
+description: 升级项目依赖
+usage: /upgrade-dependency <package-name> <from-version> <to-version>
+argument-hint: <package-name> <from-version> <to-version>
 ---
 
 # Upgrade Dependency Command
-
 
 ## 使用前：自动识别仓库
 

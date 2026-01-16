@@ -1,11 +1,10 @@
 ---
-name: "review-task"
-description: "审查任务实现并输出代码审查报告"
-usage: "/review-task <task-id> [--pr-number]"
+description: 审查任务实现并输出代码审查报告
+usage: /review-task <task-id> [--pr-number]
+argument-hint: <task-id> [--pr-number=<number>]
 ---
 
 # Review Task Command
-
 
 ## 使用前：自动识别仓库
 

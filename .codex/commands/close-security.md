@@ -1,11 +1,10 @@
 ---
-name: "close-security"
-description: "关闭 Dependabot 安全告警（需提供合理理由）"
-usage: "/close-security <alert-number>"
+description: 关闭 Dependabot 安全告警（需提供合理理由）
+usage: /close-security <alert-number>
+argument-hint: <alert-number>
 ---
 
 # Close Security Command
-
 
 ## 使用前：自动识别仓库
 

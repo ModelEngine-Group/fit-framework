@@ -1,11 +1,10 @@
 ---
-name: "sync-issue"
-description: "将任务处理进度同步到 GitHub Issue 评论"
-usage: "/sync-issue <task-id>"
+description: 将任务处理进度同步到 GitHub Issue 评论
+usage: /sync-issue <task-id>
+argument-hint: <task-id>
 ---
 
 # Sync Issue Command
-
 
 ## 使用前：自动识别仓库
 

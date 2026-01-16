@@ -1,11 +1,10 @@
 ---
-name: "task-status"
-description: "查看任务的当前状态和进度"
-usage: "/task-status <task-id>"
+description: 查看任务的当前状态和进度
+usage: /task-status <task-id>
+argument-hint: <task-id>
 ---
 
 # Task Status Command
-
 
 ## 使用前：自动识别仓库
 

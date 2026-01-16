@@ -1,11 +1,10 @@
 ---
-name: "plan-task"
-description: "为任务设计技术方案并输出实施计划"
-usage: "/plan-task <task-id>"
+description: 为任务设计技术方案并输出实施计划
+usage: /plan-task <task-id>
+argument-hint: <task-id>
 ---
 
 # Plan Task Command
-
 
 ## 使用前：自动识别仓库
 

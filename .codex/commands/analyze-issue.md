@@ -1,11 +1,10 @@
 ---
-name: "analyze-issue"
-description: "分析 GitHub Issue 并创建需求分析文档"
-usage: "/analyze-issue <issue-number>"
+description: 分析 GitHub Issue 并创建需求分析文档
+usage: /analyze-issue <issue-number>
+argument-hint: <issue-number>
 ---
 
 # Analyze Issue Command
-
 
 ## 使用前：自动识别仓库
 

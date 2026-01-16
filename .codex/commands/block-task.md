@@ -1,11 +1,10 @@
 ---
-name: "block-task"
-description: "标记任务阻塞并记录阻塞原因"
-usage: "/block-task <task-id> [--reason <阻塞原因>]"
+description: 标记任务阻塞并记录阻塞原因
+usage: /block-task <task-id> [--reason <阻塞原因>]
+argument-hint: <task-id> [--reason=<reason>]
 ---
 
 # Block Task Command
-
 
 ## 使用前：自动识别仓库
 
