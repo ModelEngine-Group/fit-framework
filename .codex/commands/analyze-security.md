@@ -89,7 +89,7 @@ ghsa_id: <GHSA-ID>
 
 ### 5. 输出分析文档
 
-创建 `{task_dir}/security-analysis.md`，必须包含以下章节：
+创建 `{task_dir}/analysis.md`，必须包含以下章节：
 
 ```markdown
 # 安全告警分析报告
@@ -173,7 +173,7 @@ ghsa_id: <GHSA-ID>
 - `current_step`: security-analysis
 - `assigned_to`: codex
 - `updated_at`: {当前时间}
-- 标记 security-analysis.md 为已完成
+- 标记 analysis.md 为已完成
 
 ### 7. 告知用户
 
@@ -193,7 +193,7 @@ ghsa_id: <GHSA-ID>
 
 **输出文件**:
 - 任务文件: .ai-workspace/active/{task-id}/task.md
-- 分析文档: {task_dir}/security-analysis.md
+- 分析文档: {task_dir}/analysis.md
 
 **修复建议**: {简短的修复建议摘要}
 
