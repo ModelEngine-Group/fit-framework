@@ -52,7 +52,7 @@ ls -la .ai-workspace/active/{task-id}/task.md
 - 是否有未解决的阻塞问题
 
 **文件完整性**：
-- [ ] `analysis.md` 或 `security-analysis.md` 存在（如果是 feature-development 或 security-fix）
+- [ ] `analysis.md` 存在（如果是 feature-development 或 security-fix）
 - [ ] `plan.md` 存在（如果是 feature-development）
 - [ ] `implementation.md` 存在
 - [ ] `review.md` 存在且显示批准
@@ -254,7 +254,7 @@ A: 使用 `/sync-issue` 会更新 Issue 状态，但是否关闭由用户决定�
 ### 确保数据完整
 
 归档前确认所有文档都已创建：
-- `analysis.md` 或 `security-analysis.md`
+- `analysis.md`
 - `plan.md`
 - `implementation.md`
 - `review.md`

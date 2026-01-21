@@ -54,7 +54,7 @@ subtask: false
       - 代码层面的防护
       - 网络隔离等
 
-5. 输出分析文档到 security-analysis.md,包含:
+5. 输出分析文档到 analysis.md,包含:
    - 告警基本信息(编号、严重程度、GHSA/CVE ID)
    - 漏洞详情(描述、受影响的依赖、依赖文件位置)
    - 影响范围评估(直接影响、漏洞可利用性分析)
@@ -63,9 +63,9 @@ subtask: false
    - 参考链接
 
 6. 更新任务状态:
-   - current_step: security-analysis
-   - updated_at: 当前时间
-   - 标记 security-analysis.md 为已完成
+    - current_step: security-analysis
+    - updated_at: 当前时间
+    - 标记 analysis.md 为已完成
 
 7. 告知用户:
    ```
@@ -81,9 +81,9 @@ subtask: false
    - 任务标题: <title>
    - 风险等级: <高/中/低>
    
-   **输出文件**:
-   - 任务文件: .ai-workspace/active/<task-id>/task.md
-   - 分析文档: .ai-workspace/active/<task-id>/security-analysis.md
+**输出文件**:
+    - 任务文件: .ai-workspace/active/<task-id>/task.md
+    - 分析文档: .ai-workspace/active/<task-id>/analysis.md
    
    **修复建议**: <简短的修复建议摘要>
    
