@@ -2,7 +2,6 @@
 description: 执行完整的测试流程
 agent: build
 subtask: false
-model: anthropic/claude-3-5-sonnet-20241022
 ---
 
 执行完整的测试流程,包括单元测试、构建验证和集成测试。
