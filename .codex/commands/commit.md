@@ -277,7 +277,9 @@ git log -3 --format="%s"
 ```
 
 **提交消息格式建议**：
-- 使用项目规范的格式（如 Conventional Commits）
+- 使用项目规范的格式（Conventional Commits）
+- 采用 `<type>(<scope>): <subject>`，subject 使用中文且约 20 字以内
+- scope 为模块名（可省略）
 - 第一行简明扼要（50字符以内）
 - 如需详细说明，空一行后添加正文
 - 说明改动的原因，而非改动的内容
@@ -291,8 +293,6 @@ git commit -m "$(cat <<'EOF'
 <type>(<scope>): <subject>
 
 <body>
-
-Co-Authored-By: Codex CLI <noreply@openai.com>
 EOF
 )"
 ```

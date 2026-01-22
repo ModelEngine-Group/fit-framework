@@ -34,7 +34,8 @@ subtask: false
 2. 分析变更:
    - 确定变更类型(新功能/增强/Bug修复/重构/测试/文档等)
    - 生成符合规范的提交消息(参考最近的 commit 格式)
-   - 提交消息格式: [模块] 简短描述(20字左右,中文)
+   - 提交消息格式: `<type>(<scope>): <subject>`，subject 使用中文且约 20 字以内
+   - scope 为模块名(如 fit、waterflow、fel)，可省略
    - 不要提交敏感文件(.env, credentials.json等)
 
 **步骤 3: 提交代码**

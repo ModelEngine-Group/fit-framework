@@ -1,6 +1,6 @@
 ---
 description: 执行完整的测试流程
-agent: build
+agent: general
 subtask: false
 ---
 

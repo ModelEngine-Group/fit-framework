@@ -169,8 +169,8 @@ Codex 和 GeminiCli 可以互为替代或协作：
 
 ### 提交规范
 
-- 提交信息：`[模块] 简述`
-- 例如：`[fit] 修复某问题`
+- 提交信息遵循 Conventional Commits：`<type>(<scope>): <subject>`
+- subject 使用中文且约 20 字以内，scope 为模块名（可省略）
 - 不要自动提交，等待人工确认
 
 ## Codex vs GeminiCli 选择建议

@@ -32,8 +32,8 @@ This repo hosts the FIT framework and related engines.
 
 ## Commit & Pull Request Guidelines
 
-- Commit messages use a module tag in brackets and a short Chinese summary, e.g. `[fit] 修复某问题`.
-- Keep commit subjects concise (around 20 characters); add details in the body if needed.
+- Commit messages follow Conventional Commits: `<type>(<scope>): <subject>`, with a Chinese subject around 20 characters.
+- Scope is the module name (e.g., `fit`, `waterflow`, `fel`) and can be omitted.
 - PRs should be based on the correct module/version branch and normally include a single commit.
 
 ## Security & Configuration Tips

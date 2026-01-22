@@ -271,6 +271,7 @@ argument-hint: <task-id> [--pr-number=<number>]
 
 ### 示例3：完整工作流
 
+**功能开发流程**：
 ```bash
 # 1. 分析 Issue
 /analyze-issue 207
@@ -283,6 +284,27 @@ argument-hint: <task-id> [--pr-number=<number>]
 
 # 4. 代码审查 ← 当前步骤
 /review-task TASK-20251227-104654
+
+# 5. 如果审查通过，提交代码
+/commit
+
+# 6. 创建 Pull Request
+/create-pr
+```
+
+**安全修复流程**：
+```bash
+# 1. 分析安全告警
+/analyze-security 23
+
+# 2. 设计修复方案
+/plan-task TASK-20251227-110000
+
+# 3. 实施修复
+/implement-task TASK-20251227-110000
+
+# 4. 代码审查 ← 当前步骤
+/review-task TASK-20251227-110000
 
 # 5. 如果审查通过，提交代码
 /commit

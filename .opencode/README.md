@@ -34,13 +34,14 @@
 完整的任务管理工作流命令：
 
 1. **`/analyze-issue <issue-number>`** - 分析 GitHub Issue 并创建需求分析文档
-2. **`/plan <task-id>`** - 为任务设计技术方案并输出实施计划
-3. **`/implement <task-id>`** - 根据技术方案实施任务并输出实现报告
-4. **`/review <task-id>`** - 审查任务实现并输出代码审查报告
-5. **`/refine <task-id>`** - 处理代码审查反馈并修复问题
-6. **`/task-status <task-id>`** - 查看任务的当前状态和进度
-7. **`/complete <task-id>`** - 标记任务完成并归档到 completed 目录
-8. **`/block <task-id>`** - 标记任务阻塞并记录阻塞原因
+2. **`/analyze-security <alert-number>`** - 分析 Dependabot 安全告警并创建安全分析文档
+3. **`/plan-task <task-id>`** - 为任务设计技术方案并输出实施计划
+4. **`/implement-task <task-id>`** - 根据技术方案实施任务并输出实现报告
+5. **`/review-task <task-id>`** - 审查任务实现并输出代码审查报告
+6. **`/refinement-task <task-id>`** - 处理代码审查反馈并修复问题
+7. **`/task-status <task-id>`** - 查看任务的当前状态和进度
+8. **`/complete-task <task-id>`** - 标记任务完成并归档到 completed 目录
+9. **`/block-task <task-id>`** - 标记任务阻塞并记录阻塞原因
 
 ### Git 和 PR 管理
 
@@ -57,7 +58,6 @@
 依赖升级和安全告警处理命令：
 
 - **`/upgrade-dependency <package> <from> <to>`** - 升级项目依赖
-- **`/analyze-security <alert-number>`** - 分析 Dependabot 安全告警并创建修复任务
 - **`/close-security <alert-number>`** - 关闭 Dependabot 安全告警（需提供合理理由）
 
 ### 测试
@@ -73,16 +73,16 @@
 /analyze-issue 207
 
 # 2. 设计技术方案
-/plan TASK-20260120-104654
+/plan-task TASK-20260120-104654
 
 # 3. 实施功能
-/implement TASK-20260120-104654
+/implement-task TASK-20260120-104654
 
 # 4. 代码审查
-/review TASK-20260120-104654
+/review-task TASK-20260120-104654
 
 # 5. 如果有问题需要修复
-/refine TASK-20260120-104654
+/refinement-task TASK-20260120-104654
 
 # 6. 提交代码
 /commit
@@ -91,7 +91,7 @@
 /create-pr
 
 # 8. 标记任务完成
-/complete TASK-20260120-104654
+/complete-task TASK-20260120-104654
 ```
 
 ### 依赖升级流程
@@ -111,13 +111,22 @@
 /analyze-security 23
 
 # 2. 设计修复方案
-/plan TASK-20260120-110000
+/plan-task TASK-20260120-110000
 
 # 3. 实施修复
-/implement TASK-20260120-110000
+/implement-task TASK-20260120-110000
 
-# 4. 提交修复
+# 4. 代码审查
+/review-task TASK-20260120-110000
+
+# 5. 提交修复
 /commit
+
+# 6. 创建 PR
+/create-pr
+
+# 7. 标记任务完成
+/complete-task TASK-20260120-110000
 
 # 或者如果是误报
 /close-security 23
