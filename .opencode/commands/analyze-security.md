@@ -1,6 +1,6 @@
 ---
 description: 分析 Dependabot 安全告警并创建安全分析文档
-agent: explore
+agent: general
 subtask: false
 ---
 

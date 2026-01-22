@@ -1,6 +1,6 @@
 ---
 description: 分析 GitHub Issue 并创建需求分析文档
-agent: explore
+agent: general
 subtask: false
 ---
 

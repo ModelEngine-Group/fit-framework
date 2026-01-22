@@ -193,11 +193,11 @@ Bash("OWNER_GROUP=$(ls -l README.md | awk '{print $3\":\"$4}') && sudo chown $OW
 
 **⚠️ 重要规则（CRITICAL）：**
 
-本项目的提交信息**必须使用中文作为核心内容**，遵循以下格式：
+本项目的提交信息**必须使用中文作为核心内容**，遵循 Conventional Commits 格式：
 
 **标准格式：**
 ```
-<type>: <中文描述>
+<type>(<scope>): <中文描述>
 
 <可选的详细说明>
 
