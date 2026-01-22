@@ -25,7 +25,7 @@ import java.util.function.Predicate;
  * @author 季聿阶
  * @since 2024-02-11
  */
-public interface Solo<T> extends Publisher<T> {
+public interface Solo<T> extends Publisher<T>, org.reactivestreams.Publisher<T> {
     /**
      * 通过指定的 {@link Emitter 发送器} 消费逻辑创建 {@link Solo 响应式流}。
      *

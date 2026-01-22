@@ -80,6 +80,34 @@ public abstract class AbstractSolo<T> implements Solo<T> {
         this.subscribe0(ObjectUtils.getIfNull(subscriber, Subscriber::empty));
     }
 
+    @Override
+    public void subscribe(org.reactivestreams.Subscriber<? super T> subscriber) {
+        if (subscriber == null) {
+            throw new NullPointerException("Subscriber cannot be null");
+        }
+        // 使用现有的 Lambda subscribe 方法，适配 Reactive Streams Subscriber
+        this.subscribe(
+                // onSubscribedAction: 将内部 Subscription 适配为 Reactive Streams Subscription
+                subscription -> subscriber.onSubscribe(new org.reactivestreams.Subscription() {
+                    @Override
+                    public void request(long n) {
+                        subscription.request(n);
+                    }
+
+                    @Override
+                    public void cancel() {
+                        subscription.cancel();
+                    }
+                }),
+                // consumeAction: 将数据传递给 Reactive Streams Subscriber
+                (subscription, data) -> subscriber.onNext(data),
+                // completeAction: 通知 Reactive Streams Subscriber 完成
+                subscription -> subscriber.onComplete(),
+                // failAction: 将异常传递给 Reactive Streams Subscriber
+                (subscription, cause) -> subscriber.onError(cause)
+        );
+    }
+
     /**
      * 向发布者订阅以启动数据发送。
      *
