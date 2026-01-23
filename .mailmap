@@ -2,6 +2,9 @@
 # 统一 Claude AI 的贡献者署名，确保 GitHub 能够正确统计所有 Claude 辅助的提交
 
 # 将所有 Claude 模型变体统一为 "Claude"
+Claude <noreply@anthropic.com> Claude Haiku 4 <noreply@anthropic.com>
+Claude <noreply@anthropic.com> Claude Sonnet 4 <noreply@anthropic.com>
+Claude <noreply@anthropic.com> Claude Opus 4 <noreply@anthropic.com>
+Claude <noreply@anthropic.com> Claude Haiku 4.5 <noreply@anthropic.com>
 Claude <noreply@anthropic.com> Claude Sonnet 4.5 <noreply@anthropic.com>
 Claude <noreply@anthropic.com> Claude Opus 4.5 <noreply@anthropic.com>
-Claude <noreply@anthropic.com> Claude Haiku 4.5 <noreply@anthropic.com>

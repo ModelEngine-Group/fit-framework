@@ -36,65 +36,38 @@ fi
 
 **说明：** 构建日志保存到 `.ai-workspace/logs/maven-build-{timestamp}.log`
 
-### 步骤 3：创建动态插件目录
+### 步骤 3：加载公共脚本并初始化环境
 
 ```bash
-mkdir -p dynamic-plugins
+source .ai-agents/scripts/fit-service.sh
+
+init_plugin_dir
 ```
+
+**说明：** 加载 FIT 服务管理公共脚本，初始化插件目录（日志目录在步骤 2 已创建）
 
 ### 步骤 4：启动 FIT 服务
 
 ```bash
-TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-FIT_LOG=".ai-workspace/logs/fit-server-${TIMESTAMP}.log"
-nohup build/bin/fit start --plugin-dir=dynamic-plugins > "$FIT_LOG" 2>&1 &
-FIT_PID=$!
-
-# 等待服务启动（最多 60 秒）
-for i in {1..60}; do
-    if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-        exit 0
-    fi
-    if [ $i -eq 60 ]; then
-        cat "$FIT_LOG"
-        kill $FIT_PID 2>/dev/null || true
-        exit 1
-    fi
-    sleep 1
-done
+start_fit_service
 ```
 
-**说明：** FIT 服务日志保存到 `.ai-workspace/logs/fit-server-{timestamp}.log`
+**说明：** 启动服务并等待健康检查通过（最多 60 秒），日志自动保存到 `.ai-workspace/logs/fit-server-{timestamp}.log`
 
-### 步骤 5：验证健康检查接口
+### 步骤 5：执行所有验证
 
 ```bash
-PLUGINS_RESPONSE=$(curl -s http://localhost:8080/actuator/plugins)
-if [ $? -eq 0 ]; then
-    echo "$PLUGINS_RESPONSE"
-else
-    pkill -f fit-discrete-launcher || true
-    exit 1
-fi
+verify_all
+TEST_RESULT=$?
 ```
 
-**说明：** 返回插件列表 JSON
+**说明：** 验证健康检查、插件列表、Swagger 文档等接口
 
-### 步骤 6：验证 Swagger 文档页面
-
-```bash
-curl -s http://localhost:8080/openapi.html | grep -qi "swagger\|openapi"
-```
-
-**说明：** 检查 Swagger 文档页面是否可访问
-
-### 步骤 7：清理测试环境
+### 步骤 6：清理测试环境
 
 ```bash
-pkill -f fit-discrete-launcher || true
-sleep 2
-rm -rf build dynamic-plugins
-ls -lh .ai-workspace/logs/
+cleanup true
+exit $TEST_RESULT
 ```
 
 **说明：** 清理构建产物和动态插件目录，测试日志保留在 `.ai-workspace/logs/`
