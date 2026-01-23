@@ -9,9 +9,10 @@ subtask: false
 执行以下步骤:
 
 1. 验证前置条件:
-   - 检查 .ai-workspace/active/$1/task.md 存在
-   - 检查 plan.md 存在
-   - 读取技术方案,理解实施步骤和文件清单
+   !`test -f .ai-workspace/active/$1/task.md && echo "✅ 任务文件存在" || echo "❌ ERROR: 任务文件不存在"`
+   !`test -f .ai-workspace/active/$1/plan.md && echo "✅ 技术方案存在" || echo "❌ ERROR: 技术方案不存在,请先执行 /plan $1"`
+   
+   读取技术方案,理解实施步骤和文件清单
 
 2. 执行代码实现:
    - 按照 plan.md 中的步骤顺序执行

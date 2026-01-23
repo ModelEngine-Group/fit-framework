@@ -9,9 +9,9 @@ subtask: false
 执行以下步骤:
 
 1. 验证前置条件:
-   - 检查 .ai-workspace/active/$1/task.md 存在
-   - 检查 review.md 存在
-   - 检查 implementation.md 存在
+   !`test -f .ai-workspace/active/$1/task.md && echo "✅ 任务文件存在" || echo "❌ ERROR: 任务文件不存在"`
+   !`test -f .ai-workspace/active/$1/review.md && echo "✅ 审查报告存在" || echo "❌ ERROR: 审查报告不存在,请先执行 /review $1"`
+   !`test -f .ai-workspace/active/$1/implementation.md && echo "✅ 实现报告存在" || echo "❌ ERROR: 实现报告不存在"`
 
 2. 读取审查报告:
    - 提取需要修复的问题,按优先级分类:

@@ -10,11 +10,14 @@ subtask: false
 
 1. 识别对象与获取信息:
    
-   尝试获取 Issue 信息:
-   !`gh issue view $1 --json number,title,body,labels,state`
+   先尝试获取 Issue 信息:
+   !`gh issue view $1 --json number,title,body,labels,state 2>&1`
    
-   如果是 PR,获取 PR 信息:
-   !`gh pr view $1 --json number,title,body,labels,state,files`
+   如果上面返回错误(不是 Issue),尝试获取 PR 信息:
+   !`gh pr view $1 --json number,title,body,labels,state,files 2>&1`
+   
+   如果两者都失败:
+   !`echo "❌ ERROR: #$1 不是有效的 Issue 或 PR 编号"`
 
 2. 智能分析:
    
@@ -55,10 +58,10 @@ subtask: false
    用户确认后,根据对象类型执行命令:
    
    如果是 Issue:
-   !`gh issue edit $1 --title "<new-title>"`
+   !`gh issue edit $1 --title "<new-title>" && echo "✅ Issue 标题已更新" || echo "❌ ERROR: 更新失败"`
    
    如果是 PR:
-   !`gh pr edit $1 --title "<new-title>"`
+   !`gh pr edit $1 --title "<new-title>" && echo "✅ PR 标题已更新" || echo "❌ ERROR: 更新失败"`
 
 5. 告知用户:
    ```

@@ -20,8 +20,8 @@ subtask: false
 
 2. 查找依赖文件:
    使用 grep 搜索包含该依赖的文件:
-   !`grep -r "$1" --include="pom.xml" --include="package.json" --include="build.gradle"`
-   !`grep -r "$2" --include="pom.xml" --include="package.json" --include="build.gradle"`
+   !`grep -r "$1" --include="pom.xml" --include="package.json" --include="build.gradle" --include="requirements.txt" . || echo "⚠️  未找到包含 $1 的文件"`
+   !`grep -r "$2" --include="pom.xml" --include="package.json" --include="build.gradle" --include="requirements.txt" . || echo "⚠️  未找到版本 $2"`
 
 3. 更新依赖版本:
    根据项目类型更新对应的依赖文件:
@@ -46,15 +46,20 @@ subtask: false
    5.1 查看变更:
    !`git diff`
    
-   5.2 编译验证:
-   - Maven: !`mvn clean package -Dmaven.test.skip=true`
-   - Node.js: !`npm install && npm run build`
-   - Gradle: !`./gradlew clean build -x test`
+   5.2 验证变更文件数量:
+   !`git diff --name-only | wc -l`
    
-   5.3 运行测试(推荐):
-   - Maven: !`mvn test`
-   - Node.js: !`npm test`
-   - Gradle: !`./gradlew test`
+   5.3 编译验证:
+   根据项目类型选择:
+   - Maven: !`mvn clean package -Dmaven.test.skip=true 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   - Node.js: !`npm install && npm run build 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   - Gradle: !`./gradlew clean build -x test 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   
+   5.4 运行测试(推荐):
+   根据项目类型选择:
+   - Maven: !`mvn test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
+   - Node.js: !`npm test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
+   - Gradle: !`./gradlew test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
 
 6. 输出变更摘要:
    ```

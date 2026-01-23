@@ -23,7 +23,7 @@ subtask: false
 执行以下步骤:
 
 1. 验证任务存在:
-   !`ls -la .ai-workspace/active/$1/task.md`
+   !`test -f .ai-workspace/active/$1/task.md && echo "✅ 任务存在" || echo "❌ ERROR: 任务不存在"`
 
 2. 分析并记录阻塞原因:
    询问用户或根据 $2 参数确定:
@@ -33,25 +33,29 @@ subtask: false
    - 尝试的解决方案: 已经尝试了哪些方法?
    - 需要的帮助: 需要谁来帮助?需要什么资源?
 
-3. 更新任务状态(CRITICAL):
-   使用 Edit 工具更新 task.md:
-   ```yaml
-   status: blocked
-   current_step: <保持不变>
-   updated_at: !`date '+%Y-%m-%d %H:%M:%S'`
-   blocked_at: !`date '+%Y-%m-%d %H:%M:%S'`
-   blocked_by: opencode
-   blocked_reason: <简短描述阻塞原因>
-   ```
+3. 获取当前时间:
+   !`date '+%Y-%m-%d %H:%M:%S'`
 
-4. 在 task.md 中添加"阻塞信息"章节:
+4. 更新任务状态(CRITICAL):
+   使用 Edit 工具更新 task.md 的 YAML front matter:
+   - status: blocked
+   - current_step: <保持不变>
+   - updated_at: <使用步骤3获取的时间>
+   - blocked_at: <使用步骤3获取的时间>
+   - blocked_by: opencode
+   - blocked_reason: <简短描述阻塞原因>
+
+5. 在 task.md 中添加"阻塞信息"章节:
+   
+   使用 Edit 工具在 task.md 末尾添加以下内容:
+   
    ```markdown
    ---
    
    ## ⚠️ 阻塞信息
    
    ### 阻塞概要
-   - **阻塞时间**: !`date '+%Y-%m-%d %H:%M:%S'`
+   - **阻塞时间**: <使用步骤3获取的时间>
    - **阻塞步骤**: <current_step>
    - **阻塞者**: opencode
    - **阻塞类型**: <技术问题/需求问题/资源问题/决策问题>
@@ -78,20 +82,18 @@ subtask: false
    - [ ] 条件 2
    ```
 
-5. 移动到阻塞目录(CRITICAL):
-   ```bash
-   mkdir -p .ai-workspace/blocked
-   mv .ai-workspace/active/$1 .ai-workspace/blocked/
-   ```
+6. 移动到阻塞目录(CRITICAL):
+   !`mkdir -p .ai-workspace/blocked`
+   !`mv .ai-workspace/active/$1 .ai-workspace/blocked/`
 
-6. 验证移动成功:
-   !`test ! -d .ai-workspace/active/$1 && echo "已移除 active 目录" || echo "ERROR: active 目录仍存在"`
-   !`test -d .ai-workspace/blocked/$1 && echo "已移动到 blocked" || echo "ERROR: 移动失败"`
+7. 验证移动成功:
+   !`test ! -d .ai-workspace/active/$1 && echo "✅ 已移除 active 目录" || echo "❌ ERROR: active 目录仍存在"`
+   !`test -d .ai-workspace/blocked/$1 && echo "✅ 已移动到 blocked" || echo "❌ ERROR: 移动失败"`
 
-7. 可选: 同步到 Issue:
+8. 可选: 同步到 Issue:
    如果有关联 Issue,使用 /sync-issue <issue-number> 更新阻塞状态
 
-8. 告知用户:
+9. 告知用户:
    ```
    ⚠️  任务 $1 已标记为阻塞
    
@@ -117,10 +119,13 @@ subtask: false
 
 **解除阻塞**:
 当问题解决后,手动解除阻塞:
-```bash
-mv .ai-workspace/blocked/$1 .ai-workspace/active/
-# 然后使用 Edit 工具更新 task.md,将 status 改回 active,移除 blocked_* 字段
-```
+
+!`mv .ai-workspace/blocked/$1 .ai-workspace/active/`
+
+然后使用 Edit 工具更新 task.md:
+- 将 status 改回 active
+- 移除 blocked_at, blocked_by, blocked_reason 字段
+- 更新 updated_at 为当前时间
 
 **注意事项**:
 - 及时标记,不要拖延

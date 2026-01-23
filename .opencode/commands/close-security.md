@@ -9,7 +9,7 @@ subtask: false
 执行以下步骤:
 
 1. 获取安全告警信息:
-   !`gh api repos/<owner>/<repo>/dependabot/alerts/$1`
+   !`gh api "repos/{owner}/{repo}/dependabot/alerts/$1"`
    
    验证告警状态:
    - 如果已经是 dismissed 或 fixed 状态,提示用户并退出
@@ -61,13 +61,7 @@ subtask: false
    ```
 
 6. 执行关闭操作:
-   ```bash
-   gh api --method PATCH \
-     repos/<owner>/<repo>/dependabot/alerts/$1 \
-     -f state=dismissed \
-     -f dismissed_reason="<API参数>" \
-     -f dismissed_comment="<用户的详细说明>"
-   ```
+   !`gh api --method PATCH "repos/{owner}/{repo}/dependabot/alerts/$1" -f state=dismissed -f dismissed_reason="<API参数>" -f dismissed_comment="<用户的详细说明>" && echo "✅ 告警已关闭" || echo "❌ ERROR: 关闭失败"`
    
    **选项到 API 参数的映射**:
    - 误报 → not_used 或 inaccurate
@@ -77,8 +71,9 @@ subtask: false
    - 测试或开发依赖 → not_used
 
 7. 记录到任务(如果存在):
-   - 搜索包含 security_alert_number: $1 的任务
-   - 如果找到,添加关闭记录并归档任务
+   !`grep -r "security_alert_number: $1" .ai-workspace/active/ .ai-workspace/blocked/ 2>/dev/null || echo "⚠️  无关联任务"`
+   
+   如果找到相关任务,添加关闭记录并归档任务
 
 8. 告知用户:
    ```

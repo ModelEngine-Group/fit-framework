@@ -19,14 +19,17 @@ subtask: false
    - implementation.md - 实现报告
    - review.md - 审查报告
 
-3. 生成进度摘要:
+3. 获取当前时间:
+   !`date '+%Y-%m-%d %H:%M:%S'`
 
-基本格式:
+4. 生成进度摘要:
+
+基本格式（使用步骤3获取的时间）:
 ```markdown
 ## 🤖 任务进度更新
 
 **任务ID**: $1
-**更新时间**: !`date '+%Y-%m-%d %H:%M:%S'`
+**更新时间**: <当前时间>
 **当前状态**: <状态描述>
 
 ### ✅ 已完成
@@ -63,18 +66,22 @@ subtask: false
 - **突出关键决策**: 技术方案选择、重要发现等
 - **面向人类阅读**: 避免技术细节,使用易懂的语言
 
-4. 同步到 Issue:
-   ```bash
-   gh issue comment <issue-number> --body "$(cat <<'EOF'
-   <生成的进度摘要>
-   EOF
-   )"
-   ```
+5. 同步到 Issue:
+   使用 gh 命令添加评论，将生成的进度摘要作为 body。
+   
+   执行命令:
+   !`gh issue comment <issue-number> --body "<生成的进度摘要>"`
+   
+   或使用 HEREDOC 格式（推荐用于多行内容）:
+   !`gh issue comment <issue-number> --body "$(cat <<'EOF'
+<生成的进度摘要>
+EOF
+)"`
 
-5. 更新任务状态:
+6. 更新任务状态:
    - 在 task.md 中添加或更新 last_synced_at 字段
 
-6. 告知用户:
+7. 告知用户:
    ```
    ✅ 任务进度已同步到 Issue #<issue-number>
    

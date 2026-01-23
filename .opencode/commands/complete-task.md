@@ -22,7 +22,7 @@ subtask: false
 执行以下步骤:
 
 1. 验证任务存在:
-   !`ls -la .ai-workspace/active/$1/task.md`
+   !`test -f .ai-workspace/active/$1/task.md && echo "✅ 任务存在" || echo "❌ ERROR: 任务不存在"`
 
 2. 读取并验证任务状态:
    - 检查所有步骤是否标记为完成 ✅
@@ -30,23 +30,27 @@ subtask: false
    - 检查 status 是否为 active
    - 检查文件完整性: analysis.md, plan.md, implementation.md, review.md 都存在
 
-3. 更新任务状态(CRITICAL):
-   使用 Edit 工具更新 task.md:
-   ```yaml
-   status: completed
-   current_step: finalize
-   updated_at: !`date '+%Y-%m-%d %H:%M:%S'`
-   completed_at: !`date '+%Y-%m-%d %H:%M:%S'`
-   ```
+3. 获取当前时间:
+   !`date '+%Y-%m-%d %H:%M:%S'`
 
-4. 在 task.md 末尾添加完成总结:
+4. 更新任务状态(CRITICAL):
+   使用 Edit 工具更新 task.md 的 YAML front matter:
+   - status: completed
+   - current_step: finalize
+   - updated_at: <使用步骤3获取的时间>
+   - completed_at: <使用步骤3获取的时间>
+
+5. 在 task.md 末尾添加完成总结:
+   
+   使用 Edit 工具在 task.md 末尾添加以下内容:
+   
    ```markdown
    ---
    
    ## 任务完成总结
    
    ### 完成信息
-   - **完成时间**: !`date '+%Y-%m-%d %H:%M:%S'`
+   - **完成时间**: <使用步骤3获取的时间>
    - **完成者**: opencode
    - **关联 PR**: #<pr-number>(如果有)
    - **关联 Issue**: #<issue-number>(如果有)
@@ -66,20 +70,18 @@ subtask: false
    - [x] 代码已合并
    ```
 
-5. 归档任务(CRITICAL):
-   ```bash
-   mkdir -p .ai-workspace/completed
-   mv .ai-workspace/active/$1 .ai-workspace/completed/
-   ```
+6. 归档任务(CRITICAL):
+   !`mkdir -p .ai-workspace/completed`
+   !`mv .ai-workspace/active/$1 .ai-workspace/completed/`
 
-6. 验证移动成功:
-   !`test ! -d .ai-workspace/active/$1 && echo "已移除 active 目录" || echo "ERROR: active 目录仍存在"`
-   !`test -d .ai-workspace/completed/$1 && echo "已归档到 completed" || echo "ERROR: 归档失败"`
+7. 验证移动成功:
+   !`test ! -d .ai-workspace/active/$1 && echo "✅ 已移除 active 目录" || echo "❌ ERROR: active 目录仍存在"`
+   !`test -d .ai-workspace/completed/$1 && echo "✅ 已归档到 completed" || echo "❌ ERROR: 归档失败"`
 
-7. 可选: 同步到 Issue:
+8. 可选: 同步到 Issue:
    如果有关联 Issue,使用 /sync-issue <issue-number> 更新 Issue 状态
 
-8. 告知用户:
+9. 告知用户:
    ```
    🎉 任务 $1 已完成并归档
    
