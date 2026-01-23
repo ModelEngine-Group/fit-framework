@@ -9,9 +9,12 @@ subtask: false
 执行以下步骤:
 
 1. 查找任务文件:
-   - 在 .ai-workspace/active/$1/task.md 查找
-   - 如果不存在,检查 blocked/ 和 completed/ 目录
-   - 读取 task.md 和 analysis.md
+   !`test -f .ai-workspace/active/$1/task.md && echo "✅ 任务存在于 active" || echo "⚠️  任务不在 active 目录"`
+   
+   如果不在 active 目录,检查其他目录:
+   !`find .ai-workspace -type f -path "*/$1/task.md" 2>/dev/null || echo "❌ ERROR: 任务不存在"`
+   
+   读取 task.md 和 analysis.md
 
 2. 理解问题本质和约束条件:
    - 阅读 analysis.md，理解问题的根本原因和影响范围

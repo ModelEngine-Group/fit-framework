@@ -9,9 +9,10 @@ subtask: false
 执行以下步骤:
 
 1. 验证前置条件:
-   - 检查 .ai-workspace/active/$1/task.md 存在
-   - 检查 implementation.md 存在
-   - 读取实现报告,了解已修改的文件和实现的功能
+   !`test -f .ai-workspace/active/$1/task.md && echo "✅ 任务文件存在" || echo "❌ ERROR: 任务文件不存在"`
+   !`test -f .ai-workspace/active/$1/implementation.md && echo "✅ 实现报告存在" || echo "❌ ERROR: 实现报告不存在,请先执行 /implement $1"`
+   
+   读取实现报告,了解已修改的文件和实现的功能
 
 2. 执行代码审查,检查:
    - 代码质量和编码规范(遵循项目规范)

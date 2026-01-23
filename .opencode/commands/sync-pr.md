@@ -19,14 +19,17 @@ subtask: false
    - implementation.md - 实现报告
    - review.md - 审查报告
 
-3. 生成进度摘要:
+3. 获取当前时间:
+   !`date '+%Y-%m-%d %H:%M:%S'`
 
-基本格式:
+4. 生成进度摘要:
+
+基本格式（使用步骤3获取的时间）:
 ```markdown
 ## 🤖 开发进度更新
 
 **任务ID**: $1
-**更新时间**: !`date '+%Y-%m-%d %H:%M:%S'`
+**更新时间**: <当前时间>
 **当前状态**: <状态描述>
 
 ### ✅ 已完成
@@ -70,18 +73,22 @@ subtask: false
 - **逻辑连贯**: 按开发流程展示进展
 - **便于审查**: 说明关键变更的原因和影响
 
-4. 同步到 PR:
-   ```bash
-   gh pr comment <pr-number> --body "$(cat <<'EOF'
-   <生成的进度摘要>
-   EOF
-   )"
-   ```
+5. 同步到 PR:
+   使用 gh 命令添加评论，将生成的进度摘要作为 body。
+   
+   执行命令:
+   !`gh pr comment <pr-number> --body "<生成的进度摘要>"`
+   
+   或使用 HEREDOC 格式（推荐用于多行内容）:
+   !`gh pr comment <pr-number> --body "$(cat <<'EOF'
+<生成的进度摘要>
+EOF
+)"`
 
-5. 更新任务状态:
+6. 更新任务状态:
    - 在 task.md 中添加或更新 last_synced_to_pr_at 字段
 
-6. 告知用户:
+7. 告知用户:
    ```
    ✅ 任务进度已同步到 PR #<pr-number>
    

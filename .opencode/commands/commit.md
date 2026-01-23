@@ -18,10 +18,13 @@ subtask: false
    !`git diff --cached --name-only`
 
 3. 对于每个修改的文件,检查是否包含版权头:
-   - 使用 grep "Copyright" 查找版权头
-   - 如果文件包含版权头且年份不是当前年份,使用 Edit 工具更新
-   - 更新格式示例: "Copyright (C) 2024-2025" → "Copyright (C) 2024-!`date +%Y`"
-   - **绝对不要**硬编码年份
+   - 使用 Read 工具读取文件内容
+   - 使用 grep 查找版权头: !`grep -l "Copyright" <file-path> 2>/dev/null || echo "无版权头"`
+   - 如果文件包含版权头且年份过期,使用 Edit 工具更新
+   - 更新格式示例（假设当前年份为 2026）:
+     * "Copyright (C) 2024-2025" → "Copyright (C) 2024-2026"
+     * "Copyright (C) 2024" → "Copyright (C) 2024-2026"
+   - **绝对不要**硬编码年份，始终使用步骤1获取的当前年份
    - **只更新修改的文件**,不批量更新所有文件
 
 **步骤 2: 分析变更并生成提交信息**
@@ -41,13 +44,17 @@ subtask: false
 **步骤 3: 提交代码**
 
 1. 添加文件到暂存区:
-   !`git add <相关文件>`
+   !`git add .`
+   
+   或指定特定文件:
+   !`git add <file1> <file2>`
 
 2. 创建提交:
    !`git commit -m "<提交消息>"`
 
 3. 验证提交成功:
    !`git status`
+   !`git log -1 --oneline`
 
 **步骤 4: 更新任务状态(如果是任务相关的提交)**
 

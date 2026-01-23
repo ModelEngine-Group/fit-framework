@@ -9,12 +9,15 @@ subtask: false
 执行以下步骤:
 
 1. 查找任务文件:
-   - 优先在 .ai-workspace/active/$1/ 查找
-   - 如果没找到,检查 completed/ 目录
-   - 如果还没找到,检查 blocked/ 目录
-   - 读取 task.md
+   !`if [ -d .ai-workspace/active/$1 ]; then echo "active"; elif [ -d .ai-workspace/completed/$1 ]; then echo "completed"; elif [ -d .ai-workspace/blocked/$1 ]; then echo "blocked"; else echo "not_found"; fi`
+   
+   根据上面的结果确定任务位置,然后读取 task.md:
+   !`cat .ai-workspace/<status>/$1/task.md`
 
 2. 检查上下文文件:
+   !`ls -lh .ai-workspace/<status>/$1/ | grep -E '\.(md)$' || echo "无上下文文件"`
+   
+   列出所有 markdown 文件及其大小:
    - analysis.md - 需求分析
    - plan.md - 技术方案
    - implementation.md - 实现报告
