@@ -51,15 +51,15 @@ subtask: false
    
    5.3 编译验证:
    根据项目类型选择:
-   - Maven: !`mvn clean package -Dmaven.test.skip=true 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
-   - Node.js: !`npm install && npm run build 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
-   - Gradle: !`./gradlew clean build -x test 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   - Maven: !`mkdir -p .ai-workspace/logs && mvn clean package -Dmaven.test.skip=true 2>&1 | tee .ai-workspace/logs/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   - Node.js: !`mkdir -p .ai-workspace/logs && npm install && npm run build 2>&1 | tee .ai-workspace/logs/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   - Gradle: !`mkdir -p .ai-workspace/logs && ./gradlew clean build -x test 2>&1 | tee .ai-workspace/logs/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
    
    5.4 运行测试(推荐):
    根据项目类型选择:
-   - Maven: !`mvn test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
-   - Node.js: !`npm test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
-   - Gradle: !`./gradlew test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
+   - Maven: !`mkdir -p .ai-workspace/logs && mvn test 2>&1 | tee .ai-workspace/logs/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
+   - Node.js: !`mkdir -p .ai-workspace/logs && npm test 2>&1 | tee .ai-workspace/logs/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
+   - Gradle: !`mkdir -p .ai-workspace/logs && ./gradlew test 2>&1 | tee .ai-workspace/logs/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
 
 6. 输出变更摘要:
    ```

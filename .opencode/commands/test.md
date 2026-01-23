@@ -6,31 +6,108 @@ subtask: false
 
 执行完整的测试流程,包括单元测试、构建验证和集成测试。
 
-使用自动化测试脚本执行完整的测试流程:
+## 测试流程
 
-!`./.ai-agents/scripts/run-test.sh`
+### 步骤 1：清理构建产物
 
-**测试流程包括**:
+```bash
+rm -rf build
+```
 
-1. 清理构建产物 - 删除之前的 build 目录
-2. 执行单元测试和构建 - 运行 mvn clean install 执行全量单元测试
-3. 创建动态插件目录 - 创建 dynamic-plugins 目录
-4. 启动 FIT 服务 - 使用 build/bin/fit start 启动服务
-5. 验证健康检查接口 - 访问 /actuator/plugins 接口
-6. 验证 Swagger 文档 - 访问 /openapi.html 页面
-7. 清理测试环境 - 停止服务并删除构建产物
+### 步骤 2：执行 Maven 构建和单元测试
 
-**测试报告**:
+```bash
+mkdir -p .ai-workspace/logs
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+LOG_FILE=".ai-workspace/logs/maven-build-${TIMESTAMP}.log"
 
-脚本会自动生成测试报告,包含:
-- ✅/✗ 单元测试结果
-- ✅/✗ 构建状态
-- ✅/✗ FIT 服务启动状态
-- ✅/✗ 健康检查接口响应
-- ✅/✗ Swagger 文档页面可访问性
+# 使用 -f 参数指定 pom.xml 位置，避免 cd 命令
+mvn -f framework/pom.xml clean install -pl '!ohscript' -DskipITs > "$LOG_FILE" 2>&1
+BUILD_STATUS=$?
 
-**注意事项**:
-- 确保 8080 端口未被占用
-- 测试脚本已在配置中自动授权
-- 整个测试流程无需手动确认,自动执行所有步骤
-- 超时时间: 15分钟(900000ms)
+# 显示构建摘要
+tail -100 "$LOG_FILE"
+
+if [ $BUILD_STATUS -ne 0 ]; then
+    grep -A 5 "BUILD FAILURE\|COMPILATION ERROR\|ERROR\|FAILED" "$LOG_FILE" | head -50
+    exit $BUILD_STATUS
+fi
+```
+
+**说明：** 构建日志保存到 `.ai-workspace/logs/maven-build-{timestamp}.log`
+
+### 步骤 3：创建动态插件目录
+
+```bash
+mkdir -p dynamic-plugins
+```
+
+### 步骤 4：启动 FIT 服务
+
+```bash
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+FIT_LOG=".ai-workspace/logs/fit-server-${TIMESTAMP}.log"
+nohup build/bin/fit start --plugin-dir=dynamic-plugins > "$FIT_LOG" 2>&1 &
+FIT_PID=$!
+
+# 等待服务启动（最多 60 秒）
+for i in {1..60}; do
+    if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
+        exit 0
+    fi
+    if [ $i -eq 60 ]; then
+        cat "$FIT_LOG"
+        kill $FIT_PID 2>/dev/null || true
+        exit 1
+    fi
+    sleep 1
+done
+```
+
+**说明：** FIT 服务日志保存到 `.ai-workspace/logs/fit-server-{timestamp}.log`
+
+### 步骤 5：验证健康检查接口
+
+```bash
+PLUGINS_RESPONSE=$(curl -s http://localhost:8080/actuator/plugins)
+if [ $? -eq 0 ]; then
+    echo "$PLUGINS_RESPONSE"
+else
+    pkill -f fit-discrete-launcher || true
+    exit 1
+fi
+```
+
+**说明：** 返回插件列表 JSON
+
+### 步骤 6：验证 Swagger 文档页面
+
+```bash
+curl -s http://localhost:8080/openapi.html | grep -qi "swagger\|openapi"
+```
+
+**说明：** 检查 Swagger 文档页面是否可访问
+
+### 步骤 7：清理测试环境
+
+```bash
+pkill -f fit-discrete-launcher || true
+sleep 2
+rm -rf build dynamic-plugins
+ls -lh .ai-workspace/logs/
+```
+
+**说明：** 清理构建产物和动态插件目录，测试日志保留在 `.ai-workspace/logs/`
+
+## 执行说明
+
+- **超时设置：** Maven 构建步骤需要设置 900000ms (15分钟) 超时
+- **并行执行：** 各步骤需按顺序执行，不可并行
+- **日志保存：** 构建和服务日志自动保存到 `.ai-workspace/logs/` 目录
+- **端口要求：** 确保 8080 端口未被占用
+- **预计时间：** 整个流程约 15-20 分钟
+
+## 输出文件
+
+- `.ai-workspace/logs/maven-build-{timestamp}.log` - Maven 构建完整日志
+- `.ai-workspace/logs/fit-server-{timestamp}.log` - FIT 服务启动日志

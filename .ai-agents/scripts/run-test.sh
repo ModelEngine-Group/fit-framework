@@ -7,6 +7,9 @@ echo "=========================================="
 echo "FIT Framework 测试流程"
 echo "=========================================="
 
+# 创建日志目录
+mkdir -p .ai-workspace/logs
+
 # 1. 清理构建产物
 echo ""
 echo "[1/6] 清理构建产物..."
@@ -16,7 +19,7 @@ rm -rf build
 echo ""
 echo "[2/6] 执行 Maven 构建和单元测试..."
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-LOG_FILE="/tmp/maven-build-${TIMESTAMP}.log"
+LOG_FILE=".ai-workspace/logs/maven-build-${TIMESTAMP}.log"
 echo "构建日志保存到: $LOG_FILE"
 
 cd framework
@@ -33,12 +36,13 @@ if [ $BUILD_STATUS -ne 0 ]; then
     echo ""
     echo "========== 错误详情 =========="
     grep -A 5 "BUILD FAILURE\|COMPILATION ERROR\|ERROR\|FAILED" "$LOG_FILE" | head -50
-    rm "$LOG_FILE"
+    echo ""
+    echo "完整日志已保存到: $LOG_FILE"
     exit $BUILD_STATUS
 fi
 
-rm "$LOG_FILE"
 echo "✓ Maven 构建成功"
+echo "完整日志已保存到: $LOG_FILE"
 
 # 3. 创建动态插件目录
 echo ""
@@ -49,7 +53,7 @@ echo "✓ 动态插件目录创建成功"
 # 4. 启动 FIT 服务
 echo ""
 echo "[4/6] 启动 FIT 服务..."
-FIT_LOG="/tmp/fit-server-${TIMESTAMP}.log"
+FIT_LOG=".ai-workspace/logs/fit-server-${TIMESTAMP}.log"
 build/bin/fit start --plugin-dir=dynamic-plugins > "$FIT_LOG" 2>&1 &
 FIT_PID=$!
 echo "FIT 服务进程 PID: $FIT_PID"
@@ -106,7 +110,7 @@ sleep 2
 echo "删除构建产物和动态插件目录..."
 rm -rf build
 rm -rf dynamic-plugins
-rm -f "$FIT_LOG"
+echo "测试日志已保存到: .ai-workspace/logs/"
 
 echo ""
 echo "=========================================="
