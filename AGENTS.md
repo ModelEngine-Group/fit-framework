@@ -145,6 +145,19 @@ AI 切换：任何 AI 都可以通过读取任务目录接手任务。
 
 **重要**：这只是推荐，人类决定使用哪个 AI 执行哪个步骤。
 
+### 交流语言规范
+
+**所有 AI 智能体必须遵循以下语言规范**：
+
+- **回复语言与问题保持一致**：AI 应根据用户输入的语言自动调整回复语言（自适应策略）
+  - 用户使用中文提问 → AI 使用中文回复
+  - 用户使用英文提问 → AI 使用英文回复
+- **项目文档默认语言**：中文
+  - 代码注释：中文
+  - 文档生成：中文
+  - 提交信息：中文（遵循 Conventional Commits 格式）
+- **配置说明**：各 AI 的 `preferences.yaml` 中通过 `communication_language: "Adaptive (Match user's language)"` 字段定义
+
 ### 详细文档
 
 - 协作总指南：`.ai-agents/README.md`
@@ -153,7 +166,7 @@ AI 切换：任何 AI 都可以通过读取任务目录接手任务。
 - Claude 配置：`.claude/README.md`
 - Claude 项目规则：`.claude/project-rules.md`（包含规则 7：任务状态管理规范）
 - Claude 命令参考：`.claude/commands/`
-- ChatGPT 配置：`.ai-agents/chatgpt/README.md`
+- Codex 配置：`.ai-agents/codex/README.md`
 - Gemini 配置：`.ai-agents/gemini/README.md`
 
 ### 基于标准

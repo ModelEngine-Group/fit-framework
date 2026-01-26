@@ -7,6 +7,9 @@ echo "=========================================="
 echo "FIT Framework 测试流程"
 echo "=========================================="
 
+# 创建日志目录
+mkdir -p .ai-workspace/logs
+
 # 1. 清理构建产物
 echo ""
 echo "[1/6] 清理构建产物..."
@@ -16,7 +19,7 @@ rm -rf build
 echo ""
 echo "[2/6] 执行 Maven 构建和单元测试..."
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-LOG_FILE="/tmp/maven-build-${TIMESTAMP}.log"
+LOG_FILE=".ai-workspace/logs/maven-build-${TIMESTAMP}.log"
 echo "构建日志保存到: $LOG_FILE"
 
 cd framework
@@ -33,12 +36,13 @@ if [ $BUILD_STATUS -ne 0 ]; then
     echo ""
     echo "========== 错误详情 =========="
     grep -A 5 "BUILD FAILURE\|COMPILATION ERROR\|ERROR\|FAILED" "$LOG_FILE" | head -50
-    rm "$LOG_FILE"
+    echo ""
+    echo "完整日志已保存到: $LOG_FILE"
     exit $BUILD_STATUS
 fi
 
-rm "$LOG_FILE"
 echo "✓ Maven 构建成功"
+echo "完整日志已保存到: $LOG_FILE"
 
 # 3. 创建动态插件目录
 echo ""
@@ -49,7 +53,7 @@ echo "✓ 动态插件目录创建成功"
 # 4. 启动 FIT 服务
 echo ""
 echo "[4/6] 启动 FIT 服务..."
-FIT_LOG="/tmp/fit-server-${TIMESTAMP}.log"
+FIT_LOG=".ai-workspace/logs/fit-server-${TIMESTAMP}.log"
 build/bin/fit start --plugin-dir=dynamic-plugins > "$FIT_LOG" 2>&1 &
 FIT_PID=$!
 echo "FIT 服务进程 PID: $FIT_PID"
@@ -58,12 +62,13 @@ echo "FIT 服务日志: $FIT_LOG"
 # 等待服务启动（最多 60 秒）
 echo "等待服务启动..."
 for i in {1..60}; do
-    if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-        echo "✓ FIT 服务启动成功"
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health 2>/dev/null)
+    if [ "$HTTP_CODE" = "200" ]; then
+        echo "✓ FIT 服务启动成功 (HTTP $HTTP_CODE)"
         break
     fi
     if [ $i -eq 60 ]; then
-        echo "✗ FIT 服务启动超时"
+        echo "✗ FIT 服务启动超时 (最后 HTTP 状态码: $HTTP_CODE)"
         echo "========== 启动日志 =========="
         cat "$FIT_LOG"
         kill $FIT_PID 2>/dev/null || true
@@ -75,13 +80,15 @@ done
 # 5. 验证健康检查接口
 echo ""
 echo "[5/6] 验证健康检查接口..."
-PLUGINS_RESPONSE=$(curl -s http://localhost:8080/actuator/plugins)
-if [ $? -eq 0 ]; then
-    echo "✓ 健康检查接口正常"
+HTTP_CODE=$(curl -s -o /tmp/plugins_response.json -w "%{http_code}" http://localhost:8080/actuator/plugins)
+if [ "$HTTP_CODE" = "200" ]; then
+    echo "✓ 健康检查接口正常 (HTTP $HTTP_CODE)"
     echo "插件列表响应:"
-    echo "$PLUGINS_RESPONSE" | head -20
+    cat /tmp/plugins_response.json | head -20
+    rm -f /tmp/plugins_response.json
 else
-    echo "✗ 健康检查接口失败"
+    echo "✗ 健康检查接口失败 (HTTP $HTTP_CODE)"
+    rm -f /tmp/plugins_response.json
     pkill -f fit-discrete-launcher || true
     exit 1
 fi
@@ -89,12 +96,13 @@ fi
 # 6. 验证 Swagger 文档页面
 echo ""
 echo "[6/6] 验证 Swagger 文档页面..."
-SWAGGER_RESPONSE=$(curl -s http://localhost:8080/openapi.html)
-if [ $? -eq 0 ] && echo "$SWAGGER_RESPONSE" | grep -q "swagger" 2>/dev/null || echo "$SWAGGER_RESPONSE" | grep -q "Swagger" 2>/dev/null; then
-    echo "✓ Swagger 文档页面可访问"
+HTTP_CODE=$(curl -s -o /tmp/swagger_response.html -w "%{http_code}" http://localhost:8080/openapi.html)
+if [ "$HTTP_CODE" = "200" ] && grep -qi "swagger\|openapi" /tmp/swagger_response.html 2>/dev/null; then
+    echo "✓ Swagger 文档页面可访问 (HTTP $HTTP_CODE)"
 else
-    echo "⚠ Swagger 文档页面响应异常（可能正常，取决于配置）"
+    echo "⚠ Swagger 文档页面响应异常 (HTTP $HTTP_CODE)"
 fi
+rm -f /tmp/swagger_response.html
 
 # 7. 清理测试环境
 echo ""
@@ -106,7 +114,7 @@ sleep 2
 echo "删除构建产物和动态插件目录..."
 rm -rf build
 rm -rf dynamic-plugins
-rm -f "$FIT_LOG"
+echo "测试日志已保存到: .ai-workspace/logs/"
 
 echo ""
 echo "=========================================="

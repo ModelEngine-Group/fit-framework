@@ -39,8 +39,15 @@ usage: "/test"
 4. ✅/✗ 健康检查接口响应
 5. ✅/✗ Swagger 文档页面可访问性
 
+**日志输出：**
+
+所有测试日志保存在 `.ai-workspace/logs/` 目录（已被 git 忽略）：
+- `maven-build-{timestamp}.log` - Maven 构建日志
+- `fit-server-{timestamp}.log` - FIT 服务启动日志
+
 **注意事项：**
 
 1. **端口冲突**：确保 8080 端口未被占用
 2. **权限配置**：测试脚本已在 `.claude/settings.json` 中配置自动授权
 3. **完全自动化**：整个测试流程无需手动确认，自动执行所有步骤
+4. **日志保留**：测试日志在清理时会被保留在 `.ai-workspace/logs/` 目录

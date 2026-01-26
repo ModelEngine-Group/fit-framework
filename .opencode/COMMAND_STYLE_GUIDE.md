@@ -316,10 +316,10 @@ updated_at: 2026-01-23 10:30:00
    !`git diff --name-only | wc -l`
 
 3. 编译验证:
-   !`mvn clean package -Dmaven.test.skip=true 2>&1 | tee /tmp/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
+   !`mkdir -p .ai-workspace/logs && mvn clean package -Dmaven.test.skip=true 2>&1 | tee .ai-workspace/logs/build.log && echo "✅ 编译成功" || echo "❌ 编译失败"`
 
 4. 运行测试:
-   !`mvn test 2>&1 | tee /tmp/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
+   !`mkdir -p .ai-workspace/logs && mvn test 2>&1 | tee .ai-workspace/logs/test.log && echo "✅ 测试通过" || echo "❌ 测试失败"`
 ```
 
 ---
