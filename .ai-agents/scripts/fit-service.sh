@@ -75,25 +75,26 @@ start_fit_service() {
     # 等待服务启动（最多 60 秒）
     log_info "等待服务健康检查..."
     for i in {1..60}; do
-        if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
+        local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health 2>/dev/null)
+        if [ "$http_code" = "200" ]; then
             log_info "FIT 服务启动成功！"
             return 0
         fi
-        
+
         # 检查进程是否还存在
         if ! kill -0 $FIT_PID 2>/dev/null; then
             log_error "FIT 服务进程已退出"
             cat "$FIT_LOG"
             return 1
         fi
-        
+
         if [ $i -eq 60 ]; then
             log_error "服务启动超时（60秒）"
             cat "$FIT_LOG"
             kill $FIT_PID 2>/dev/null || true
             return 1
         fi
-        
+
         sleep 1
     done
 }
@@ -102,14 +103,16 @@ start_fit_service() {
 # 返回: 0 成功, 1 失败
 verify_health() {
     log_info "验证健康检查接口: /actuator/health"
-    
-    local response=$(curl -s http://localhost:8080/actuator/health)
-    if [ $? -eq 0 ]; then
-        log_info "健康检查通过"
-        echo "$response"
+
+    local http_code=$(curl -s -o /tmp/health_response.json -w "%{http_code}" http://localhost:8080/actuator/health)
+    if [ "$http_code" = "200" ]; then
+        log_info "健康检查通过 (HTTP $http_code)"
+        cat /tmp/health_response.json
+        rm -f /tmp/health_response.json
         return 0
     else
-        log_error "健康检查失败"
+        log_error "健康检查失败 (HTTP $http_code)"
+        rm -f /tmp/health_response.json
         return 1
     fi
 }
@@ -118,14 +121,16 @@ verify_health() {
 # 返回: 0 成功, 1 失败
 verify_plugins() {
     log_info "验证插件列表接口: /actuator/plugins"
-    
-    local response=$(curl -s http://localhost:8080/actuator/plugins)
-    if [ $? -eq 0 ]; then
-        log_info "插件列表接口验证通过"
-        echo "$response"
+
+    local http_code=$(curl -s -o /tmp/plugins_response.json -w "%{http_code}" http://localhost:8080/actuator/plugins)
+    if [ "$http_code" = "200" ]; then
+        log_info "插件列表接口验证通过 (HTTP $http_code)"
+        cat /tmp/plugins_response.json
+        rm -f /tmp/plugins_response.json
         return 0
     else
-        log_error "插件列表接口验证失败"
+        log_error "插件列表接口验证失败 (HTTP $http_code)"
+        rm -f /tmp/plugins_response.json
         return 1
     fi
 }
@@ -134,12 +139,15 @@ verify_plugins() {
 # 返回: 0 成功, 1 失败
 verify_swagger() {
     log_info "验证 Swagger 文档页面: /openapi.html"
-    
-    if curl -s http://localhost:8080/openapi.html | grep -qi "swagger\|openapi"; then
-        log_info "Swagger 文档页面验证通过"
+
+    local http_code=$(curl -s -o /tmp/swagger_response.html -w "%{http_code}" http://localhost:8080/openapi.html)
+    if [ "$http_code" = "200" ] && grep -qi "swagger\|openapi" /tmp/swagger_response.html 2>/dev/null; then
+        log_info "Swagger 文档页面验证通过 (HTTP $http_code)"
+        rm -f /tmp/swagger_response.html
         return 0
     else
-        log_error "Swagger 文档页面验证失败"
+        log_error "Swagger 文档页面验证失败 (HTTP $http_code)"
+        rm -f /tmp/swagger_response.html
         return 1
     fi
 }

@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2024 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2024-2026 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -52,6 +52,16 @@ public class ActuatorController {
     ActuatorController(FitRuntime fitRuntime, BrokerClient brokerClient) {
         this.fitRuntime = notNull(fitRuntime, "The FIT runtime cannot be null.");
         this.brokerClient = notNull(brokerClient, "The broker client cannot be null.");
+    }
+
+    /**
+     * 健康检查端点。
+     *
+     * @return 表示健康状态的 {@link String}。
+     */
+    @GetMapping(path = "/health")
+    public String health() {
+        return "OK";
     }
 
     /**

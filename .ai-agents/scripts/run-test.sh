@@ -62,12 +62,13 @@ echo "FIT 服务日志: $FIT_LOG"
 # 等待服务启动（最多 60 秒）
 echo "等待服务启动..."
 for i in {1..60}; do
-    if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-        echo "✓ FIT 服务启动成功"
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health 2>/dev/null)
+    if [ "$HTTP_CODE" = "200" ]; then
+        echo "✓ FIT 服务启动成功 (HTTP $HTTP_CODE)"
         break
     fi
     if [ $i -eq 60 ]; then
-        echo "✗ FIT 服务启动超时"
+        echo "✗ FIT 服务启动超时 (最后 HTTP 状态码: $HTTP_CODE)"
         echo "========== 启动日志 =========="
         cat "$FIT_LOG"
         kill $FIT_PID 2>/dev/null || true
@@ -79,13 +80,15 @@ done
 # 5. 验证健康检查接口
 echo ""
 echo "[5/6] 验证健康检查接口..."
-PLUGINS_RESPONSE=$(curl -s http://localhost:8080/actuator/plugins)
-if [ $? -eq 0 ]; then
-    echo "✓ 健康检查接口正常"
+HTTP_CODE=$(curl -s -o /tmp/plugins_response.json -w "%{http_code}" http://localhost:8080/actuator/plugins)
+if [ "$HTTP_CODE" = "200" ]; then
+    echo "✓ 健康检查接口正常 (HTTP $HTTP_CODE)"
     echo "插件列表响应:"
-    echo "$PLUGINS_RESPONSE" | head -20
+    cat /tmp/plugins_response.json | head -20
+    rm -f /tmp/plugins_response.json
 else
-    echo "✗ 健康检查接口失败"
+    echo "✗ 健康检查接口失败 (HTTP $HTTP_CODE)"
+    rm -f /tmp/plugins_response.json
     pkill -f fit-discrete-launcher || true
     exit 1
 fi
@@ -93,12 +96,13 @@ fi
 # 6. 验证 Swagger 文档页面
 echo ""
 echo "[6/6] 验证 Swagger 文档页面..."
-SWAGGER_RESPONSE=$(curl -s http://localhost:8080/openapi.html)
-if [ $? -eq 0 ] && echo "$SWAGGER_RESPONSE" | grep -q "swagger" 2>/dev/null || echo "$SWAGGER_RESPONSE" | grep -q "Swagger" 2>/dev/null; then
-    echo "✓ Swagger 文档页面可访问"
+HTTP_CODE=$(curl -s -o /tmp/swagger_response.html -w "%{http_code}" http://localhost:8080/openapi.html)
+if [ "$HTTP_CODE" = "200" ] && grep -qi "swagger\|openapi" /tmp/swagger_response.html 2>/dev/null; then
+    echo "✓ Swagger 文档页面可访问 (HTTP $HTTP_CODE)"
 else
-    echo "⚠ Swagger 文档页面响应异常（可能正常，取决于配置）"
+    echo "⚠ Swagger 文档页面响应异常 (HTTP $HTTP_CODE)"
 fi
+rm -f /tmp/swagger_response.html
 
 # 7. 清理测试环境
 echo ""
