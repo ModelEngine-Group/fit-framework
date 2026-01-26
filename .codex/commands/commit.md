@@ -76,8 +76,8 @@ git diff
 
 文中所有路径示例默认以仓库根目录为基准。
 
-CURRENT_YEAR=$(date +%Y)
-echo "当前年份: $CURRENT_YEAR"
+current_year=$(date +%Y)
+echo "当前年份: $current_year"
 ```
 
 **步骤 2：检查修改的文件**
@@ -105,9 +105,9 @@ grep "Copyright.*[0-9]\{4\}" <modified_file>
 如果文件包含版权头且年份不是当前年份，使用 `Edit` 工具更新：
 
 **常见格式：**
-- `Copyright (C) 2024-2025` → `Copyright (C) 2024-<CURRENT_YEAR>`
-- `Copyright (C) 2024` → `Copyright (C) 2024-<CURRENT_YEAR>`
-- `Copyright (C) 2025` → `Copyright (C) <CURRENT_YEAR>`（如果已是当前年）
+- `Copyright (C) 2024-2025` → `Copyright (C) 2024-<current_year>`
+- `Copyright (C) 2024` → `Copyright (C) 2024-<current_year>`
+- `Copyright (C) 2025` → `Copyright (C) <current_year>`（如果已是当前年）
 
 **示例：**
 ```bash
@@ -151,7 +151,7 @@ Edit(
 
 ```bash
 # 1. 获取当前年份
-CURRENT_YEAR=$(date +%Y)
+current_year=$(date +%Y)
 # 输出：2026
 
 # 2. 查看修改的文件
@@ -299,15 +299,6 @@ git add <file-path>
 
 ### 步骤 2：分析变更并生成提交信息
 
-参考最近的提交风格：
-```bash
-# 查看最近 10 个提交
-git log -10 --oneline
-
-# 查看最近的提交消息格式
-git log -3 --format="%s"
-```
-
 **提交消息格式建议**：
 - 使用项目规范的格式（Conventional Commits）
 - 采用 `<type>(<scope>): <subject>`，subject 使用中文且约 20 字以内
@@ -315,6 +306,24 @@ git log -3 --format="%s"
 - 第一行简明扼要（50字符以内）
 - 如需详细说明，空一行后添加正文
 - 说明改动的原因，而非改动的内容
+
+**scope 参考（按目录）**：
+- `.codex/` → `codex`（如：`docs(codex): ...`）
+- `.claude/` → `claude`（如：`docs(claude): ...`）
+- `.ai-agents/` → `agents`
+- `framework/fit/java` → `fit`
+- `framework/waterflow` → `waterflow`
+- `framework/fel` → `fel`
+- `docs/` → `docs`
+- `examples/` → `examples`
+- `docker/` → `docker`
+
+**Codex 署名约定**（由 Codex 代为提交时）：
+```
+🤖 Generated with Codex
+
+Co-Authored-By: Codex <noreply@openai.com>
+```
 
 ### 步骤 3：创建提交
 
@@ -325,6 +334,10 @@ git commit -m "$(cat <<'EOF'
 <type>(<scope>): <subject>
 
 <body>
+
+🤖 Generated with Codex
+
+Co-Authored-By: Codex <noreply@openai.com>
 EOF
 )"
 ```
@@ -332,13 +345,15 @@ EOF
 **示例**：
 ```bash
 git commit -m "$(cat <<'EOF'
-docs: 更新 Codex 命令配置说明
+docs(opencode): 更新 Codex 命令配置说明
 
 - 移除对 Claude Code 插件的引用
 - 添加基于 Git 命令的实际操作步骤
 - 保留版权头检查和任务状态更新规则
 
-Co-Authored-By: Codex CLI <noreply@openai.com>
+🤖 Generated with Codex
+
+Co-Authored-By: Codex <noreply@openai.com>
 EOF
 )"
 ```
@@ -371,8 +386,8 @@ git push -u origin <branch-name>
 
 ```bash
 # 1. 获取当前年份
-CURRENT_YEAR=$(date +%Y)
-echo "当前年份: $CURRENT_YEAR"
+current_year=$(date +%Y)
+echo "当前年份: $current_year"
 
 # 2. 查看修改的文件
 git status --short
@@ -399,7 +414,9 @@ feat(core): 添加用户认证功能
 - 添加登录和登出接口
 - 更新相关测试用例
 
-Co-Authored-By: Codex CLI <noreply@openai.com>
+🤖 Generated with Codex
+
+Co-Authored-By: Codex <noreply@openai.com>
 EOF
 )"
 
