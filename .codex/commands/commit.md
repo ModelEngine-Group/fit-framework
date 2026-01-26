@@ -76,8 +76,8 @@ git diff
 
 文中所有路径示例默认以仓库根目录为基准。
 
-CURRENT_YEAR=$(date +%Y)
-echo "当前年份: $CURRENT_YEAR"
+current_year=$(date +%Y)
+echo "当前年份: $current_year"
 ```
 
 **步骤 2：检查修改的文件**
@@ -105,9 +105,9 @@ grep "Copyright.*[0-9]\{4\}" <modified_file>
 如果文件包含版权头且年份不是当前年份，使用 `Edit` 工具更新：
 
 **常见格式：**
-- `Copyright (C) 2024-2025` → `Copyright (C) 2024-<CURRENT_YEAR>`
-- `Copyright (C) 2024` → `Copyright (C) 2024-<CURRENT_YEAR>`
-- `Copyright (C) 2025` → `Copyright (C) <CURRENT_YEAR>`（如果已是当前年）
+- `Copyright (C) 2024-2025` → `Copyright (C) 2024-<current_year>`
+- `Copyright (C) 2024` → `Copyright (C) 2024-<current_year>`
+- `Copyright (C) 2025` → `Copyright (C) <current_year>`（如果已是当前年）
 
 **示例：**
 ```bash
@@ -151,7 +151,7 @@ Edit(
 
 ```bash
 # 1. 获取当前年份
-CURRENT_YEAR=$(date +%Y)
+current_year=$(date +%Y)
 # 输出：2026
 
 # 2. 查看修改的文件
@@ -371,8 +371,8 @@ git push -u origin <branch-name>
 
 ```bash
 # 1. 获取当前年份
-CURRENT_YEAR=$(date +%Y)
-echo "当前年份: $CURRENT_YEAR"
+current_year=$(date +%Y)
+echo "当前年份: $current_year"
 
 # 2. 查看修改的文件
 git status --short
