@@ -1,0 +1,49 @@
+description = "根据技术方案实施任务并输出实现报告"
+prompt = """
+请根据技术方案实施任务 {{args}}。
+
+**检查前置条件**:
+!{if [ -f .ai-workspace/active/{{args}}/task.md ]; then echo "✅ 任务文件存在"; else echo "❌ 任务文件不存在"; fi}
+!{if [ -f .ai-workspace/active/{{args}}/plan.md ]; then echo "✅ 技术方案存在"; else echo "❌ 技术方案不存在"; fi}
+
+执行以下步骤:
+
+1. **准备工作**:
+   - 如果前置条件未满足，提示用户。
+   - 读取 `plan.md`，理解实施步骤和文件清单。
+
+2. **执行代码实现**:
+   - **严格按照 `plan.md` 的步骤顺序执行**。
+   - 使用 `write_file` 或 `replace` 修改代码。
+   - 实现功能代码。
+   - **编写完整的单元测试**。
+   - 运行测试验证功能 (使用 `run_shell_command`)。
+   - 遵循项目编码规范。
+
+3. **运行验证**:
+   - 运行 Maven/Node/Python 测试确保通过。
+
+4. **输出实现报告**:
+   在任务目录下创建 `implementation.md`, 包含:
+   - 已修改文件列表
+   - 关键代码说明
+   - 测试结果
+   - 与方案的差异(如有)
+   - 待审查事项
+   - 下一步建议
+
+5. **更新任务状态**:
+   - 修改 `task.md`:
+     - current_step: implementation
+     - updated_at: 当前时间
+     - 标记代码实现为完成
+
+6. **告知用户**:
+   - 输出实现概要
+   - 提示下一步使用 `/fit:review-task {{args}}` 进行代码审查。
+
+**原则**:
+- 严格遵循方案。
+- 每步都要运行测试。
+- **不要**自动提交代码 (git commit)，等待审查。
+"""

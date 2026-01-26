@@ -1,0 +1,31 @@
+description = "标记任务阻塞并记录原因"
+prompt = """
+请标记任务 {{args}} 为阻塞状态。
+
+**任务检查**:
+!{if [ -d .ai-workspace/active/{{args}} ]; then echo "Found"; else echo "Not Found"; fi}
+
+执行以下步骤:
+
+1. **验证任务**:
+   - 如果任务未找到，报错。
+
+2. **记录阻塞原因**:
+   - 询问用户具体的阻塞原因 (如果参数中未提供详细信息)。
+   - 阻塞类型: 技术/需求/资源/决策。
+
+3. **更新任务状态**:
+   - 修改 `task.md`:
+     - status: blocked
+     - blocked_at: 当前时间
+     - blocked_reason: (填入原因)
+   - 在 `task.md` 末尾添加 "阻塞信息" 章节。
+
+4. **移动任务**:
+   - 使用 `run_shell_command` 创建 `.ai-workspace/blocked`。
+   - 使用 `run_shell_command` 移动任务目录到 `blocked`。
+
+5. **告知用户**:
+   - 任务已标记为阻塞。
+   - 归档位置: `.ai-workspace/blocked/{{args}}/`。
+"""

@@ -1,0 +1,22 @@
+description = "优化 Issue/PR 标题"
+prompt = """
+请分析并优化 Issue/PR #{{args}} 的标题。
+
+执行以下步骤:
+
+1. **获取信息**:
+   - 尝试 `gh issue view {{args}}` 或 `gh pr view {{args}}`.
+   - 获取 title, body, labels, files.
+
+2. **分析**:
+   - 忽略原标题。
+   - 根据 body 和 labels 推断 Type (feat/fix/docs...) 和 Scope (fit/waterflow...).
+   - 提炼 Subject (中文, 简练).
+
+3. **建议**:
+   - 输出: `原标题` -> `新标题`.
+   - 询问用户是否确认修改。
+
+4. **执行 (如果用户确认)**:
+   - `gh issue edit` 或 `gh pr edit`.
+"""

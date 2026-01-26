@@ -1,0 +1,37 @@
+description = "提交当前变更到 Git (自动检查版权)"
+prompt = """
+请提交当前变更到 Git。
+
+**当前状态**:
+!{git status --short}
+!{git log -1 --oneline}
+当前年份: !{date +%Y}
+
+执行以下步骤:
+
+1. **检查本地修改**:
+   - 如果没有暂存的修改，提示用户先使用 `git add`，或者使用 `git diff` 查看。
+   - 务必理解用户的修改，不要覆盖用户的实现。
+
+2. **版权头检查 (CRITICAL)**:
+   - 对于每个修改过的文件，检查是否包含版权头。
+   - 使用 `read_file` 检查。
+   - 如果包含版权头但年份过期，使用 `replace` 更新到当前年份 ({{args}} 或当前时间)。
+   - 格式示例: "Copyright (C) 2024" -> "Copyright (C) 2024-2026" (假设当前是2026)。
+   - **不要**硬编码年份。
+
+3. **生成提交信息**:
+   - 格式: `<type>(<scope>): <subject>`
+   - Body: 详细说明变更内容 (2-4个要点)。
+   - 签名: `Co-Authored-By: Gemini <noreply@google.com>` (或类似)。
+
+4. **执行提交**:
+   - 使用 `run_shell_command` 执行 `git commit`.
+   - 确保使用 HEREDOC 或 `-m` 正确传递多行消息。
+
+5. **验证**:
+   - 运行 `git status` 确认提交成功。
+
+**后置操作**:
+- 如果是任务相关的提交，提示用户更新任务状态 (`/fit:task-status` 或 `/fit:complete-task`).
+"""

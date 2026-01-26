@@ -1,0 +1,29 @@
+description = "升级项目依赖"
+prompt = """
+请升级项目依赖。
+
+**参数**: {{args}}
+(期望格式: `<package> <from_version> <to_version>`, 例如 `swagger-ui 5.30.0 5.30.2`)
+
+执行以下步骤:
+
+1. **解析参数**:
+   - 从 `{{args}}` 中解析出 包名, 原版本, 新版本。
+
+2. **查找文件**:
+   - 使用 `run_shell_command` 执行 `grep -r "<package>" ...` 查找相关文件 (pom.xml, package.json 等)。
+
+3. **更新依赖**:
+   - 使用 `replace` 或 `write_file` 更新版本号。
+   - Maven: `<version>OLD</version>` -> `<version>NEW</version>`
+   - Node: `"pkg": "OLD"` -> `"pkg": "NEW"`
+
+4. **验证变更**:
+   - 运行 `git diff` 查看修改。
+   - 运行编译/构建命令验证 (mvn clean package, npm run build 等)。
+   - **强烈建议** 运行测试。
+
+5. **输出摘要**:
+   - 显示变更文件、验证结果。
+   - 提示用户提交 (`/fit:commit`).
+"""

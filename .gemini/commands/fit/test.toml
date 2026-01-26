@@ -1,0 +1,21 @@
+description = "执行完整的测试流程 (Build & Test)"
+prompt = """
+请执行完整的测试流程。
+
+脚本位置: `.ai-agents/scripts/run-test.sh`
+
+执行以下步骤:
+
+1. **检查脚本**:
+   - 确认脚本存在且可执行 (`chmod +x .ai-agents/scripts/run-test.sh`).
+
+2. **运行测试**:
+   - 使用 `run_shell_command` 执行脚本: `./.ai-agents/scripts/run-test.sh`
+   - 注意: 该脚本包含清理、构建、服务启动、接口验证等步骤，耗时可能较长 (10-20分钟)。
+
+3. **监控结果**:
+   - 如果脚本失败，分析输出日志 (脚本会提示日志路径)。
+
+4. **报告**:
+   - 输出测试摘要 (成功/失败)。
+"""

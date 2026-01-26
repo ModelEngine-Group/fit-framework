@@ -1,0 +1,54 @@
+description = "分析 GitHub Issue 并创建需求分析文档"
+prompt = """
+请分析 GitHub Issue #{{args}} 并创建任务文件。
+
+当前时间: !{date '+%Y-%m-%d %H:%M:%S'}
+
+Issue 信息:
+!{gh issue view {{args}} --json number,title,body,labels 2>/dev/null || echo "Issue not found"}
+
+执行以下步骤:
+
+1. **检查 Issue 信息**:
+   如果上面的 Issue 信息显示未找到，请提示用户检查 Issue 编号。
+
+2. **生成任务ID**:
+   使用格式 `TASK-YYYYMMDD-HHMMSS` (使用上面的当前时间)。
+
+3. **创建任务目录**:
+   使用 `run_shell_command` 创建目录: `.ai-workspace/active/TASK-{timestamp}/`
+   
+   使用 `write_file` 基于 `.ai-agents/templates/task.md` (如果存在) 或创建新的 `task.md` 文件:
+   - 填写任务元数据: issue_number, title, created_at, workflow 等。
+   - created_at 和 updated_at 使用当前时间。
+
+4. **执行需求分析**:
+   - 阅读并理解上面的 Issue 描述。
+   - 使用 `search_file_content` 或 `glob` 搜索相关代码文件。
+   - 分析代码结构和影响范围。
+   - 识别潜在的技术风险和依赖。
+   - 评估工作量和复杂度。
+
+5. **输出分析文档**:
+   在任务目录下创建 `analysis.md`, 包含:
+   - 需求理解(重新描述需求)
+   - 相关文件列表(带文件路径和行号)
+   - 影响范围评估(直接影响和间接影响)
+   - 技术风险
+   - 依赖关系
+   - 工作量和复杂度评估
+
+6. **更新任务状态**:
+   - current_step: requirement-analysis
+   - updated_at: 当前时间
+   - 标记 analysis.md 为已完成
+
+7. **告知用户**:
+   - 输出任务ID、标题、工作流
+   - 显示输出文件路径
+   - 提示下一步使用 `/fit:plan-task {{args}}` 设计技术方案
+
+**注意事项**:
+- 严格遵循 `.ai-agents/workflows/feature-development.yaml` 工作流定义
+- 分析完成后建议人工审查
+"""
