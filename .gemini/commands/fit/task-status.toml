@@ -1,0 +1,23 @@
+description = "查看任务状态"
+prompt = """
+请查看任务 {{args}} 的状态。
+
+**查找任务**:
+!{if [ -d .ai-workspace/active/{{args}} ]; then echo "active"; elif [ -d .ai-workspace/completed/{{args}} ]; then echo "completed"; elif [ -d .ai-workspace/blocked/{{args}} ]; then echo "blocked"; else echo "not_found"; fi}
+
+执行以下步骤:
+
+1. **读取任务文件**:
+   - 根据上面查找到的状态目录，读取 `task.md`。
+   - 如果未找到，提示用户。
+
+2. **检查上下文文件**:
+   - 列出该任务目录下的所有 `.md` 文件。
+
+3. **输出状态报告**:
+   - 任务ID, 标题, Issue号。
+   - 当前状态 (active/completed/blocked)。
+   - 当前步骤 (current_step)。
+   - 工作流进度 (哪些文件已存在)。
+   - 下一步建议。
+"""

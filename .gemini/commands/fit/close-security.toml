@@ -1,0 +1,22 @@
+description = "关闭 Security Alert"
+prompt = """
+请关闭 Security Alert #{{args}}。
+
+执行以下步骤:
+
+1. **获取 Alert**:
+   - `gh api repos/:owner/:repo/dependabot/alerts/{{args}}`.
+   - 如果已关闭，提示并退出。
+
+2. **交互/执行**:
+   - **如果用户未在参数中提供理由**:
+     - 展示 Alert 详情。
+     - 询问关闭理由 (误报, 无法利用, 已缓解, etc).
+     - **停止执行并等待用户回复**。
+
+   - **如果用户已提供理由** (在上下文中或参数中):
+     - 确认理由合理。
+     - 使用 `gh api --method PATCH ...` 关闭 Alert (state=dismissed).
+     - 记录到关联任务 (如有).
+     - 告知用户结果。
+"""

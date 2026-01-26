@@ -1,0 +1,31 @@
+description = "创建 Pull Request"
+prompt = """
+请创建 Pull Request。
+
+**目标分支**: {{args}} (默认为 3.6.x)
+
+**当前状态**:
+!{git status --short}
+!{git branch --show-current}
+
+**最近的 PR**:
+!{gh pr list --limit 3 --state merged --json number,title,body 2>/dev/null || echo "No recent PRs"}
+
+执行以下步骤:
+
+1. **准备工作**:
+   - 读取 `.github/PULL_REQUEST_TEMPLATE.md` (如果存在)。
+   - 确认当前分支已推送到远程。如果未推送，运行 `git push -u origin HEAD`。
+
+2. **生成 PR 内容**:
+   - 标题: `[模块名] 简短描述`
+   - 内容: 基于模板和最近的 commit 填写。
+   - 结尾添加: `🤖 Generated with Gemini CLI`
+
+3. **创建 PR**:
+   - 使用 `run_shell_command` 执行 `gh pr create`.
+   - 指定 `--base` (默认 3.6.x 或 {{args}}).
+
+4. **告知用户**:
+   - 输出 PR 链接。
+"""

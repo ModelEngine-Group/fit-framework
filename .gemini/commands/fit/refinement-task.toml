@@ -1,0 +1,33 @@
+description = "处理代码审查反馈并修复问题"
+prompt = """
+请处理任务 {{args}} 的代码审查反馈并修复问题。
+
+**检查前置条件**:
+!{if [ -f .ai-workspace/active/{{args}}/review.md ]; then echo "✅ 审查报告存在"; else echo "❌ 审查报告不存在"; fi}
+
+执行以下步骤:
+
+1. **读取审查报告**:
+   - 读取 `review.md`。
+   - 提取所有🔴必须修复和🟡建议修改的问题。
+
+2. **执行修复**:
+   - 逐个修复问题。
+   - 确保不引入新问题。
+   - 运行测试确保通过。
+
+3. **创建修复报告**:
+   在任务目录下创建 `refinement-report.md`, 包含:
+   - 修复概要
+   - 修复内容详情
+   - 未修复问题及原因
+   - 测试结果
+
+4. **更新任务状态**:
+   - 修改 `task.md`:
+     - current_step: refinement
+     - updated_at: 当前时间
+
+5. **告知用户**:
+   - 提示下一步: 重新审查 (`/fit:review-task {{args}}`) 或 提交 (`/fit:commit`)。
+"""

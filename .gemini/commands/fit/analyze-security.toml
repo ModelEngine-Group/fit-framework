@@ -1,0 +1,33 @@
+description = "分析 Security Alert 并创建任务"
+prompt = """
+请分析 Dependabot Security Alert #{{args}}。
+
+**前置检查**:
+- 检查是否已有任务处理此 Alert (grep "security_alert_number: {{args}}").
+
+执行以下步骤:
+
+1. **获取信息**:
+   - 获取 Repo 信息: `gh repo view --json owner,name`.
+   - 获取 Alert 详情: `gh api repos/:owner/:repo/dependabot/alerts/{{args}}`.
+
+2. **创建任务**:
+   - 如果无现有任务，创建 `.ai-workspace/active/TASK-{timestamp}/`.
+   - 创建 `task.md` (记录 severity, cve_id, ghsa_id).
+
+3. **分析**:
+   - 确定受影响的依赖和版本。
+   - 搜索代码中使用情况 (`search_file_content`).
+   - 评估风险 (影响范围, 可利用性).
+
+4. **输出文档**:
+   - 创建 `analysis.md` (包含漏洞详情, 影响评估, 风险评估).
+
+5. **更新状态**:
+   - `current_step: security-analysis`.
+
+6. **告知用户**:
+   - 输出分析摘要。
+   - 提示下一步: `/fit:plan-task`.
+   - 如果是误报: `/fit:close-security {{args}}`.
+"""

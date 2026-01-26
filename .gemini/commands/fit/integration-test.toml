@@ -1,0 +1,29 @@
+description = "执行集成测试 (需先构建)"
+prompt = """
+请执行集成测试。
+
+**前置检查**:
+!{if [ -d "build" ]; then echo "✅ Build dir found"; else echo "❌ Build dir missing"; fi}
+
+执行以下步骤:
+
+1. **环境检查**:
+   - 如果 `build/` 目录不存在，提示用户先运行 `/fit:test` 或构建命令。
+
+2. **执行测试**:
+   - 使用 `run_shell_command` 执行以下逻辑 (参考 `.ai-agents/scripts/fit-service.sh`):
+     ```bash
+     source .ai-agents/scripts/fit-service.sh
+     init_log_dir
+     init_plugin_dir
+     start_fit_service
+     verify_all
+     TEST_RESULT=$?
+     cleanup false
+     exit $TEST_RESULT
+     ```
+
+3. **报告**:
+   - 输出集成测试结果。
+   - 日志位于 `.ai-workspace/logs/fit-server-*.log`。
+"""

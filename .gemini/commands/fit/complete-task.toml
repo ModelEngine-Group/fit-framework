@@ -1,0 +1,39 @@
+description = "标记任务完成并归档"
+prompt = """
+请标记任务 {{args}} 为已完成，并归档。
+
+**前置检查**:
+- 确认代码已审查通过。
+- 确认代码已提交 (Git)。
+- 确认测试通过。
+
+**任务状态**:
+!{if [ -d .ai-workspace/active/{{args}} ]; then echo "Active"; else echo "Not Active"; fi}
+
+执行以下步骤:
+
+1. **验证任务**:
+   - 检查 `.ai-workspace/active/{{args}}/` 下的文件完整性 (analysis, plan, implementation, review)。
+   - 如果任务不在 active 目录，停止执行。
+
+2. **更新任务元数据**:
+   - 修改 `task.md`:
+     - status: completed
+     - current_step: finalize
+     - completed_at: 当前时间
+   - 在 `task.md` 末尾添加 "任务完成总结" (包含完成时间、交付成果清单)。
+
+3. **归档任务**:
+   - 使用 `run_shell_command` 创建目录 `.ai-workspace/completed` (如果不存在)。
+   - 使用 `run_shell_command` 将任务目录从 `active` 移动到 `completed`。
+     - `mv .ai-workspace/active/{{args}} .ai-workspace/completed/`
+
+4. **同步(可选)**:
+   - 如果有关联 Issue/PR，提示用户同步。
+
+5. **告知用户**:
+   - 任务已归档到 `.ai-workspace/completed/{{args}}/`。
+   - 列出交付成果。
+
+**注意**: 只有在真正完成所有工作后才执行此操作。
+"""
