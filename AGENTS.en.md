@@ -145,6 +145,19 @@ AI handoff: Any AI can take over by reading the task directory.
 
 **Important**: These are recommendations only. Humans decide which AI handles which step.
 
+### Communication Language Guidelines
+
+**All AI agents must follow these language guidelines**:
+
+- **Response language matches input language**: AI should automatically adapt to the user's input language (adaptive strategy)
+  - User asks in Chinese → AI responds in Chinese
+  - User asks in English → AI responds in English
+- **Project default language**: Chinese
+  - Code comments: Chinese
+  - Documentation: Chinese
+  - Commit messages: Chinese (following Conventional Commits format)
+- **Configuration**: Defined via `communication_language: "Adaptive (Match user's language)"` field in each AI's `preferences.yaml`
+
 ### Detailed Documentation
 
 - Collaboration Guide: `.ai-agents/README.md`
@@ -153,7 +166,7 @@ AI handoff: Any AI can take over by reading the task directory.
 - Claude Config: `.claude/README.md`
 - Claude Project Rules: `.claude/project-rules.md` (includes Rule 7: Task Status Management)
 - Claude Command Reference: `.claude/commands/`
-- ChatGPT Config: `.ai-agents/chatgpt/README.md`
+- Codex Config: `.ai-agents/codex/README.md`
 - Gemini Config: `.ai-agents/gemini/README.md`
 
 ### Based on Standards

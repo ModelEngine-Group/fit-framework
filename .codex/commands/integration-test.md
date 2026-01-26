@@ -47,13 +47,13 @@ start_fit_service
 **步骤 4：执行所有验证**
 ```bash timeout=30000
 verify_all
-TEST_RESULT=$?
+test_result=$?
 ```
 
 **步骤 5：清理测试环境**
 ```bash
 cleanup false
-exit $TEST_RESULT
+exit $test_result
 ```
 
 **测试内容包括：**

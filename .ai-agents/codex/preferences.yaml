@@ -5,6 +5,8 @@ agent:
   name: "GPT"
   role: "Implementation & Testing Specialist"
   version: "ChatGPT-4 / ChatGPT-4 Turbo"
+  # 交流语言：跟随用户输入
+  communication_language: "Adaptive (Match user's language)"
 
 # 擅长的任务类型
 strengths:
