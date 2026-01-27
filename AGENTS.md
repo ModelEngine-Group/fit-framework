@@ -163,8 +163,8 @@ AI 切换：任何 AI 都可以通过读取任务目录接手任务。
 - 协作总指南：`.ai-agents/README.md`
 - 快速开始：`.ai-agents/QUICKSTART.md`
 - 工作流定义：`.ai-agents/workflows/`
-- Claude 配置：`.claude/README.md`
-- Claude 项目规则：`.claude/project-rules.md`（包含规则 7：任务状态管理规范）
+- Claude 系统提示词：`.claude/CLAUDE.md`
+- Claude 项目规则：`.claude/project-rules.md`
 - Claude 命令参考：`.claude/commands/`
 - Codex 配置：`.ai-agents/codex/README.md`
 - Gemini 配置：`.ai-agents/gemini/README.md`
