@@ -191,6 +191,17 @@ AI 会：
 
 ## 🔧 配置说明
 
+### 配置文件注入机制
+
+不同 AI 工具会自动读取不同的项目指令文件：
+
+| AI 工具        | 注入的文件               | 配置说明                                       |
+|--------------|---------------------|-------------------------------------------|
+| Claude Code  | `.claude/CLAUDE.md` | 项目根目录                                     |
+| Gemini CLI   | `AGENTS.md`         | 通过 `.gemini/settings.json` 配置              |
+| OpenCode     | `AGENTS.md`         | 项目根目录（或 `~/.config/opencode/AGENTS.md`）   |
+| Codex CLI    | `AGENTS.md`         | 项目根目录（或 `~/.codex/AGENTS.md`）             |
+
 ### ClaudeCode 配置
 
 ClaudeCode 的配置保持在 `.claude/` 目录（项目根目录），包括：

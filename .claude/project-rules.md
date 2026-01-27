@@ -1,5 +1,11 @@
 # FIT Framework 项目规则
 
+> 📖 **基础规范**：详细的项目规范（项目结构、构建命令、编码风格、提交格式等）请参见根目录 `AGENTS.md` 文件。
+>
+> 🎯 **本文件定义 Claude 特定的强制规则和执行流程**
+
+---
+
 ## 核心规则概览
 
 | 规则                  | 级别    | 说明                   |
@@ -15,32 +21,29 @@
 
 ## 规则 1: Commit Message 格式规范（🔴 关键）
 
-**核心原则**: 提交信息**必须使用中文**描述，遵循 Conventional Commits 格式
+> 📖 **详细规范**：完整的 Conventional Commits 格式和 type 类型定义请参见 `AGENTS.md`
 
-**标准格式**:
-```
-<type>(<scope>): <中文描述>
+**Claude 执行要点**:
+
+1. **强制使用中文描述**：`<type>(<scope>): <中文描述>`
+2. **末尾添加生成标记和署名**：
+   ```
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+   Co-Authored-By: Claude <noreply@anthropic.com>
+   ```
+3. **使用 HEREDOC 格式传递消息**（避免转义问题）
+
+**标准提交格式**:
+```bash
+git commit -m "$(cat <<'EOF'
+feat(fit): 添加用户认证功能
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
-```
-
-**Type 类型**:
-- `feat`: 新功能
-- `fix`: Bug 修复
-- `docs`: 文档更新
-- `refactor`: 重构
-- `perf`: 性能优化
-- `test`: 测试相关
-- `chore`: 构建/依赖相关
-- `chore(deps)`: 依赖升级
-
-**示例**:
-```
-feat(auth): 添加用户认证功能
-fix(login): 修复登录失败的问题
-chore(deps): 升级 fastjson2 到 v2.0.60
+EOF
+)"
 ```
 
 ---
@@ -60,43 +63,57 @@ chore(deps): 升级 fastjson2 到 v2.0.60
 
 ## 规则 3: PR 提交规范（🟡 重要）
 
-**核心原则**: 创建 PR 时必须遵循项目规范
+> 📖 **详细规范**：PR 提交的基本要求和标准流程请参见 `AGENTS.md`
 
-**强制要求**:
-1. 创建 PR 前读取 `.github/PULL_REQUEST_TEMPLATE.md`
-2. 完整填写模板中的所有必填项
-3. 使用 HEREDOC 格式创建 PR
-4. 末尾添加: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
+**Claude 执行流程**:
 
-**PR 标题格式**:
-- `[模块名] Upgrade <package> from vX.Y.Z to vA.B.C` (依赖升级)
-- `[模块名] Fix <issue-description>` (Bug修复)
-- `[模块名] Add <feature-description>` (新功能)
+1. **读取 PR 模板**：`.github/PULL_REQUEST_TEMPLATE.md`
+2. **分析所有变更**：`git diff [base-branch]...HEAD`（查看分支分叉后的所有提交）
+3. **检查远程分支**：确认是否需要推送
+4. **创建 PR**：使用 `gh pr create` + HEREDOC 格式
+5. **添加生成标记**：`🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 
-**创建流程**: 读取模板 → 分析变更 → 检查远程分支 → 推送(如需) → 创建PR
+**PR 创建命令示例**:
+```bash
+gh pr create --title "feat(fit): 添加用户认证功能" --body "$(cat <<'EOF'
+## 变更说明
+- 添加用户认证模块
+- 实现 JWT Token 验证
+
+## 测试计划
+- [ ] 单元测试通过
+- [ ] 集成测试通过
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)"
+```
 
 ---
 
 ## 规则 4: 版权年份更新（🔴 关键）
 
-**核心原则**: 修改带版权头的文件时，**必须更新版权年份到当前年份**
+> 📖 **详细规范**：版权年份更新的基本要求请参见 `AGENTS.md`
 
-**强制要求**:
-1. **动态获取年份**: `CURRENT_YEAR=$(date +%Y)`
-2. **只更新当前修改的文件**: 不要批量更新所有文件
-3. **使用 Edit 工具更新**: 将 `2024-2025` 或 `2024` 更新为 `2024-<CURRENT_YEAR>`
+**Claude 自动化执行步骤**:
 
-**常见格式**:
+```bash
+# 1. 动态获取当前年份（不要硬编码）
+CURRENT_YEAR=$(date +%Y)
+
+# 2. 使用 Edit 工具更新版权头（假设当前年份为 2026）
+#    将 "Copyright (C) 2024-2025" → "Copyright (C) 2024-2026"
+#    将 "Copyright (C) 2024" → "Copyright (C) 2024-2026"
+
+# 3. 只更新当前修改的文件，不批量更新所有文件
 ```
-Copyright (C) 2024-2025 → Copyright (C) 2024-2026
-Copyright (C) 2024      → Copyright (C) 2024-2026
-```
 
-**检查清单**:
-- [ ] 使用 `date +%Y` 动态获取年份
-- [ ] 检查修改文件是否有版权头
-- [ ] 年份不是当前年份则更新
-- [ ] 绝对不要硬编码年份
+**关键原则**:
+- ✅ 修改文件时自动触发更新
+- ✅ 使用 `date +%Y` 动态获取年份
+- ✅ 使用 Edit 工具精确替换
+- ❌ 绝对不要硬编码年份
+- ❌ 不要批量更新未修改的文件
 
 ---
 
@@ -172,6 +189,15 @@ assigned_to: {ai-name}
 mvn clean install     # 编译项目
 mvn test              # 运行测试
 ./build/bin/fit start # 启动应用
+```
+
+**配置文件架构**:
+```
+AGENTS.md (基础规范 - 所有 AI 共享)
+    ↓
+.claude/CLAUDE.md (系统提示词增强 - 直接注入)
+    ↓
+.claude/project-rules.md (规则文档 - 本文件)
 ```
 
 ---
