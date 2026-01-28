@@ -22,19 +22,5 @@
             <artifactId>fit-spring-boot-starter</artifactId>
             <version>${fit.version}</version>
         </dependency>
-
-        <!-- FEL 核心：需要访问核心接口 -->
-        <dependency>
-            <groupId>org.fitframework.fel</groupId>
-            <artifactId>fel-core</artifactId>
-            <version>${fel.version}</version>
-        </dependency>
-
-        <!-- FEL OpenAI 模型：需要访问 OpenAiModel 类 -->
-        <dependency>
-            <groupId>org.fitframework.fel</groupId>
-            <artifactId>fel-model-openai-plugin</artifactId>
-            <version>${fel.version}</version>
-        </dependency>
     </dependencies>
 </project>
