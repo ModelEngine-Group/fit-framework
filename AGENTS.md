@@ -103,47 +103,11 @@
 
 ### 任务跟踪
 
-**使用 Slash Commands 创建和管理任务**：
-```bash
-# 分析 Issue 并创建任务
-/analyze-issue <issue-number>
-
-# 查看任务状态
-/task-status <task-id>
-
-# 同步到 GitHub Issue
-/sync-issue <issue-number>
-```
-
-**任务目录结构**：
-```
-.ai-workspace/
-├── active/TASK-{timestamp}/      # 进行中的任务
-│   ├── task.md                   # 任务元数据
-│   ├── analysis.md               # 需求分析
-│   ├── plan.md                   # 技术方案
-│   ├── implementation.md         # 实现报告
-│   └── review.md                 # 审查报告
-├── blocked/TASK-{timestamp}/     # 被阻塞的任务
-└── completed/TASK-{timestamp}/   # 已完成的任务
-```
-
-AI 接手任务：
-- 读取任务文件：`.ai-workspace/active/{task-id}/task.md`
-- 读取上下文文件：`active/{task-id}/`
-- 完成任务清单
-- 更新任务状态（CRITICAL：参见规则 7）
-
-AI 切换：任何 AI 都可以通过读取任务目录接手任务。
-
-### AI 能力参考
-
-- **Claude**：擅长架构设计、代码审查、安全分析、复杂推理
-- **ChatGPT**：擅长代码实现、测试编写、Bug 修复、文档生成
-- **Gemini**：擅长代码实现、多模态理解、快速响应
-- **Cursor**：擅长代码编辑、快速实现（基于多种模型）
-
-**重要**：这只是推荐，人类决定使用哪个 AI 执行哪个步骤。
+**任务跟踪**：
+- 任务存储在 `.ai-workspace/` 目录（active/、blocked/、completed/）
+- 每个任务包含：task.md（元数据）、analysis.md、plan.md、implementation.md、review.md
+- AI 接手：读取 `active/{task-id}/task.md` 和上下文文件
+- 任务切换：任何 AI 都可以通过读取任务目录接手任务
 
 ### 交流语言规范
 
@@ -160,14 +124,8 @@ AI 切换：任何 AI 都可以通过读取任务目录接手任务。
 
 ### 详细文档
 
-- 协作总指南：`.ai-agents/README.md`
-- 快速开始：`.ai-agents/QUICKSTART.md`
-- 工作流定义：`.ai-agents/workflows/`
-- Claude 系统提示词：`.claude/CLAUDE.md`
-- Claude 项目规则：`.claude/project-rules.md`
-- Claude 命令参考：`.claude/commands/`
-- Codex 配置：`.ai-agents/codex/README.md`
-- Gemini 配置：`.ai-agents/gemini/README.md`
+- 协作总指南：`.ai-agents/README.md`（包含工作流定义、快速开始指南）
+- 工具特定配置：`.ai-agents/{claude,codex,gemini,cursor}/`
 
 ### 基于标准
 

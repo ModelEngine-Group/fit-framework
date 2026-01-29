@@ -195,12 +195,43 @@ AI 会：
 
 不同 AI 工具会自动读取不同的项目指令文件：
 
-| AI 工具        | 注入的文件               | 配置说明                                       |
-|--------------|---------------------|-------------------------------------------|
-| Claude Code  | `.claude/CLAUDE.md` | 项目根目录                                     |
-| Gemini CLI   | `AGENTS.md`         | 通过 `.gemini/settings.json` 配置              |
-| OpenCode     | `AGENTS.md`         | 项目根目录（或 `~/.config/opencode/AGENTS.md`）   |
-| Codex CLI    | `AGENTS.md`         | 项目根目录（或 `~/.codex/AGENTS.md`）             |
+| AI 工具       | 注入的文件               | 配置说明                                    |
+|-------------|---------------------|-----------------------------------------|
+| Claude Code | `.claude/CLAUDE.md` | 项目根目录                                   |
+| Gemini CLI  | `AGENTS.md`         | 通过 `.gemini/settings.json` 配置           |
+| OpenCode    | `AGENTS.md`         | 项目根目录（或 `~/.config/opencode/AGENTS.md`） |
+| Codex CLI   | `AGENTS.md`         | 项目根目录（或 `~/.codex/AGENTS.md`）           |
+
+#### Claude Code 加载机制（实验验证）
+
+**测试方法**：在不同位置创建带唯一标识符的 CLAUDE.md 文件（.claude/rules/、子目录、~/.claude/），观察 Claude 接收到的系统上下文。
+
+**核心结论**：
+
+1. **启动时加载（永久）**
+   - 加载位置：`.claude/CLAUDE.md` + `.claude/rules/*.md` + `~/.claude/CLAUDE.md`
+   - 注入方式：拼接到系统提示词（持续生效）
+   - 合并策略：简单拼接，无智能合并
+
+2. **按需加载（临时）**
+   - 加载位置：子目录 `CLAUDE.md`（如 `test-subdir/CLAUDE.md`）
+   - 触发时机：首次 Read 该目录下文件时
+   - 注入方式：通过 `<system-reminder>` 注入到函数结果（临时生效）
+   - 限制：Write 工具不触发加载
+
+3. **文件组织建议**
+   ```
+   .claude/
+   ├── CLAUDE.md            # 核心配置（100-200 行）
+   └── rules/               # 模块化规则（每个 50-100 行）
+       ├── 01-xxx.md        # 用数字前缀控制顺序
+       └── 02-yyy.md
+   ```
+
+**注意事项**：
+- 避免重复定义规则（拼接时不去重）
+- 控制总长度（建议 `.claude/` 总计 ≤500 行）
+- 子目录规则按需加载（节省 token）
 
 ### ClaudeCode 配置
 
