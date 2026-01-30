@@ -81,14 +81,14 @@ public abstract class AbstractSolo<T> implements Solo<T> {
     }
 
     @Override
-    public void subscribe(org.reactivestreams.Subscriber<? super T> subscriber) {
+    public void subscribe(java.util.concurrent.Flow.Subscriber<? super T> subscriber) {
         if (subscriber == null) {
             throw new NullPointerException("Subscriber cannot be null");
         }
-        // 使用现有的 Lambda subscribe 方法，适配 Reactive Streams Subscriber
+        // 使用现有的 Lambda subscribe 方法，适配 Flow Subscriber
         this.subscribe(
-                // onSubscribedAction: 将内部 Subscription 适配为 Reactive Streams Subscription
-                subscription -> subscriber.onSubscribe(new org.reactivestreams.Subscription() {
+                // onSubscribedAction: 将内部 Subscription 适配为 Flow Subscription
+                subscription -> subscriber.onSubscribe(new java.util.concurrent.Flow.Subscription() {
                     @Override
                     public void request(long n) {
                         subscription.request(n);
@@ -99,11 +99,11 @@ public abstract class AbstractSolo<T> implements Solo<T> {
                         subscription.cancel();
                     }
                 }),
-                // consumeAction: 将数据传递给 Reactive Streams Subscriber
+                // consumeAction: 将数据传递给 Flow Subscriber
                 (subscription, data) -> subscriber.onNext(data),
-                // completeAction: 通知 Reactive Streams Subscriber 完成
+                // completeAction: 通知 Flow Subscriber 完成
                 subscription -> subscriber.onComplete(),
-                // failAction: 将异常传递给 Reactive Streams Subscriber
+                // failAction: 将异常传递给 Flow Subscriber
                 (subscription, cause) -> subscriber.onError(cause)
         );
     }

@@ -28,13 +28,6 @@
             <version>${fit.version}</version>
         </dependency>
 
-        <!-- Reactive Streams -->
-        <dependency>
-            <groupId>org.reactivestreams</groupId>
-            <artifactId>reactive-streams</artifactId>
-            <version>1.0.4</version>
-        </dependency>
-
         <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

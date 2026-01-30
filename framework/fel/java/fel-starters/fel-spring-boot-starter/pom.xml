@@ -22,5 +22,69 @@
             <artifactId>fit-spring-boot-starter</artifactId>
             <version>${fit.version}</version>
         </dependency>
+        <!-- FEL 核心：需要访问核心接口 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-core</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL OpenAI 模型：需要访问 OpenAiModel 类 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-model-openai-plugin</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL Flow：Agent流编排需要 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-flow</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL 工具系统：Agent工具调用需要 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-discoverer</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-executor</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-factory-repository</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-repository-simple</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>tool-service</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FIT 运行时插件：必须显式声明（FIT 插件加载机制要求） -->
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-http-client-okhttp</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-value-fastjson</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-message-serializer-json-jackson</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
     </dependencies>
 </project>
