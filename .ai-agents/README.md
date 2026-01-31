@@ -233,6 +233,40 @@ AI 会：
 - 控制总长度（建议 `.claude/` 总计 ≤500 行）
 - 子目录规则按需加载（节省 token）
 
+#### Gemini CLI 加载机制（实测验证）
+
+**测试方法**：
+1. 创建多级目录 `.gemini-test/level1/level2/`
+2. 在各级目录放置包含特定指令（Tag）的 `AGENTS.md`
+3. 运行时 `cd` 进入深层目录，观察回复是否包含所有 Tag
+4. **结论**：无需重启，目录切换即时生效，所有层级的 `AGENTS.md` 内容被拼接注入
+
+**核心结论**：
+
+1. **配置驱动加载**
+   - **默认行为**：Gemini CLI 默认查找 **`GEMINI.md`**。
+   - **项目配置**：本项目通过 `.gemini/settings.json` 的 `context.fileName` 字段将其重写为 `["AGENTS.md"]`，以遵循 Linux Foundation AAIF 标准。
+   - **加载源**：因此，实际加载的是 `AGENTS.md`。
+
+2. **级联加载（Cascading Context）**
+   - **触发机制**：**依赖 CLI 启动时的目录**。
+     - Gemini CLI 的 Shell 环境通常在每轮对话后重置，因此 Agent 无法通过 `cd` 命令持久切换目录。
+     - **如果需要加载子模块规则**（如 `framework/fit/AGENTS.md`），用户必须**在该目录下启动 Gemini CLI**，或者在该目录下运行 IDE。
+   - **级联顺序**：
+     Global (`~/.gemini/`) + Project Root + ... + Parent Dir + Current Dir
+   - **合并策略**：**简单拼接（Concatenation）**。
+
+   - **💡 使用技巧：如何临时激活子目录规则？**
+     虽然 Agent 无法持久保持目录状态，但您可以在 Prompt 中明确指示上下文。
+     - **方法 1（推荐）**：“请进入 `framework/fit` 目录，检查 Main.java 的代码规范”。
+       - 结果：Agent 执行 `cd`，CLI 立即加载 `framework/fit/AGENTS.md`，规则在**当前回复**中生效。
+     - **方法 2（手动引用）**：“请参考 `framework/fit/AGENTS.md` 的规则进行开发”。
+       - 结果：Agent 读取文件内容作为普通上下文使用。
+
+3. **文件组织建议**
+   - **根目录 `AGENTS.md`**：存放**绝大多数**通用规则。这是最安全、最可靠的地方。
+   - **子目录 `AGENTS.md`**：仅用于那些用户通常会**在该目录下启动终端**进行开发的独立子项目。对于普通的模块化项目，建议尽量将规则合并到根目录，避免因目录层级问题导致规则未加载。
+
 ### ClaudeCode 配置
 
 ClaudeCode 的配置保持在 `.claude/` 目录（项目根目录），包括：
