@@ -11,5 +11,6 @@
     <modules>
         <module>fel-example</module>
         <module>fit-example</module>
+        <module>fel-spring-example</module>
     </modules>
 </project>
