@@ -202,6 +202,21 @@ AI 会：
 | OpenCode    | `AGENTS.md`         | 项目根目录（或 `~/.config/opencode/AGENTS.md`） |
 | Codex CLI   | `AGENTS.md`         | 项目根目录（或 `~/.codex/AGENTS.md`）           |
 
+#### 各 AI 工具加载机制对比
+
+| 特性            | OpenCode                                 | Claude Code                 | Gemini CLI       | Codex CLI   |
+|---------------|------------------------------------------|-----------------------------|------------------|-------------|
+| **文件优先级**     | `AGENTS.md` > `CLAUDE.md` > `CONTEXT.md` | `.claude/CLAUDE.md`         | `AGENTS.md`      | `AGENTS.md` |
+| **全局配置**      | `~/.config/opencode/` + `~/.claude/`     | `~/.claude/`                | `~/.gemini/`     | `~/.codex/` |
+| **子目录加载**     | ✅ Read 工具自动向上遍历                          | ✅ Read 工具触发                 | ✅ 启动时级联（需在子目录启动） | ❌ 不支持       |
+| **去重机制**      | ✅ 多层去重（system/already/claimed）           | ✅ 去重                        | ❌ 简单拼接           | -           |
+| **远程配置**      | ✅ 支持 HTTP URL                            | ❌ 不支持                       | ❌ 不支持            | ❌ 不支持       |
+| **多模型支持**     | ✅ 5+ 种模型提示词                              | ❌ 固定 Claude                 | ❌ 固定 Gemini      | ❌ 固定 OpenAI |
+| **Agent 提示词** | ✅ 支持自定义 Agent                            | ✅ 内置 Agent（explore/general） | ❌ 不支持            | ❌ 不支持       |
+| **触发工具**      | Read（其他工具不触发）                            | Read                        | cd（目录切换）         | -           |
+| **持久化**       | 分层：永久（启动时）+ 临时（Read时）                    | 分层：永久 + 临时                  | 永久（启动时级联）        | 永久（启动时）     |
+| **配置复杂度**     | ⭐⭐⭐⭐⭐（最复杂）                               | ⭐⭐⭐                         | ⭐⭐               | ⭐           |
+
 #### Claude Code 加载机制（实验验证）
 
 **测试方法**：在不同位置创建带唯一标识符的 CLAUDE.md 文件（.claude/rules/、子目录、~/.claude/），观察 Claude 接收到的系统上下文。
@@ -290,7 +305,91 @@ AI 会：
 
 4. **使用技巧**
    - 需要子目录规则时，必须**在该目录启动 Codex CLI**
-   - 或在 Prompt 中明确指示：“请读取 `path/to/AGENTS.md` 并严格遵守其中规则”
+   - 或在 Prompt 中明确指示："请读取 `path/to/AGENTS.md` 并严格遵守其中规则"
+
+#### OpenCode 加载机制（基于源码分析）
+
+**测试方法**：基于 OpenCode 开源代码（packages/opencode/src/session/）的实现逻辑分析
+
+**核心结论**：
+
+OpenCode 的配置注入机制是**最复杂且最智能**的，原因：
+1. **支持多模型**（Claude、GPT、Gemini、Qwen 等），每个模型有独立的系统提示词
+2. **分层注入**（7 层提示词架构）
+3. **动态按需加载**（Read 工具自动向上遍历）
+4. **支持远程配置**（HTTP URL + glob 匹配）
+
+**1. 启动时加载（永久生效）**
+
+**加载优先级**（找到一个就停止）：
+- 项目级：`AGENTS.md` > `CLAUDE.md` > `CONTEXT.md`
+- 全局级：`~/.config/opencode/AGENTS.md` > `~/.claude/CLAUDE.md` > `$OPENCODE_CONFIG_DIR/AGENTS.md`
+- 用户自定义：`opencode.json` 中的 `config.instructions`（支持 glob 和 HTTP URL）
+
+**关键特性**：
+- ✅ 按优先级去重（项目级和全局级各取一个）
+- ✅ 支持远程配置（HTTP URL，5 秒超时）
+- ✅ 支持 glob 匹配（如 `packages/*/AGENTS.md`）
+
+**2. 按需加载（临时生效）**
+
+**触发时机**：首次 Read 工具读取某个目录下的文件时
+
+**行为**：
+- 从当前文件目录向上遍历到项目根目录
+- 查找每级目录的 `AGENTS.md`/`CLAUDE.md`/`CONTEXT.md`
+- 通过 `<system-reminder>` 标签注入到 Read 工具输出中
+- 三层去重：不在系统提示词中 + 不在已加载列表 + 不在当前消息已加载
+
+**关键特性**：
+- ✅ 智能去重（避免重复注入）
+- ✅ 向上遍历（自动加载父目录配置）
+- ✅ 消息级缓存（同一消息不重复）
+- ⚠️ 只有 Read 工具触发（Write/Edit/Bash 不触发）
+
+**3. 多模型支持**
+
+**模型特定提示词**：
+- Claude：`prompt/anthropic.txt`
+- GPT/O1/O3：`prompt/beast.txt`
+- Gemini：`prompt/gemini.txt`
+- Codex（GPT-5）：`prompt/codex_header.txt`
+- 其他（Qwen 等）：`prompt/qwen.txt`
+
+**特殊处理**：
+- Codex 通过 `options.instructions` 发送系统提示词
+- 其他模型通过 `system` 消息发送
+- Agent 自定义提示词优先级高于模型默认提示词
+
+**4. 配置层次总结**
+
+| 加载阶段      | 加载位置                    | 触发时机        | 持久性      |
+|-----------|-------------------------|-------------|----------|
+| 模型提示词     | `prompt/*.txt`          | 启动时/切换模型时   | 永久       |
+| 环境信息      | 动态生成（工作目录、平台、日期）        | 每次对话        | 每次对话     |
+| 全局配置      | `~/.config/opencode/` 等 | 启动时         | 永久       |
+| 项目配置      | 项目根目录 `AGENTS.md`       | 启动时         | 永久       |
+| 子目录配置     | 子目录 `AGENTS.md`         | Read 工具首次读取 | 临时       |
+| 远程配置      | HTTP URL                | 启动时         | 永久       |
+| Agent 提示词 | `agent.prompt` 字段       | 执行 Agent 时  | 当前 Agent |
+
+**5. 文件组织建议**
+
+```
+project/
+├── AGENTS.md                    # 核心配置（所有模型共享）
+├── .claude/CLAUDE.md            # Claude Code 专用（可选）
+├── packages/
+│   ├── api/AGENTS.md            # API 模块规则（Read 时加载）
+│   └── web/AGENTS.md            # Web 模块规则（Read 时加载）
+└── opencode.json                # 可选：远程配置 + glob
+```
+
+**6. 使用技巧**
+
+- **节省 token**：将通用规则放根目录，模块特定规则放子目录（按需加载）
+- **远程配置**：适合公司统一规范或开源社区规则，但关键规则建议本地存储
+- **多模型项目**：利用 OpenCode 的多模型支持，为不同模型配置不同提示词
 
 ### ClaudeCode 配置
 
