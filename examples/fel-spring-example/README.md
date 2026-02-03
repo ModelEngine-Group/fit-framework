@@ -18,6 +18,7 @@
 **核心依赖**（必需）：
 
 ```xml
+
 <dependency>
     <groupId>org.fitframework.fel</groupId>
     <artifactId>fel-spring-boot-starter</artifactId>
@@ -26,6 +27,7 @@
 ```
 
 这个依赖会自动引入：
+
 - FEL 核心功能（ChatModel、EmbedModel）
 - FIT 框架运行时
 - Spring Boot 自动配置
@@ -51,11 +53,10 @@ fel:
 
 `fel-spring-boot-starter` 会自动将 FEL Bean 注册到 Spring 容器，可以直接注入使用：
 
-```java
+``` java
 @RestController
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")  // ← 必须添加
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class ChatController {
-
     private final ChatModel chatModel;
 
     public ChatController(ChatModel chatModel) {
@@ -66,21 +67,21 @@ public class ChatController {
 
 **⚠️ 注意**：建议添加 `@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")`，否则 IDE 会显示波浪线警告。
 
-**原因**：FEL Bean 是运行时动态注册的，IDE 在编译期无法感知这些 Bean 的存在，会显示 "Could not autowire" 警告。虽然不影响运行，但添加此注解可以消除 IDE 警告。
+**原因**：FEL Bean 是运行时动态注册的，IDE 在编译期无法感知这些 Bean 的存在，会显示 "Could not autowire"
+警告。虽然不影响运行，但添加此注解可以消除 IDE 警告。
 
 **自动注入的 FEL Bean**：
 
-| Bean 类型 | 说明 | 注入方式 |
-|----------|------|---------|
-| `ChatModel` | 聊天模型 | 构造器注入 |
-| `EmbedModel` | 嵌入模型 | 构造器注入 |
-| `ObjectSerializer` | JSON 序列化器 | 构造器注入，需要 `@Qualifier("json")` |
-| `ToolRepository` | 工具仓库 | 构造器注入 |
-| `ToolExecuteService` | 工具执行服务 | 构造器注入 |
+| Bean 类型              | 说明                                              | 注入方式                          |
+|----------------------|-------------------------------------------------|-------------------------------|
+| `OpenAiModel`        | EmbedModel、ChatModel、ImageModel、RerankModel 实现类 | 构造器注入                         |
+| `ObjectSerializer`   | JSON 序列化器                                       | 构造器注入，需要 `@Qualifier("json")` |
+| `ToolRepository`     | 工具仓库                                            | 构造器注入                         |
+| `ToolExecuteService` | 工具执行服务                                          | 构造器注入                         |
 
 ### 2. 模型调用
 
-```java
+``` java
 // 返回文本或手动转换为 Map
 @GetMapping("/chat")
 public Map<String, Object> chat(@RequestParam String query) {
@@ -102,7 +103,7 @@ public Map<String, Object> chat(@RequestParam String query) {
 
 **关键**：FEL 的 `Choir` 实现了 JDK 的 `Flow.Publisher` 接口，与 Spring Reactor 的 `Publisher` 之间需要用适配器转换。
 
-```java
+``` java
 import reactor.adapter.JdkFlowAdapter;  // ← 导入适配器
 import reactor.core.publisher.Flux;
 
@@ -121,7 +122,7 @@ public Flux<String> stream(@RequestParam String query) {
 
 **⚠️ 非常重要**：工具实现类必须使用 **FIT 的 `@Component`**，不能使用 Spring 的 `@Component`。
 
-```java
+``` java
 package com.example.tools;
 
 import modelengine.fitframework.annotation.Component;  // ← FIT 的注解
@@ -138,6 +139,7 @@ public class WeatherTool {
 ```
 
 **使用 Spring 的 `@Component` 会导致工具无法被发现，报错**：
+
 ```
 FitableNotFoundException: No fitables. [genericableId=com.example.tools.WeatherTool]
 ```
@@ -146,7 +148,7 @@ FitableNotFoundException: No fitables. [genericableId=com.example.tools.WeatherT
 
 在 `application.yml` 中把工具实现类的 FIT Bean 手动注册 spring 里：
 
-```yaml
+``` yaml
 fit:
   beans:
     packages:
@@ -157,7 +159,7 @@ fit:
 
 在 `pom.xml` 中添加 plugin，build 时自动在 `target/classes` 目录里生成工具文件`tools.json`
 
-```xml
+``` xml
 <build>
     <plugins>
         <plugin>
@@ -183,6 +185,7 @@ fit:
 ### 1. IDE 显示 "Could not autowire" 警告
 
 **问题**：
+
 ```
 Could not autowire. No beans of 'ChatModel' type found.
 ```
@@ -191,7 +194,7 @@ Could not autowire. No beans of 'ChatModel' type found.
 
 **解决**：添加注解消除 IDE 警告
 
-```java
+``` java
 @RestController
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")  // ← 必须添加
 public class MyController {
@@ -203,6 +206,7 @@ public class MyController {
 ### 2. 流式响应没有输出
 
 **检查清单**：
+
 - ✅ 使用了 `JdkFlowAdapter.flowPublisherToFlux()` 转换
 - ✅ 设置了 `produces = "text/event-stream;charset=UTF-8"`
 - ✅ ChatOption 设置了 `.stream(true)`
@@ -210,6 +214,7 @@ public class MyController {
 ### 3. 工具无法被发现
 
 **错误**：
+
 ```
 FitableNotFoundException: No fitables. [genericableId=xxx]
 ```
@@ -219,7 +224,7 @@ FitableNotFoundException: No fitables. [genericableId=xxx]
 **解决步骤**：
 
 1. ✅ 确认工具类使用 **FIT 的 `@Component`**：
-   ```java
+   ``` java
    import modelengine.fitframework.annotation.Component;  // ← 正确
    // import org.springframework.stereotype.Component;    // ← 错误
 
@@ -228,7 +233,7 @@ FitableNotFoundException: No fitables. [genericableId=xxx]
    ```
 
 2. ✅ 配置 `fit.beans.packages` 扫描：
-   ```yaml
+   ``` yaml
    fit:
      beans:
        packages:
@@ -242,13 +247,14 @@ FitableNotFoundException: No fitables. [genericableId=xxx]
 ### 4. ObjectSerializer 注入失败
 
 **错误**：
+
 ```
 No qualifying bean of type 'ObjectSerializer' available
 ```
 
 **解决**：在构造器注入时添加 `@Qualifier("json")`
 
-```java
+``` java
 public MyController(
     ChatModel chatModel,
     @Qualifier("json") ObjectSerializer serializer  // ← 必须添加

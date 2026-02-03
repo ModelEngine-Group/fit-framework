@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>chat-template-example</artifactId>
+    <artifactId>chat-template-spring-example</artifactId>
 
     <dependencies>
         <!-- FEL Spring Boot Starter -->

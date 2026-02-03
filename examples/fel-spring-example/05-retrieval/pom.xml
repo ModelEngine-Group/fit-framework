@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>retrieval-example</artifactId>
+    <artifactId>retrieval-spring-example</artifactId>
 
     <dependencies>
         <!-- FEL Spring Boot Starter -->

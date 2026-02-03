@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>output-parser-example</artifactId>
+    <artifactId>output-parser-spring-example</artifactId>
 
     <dependencies>
         <!-- FEL Spring Boot Starter -->
