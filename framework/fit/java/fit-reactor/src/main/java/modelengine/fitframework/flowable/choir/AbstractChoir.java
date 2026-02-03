@@ -22,6 +22,7 @@ import modelengine.fitframework.flowable.publisher.SubscribeOnPublisherDecorator
 import modelengine.fitframework.flowable.subscriber.BlockAllSubscriber;
 import modelengine.fitframework.flowable.subscriber.FunctionalSubscriber;
 import modelengine.fitframework.inspection.Nonnull;
+import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.schedule.ThreadPoolExecutor;
 import modelengine.fitframework.util.ObjectUtils;
 
@@ -130,7 +131,7 @@ public abstract class AbstractChoir<T> implements Choir<T> {
     @Override
     public void subscribe(java.util.concurrent.Flow.Subscriber<? super T> subscriber) {
         if (subscriber == null) {
-            throw new NullPointerException("Subscriber cannot be null");
+            Validation.notNull(subscriber, "Subscriber cannot be null.");
         }
         // 使用现有的 Lambda subscribe 方法，适配 Flow Subscriber
         this.subscribe(

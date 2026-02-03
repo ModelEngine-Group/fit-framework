@@ -22,6 +22,7 @@
             <artifactId>fit-spring-boot-starter</artifactId>
             <version>${fit.version}</version>
         </dependency>
+
         <!-- FEL 核心：需要访问核心接口 -->
         <dependency>
             <groupId>org.fitframework.fel</groupId>
