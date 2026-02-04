@@ -45,21 +45,21 @@ public class ChatModelExampleController {
      * 聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的回复的 Map。
+     * @return 表示聊天模型生成的回复的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
      */
     @GetMapping("/chat")
-    public Object chat(@RequestParam("query") String query) {
+    public Map<String, Object> chat(@RequestParam("query") String query) {
         ChatOption option = ChatOption.custom().model(this.modelName).stream(false).build();
         ChatMessage aiMessage =
                 this.chatModel.generate(ChatMessages.from(new HumanMessage(query)), option).first().block().get();
-        return java.util.Map.of("content", aiMessage.text(), "toolCalls", aiMessage.toolCalls());
+        return Map.of("content", aiMessage.text(), "toolCalls", aiMessage.toolCalls());
     }
 
     /**
      * 流式聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的流式回复的 Choir。
+     * @return 表示聊天模型生成的流式回复的 {@link Flux}。
      */
     @GetMapping(value = "/chat-stream", produces = "text/event-stream;charset=UTF-8")
     public Flux<Map<String, Object>> chatStream(@RequestParam("query") String query) {

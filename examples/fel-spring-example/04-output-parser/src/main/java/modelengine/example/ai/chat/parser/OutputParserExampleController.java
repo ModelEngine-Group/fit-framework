@@ -60,7 +60,7 @@ public class OutputParserExampleController {
      * 聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的回复的 {@link Demo}。
+     * @return 表示聊天模型生成的回复的 {@link String}。
      */
     @GetMapping("/chat")
     public String chat(@RequestParam("query") String query) {
@@ -75,7 +75,7 @@ public class OutputParserExampleController {
      * 流式聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的回复的 @{@link Choir}{@code <}{@link Demo}{@code >}。
+     * @return 表示聊天模型生成的回复的 {@link Flux}{@code <}{@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >>}。
      */
     @GetMapping(value = "/chat-stream", produces = "text/event-stream;charset=UTF-8")
     public Flux<Map<String, Object>> chatStream(@RequestParam("query") String query) {

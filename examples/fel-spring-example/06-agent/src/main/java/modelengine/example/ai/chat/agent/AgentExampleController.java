@@ -20,6 +20,7 @@ import modelengine.fel.engine.operators.patterns.support.DefaultAgent;
 import modelengine.fel.engine.operators.prompts.Prompts;
 import modelengine.fel.tool.service.ToolExecuteService;
 import modelengine.fel.tool.service.ToolRepository;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Agent 样例控制器（Spring Boot 版本）。
@@ -59,18 +61,15 @@ public class AgentExampleController {
      * 聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的回复的 Map。
+     * @return 表示聊天模型生成的回复的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
      */
     @GetMapping("/chat")
-    public Object chat(@RequestParam("query") String query) {
+    public Map<String, Object> chat(@RequestParam("query") String query) {
         List<ToolInfo> toolInfos = asParent(toolRepository.listTool("example"));
         ChatMessage aiMessage = this.agentFlow.converse()
                 .bind(ChatOption.custom(this.chatOption).tools(toolInfos).build())
                 .offer(query)
                 .await();
-        return java.util.Map.of(
-            "content", aiMessage.text(),
-            "toolCalls", aiMessage.toolCalls()
-        );
+        return Map.of("content", aiMessage.text(), "toolCalls", aiMessage.toolCalls());
     }
 }

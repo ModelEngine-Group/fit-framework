@@ -13,11 +13,14 @@ import modelengine.fel.core.chat.support.ChatMessages;
 import modelengine.fel.core.chat.support.HumanMessage;
 import modelengine.fel.core.memory.Memory;
 import modelengine.fel.core.memory.support.CacheMemory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * 聊天记忆样例控制器（Spring Boot 版本）。
@@ -42,18 +45,15 @@ public class ChatMemoryExampleController {
      * 聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的回复的 Map。
+     * @return 表示聊天模型生成的回复的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
      */
     @GetMapping("/chat")
-    public Object chat(@RequestParam("query") String query) {
+    public Map<String, Object> chat(@RequestParam("query") String query) {
         ChatOption option = ChatOption.custom().model(this.modelName).stream(false).build();
         this.memory.add(new HumanMessage(query));
         ChatMessage aiMessage =
                 this.chatModel.generate(ChatMessages.from(this.memory.messages()), option).first().block().get();
         this.memory.add(aiMessage);
-        return java.util.Map.of(
-            "content", aiMessage.text(),
-            "toolCalls", aiMessage.toolCalls()
-        );
+        return Map.of("content", aiMessage.text(), "toolCalls", aiMessage.toolCalls());
     }
 }

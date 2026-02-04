@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -118,14 +119,14 @@ public class RetrievalExampleController {
      * 聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的回复的 Map。
+     * @return 表示聊天模型生成的回复的 {@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >}。
      */
     @GetMapping("/chat")
-    public Object chat(@RequestParam("query") String query) {
+    public Map<String, Object> chat(@RequestParam("query") String query) {
         ChatMessage aiMessage = this.ragFlow.converse().offer(query).await();
         this.memory.add(new HumanMessage(query));
         this.memory.add(aiMessage);
-        return java.util.Map.of("content", aiMessage.text(), "toolCalls", aiMessage.toolCalls());
+        return Map.of("content", aiMessage.text(), "toolCalls", aiMessage.toolCalls());
     }
 
     private static File getData() {
