@@ -19,7 +19,7 @@ import modelengine.fitframework.annotation.Property;
  * @author 易文渊
  * @author 杭潇
  * @author 黄可欣
- * @since 2025-01-20
+ * @since 2024-09-02
  */
 @Component
 @Group(name = "example")

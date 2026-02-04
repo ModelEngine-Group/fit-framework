@@ -26,7 +26,7 @@ import java.util.Map;
  * 聊天记忆样例控制器（Spring Boot 版本）。
  *
  * @author 黄可欣
- * @since 2025-01-20
+ * @since 2026-01-20
  */
 @RestController
 @RequestMapping("/ai/example")

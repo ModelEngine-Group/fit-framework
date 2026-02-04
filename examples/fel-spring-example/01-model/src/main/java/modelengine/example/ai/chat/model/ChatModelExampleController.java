@@ -27,7 +27,7 @@ import java.util.Map;
  * 聊天模型样例控制器（Spring Boot 版本）。
  *
  * @author 黄可欣
- * @since 2025-01-20
+ * @since 2026-01-20
  */
 @RestController
 @RequestMapping("/ai/example")
@@ -59,7 +59,7 @@ public class ChatModelExampleController {
      * 流式聊天接口。
      *
      * @param query 表示用户输入查询的 {@link String}。
-     * @return 表示聊天模型生成的流式回复的 {@link Flux}。
+     * @return 表示聊天模型生成的流式回复的 {@link Flux}{@code <}{@link Map}{@code <}{@link String}{@code , }{@link Object}{@code >>}。
      */
     @GetMapping(value = "/chat-stream", produces = "text/event-stream;charset=UTF-8")
     public Flux<Map<String, Object>> chatStream(@RequestParam("query") String query) {
