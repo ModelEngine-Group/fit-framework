@@ -130,9 +130,7 @@ public abstract class AbstractChoir<T> implements Choir<T> {
 
     @Override
     public void subscribe(java.util.concurrent.Flow.Subscriber<? super T> subscriber) {
-        if (subscriber == null) {
-            Validation.notNull(subscriber, "Subscriber cannot be null.");
-        }
+        Validation.notNull(subscriber, "Subscriber cannot be null.");
         // 使用现有的 Lambda subscribe 方法，适配 Flow Subscriber
         this.subscribe(
                 // onSubscribedAction: 将内部 Subscription 适配为 Flow Subscription

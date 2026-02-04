@@ -36,7 +36,7 @@ import java.util.Set;
  */
 @Configuration
 public class FelSpringBootAutoConfiguration {
-    private static final Logger LOG = LoggerFactory.getLogger(FelSpringBootAutoConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(FelSpringBootAutoConfiguration.class);
 
     /**
      * Spring 层需要注入的 FEL Bean 类型名称白名单（使用字符串避免类加载失败）。
@@ -64,13 +64,11 @@ public class FelSpringBootAutoConfiguration {
      */
     private static class FelBeanAutoRegistrar implements BeanDefinitionRegistryPostProcessor {
         @Override
-        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-            // 不需要在这里处理
-        }
+        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {}
 
         @Override
         public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-            LOG.info("Installing FEL Bean auto-registration processor");
+            log.info("Installing FEL Bean auto-registration processor...");
             beanFactory.addBeanPostProcessor(new FitRuntimeDetectorBeanPostProcessor(beanFactory));
         }
     }
@@ -89,82 +87,97 @@ public class FelSpringBootAutoConfiguration {
 
         @Override
         public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-            if (!registered && bean instanceof FitRuntime) {
-                registered = true;
-                registerFelBeansToSpring((FitRuntime) bean);
+            if (!this.registered && bean instanceof FitRuntime) {
+                this.registered = true;
+                this.registerFelBeansToSpring((FitRuntime) bean);
             }
             return bean;
         }
 
         /**
-         * 将 FIT 容器中符合白名单的 FEL Bean 注册到 Spring 容器。
+         * 将 FIT 容器中符合 {@link FelSpringBootAutoConfiguration#REQUIRED_BEAN_TYPE_NAMES} 的 FEL Bean 注册到 Spring 容器。
          *
-         * @param fitRuntime FIT 运行时实例
+         * @param fitRuntime 表示 FIT 运行时实例的 {@link FitRuntime}。
          */
         private void registerFelBeansToSpring(FitRuntime fitRuntime) {
-            LOG.info("Auto-registering FEL beans to Spring container (whitelist mode)");
+            log.info("Auto-registering FEL beans to Spring container...");
             try {
                 BeanContainer container = fitRuntime.root().container();
                 List<BeanFactory> allFactories = container.all();
-                LOG.debug("Found {} beans in FIT container", allFactories.size());
-
+                log.debug("Found {} beans in FIT container", allFactories.size());
                 int registeredCount = 0;
-                int skippedCount = 0;
-                int filteredCount = 0;
 
                 for (BeanFactory factory : allFactories) {
                     BeanMetadata metadata = factory.metadata();
                     String beanName = metadata.name();
-                    Type beanType = metadata.type();
-                    String typeName = beanType.getTypeName();
-
-                    // 检查是否在白名单中（使用字符串匹配，支持子类）
-                    boolean isRequired = REQUIRED_BEAN_TYPE_NAMES.stream().anyMatch(requiredTypeName -> {
-                        try {
-                            Class<?> actualType = Class.forName(typeName);
-                            Class<?> requiredType = Class.forName(requiredTypeName);
-                            return requiredType.isAssignableFrom(actualType);
-                        } catch (ClassNotFoundException e) {
-                            // 某些可选依赖的类可能不在 classpath 中，忽略
-                            return false;
-                        }
-                    });
-
-                    if (!isRequired) {
-                        LOG.trace("Filtered out FIT bean '{}' - not in whitelist", beanName);
-                        filteredCount++;
+                    String typeName = metadata.type().getTypeName();
+                    if (!this.isRequiredBeanType(typeName) || this.isBeanAlreadyRegisteredInSpring(beanName)) {
                         continue;
                     }
 
-                    // 避免重复注册
-                    if (beanFactory.containsSingleton(beanName) || beanFactory.containsBeanDefinition(beanName)) {
-                        LOG.debug("Skipping bean '{}' - already exists in Spring container", beanName);
-                        skippedCount++;
-                        continue;
-                    }
-
-                    try {
-                        if (metadata.singleton()) {
-                            Object instance = factory.get();
-                            beanFactory.registerSingleton(beanName, instance);
-                            registeredCount++;
-                            LOG.info("Registered FEL bean '{}' (type: {}) to Spring container", beanName, typeName);
-                        }
-                    } catch (Exception e) {
-                        LOG.warn("Failed to register FEL bean '{}' of type {}: {}",
-                                beanName,
-                                typeName,
-                                e.getMessage());
+                    // 注册单例 Bean
+                    if (this.registerSingletonBean(factory, metadata, beanName, typeName)) {
+                        registeredCount++;
                     }
                 }
 
-                LOG.info("FEL Bean auto-registration completed: {} registered, {} skipped, {} filtered",
-                        registeredCount,
-                        skippedCount,
-                        filteredCount);
+                log.info("FEL Bean auto-registration completed: {} registered", registeredCount);
             } catch (Exception e) {
-                LOG.error("Failed to auto-register FEL beans", e);
+                log.error("Failed to auto-register FEL beans", e);
             }
+        }
+
+        /**
+         * 检查指定类型是否在白名单中（支持子类匹配）。
+         *
+         * @param typeName 表示类型全限定名的 {@link String}。
+         * @return 如果类型在白名单中则返回 {@code true}，否则返回 {@code false}。
+         */
+        private boolean isRequiredBeanType(String typeName) {
+            return REQUIRED_BEAN_TYPE_NAMES.stream().anyMatch(requiredTypeName -> {
+                try {
+                    Class<?> actualType = Class.forName(typeName);
+                    Class<?> requiredType = Class.forName(requiredTypeName);
+                    return requiredType.isAssignableFrom(actualType);
+                } catch (ClassNotFoundException e) {
+                    // 某些可选依赖的类可能不在 classpath 中，忽略
+                    return false;
+                }
+            });
+        }
+
+        /**
+         * 检查指定名称的 Bean 是否已在 Spring 容器中注册。
+         *
+         * @param beanName 表示 Bean 名称的 {@link String}。
+         * @return 如果 Bean 已注册则返回 {@code true}，否则返回 {@code false}。
+         */
+        private boolean isBeanAlreadyRegisteredInSpring(String beanName) {
+            return this.beanFactory.containsSingleton(beanName) || this.beanFactory.containsBeanDefinition(beanName);
+        }
+
+        /**
+         * 注册单例 Bean 到 Spring 容器。
+         *
+         * @param factory 表示 Bean 工厂的 {@link BeanFactory}。
+         * @param metadata 表示 Bean 元数据的 {@link BeanMetadata}。
+         * @param beanName 表示 Bean 名称的 {@link String}。
+         * @param typeName 表示类型全限定名的 {@link String}。
+         * @return 如果注册成功则返回 {@code true}，否则返回 {@code false}。
+         */
+        private boolean registerSingletonBean(BeanFactory factory, BeanMetadata metadata, String beanName,
+                String typeName) {
+            try {
+                if (metadata.singleton()) {
+                    Object instance = factory.get();
+                    this.beanFactory.registerSingleton(beanName, instance);
+                    log.info("Registered FEL bean '{}' (type: {}) to Spring container", beanName, typeName);
+                    return true;
+                }
+            } catch (Exception e) {
+                log.warn("Failed to register FEL bean '{}' of type {}: {}", beanName, typeName, e.getMessage());
+            }
+            return false;
         }
     }
 }

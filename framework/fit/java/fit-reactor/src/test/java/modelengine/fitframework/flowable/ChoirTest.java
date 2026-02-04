@@ -566,10 +566,10 @@ public class ChoirTest {
         }
 
         @Test
-        @DisplayName("使用 null Flow.Subscriber 订阅，应抛出 NullPointerException")
-        void shouldThrowNullPointerExceptionWhenSubscriberIsNull() {
-            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Choir.just(1, 2, 3)
-                    .subscribe((Flow.Subscriber<Integer>) null)).withMessage("Subscriber cannot be null");
+        @DisplayName("使用 null Flow.Subscriber 订阅，应抛出 IllegalArgumentException")
+        void shouldThrowIllegalArgumentExceptionWhenSubscriberIsNull() {
+            assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> Choir.just(1, 2, 3)
+                    .subscribe((Flow.Subscriber<Integer>) null)).withMessage("Subscriber cannot be null.");
         }
     }
 }
