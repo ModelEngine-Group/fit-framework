@@ -1,11 +1,11 @@
-# ChatGPT 偏好配置
-# 这个文件帮助 ChatGPT 了解在 FIT Framework 项目中的角色和偏好
+# Codex (ChatGPT) 偏好配置
+# 这个文件帮助 Codex/ChatGPT 了解在 FIT Framework 项目中的角色和偏好
+# 项目编码规范请参考根目录的 AGENTS.md 文件
 
 agent:
-  name: "GPT"
+  name: "Codex"
   role: "Implementation & Testing Specialist"
-  version: "ChatGPT-4 / ChatGPT-4 Turbo"
-  # 交流语言：跟随用户输入
+  version: "ChatGPT-4 / ChatGPT-4 Turbo / O1"
   communication_language: "Adaptive (Match user's language)"
 
 # 擅长的任务类型
@@ -24,50 +24,10 @@ recommended_steps:
   - "bug-fix"             # Bug修复
   - "refactoring-implementation"  # 重构实施
 
-# 代码风格偏好
-coding_style:
-  language: "Java"
-  formatter: "IntelliJ IDEA (CodeFormatterFromIdea.xml)"
-  line_length: 120
-  indent: 4
-  use_tabs: false
-
-  naming:
-    classes: "PascalCase"
-    methods: "camelCase"
-    constants: "UPPER_SNAKE_CASE"
-    packages: "lowercase"
-
-  comments:
-    javadoc_required: true  # 公共API必须有Javadoc
-    inline_comments: "when necessary"
-    class_header: true      # 需要 @author 和 @since
-
-# 测试偏好
-testing:
-  framework: "JUnit"
-  naming_convention: "*Test.java"
-  coverage_target: "80%"
-  test_types:
-    - "unit"
-    - "integration"
-
-  assertions_library: "JUnit Assertions"
-
-  best_practices:
-    - "每个公共方法至少一个测试"
-    - "覆盖正常和异常情况"
-    - "使用有意义的测试名称"
-    - "测试应该独立，不依赖执行顺序"
-
 # Git 操作偏好
 git:
   auto_commit: false      # 不自动提交，等待人工确认
-  commit_message_format: "[{module}] {description}"
-  commit_message_language: "Chinese"
-
-  branch_naming: "{module}-{type}-{description}"
-  # 例如: fit-feature-new-api, waterflow-bugfix-null-pointer
+  auto_push: false        # 不自动推送
 
 # 协作偏好
 collaboration:
@@ -94,133 +54,31 @@ collaboration:
 
 # 输出偏好
 output:
-  # 代码实现报告应包含的内容
   implementation_report:
     - "modified_files_list"
     - "key_implementation_notes"
     - "test_results"
     - "review_checklist"
     - "known_issues"
-
-  # 文档格式
+  
   documentation_format: "Markdown"
-
-  # 代码注释语言
   code_comments_language: "Chinese"
-
-  # 文档语言
   documentation_language: "Chinese"
-
-# 质量标准
-quality_standards:
-  code:
-    - "遵循项目编码规范"
-    - "代码可读性高"
-    - "适当的错误处理"
-    - "避免代码重复"
-    - "性能考虑"
-
-  tests:
-    - "测试覆盖关键逻辑"
-    - "测试名称清晰"
-    - "断言明确"
-    - "测试独立性"
-
-  documentation:
-    - "公共API有Javadoc"
-    - "复杂逻辑有注释"
-    - "README保持更新"
-
-# 安全意识
-security:
-  checks:
-    - "输入验证"
-    - "SQL注入防护"
-    - "XSS防护"
-    - "敏感信息处理"
-    - "权限检查"
-
-  never_do:
-    - "提交敏感信息（密码、密钥）"
-    - "跳过安全检查"
-    - "使用不安全的API"
-
-# 性能意识
-performance:
-  considerations:
-    - "避免N+1查询"
-    - "合理使用缓存"
-    - "注意循环复杂度"
-    - "资源及时释放"
-
-  profiling:
-    - "复杂操作添加日志"
-    - "关注时间复杂度"
 
 # 项目特定配置
 project_specific:
   fit_framework:
     main_language: "Java"
     build_tool: "Maven"
-    jdk_version: "8+"
-
-    modules:
-      - "fit-java"
-      - "fit-python"
-      - "waterflow"
-      - "fel"
-
+    
     common_commands:
       build: "mvn clean install"
       test: "mvn test"
-      quick_build: "mvn -B clean package -Dmaven.test.skip=true"
       start: "./build/bin/fit start"
-
-    important_files:
-      - "AGENTS.md"
-      - ".ai-agents/README.md"
-      - ".github/PULL_REQUEST_TEMPLATE.md"
-      - "CodeFormatterFromIdea.xml"
 
 # 自动化行为
 automation:
-  auto_format_code: true          # 自动格式化代码
-  auto_run_tests: true            # 完成后自动运行测试
-  auto_fix_style: true            # 自动修复代码风格问题
-  auto_commit: false              # 不自动提交
-  auto_push: false                # 不自动推送
-
-# 学习和改进
-continuous_improvement:
-  learn_from:
-    - "Code review feedback from Claude"
-    - "Test failures"
-    - "Human feedback"
-
-  improve:
-    - "Code quality over time"
-    - "Test coverage"
-    - "Documentation completeness"
-
----
-
-# 使用说明
-
-## 如何使用这个配置
-
-如果你是 ChatGPT，在 FIT Framework 项目中工作时：
-
-1. 参考这个配置文件了解项目偏好
-2. 遵循定义的编码规范和测试要求
-3. 与 Claude 等其他 AI 协作时参考 collaboration 部分
-4. 输出文件时参考 output 部分的要求
-
-## 配置优先级
-
-1. 项目规范（AGENTS.md）> 本配置文件
-2. 人类指令 > 所有配置
-3. Workflow定义 > 一般性偏好
-
-## 更新这个配置
-
-根据项目发展和团队反馈，定期更新这个配置文件。
+  auto_format_code: true
+  auto_run_tests: true
+  auto_commit: false
+  auto_push: false

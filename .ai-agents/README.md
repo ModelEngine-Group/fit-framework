@@ -1,6 +1,68 @@
-# FIT Framework - AI 智能体协作配置
+# FIT Framework - AI 智能体协作指南
 
-本目录包含 FIT Framework 项目的 AI 智能体协作配置，支持三个主流 AI 工具（ClaudeCode、Codex、GeminiCli）在同一项目中高效协作。
+本目录包含 FIT Framework 项目的 AI 智能体协作配置，支持多个主流 AI 工具（Claude Code、Codex、Gemini CLI、Cursor 等）在同一项目中高效协作。
+
+> **💡 提示**：如需快速了解项目规范，请先阅读对应工具的配置文件（详见下方"配置体系说明"）。本文档专注于**多 AI 协作机制**的详细说明。
+
+## 🔧 配置体系说明
+
+本项目采用**双轨配置体系**，不同 AI 工具使用不同的配置文件：
+
+### 配置体系 A：Claude Code
+**适用工具**：Claude Code
+
+**配置文件**：
+- **`.claude/CLAUDE.md`** - 快速参考（启动时自动加载）
+- **`.claude/project-rules.md`** - 详细规则
+- **`.claude/commands/`** - Slash Commands 实现
+
+**特点**：
+- Claude Code 专属配置，包含 Slash Commands 和特定规则
+- 自包含，不依赖其他配置文件
+- 启动时自动加载 `.claude/CLAUDE.md`
+
+### 配置体系 B：AGENTS.md 标准
+**适用工具**：Codex CLI、Gemini CLI、Cursor、其他 TUI 工具
+
+**配置文件**：
+- **`AGENTS.md`** - 项目开发规范（根目录）
+- **`.ai-agents/codex/preferences.yaml`** - Codex 特定配置
+- **`.ai-agents/gemini/preferences.yaml`** - Gemini 特定配置
+
+**特点**：
+- 遵循 [AGENTS.md 标准](https://agents.md)（Linux Foundation AAIF）
+- 轻量级，专注于项目开发规范
+- 启动时自动加载 `AGENTS.md`
+
+### 两套体系的关系
+
+```
+项目规范（两套独立但内容一致）
+    ├── 体系 A：.claude/ (Claude Code 使用)
+    │   ├── CLAUDE.md (快速参考)
+    │   └── project-rules.md (详细规则)
+    │
+    └── 体系 B：AGENTS.md (其他工具使用)
+        ├── AGENTS.md (项目规范)
+        └── .ai-agents/{tool}/preferences.yaml (工具配置)
+
+协作机制（两套体系共享）
+    └── .ai-agents/ (多 AI 协作配置)
+        ├── workflows/ (工作流定义)
+        ├── templates/ (任务模板)
+        └── README.md (本文件 - 协作指南)
+
+工作区（两套体系共享）
+    └── .ai-workspace/ (任务跟踪和上下文共享)
+        ├── active/ (进行中的任务)
+        ├── blocked/ (被阻塞的任务)
+        └── completed/ (已完成的任务)
+```
+
+**为什么需要两套体系**？
+- Claude Code 仅加载 `.claude/CLAUDE.md`，不会自动读取 `AGENTS.md`
+- 其他 TUI 工具遵循 AGENTS.md 标准，自动加载根目录的 `AGENTS.md`
+- 两套体系内容一致，只是文件位置和格式不同
 
 ## 📋 目录说明
 
@@ -411,37 +473,9 @@ GeminiCli 的配置在 `.ai-agents/gemini/` 目录。
 ### 通用配置
 
 所有 AI 都应该：
-1. 读取 `AGENTS.md`（项目根目录）
-2. 遵循 `.ai-agents/workflows/` 中的工作流
+1. 读取 `AGENTS.md`（项目根目录）获取项目开发规范
+2. 遵循 `.ai-agents/workflows/` 中的工作流定义
 3. 使用 `.ai-workspace/` 进行任务跟踪和上下文共享
-
-### 版权年份管理规范
-
-**重要规则**：修改任意带版权头的文件时，**必须同步更新版权年份到当前年份**。
-
-**执行步骤**：
-
-1. **动态获取当前年份**（绝对不要硬编码年份）：
-   ```bash
-   # 使用系统命令获取当前年份
-   CURRENT_YEAR=$(date +%Y)
-   echo $CURRENT_YEAR
-   ```
-
-2. **检查并更新版权头**：
-   - 检查文件是否包含版权声明（如 `Copyright (C) 2024-2025`）
-   - 如果包含，将年份更新为当前年份（如 `2024-2025` → `2024-2026`）
-   - 如果是单一年份（如 `2024`），更新为年份范围（如 `2024-2026`）
-
-3. **常见格式示例**（假设当前年份为 2026）：
-   - `Copyright (C) 2024-2025` → `Copyright (C) 2024-2026`
-   - `Copyright (C) 2024` → `Copyright (C) 2024-2026`
-   - `© 2024-2025` → `© 2024-2026`
-
-**为什么重要**：
-- 确保版权声明的准确性和法律有效性
-- 遵循项目规范，保持一致性
-- 避免年份过时导致的合规问题
 
 ## ⚠️ 注意事项
 

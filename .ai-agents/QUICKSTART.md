@@ -1,6 +1,8 @@
 # 多 AI 协作快速开始指南
 
-本指南帮助你快速上手 FIT Framework 的多 AI 协作功能（支持 ClaudeCode、Codex、GeminiCli）。
+本指南帮助你快速上手 FIT Framework 的多 AI 协作功能（支持 Claude Code、Codex、Gemini CLI、Cursor 等）。
+
+> **📌 重要提示**：开始协作前，请先阅读根目录的 `AGENTS.md` 文件，了解项目的基本开发规范和命令。
 
 ## 🚀 5分钟快速开始
 

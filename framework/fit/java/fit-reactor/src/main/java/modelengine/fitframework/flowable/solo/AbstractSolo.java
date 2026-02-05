@@ -17,6 +17,7 @@ import modelengine.fitframework.flowable.publisher.MapPublisherDecorator;
 import modelengine.fitframework.flowable.subscriber.BlockAllSubscriber;
 import modelengine.fitframework.flowable.subscriber.FunctionalSubscriber;
 import modelengine.fitframework.inspection.Nonnull;
+import modelengine.fitframework.inspection.Validation;
 import modelengine.fitframework.util.CollectionUtils;
 import modelengine.fitframework.util.ObjectUtils;
 
@@ -78,6 +79,32 @@ public abstract class AbstractSolo<T> implements Solo<T> {
     @Override
     public void subscribe(Subscriber<T> subscriber) {
         this.subscribe0(ObjectUtils.getIfNull(subscriber, Subscriber::empty));
+    }
+
+    @Override
+    public void subscribe(java.util.concurrent.Flow.Subscriber<? super T> subscriber) {
+        Validation.notNull(subscriber, "Subscriber cannot be null.");
+        // 使用现有的 Lambda subscribe 方法，适配 Flow Subscriber
+        this.subscribe(
+                // onSubscribedAction: 将内部 Subscription 适配为 Flow Subscription
+                subscription -> subscriber.onSubscribe(new java.util.concurrent.Flow.Subscription() {
+                    @Override
+                    public void request(long n) {
+                        subscription.request(n);
+                    }
+
+                    @Override
+                    public void cancel() {
+                        subscription.cancel();
+                    }
+                }),
+                // consumeAction: 将数据传递给 Flow Subscriber
+                (subscription, data) -> subscriber.onNext(data),
+                // completeAction: 通知 Flow Subscriber 完成
+                subscription -> subscriber.onComplete(),
+                // failAction: 将异常传递给 Flow Subscriber
+                (subscription, cause) -> subscriber.onError(cause)
+        );
     }
 
     /**

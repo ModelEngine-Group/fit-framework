@@ -18,9 +18,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Flow;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -409,6 +412,164 @@ public class ChoirTest {
                 ThreadUtils.sleep(1);
             }
             assertThat(threadName1.get()).isEqualTo(threadName2.get());
+        }
+    }
+
+    @Nested
+    @DisplayName("测试 Flow.Subscriber 订阅")
+    class TestFlowSubscriber {
+        @Test
+        @DisplayName("使用 Flow.Subscriber 订阅并接收所有数据，结果符合预期")
+        void shouldReceiveAllDataWhenSubscribeWithFlowSubscriber() {
+            List<Integer> received = new ArrayList<>();
+            AtomicBoolean completed = new AtomicBoolean(false);
+            AtomicReference<Throwable> error = new AtomicReference<>();
+
+            Choir.just(1, 2, 3).subscribe(new Flow.Subscriber<>() {
+                private Flow.Subscription subscription;
+
+                @Override
+                public void onSubscribe(Flow.Subscription subscription) {
+                    this.subscription = subscription;
+                    subscription.request(Long.MAX_VALUE);
+                }
+
+                @Override
+                public void onNext(Integer item) {
+                    received.add(item);
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    error.set(throwable);
+                }
+
+                @Override
+                public void onComplete() {
+                    completed.set(true);
+                }
+            });
+
+            assertThat(received).hasSize(3).containsSequence(1, 2, 3);
+            assertThat(completed.get()).isTrue();
+            assertThat(error.get()).isNull();
+        }
+
+        @Test
+        @DisplayName("使用 Flow.Subscriber 订阅并逐个请求数据，结果符合预期")
+        void shouldReceiveDataOneByOneWhenRequestOneAtATime() {
+            List<Integer> received = new ArrayList<>();
+            AtomicBoolean completed = new AtomicBoolean(false);
+
+            Choir.just(1, 2, 3).subscribe(new Flow.Subscriber<>() {
+                private Flow.Subscription subscription;
+                private int count = 0;
+
+                @Override
+                public void onSubscribe(Flow.Subscription subscription) {
+                    this.subscription = subscription;
+                    subscription.request(1);
+                }
+
+                @Override
+                public void onNext(Integer item) {
+                    received.add(item);
+                    count++;
+                    if (count < 3) {
+                        subscription.request(1);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                }
+
+                @Override
+                public void onComplete() {
+                    completed.set(true);
+                }
+            });
+
+            assertThat(received).hasSize(3).containsSequence(1, 2, 3);
+            assertThat(completed.get()).isTrue();
+        }
+
+        @Test
+        @DisplayName("使用 Flow.Subscriber 订阅并取消订阅，结果符合预期")
+        void shouldStopReceivingWhenCancelSubscription() {
+            List<Integer> received = new ArrayList<>();
+            AtomicBoolean completed = new AtomicBoolean(false);
+
+            Choir.just(1, 2, 3, 4, 5).subscribe(new Flow.Subscriber<>() {
+                private Flow.Subscription subscription;
+
+                @Override
+                public void onSubscribe(Flow.Subscription subscription) {
+                    this.subscription = subscription;
+                    subscription.request(2);
+                }
+
+                @Override
+                public void onNext(Integer item) {
+                    received.add(item);
+                    if (received.size() == 2) {
+                        subscription.cancel();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                }
+
+                @Override
+                public void onComplete() {
+                    completed.set(true);
+                }
+            });
+
+            assertThat(received).hasSize(2).containsSequence(1, 2);
+            assertThat(completed.get()).isFalse();
+        }
+
+        @Test
+        @DisplayName("使用 Flow.Subscriber 订阅发生错误的流，结果符合预期")
+        void shouldReceiveErrorWhenSubscribeErrorStream() {
+            List<Integer> received = new ArrayList<>();
+            AtomicBoolean completed = new AtomicBoolean(false);
+            AtomicReference<Throwable> error = new AtomicReference<>();
+
+            Choir.just(1, 0, 2).map(value -> 10 / value).subscribe(new Flow.Subscriber<>() {
+                @Override
+                public void onSubscribe(Flow.Subscription subscription) {
+                    subscription.request(Long.MAX_VALUE);
+                }
+
+                @Override
+                public void onNext(Integer item) {
+                    received.add(item);
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    error.set(throwable);
+                }
+
+                @Override
+                public void onComplete() {
+                    completed.set(true);
+                }
+            });
+
+            assertThat(received).hasSize(1).containsSequence(10);
+            assertThat(completed.get()).isFalse();
+            assertThat(error.get()).isNotNull().isInstanceOf(ArithmeticException.class);
+        }
+
+        @Test
+        @DisplayName("使用 null Flow.Subscriber 订阅，应抛出 IllegalArgumentException")
+        void shouldThrowIllegalArgumentExceptionWhenSubscriberIsNull() {
+            assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> Choir.just(1, 2, 3)
+                    .subscribe((Flow.Subscriber<Integer>) null)).withMessage("Subscriber cannot be null.");
         }
     }
 }

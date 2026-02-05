@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: agent-example
+fit:
+  beans:
+    packages:
+      - 'modelengine.example.ai.chat.agent'
+fel:
+  openai:
+    api-base:'${api-base}'
+    api-key:'${your-api-key}'
+example:
+  model:'${model-name}'

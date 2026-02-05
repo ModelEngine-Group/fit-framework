@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: retrieval-example
+fel:
+  openai:
+    api-base: '${api-base}'
+    api-key: '${your-api-key}'
+example:
+  model:
+    chat: '${model-name}'
+    embed: '${model-name}'
