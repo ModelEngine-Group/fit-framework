@@ -1,16 +1,10 @@
 ---
-description: 将任务处理进度同步到 Pull Request 评论
-usage: /sync-pr <task-id>
-argument-hint: <task-id>
+name: "sync-pr"
+description: "将任务处理进度同步到 Pull Request 评论"
+usage: "/sync-pr <task-id>"
 ---
 
 # Sync PR Command
-
-## 使用前：自动识别仓库
-
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
-
-文中所有路径示例默认以仓库根目录为基准。
 
 ## 功能说明
 
@@ -37,11 +31,13 @@ argument-hint: <task-id>
 
 ### 3. 读取上下文文件
 
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
+
 检查并读取以下文件（如果存在）：
-- `{task_dir}/analysis.md` - 需求分析
-- `{task_dir}/plan.md` - 技术方案
-- `{task_dir}/implementation.md` - 实现报告
-- `{task_dir}/review.md` - 审查报告
+- `.ai-workspace/{status}/{task-id}/analysis.md` - 需求分析
+- `.ai-workspace/{status}/{task-id}/plan.md` - 技术方案
+- `.ai-workspace/{status}/{task-id}/implementation.md` - 实现报告
+- `.ai-workspace/{status}/{task-id}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
 
@@ -82,12 +78,12 @@ argument-hint: <task-id>
 ### 📂 相关文档
 
 - 任务文件: `.ai-workspace/active/{task-id}/task.md`
-- 需求分析: `{task_dir}/analysis.md`
-- 技术方案: `{task_dir}/plan.md`
-- 实现报告: `{task_dir}/implementation.md`
+- 需求分析: `.ai-workspace/active/{task-id}/analysis.md`
+- 技术方案: `.ai-workspace/active/{task-id}/plan.md`
+- 实现报告: `.ai-workspace/active/{task-id}/implementation.md`
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 **摘要原则**：
@@ -200,7 +196,7 @@ https://github.com/{owner}/{repo}/pull/{pr-number}
 - 实现报告: `.ai-workspace/active/TASK-20251227-104654/implementation.md`
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 ### 示例 2：审查完成，准备合并
@@ -243,7 +239,7 @@ https://github.com/{owner}/{repo}/pull/{pr-number}
 **向后兼容**: 是
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 ## 注意事项
@@ -268,7 +264,7 @@ https://github.com/{owner}/{repo}/pull/{pr-number}
    - 使用 Markdown 格式
    - 使用 emoji 增强可读性
    - 包含时间戳
-   - 添加 Codex CLI 签名
+   - 添加 Claude Code 签名
 
 5. **避免频繁同步**：
    - 不要在每个小改动都同步

@@ -20,7 +20,9 @@ usage: "/review-task <task-id> [--pr-number]"
 
 检查必需文件：
 - `.ai-workspace/active/{task-id}/task.md` - 任务文件
-- `{task_dir}/implementation.md` - 实现报告
+- `.ai-workspace/active/{task-id}/implementation.md` - 实现报告
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -72,7 +74,7 @@ usage: "/review-task <task-id> [--pr-number]"
 
 ### 5. 输出审查报告
 
-创建 `{task_dir}/review.md`，必须包含以下章节：
+创建 `.ai-workspace/active/{task-id}/review.md`，必须包含以下章节：
 
 ```markdown
 # 代码审查报告
@@ -190,7 +192,7 @@ usage: "/review-task <task-id> [--pr-number]"
 - 总体评价: {评价}
 
 **输出文件**：
-- 审查报告: {task_dir}/review.md
+- 审查报告: .ai-workspace/active/{task-id}/review.md
 
 **下一步**：
 {根据审查结果给出建议}
@@ -206,7 +208,7 @@ usage: "/review-task <task-id> [--pr-number]"
 执行此命令后，确认：
 
 - [ ] 已完成代码审查
-- [ ] 已创建审查报告 `{task_dir}/review.md`
+- [ ] 已创建审查报告 `.ai-workspace/active/{task-id}/review.md`
 - [ ] 已更新 task.md 中的 `current_step` 为 code-review
 - [ ] 已更新 task.md 中的 `updated_at` 为当前时间
 - [ ] 已更新 task.md 中的 `assigned_to` 为你的名字（审查者）

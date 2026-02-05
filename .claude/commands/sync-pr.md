@@ -31,11 +31,13 @@ usage: "/sync-pr <task-id>"
 
 ### 3. 读取上下文文件
 
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
+
 检查并读取以下文件（如果存在）：
-- `{task_dir}/analysis.md` - 需求分析
-- `{task_dir}/plan.md` - 技术方案
-- `{task_dir}/implementation.md` - 实现报告
-- `{task_dir}/review.md` - 审查报告
+- `.ai-workspace/{status}/{task-id}/analysis.md` - 需求分析
+- `.ai-workspace/{status}/{task-id}/plan.md` - 技术方案
+- `.ai-workspace/{status}/{task-id}/implementation.md` - 实现报告
+- `.ai-workspace/{status}/{task-id}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
 
@@ -76,9 +78,9 @@ usage: "/sync-pr <task-id>"
 ### 📂 相关文档
 
 - 任务文件: `.ai-workspace/active/{task-id}/task.md`
-- 需求分析: `{task_dir}/analysis.md`
-- 技术方案: `{task_dir}/plan.md`
-- 实现报告: `{task_dir}/implementation.md`
+- 需求分析: `.ai-workspace/active/{task-id}/analysis.md`
+- 技术方案: `.ai-workspace/active/{task-id}/plan.md`
+- 实现报告: `.ai-workspace/active/{task-id}/implementation.md`
 
 ---
 *由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*

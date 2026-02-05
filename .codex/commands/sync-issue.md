@@ -1,16 +1,10 @@
 ---
-description: 将任务处理进度同步到 GitHub Issue 评论
-usage: /sync-issue <task-id>
-argument-hint: <task-id>
+name: "sync-issue"
+description: "将任务处理进度同步到 GitHub Issue 评论"
+usage: "/sync-issue <task-id>"
 ---
 
 # Sync Issue Command
-
-## 使用前：自动识别仓库
-
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
-
-文中所有路径示例默认以仓库根目录为基准。
 
 ## 功能说明
 
@@ -26,7 +20,9 @@ argument-hint: <task-id>
 - 如果不存在，查找 `.ai-workspace/completed/{task-id}/task.md`
 - 如果都不存在，提示用户任务不存在
 
-找到后记录任务状态（status）和任务目录路径（task_dir）。
+找到后记录任务状态（status）和任务目录路径。
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 ### 2. 读取任务信息
 
@@ -40,10 +36,10 @@ argument-hint: <task-id>
 ### 3. 读取上下文文件
 
 检查并读取以下文件（如果存在）：
-- `{task_dir}/analysis.md` - 需求分析
-- `{task_dir}/plan.md` - 技术方案
-- `{task_dir}/implementation.md` - 实现报告
-- `{task_dir}/review.md` - 审查报告
+- `.ai-workspace/{status}/{task-id}/analysis.md` - 需求分析
+- `.ai-workspace/{status}/{task-id}/plan.md` - 技术方案
+- `.ai-workspace/{status}/{task-id}/implementation.md` - 实现报告
+- `.ai-workspace/{status}/{task-id}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
 
@@ -82,7 +78,7 @@ argument-hint: <task-id>
 - 技术方案: `.ai-workspace/{status}/{task-id}/plan.md`
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 **摘要原则**：
@@ -164,7 +160,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 2. 设计技术方案（使用 `/plan-task TASK-20251227-104654`）
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 ### 示例 2：技术方案完成
@@ -198,7 +194,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 ```
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 ### 示例 3：实现完成
@@ -227,16 +223,16 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 
 使用以下命令进行代码审查：
 ```
-/prompts:review-task <task-id>
+/code-review:code-review
 ```
 
 或手动审查后提交：
 ```
-/prompts:commit
+/commit
 ```
 
 ---
-*由 Codex CLI 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
 ```
 
 ## 注意事项
@@ -260,7 +256,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
    - 使用 Markdown 格式
    - 使用 emoji 增强可读性
    - 包含时间戳
-   - 添加 Codex CLI 签名
+   - 添加 Claude Code 签名
 
 5. **避免频繁同步**：
    - 不要在每个小步骤都同步

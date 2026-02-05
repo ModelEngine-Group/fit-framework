@@ -1,16 +1,10 @@
 ---
-description: 根据技术方案实施任务并输出实现报告
-usage: /implement-task <task-id>
-argument-hint: <task-id>
+name: "implement-task"
+description: "根据技术方案实施任务并输出实现报告"
+usage: "/implement-task <task-id>"
 ---
 
 # Implement Task Command
-
-## 使用前：自动识别仓库
-
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
-
-文中所有路径示例默认以仓库根目录为基准。
 
 ## 功能说明
 
@@ -26,7 +20,9 @@ argument-hint: <task-id>
 
 检查必需文件：
 - `.ai-workspace/active/{task-id}/task.md` - 任务文件
-- `{task_dir}/plan.md` - 技术方案
+- `.ai-workspace/active/{task-id}/plan.md` - 技术方案
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -68,7 +64,7 @@ pytest                        # Python 项目
 
 ### 5. 输出实现报告
 
-创建 `{task_dir}/implementation.md`，必须包含以下章节：
+创建 `.ai-workspace/active/{task-id}/implementation.md`，必须包含以下章节：
 
 ```markdown
 # 实现报告
@@ -149,11 +145,14 @@ pytest                        # Python 项目
 - 测试通过: {数量}/{总数}
 
 **输出文件**：
-- 实现报告: {task_dir}/implementation.md
+- 实现报告: .ai-workspace/active/{task-id}/implementation.md
 
 **下一步**：
 使用以下命令进行代码审查：
-/prompts:review-task {task-id}
+/review-task {task-id}
+
+或使用项目的 code-review 插件：
+/code-review:code-review
 ```
 
 ## ✅ 完成检查清单
@@ -161,7 +160,7 @@ pytest                        # Python 项目
 执行此命令后，确认：
 
 - [ ] 已完成所有代码实施
-- [ ] 已创建实现报告 `{task_dir}/implementation.md`
+- [ ] 已创建实现报告 `.ai-workspace/active/{task-id}/implementation.md`
 - [ ] 已更新 task.md 中的 `current_step` 为 implementation
 - [ ] 已更新 task.md 中的 `updated_at` 为当前时间
 - [ ] 已更新 task.md 中的 `assigned_to` 为你的名字
@@ -209,9 +208,9 @@ pytest                        # Python 项目
 
 ## 相关命令
 
-- `/prompts:plan-task <task-id>` - 设计技术方案（前置步骤）
-- `/prompts:review-task <task-id>` - 代码审查（后续步骤）
-- `/prompts:task-status <task-id>` - 查看任务状态
+- `/plan-task <task-id>` - 设计技术方案（前置步骤）
+- `/review-task <task-id>` 或 `/code-review:code-review` - 代码审查（后续步骤）
+- `/task-status <task-id>` - 查看任务状态
 
 ## 错误处理
 

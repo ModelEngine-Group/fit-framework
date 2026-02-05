@@ -1,16 +1,10 @@
 ---
-description: 审查任务实现并输出代码审查报告
-usage: /review-task <task-id> [--pr-number]
-argument-hint: <task-id> [--pr-number=<number>]
+name: "review-task"
+description: "审查任务实现并输出代码审查报告"
+usage: "/review-task <task-id> [--pr-number]"
 ---
 
 # Review Task Command
-
-## 使用前：自动识别仓库
-
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
-
-文中所有路径示例默认以仓库根目录为基准。
 
 ## 功能说明
 
@@ -26,7 +20,9 @@ argument-hint: <task-id> [--pr-number=<number>]
 
 检查必需文件：
 - `.ai-workspace/active/{task-id}/task.md` - 任务文件
-- `{task_dir}/implementation.md` - 实现报告
+- `.ai-workspace/active/{task-id}/implementation.md` - 实现报告
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -57,17 +53,14 @@ argument-hint: <task-id> [--pr-number=<number>]
 3. **提供建议**：不仅指出问题，还要提供改进建议
 4. **分级处理**：区分必须修复和建议优化
 
-### 4. 调用专业审查工具（可选，仅适用于 Claude Code）
+### 4. 调用专业审查工具（可选）
 
-⚠️ **注意**：以下工具仅在 **Claude Code 环境**中可用。如果你在使用 **Codex CLI**，请**跳过此步骤**，依赖步骤 3 中的手动审查清单进行完整审查。
-
-**如果使用 Claude Code**，可以调用以下插件进行更深度的审查：
+如果需要更深度的审查，可以调用：
 
 **方案1：快速审查**（推荐用于日常 PR）
 ```bash
 /code-review:code-review <pr-number>
 ```
-（Claude Code 插件，Codex CLI 不支持）
 - 5个并行 Sonnet 代理
 - CLAUDE.md 规范合规性
 - Bug 检测与历史上下文分析
@@ -76,15 +69,12 @@ argument-hint: <task-id> [--pr-number=<number>]
 ```bash
 /pr-review-toolkit:review-pr
 ```
-（Claude Code 插件，Codex CLI 不支持）
 - 6个专业审查代理
 - 代码注释准确性、测试覆盖、错误处理、类型设计等多维度审查
 
-**Codex CLI 用户**：请使用步骤 3 中的手动审查清单，这已经涵盖了代码审查的所有重要方面。
-
 ### 5. 输出审查报告
 
-创建 `{task_dir}/review.md`，必须包含以下章节：
+创建 `.ai-workspace/active/{task-id}/review.md`，必须包含以下章节：
 
 ```markdown
 # 代码审查报告
@@ -202,7 +192,7 @@ argument-hint: <task-id> [--pr-number=<number>]
 - 总体评价: {评价}
 
 **输出文件**：
-- 审查报告: {task_dir}/review.md
+- 审查报告: .ai-workspace/active/{task-id}/review.md
 
 **下一步**：
 {根据审查结果给出建议}
@@ -218,7 +208,7 @@ argument-hint: <task-id> [--pr-number=<number>]
 执行此命令后，确认：
 
 - [ ] 已完成代码审查
-- [ ] 已创建审查报告 `{task_dir}/review.md`
+- [ ] 已创建审查报告 `.ai-workspace/active/{task-id}/review.md`
 - [ ] 已更新 task.md 中的 `current_step` 为 code-review
 - [ ] 已更新 task.md 中的 `updated_at` 为当前时间
 - [ ] 已更新 task.md 中的 `assigned_to` 为你的名字（审查者）
@@ -335,14 +325,10 @@ argument-hint: <task-id> [--pr-number=<number>]
 
 ## 相关命令
 
-**Codex CLI 命令**：
-- `/prompts:implement-task <task-id>` - 实施任务（前置步骤）
-- `/prompts:commit` - 提交代码（后续步骤）
-- `/prompts:refinement-task <task-id>` - 修复审查发现的问题
-
-**Claude Code 环境下可选**：
-- `/code-review:code-review <pr-number>` - 深度 PR 审查（插件）
-- `/pr-review-toolkit:review-pr` - 专业多维度审查（插件）
+- `/implement-task <task-id>` - 实施任务（前置步骤）
+- `/commit` - 提交代码（后续步骤）
+- `/code-review:code-review <pr-number>` - 深度 PR 审查
+- `/pr-review-toolkit:review-pr` - 专业多维度审查
 
 ## 错误处理
 

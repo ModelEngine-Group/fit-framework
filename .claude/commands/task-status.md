@@ -69,7 +69,7 @@ usage: "/task-status <task-id>"
 
 **文件路径**：
 - 任务文件: .ai-workspace/active/{task-id}/task.md
-- 上下文目录: {task_dir}/
+- 上下文目录: .ai-workspace/active/{task-id}/
 
 **下一步建议**：
 {根据当前状态给出建议}
