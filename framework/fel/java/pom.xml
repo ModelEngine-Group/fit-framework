@@ -42,6 +42,7 @@
         <module>fel-flow</module>
         <module>fel-jacoco-aggregator</module>
         <module>fel-pipeline-core</module>
+        <module>fel-starters</module>
         <module>maven-plugins</module>
         <module>plugins</module>
         <module>services</module>

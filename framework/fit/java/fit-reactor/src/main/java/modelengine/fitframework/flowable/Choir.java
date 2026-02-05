@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * @author 季聿阶
  * @since 2024-02-08
  */
-public interface Choir<T> extends Publisher<T> {
+public interface Choir<T> extends Publisher<T>, java.util.concurrent.Flow.Publisher<T> {
     /**
      * 通过指定的 {@link Emitter 发送器} 消费逻辑创建 {@link Choir 响应式流}。
      *

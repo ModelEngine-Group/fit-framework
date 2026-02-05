@@ -3,14 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.fitframework</groupId>
-    <artifactId>example-parent</artifactId>
-    <version>3.6.3-SNAPSHOT</version>
+    <parent>
+        <groupId>org.fitframework.fel</groupId>
+        <artifactId>fel-parent</artifactId>
+        <version>3.6.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>fel-starters</artifactId>
     <packaging>pom</packaging>
 
+    <name>FEL Starters</name>
+    <description>FEL Framework Starters for different platforms</description>
+
     <modules>
-        <module>fel-example</module>
-        <module>fit-example</module>
-        <module>fel-spring-example</module>
+        <module>fel-spring-boot-starter</module>
     </modules>
 </project>

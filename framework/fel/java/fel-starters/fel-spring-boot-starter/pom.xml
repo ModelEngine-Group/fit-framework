@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.fitframework.fel</groupId>
+        <artifactId>fel-starters</artifactId>
+        <version>3.6.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>fel-spring-boot-starter</artifactId>
+
+    <name>FEL Spring Boot Starter</name>
+    <description>FEL Framework Spring Boot Starter provides auto-configuration for FEL beans in Spring Boot applications</description>
+    <url>https://github.com/ModelEngine-Group/fit-framework</url>
+
+    <dependencies>
+        <!-- FIT Spring Boot Starter：继承 FIT 的 Spring 集成 -->
+        <dependency>
+            <groupId>org.fitframework</groupId>
+            <artifactId>fit-spring-boot-starter</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+
+        <!-- FEL 核心：需要访问核心接口 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-core</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL OpenAI 模型：需要访问 OpenAiModel 类 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-model-openai-plugin</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL Flow：Agent流编排需要 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-flow</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FEL 工具系统：Agent工具调用需要 -->
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-discoverer</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-executor</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-factory-repository</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>fel-tool-repository-simple</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.fel</groupId>
+            <artifactId>tool-service</artifactId>
+            <version>${fel.version}</version>
+        </dependency>
+
+        <!-- FIT 运行时插件：必须显式声明（FIT 插件加载机制要求） -->
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-http-client-okhttp</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-value-fastjson</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fitframework.plugin</groupId>
+            <artifactId>fit-message-serializer-json-jackson</artifactId>
+            <version>${fit.version}</version>
+        </dependency>
+    </dependencies>
+</project>
