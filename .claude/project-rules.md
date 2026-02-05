@@ -1,8 +1,8 @@
-# FIT Framework 项目规则
+# FIT Framework - Claude Code 项目规则
 
-> 📖 **基础规范**：详细的项目规范（项目结构、构建命令、编码风格、提交格式等）请参见根目录 `AGENTS.md` 文件。
+> 🎯 **本文件定义 Claude Code 的强制规则和执行流程**
 >
-> 🎯 **本文件定义 Claude 特定的强制规则和执行流程**
+> 📖 **项目基础规范**（构建命令、编码风格、测试要求等）请参见 `.claude/CLAUDE.md`
 
 ---
 
@@ -21,7 +21,9 @@
 
 ## 规则 1: Commit Message 格式规范（🔴 关键）
 
-> 📖 **详细规范**：完整的 Conventional Commits 格式和 type 类型定义请参见 `AGENTS.md`
+**基础格式**：`<type>(<scope>): <中文描述>`
+- **type**: feat/fix/docs/refactor/test/chore
+- **scope**: fit/waterflow/fel（可省略）
 
 **Claude 执行要点**:
 
@@ -63,7 +65,11 @@ EOF
 
 ## 规则 3: PR 提交规范（🟡 重要）
 
-> 📖 **详细规范**：PR 提交的基本要求和标准流程请参见 `AGENTS.md`
+**基本要求**：
+- 所有测试通过（`mvn clean install`）
+- 代码已格式化
+- 公共 API 有 Javadoc
+- 版权头年份已更新
 
 **Claude 执行流程**:
 
@@ -93,7 +99,7 @@ EOF
 
 ## 规则 4: 版权年份更新（🔴 关键）
 
-> 📖 **详细规范**：版权年份更新的基本要求请参见 `AGENTS.md`
+**触发条件**：修改任意带版权头的文件时
 
 **Claude 自动化执行步骤**:
 
@@ -191,13 +197,13 @@ mvn test              # 运行测试
 ./build/bin/fit start # 启动应用
 ```
 
-**配置文件架构**:
+**Claude Code 配置架构**:
 ```
-AGENTS.md (基础规范 - 所有 AI 共享)
+.claude/CLAUDE.md (快速参考 - Claude Code 启动时加载)
     ↓
-.claude/CLAUDE.md (系统提示词增强 - 直接注入)
+.claude/project-rules.md (详细规则 - 本文件)
     ↓
-.claude/project-rules.md (规则文档 - 本文件)
+.claude/commands/ (Slash Commands 实现)
 ```
 
 ---
