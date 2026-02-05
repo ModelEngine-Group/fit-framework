@@ -1,16 +1,10 @@
 ---
-description: 为任务设计技术方案并输出实施计划
-usage: /plan-task <task-id>
-argument-hint: <task-id>
+name: "plan-task"
+description: "为任务设计技术方案并输出实施计划"
+usage: "/plan-task <task-id>"
 ---
 
 # Plan Task Command
-
-## 使用前：自动识别仓库
-
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
-
-文中所有路径示例默认以仓库根目录为基准。
 
 ## 功能说明
 
@@ -30,11 +24,13 @@ argument-hint: <task-id>
 - 如果不存在，查找 `.ai-workspace/completed/{task-id}/task.md`
 - 如果都不存在，提示用户任务不存在
 
-找到后记录任务状态（status）和任务目录路径（task_dir）。
+找到后记录任务状态（status）和任务目录路径。
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 ### 2. 读取需求分析
 
-读取 `{task_dir}/analysis.md`：
+读取 `.ai-workspace/{status}/{task-id}/analysis.md`：
 - 如果不存在，提示用户需要先执行需求分析
 - 如果存在，读取并理解需求
 
@@ -59,7 +55,7 @@ argument-hint: <task-id>
 
 ### 5. 输出方案文档
 
-创建 `{task_dir}/plan.md`，必须包含以下章节：
+创建 `.ai-workspace/{status}/{task-id}/plan.md`，必须包含以下章节：
 
 ```markdown
 # 技术方案和实施计划
@@ -154,7 +150,7 @@ argument-hint: <task-id>
 
 更新 `.ai-workspace/active/{task-id}/task.md`：
 - `current_step`: technical-design
-- `assigned_to`: codex
+- `assigned_to`: claude
 - `updated_at`: {当前时间}
 - 标记 plan.md 为已完成
 - 在工作流进度中标记技术方案设计为完成
@@ -171,7 +167,7 @@ argument-hint: <task-id>
 - 风险等级: {等级}
 
 **输出文件**：
-- 方案文档: {task_dir}/plan.md
+- 方案文档: .ai-workspace/active/{task-id}/plan.md
 
 **下一步**：
 ⚠️  **人工审查检查点** - 请审查技术方案是否合理
@@ -184,7 +180,7 @@ argument-hint: <task-id>
 
 执行此命令后，确认：
 
-- [ ] 已创建方案文档 `{task_dir}/plan.md`
+- [ ] 已创建方案文档 `.ai-workspace/active/{task-id}/plan.md`
 - [ ] 已更新 task.md 中的 `current_step` 为 technical-design
 - [ ] 已更新 task.md 中的 `updated_at` 为当前时间
 - [ ] 已更新 task.md 中的 `assigned_to` 为你的名字

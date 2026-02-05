@@ -35,17 +35,28 @@ gh api repos/{owner}/{repo}/dependabot/alerts/<alert-number>
 - `security_vulnerability.first_patched_version`: 首个修复版本
 - `security_vulnerability.vulnerable_version_range`: 受影响版本范围
 
-### 2. 创建任务文件
+### 2. 创建任务目录和文件
 
 检查是否已存在该安全告警的任务：
 - 在 `.ai-workspace/active/` 中搜索相关任务
 - 如果找到，询问是否重新分析
-- 如果没有，使用 `.ai-agents/templates/task.md` 模板创建新任务
+- 如果没有，创建新任务
 
-任务文件命名：`TASK-{yyyyMMdd-HHmmss}.md`
+**任务目录结构**：
+```
+.ai-workspace/active/TASK-{yyyyMMdd-HHmmss}/
+├── task.md          ← 使用 .ai-agents/templates/task.md 模板创建
+└── analysis.md      ← 本命令将创建此文件
+```
 
-任务元数据需包含：
+⚠️ **重要**：
+- 任务目录命名：`TASK-{yyyyMMdd-HHmmss}`（**必须**包含 `TASK-` 前缀）
+- 示例：`TASK-20260205-202013`
+- 任务ID（`{task-id}`）即为目录名：`TASK-{yyyyMMdd-HHmmss}`
+
+任务元数据（在 task.md 的 YAML front matter 中）需包含：
 ```yaml
+id: TASK-{yyyyMMdd-HHmmss}
 security_alert_number: <alert-number>
 severity: <critical/high/medium/low>
 cve_id: <CVE-ID>  # 如果有
@@ -74,7 +85,9 @@ ghsa_id: <GHSA-ID>
 
 ### 5. 输出分析文档
 
-创建 `{task_dir}/analysis.md`，必须包含以下章节：
+创建 `.ai-workspace/active/{task-id}/analysis.md`，必须包含以下章节：
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 ```markdown
 # 安全告警分析报告
@@ -167,7 +180,7 @@ ghsa_id: <GHSA-ID>
 
 **输出文件**:
 - 任务文件: .ai-workspace/active/{task-id}/task.md
-- 分析文档: {task_dir}/analysis.md
+- 分析文档: .ai-workspace/active/{task-id}/analysis.md
 
 **下一步**:
 审查安全分析后，使用以下命令设计修复方案：

@@ -24,11 +24,13 @@ usage: "/plan-task <task-id>"
 - 如果不存在，查找 `.ai-workspace/completed/{task-id}/task.md`
 - 如果都不存在，提示用户任务不存在
 
-找到后记录任务状态（status）和任务目录路径（task_dir）。
+找到后记录任务状态（status）和任务目录路径。
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 ### 2. 读取需求分析
 
-读取 `{task_dir}/analysis.md`：
+读取 `.ai-workspace/{status}/{task-id}/analysis.md`：
 - 如果不存在，提示用户需要先执行需求分析
 - 如果存在，读取并理解需求
 
@@ -53,7 +55,7 @@ usage: "/plan-task <task-id>"
 
 ### 5. 输出方案文档
 
-创建 `{task_dir}/plan.md`，必须包含以下章节：
+创建 `.ai-workspace/{status}/{task-id}/plan.md`，必须包含以下章节：
 
 ```markdown
 # 技术方案和实施计划
@@ -165,7 +167,7 @@ usage: "/plan-task <task-id>"
 - 风险等级: {等级}
 
 **输出文件**：
-- 方案文档: {task_dir}/plan.md
+- 方案文档: .ai-workspace/active/{task-id}/plan.md
 
 **下一步**：
 ⚠️  **人工审查检查点** - 请审查技术方案是否合理
@@ -178,7 +180,7 @@ usage: "/plan-task <task-id>"
 
 执行此命令后，确认：
 
-- [ ] 已创建方案文档 `{task_dir}/plan.md`
+- [ ] 已创建方案文档 `.ai-workspace/active/{task-id}/plan.md`
 - [ ] 已更新 task.md 中的 `current_step` 为 technical-design
 - [ ] 已更新 task.md 中的 `updated_at` 为当前时间
 - [ ] 已更新 task.md 中的 `assigned_to` 为你的名字

@@ -20,7 +20,9 @@ usage: "/sync-issue <task-id>"
 - 如果不存在，查找 `.ai-workspace/completed/{task-id}/task.md`
 - 如果都不存在，提示用户任务不存在
 
-找到后记录任务状态（status）和任务目录路径（task_dir）。
+找到后记录任务状态（status）和任务目录路径。
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 ### 2. 读取任务信息
 
@@ -34,10 +36,10 @@ usage: "/sync-issue <task-id>"
 ### 3. 读取上下文文件
 
 检查并读取以下文件（如果存在）：
-- `{task_dir}/analysis.md` - 需求分析
-- `{task_dir}/plan.md` - 技术方案
-- `{task_dir}/implementation.md` - 实现报告
-- `{task_dir}/review.md` - 审查报告
+- `.ai-workspace/{status}/{task-id}/analysis.md` - 需求分析
+- `.ai-workspace/{status}/{task-id}/plan.md` - 技术方案
+- `.ai-workspace/{status}/{task-id}/implementation.md` - 实现报告
+- `.ai-workspace/{status}/{task-id}/review.md` - 审查报告
 
 ### 4. 生成进度摘要
 

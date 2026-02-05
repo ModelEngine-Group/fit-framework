@@ -20,8 +20,10 @@ usage: "/refinement-task <task-id>"
 
 检查必需文件：
 - `.ai-workspace/active/{task-id}/task.md` - 任务文件
-- `{task_dir}/review.md` - 审查报告（或 review-supplement.md）
-- `{task_dir}/implementation.md` - 实现报告
+- `.ai-workspace/active/{task-id}/review.md` - 审查报告（或 review-supplement.md）
+- `.ai-workspace/active/{task-id}/implementation.md` - 实现报告
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -114,7 +116,7 @@ updated_at: {当前时间，格式: yyyy-MM-dd HH:mm:ss}
 
 ### 7. 创建修复报告
 
-创建 `{task_dir}/refinement-report.md`，记录修复情况：
+创建 `.ai-workspace/active/{task-id}/refinement-report.md`，记录修复情况：
 
 ```markdown
 # 代码修复报告
@@ -181,7 +183,7 @@ updated_at: {当前时间，格式: yyyy-MM-dd HH:mm:ss}
 - 优化建议: {数量} 项 ✅
 
 **输出文件**：
-- 修复报告: {task_dir}/refinement-report.md
+- 修复报告: .ai-workspace/active/{task-id}/refinement-report.md
 
 **下一步**：
 请执行以下操作之一：

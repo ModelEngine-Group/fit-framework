@@ -1,16 +1,10 @@
 ---
-description: 查看任务的当前状态和进度
-usage: /task-status <task-id>
-argument-hint: <task-id>
+name: "task-status"
+description: "查看任务的当前状态和进度"
+usage: "/task-status <task-id>"
 ---
 
 # Task Status Command
-
-## 使用前：自动识别仓库
-
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
-
-文中所有路径示例默认以仓库根目录为基准。
 
 ## 功能说明
 
@@ -75,7 +69,7 @@ argument-hint: <task-id>
 
 **文件路径**：
 - 任务文件: .ai-workspace/active/{task-id}/task.md
-- 上下文目录: {task_dir}/
+- 上下文目录: .ai-workspace/active/{task-id}/
 
 **下一步建议**：
 {根据当前状态给出建议}

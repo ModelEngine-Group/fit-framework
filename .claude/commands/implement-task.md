@@ -20,7 +20,9 @@ usage: "/implement-task <task-id>"
 
 检查必需文件：
 - `.ai-workspace/active/{task-id}/task.md` - 任务文件
-- `{task_dir}/plan.md` - 技术方案
+- `.ai-workspace/active/{task-id}/plan.md` - 技术方案
+
+注意：`{task-id}` 格式为 `TASK-{yyyyMMdd-HHmmss}`，例如 `TASK-20260205-202013`
 
 如果任一文件不存在，提示用户先完成前置步骤。
 
@@ -62,7 +64,7 @@ pytest                        # Python 项目
 
 ### 5. 输出实现报告
 
-创建 `{task_dir}/implementation.md`，必须包含以下章节：
+创建 `.ai-workspace/active/{task-id}/implementation.md`，必须包含以下章节：
 
 ```markdown
 # 实现报告
@@ -143,7 +145,7 @@ pytest                        # Python 项目
 - 测试通过: {数量}/{总数}
 
 **输出文件**：
-- 实现报告: {task_dir}/implementation.md
+- 实现报告: .ai-workspace/active/{task-id}/implementation.md
 
 **下一步**：
 使用以下命令进行代码审查：
@@ -158,7 +160,7 @@ pytest                        # Python 项目
 执行此命令后，确认：
 
 - [ ] 已完成所有代码实施
-- [ ] 已创建实现报告 `{task_dir}/implementation.md`
+- [ ] 已创建实现报告 `.ai-workspace/active/{task-id}/implementation.md`
 - [ ] 已更新 task.md 中的 `current_step` 为 implementation
 - [ ] 已更新 task.md 中的 `updated_at` 为当前时间
 - [ ] 已更新 task.md 中的 `assigned_to` 为你的名字
