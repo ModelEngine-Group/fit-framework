@@ -63,7 +63,7 @@
         <mybatis.version>3.5.19</mybatis.version>
 
         <!-- Test framework versions -->
-        <assertj.version>3.27.3</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <junit5.version>5.12.2</junit5.version>
         <mockito.version>5.17.0</mockito.version>
         <h2.version>2.3.232</h2.version>
