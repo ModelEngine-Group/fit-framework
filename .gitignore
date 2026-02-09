@@ -8,6 +8,7 @@
 # Common
 target/
 build/
+tmp/
 
 # Gemini
 .gemini-clipboard/
