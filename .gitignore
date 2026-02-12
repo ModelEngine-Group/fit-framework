@@ -5,6 +5,9 @@
 # VSCode
 .vscode/
 
+# macOS
+.DS_Store
+
 # Common
 target/
 build/
