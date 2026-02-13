@@ -1,14 +1,15 @@
 import pc from 'picocolors';
-import { containerName } from '../constants.js';
+import { assertValidBranchName, containerNameCandidates } from '../constants.js';
 import { runInteractive, runSafe } from '../shell.js';
 
 export function enter(branch: string, cmd: string[]) {
-  const container = containerName(branch);
+  assertValidBranchName(branch);
 
   // Verify container is running
-  const running = runSafe('docker', ['ps', '--format', '{{.Names}}']);
-  if (!running.split('\n').includes(container)) {
-    console.error(pc.red(`Container ${container} is not running`));
+  const running = runSafe('docker', ['ps', '--format', '{{.Names}}']).split('\n');
+  const container = containerNameCandidates(branch).find((name) => running.includes(name));
+  if (!container) {
+    console.error(pc.red(`No running container found for branch '${branch}'`));
     process.exit(1);
   }
 

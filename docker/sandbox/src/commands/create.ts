@@ -5,8 +5,10 @@ import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import {
   IMAGE_NAME, MAIN_REPO, DOCKERFILE, SCRIPTS_DIR,
-  containerName, worktreeDir, claudeConfigDir, sanitizeBranchName,
-  detectHostResources,
+  containerName, containerNameCandidates,
+  worktreeDirCandidates, claudeConfigDirCandidates,
+  sanitizeBranchName, detectHostResources, assertValidBranchName,
+  parsePositiveIntegerOption,
 } from '../constants.js';
 import { run, runOk, runSafe } from '../shell.js';
 
@@ -16,14 +18,18 @@ interface CreateOptions {
 }
 
 export async function create(branch: string, base: string | undefined, opts: CreateOptions) {
+  assertValidBranchName(branch);
+
   const defaults = detectHostResources();
-  const vmCpu = opts.cpu ? Number(opts.cpu) : defaults.cpu;
-  const vmMemory = opts.memory ? Number(opts.memory) : defaults.memory;
+  const vmCpu = parsePositiveIntegerOption(opts.cpu, '--cpu') ?? defaults.cpu;
+  const vmMemory = parsePositiveIntegerOption(opts.memory, '--memory') ?? defaults.memory;
 
   const safeName = sanitizeBranchName(branch);
   const container = containerName(branch);
-  const worktree = worktreeDir(branch);
-  const claudeDir = claudeConfigDir(branch);
+  const worktreeCandidates = worktreeDirCandidates(branch);
+  const claudeDirCandidates = claudeConfigDirCandidates(branch);
+  const worktree = worktreeCandidates.find((dir) => fs.existsSync(dir)) ?? worktreeCandidates[0];
+  const claudeDir = claudeDirCandidates.find((dir) => fs.existsSync(dir)) ?? claudeDirCandidates[0];
   const baseBranch = base ?? runSafe('git', ['-C', MAIN_REPO, 'branch', '--show-current']);
 
   p.intro(pc.cyan('AI Coding Sandbox (Colima)'));
@@ -103,12 +109,15 @@ export async function create(branch: string, base: string | undefined, opts: Cre
     {
       title: `Starting container '${container}'`,
       task: async (message) => {
-        // Remove old container if exists
-        const existing = runSafe('docker', ['ps', '-a', '--format', '{{.Names}}']);
-        if (existing.split('\n').includes(container)) {
+        // Remove old container if exists (also clean legacy-named containers)
+        const existing = runSafe('docker', ['ps', '-a', '--format', '{{.Names}}']).split('\n');
+        const matchedContainers = containerNameCandidates(branch).filter((name) => existing.includes(name));
+        if (matchedContainers.length > 0) {
           message('Removing old container...');
-          runSafe('docker', ['stop', container]);
-          runSafe('docker', ['rm', container]);
+          for (const name of matchedContainers) {
+            runSafe('docker', ['stop', name]);
+            runSafe('docker', ['rm', name]);
+          }
         }
 
         const envArgs: string[] = [];
@@ -143,8 +152,9 @@ export async function create(branch: string, base: string | undefined, opts: Cre
 
   // Verify
   p.log.step('Verifying setup...');
+  const runningContainers = runSafe('docker', ['ps', '--format', '{{.Names}}']).split('\n');
   const checks = [
-    { name: 'Container running', ok: runOk('docker', ['ps', '--format', '{{.Names}}']) },
+    { name: 'Container running', ok: runningContainers.includes(container) },
     { name: 'Java', ok: runOk('docker', ['exec', container, 'java', '-version']) },
     { name: 'Maven', ok: runOk('docker', ['exec', container, 'mvn', '--version']) },
     { name: 'Claude Code', ok: runOk('docker', ['exec', container, 'bash', '-lc', 'claude --version']) },
@@ -168,12 +178,12 @@ ${pc.cyan('沙箱信息：')}
 
 ${pc.cyan('管理命令：')}
   sandbox.sh ls                    # 查看所有沙箱
-  sandbox.sh exec ${safeName}      # 进入此沙箱
-  sandbox.sh rm ${safeName}        # 清理此沙箱
+  sandbox.sh exec ${branch}        # 进入此沙箱
+  sandbox.sh rm ${branch}          # 清理此沙箱
 
 ${pc.cyan('Claude Code：')}
   首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。
-  凭据持久化：~/.claude-sandboxes/${safeName}/
+  凭据持久化：${claudeDir}/
 `);
 }
 

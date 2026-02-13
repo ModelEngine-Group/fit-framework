@@ -1,6 +1,6 @@
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
-import { detectHostResources } from '../constants.js';
+import { detectHostResources, parsePositiveIntegerOption } from '../constants.js';
 import { run, runOk, runSafe } from '../shell.js';
 
 interface VmStartOptions {
@@ -22,14 +22,14 @@ export function vmStatus() {
 
 export function vmStart(opts: VmStartOptions) {
   const defaults = detectHostResources();
-  const cpu = opts.cpu ? Number(opts.cpu) : defaults.cpu;
-  const memory = opts.memory ? Number(opts.memory) : defaults.memory;
+  const cpu = parsePositiveIntegerOption(opts.cpu, '--cpu') ?? defaults.cpu;
+  const memory = parsePositiveIntegerOption(opts.memory, '--memory') ?? defaults.memory;
 
   p.intro(pc.cyan('Starting Colima VM'));
 
   if (runOk('colima', ['status'])) {
     p.log.success('VM is already running');
-      return;
+    return;
   }
 
   const s = p.spinner();

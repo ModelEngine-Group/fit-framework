@@ -3,62 +3,89 @@ import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import {
   IMAGE_NAME, MAIN_REPO, WORKTREE_BASE, CLAUDE_SANDBOX_BASE,
-  containerName, worktreeDir, claudeConfigDir, sanitizeBranchName,
+  containerNameCandidates, worktreeDirCandidates, claudeConfigDirCandidates,
+  sanitizeBranchName, assertValidBranchName,
 } from '../constants.js';
 import { run, runOk, runSafe } from '../shell.js';
 
 export async function rmOne(branch: string) {
+  assertValidBranchName(branch);
+
   const safeName = sanitizeBranchName(branch);
-  const container = containerName(branch);
-  const worktree = worktreeDir(branch);
-  const claudeDir = claudeConfigDir(branch);
+  let effectiveBranch = branch;
+  let worktreeCandidates = worktreeDirCandidates(effectiveBranch);
+  let claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
 
   p.intro(pc.cyan(`清理沙箱: ${safeName}`));
 
   // Stop and remove container
-  const existing = runSafe('docker', ['ps', '-a', '--format', '{{.Names}}']);
-  if (existing.split('\n').includes(container)) {
+  const existing = runSafe('docker', ['ps', '-a', '--format', '{{.Names}}']).split('\n');
+  const matchedContainers = containerNameCandidates(branch).filter((name) => existing.includes(name));
+  if (matchedContainers.length > 0) {
+    const resolvedBranch = runSafe('docker', [
+      'inspect',
+      '-f',
+      '{{ index .Config.Labels "fit-sandbox.branch" }}',
+      matchedContainers[0],
+    ]);
+    if (resolvedBranch) {
+      effectiveBranch = resolvedBranch;
+      worktreeCandidates = worktreeDirCandidates(effectiveBranch);
+      claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
+    }
+
     const s = p.spinner();
-    s.start(`Stopping container ${container}...`);
-    runSafe('docker', ['stop', container]);
-    runSafe('docker', ['rm', container]);
-    s.stop(pc.green(`Container ${container} removed`));
+    s.start(`Stopping container(s): ${matchedContainers.join(', ')}...`);
+    for (const name of matchedContainers) {
+      runSafe('docker', ['stop', name]);
+      runSafe('docker', ['rm', name]);
+    }
+    s.stop(pc.green(`Container removed: ${matchedContainers.join(', ')}`));
   } else {
-    p.log.warn(`Container ${container} not found`);
+    p.log.warn(`Container not found for branch '${branch}'`);
   }
 
   // Clean worktree
-  if (fs.existsSync(worktree)) {
+  const existingWorktrees = worktreeCandidates.filter((dir) => fs.existsSync(dir));
+  if (existingWorktrees.length > 0) {
     const shouldRemoveWorktree = await p.confirm({
-      message: `Remove worktree at ${worktree}?`,
+      message: `Remove worktree(s): ${existingWorktrees.join(', ')}?`,
       initialValue: false,
     });
     if (p.isCancel(shouldRemoveWorktree)) { p.outro('Cancelled'); return; }
 
     if (shouldRemoveWorktree) {
-      try {
-        run('git', ['-C', MAIN_REPO, 'worktree', 'remove', worktree, '--force']);
-      } catch {
-        fs.rmSync(worktree, { recursive: true, force: true });
+      for (const worktree of existingWorktrees) {
+        try {
+          run('git', ['-C', MAIN_REPO, 'worktree', 'remove', worktree, '--force']);
+        } catch {
+          fs.rmSync(worktree, { recursive: true, force: true });
+        }
       }
       p.log.success('Worktree removed');
 
       // Optionally delete branch
       const shouldDeleteBranch = await p.confirm({
-        message: `Also delete branch '${branch}'?`,
+        message: `Also delete branch '${effectiveBranch}'?`,
         initialValue: false,
       });
       if (!p.isCancel(shouldDeleteBranch) && shouldDeleteBranch) {
-        runSafe('git', ['-C', MAIN_REPO, 'branch', '-D', branch]);
-        p.log.success('Branch deleted');
+        if (runOk('git', ['-C', MAIN_REPO, 'branch', '-D', effectiveBranch])) {
+          p.log.success('Branch deleted');
+        } else {
+          p.log.warn(`Branch '${effectiveBranch}' was not deleted (not found or delete failed)`);
+        }
       }
     }
   }
 
   // Clean claude config directory
-  if (fs.existsSync(claudeDir)) {
-    fs.rmSync(claudeDir, { recursive: true, force: true });
-    p.log.success(`Claude config removed: ${claudeDir}`);
+  const existingClaudeDirs = claudeDirCandidates.filter((dir) => fs.existsSync(dir));
+  if (existingClaudeDirs.length > 0) {
+    for (const claudeDir of existingClaudeDirs) {
+      fs.rmSync(claudeDir, { recursive: true, force: true });
+      p.log.success(`Claude config removed: ${claudeDir}`);
+    }
   }
 
   p.outro(pc.green('Done'));

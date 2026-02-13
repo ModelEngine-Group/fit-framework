@@ -213,7 +213,7 @@ EOF
 | AI 工具找不到    | 进入容器后用 `bash -l` 确保加载环境变量                                    |
 | 磁盘不足        | `docker system prune -a` 清理                                  |
 | Worktree 冲突 | `cd 主仓库 && git worktree list` 查看，`git worktree prune` 清理失效记录 |
-| 分支名含 `/`    | 自动替换为 `-`，如 `feat/xxx` → 容器名 `fit-dev-feat-xxx`              |
+| 分支名含 `/`    | 自动将 `/` 替换为 `..`，如 `feat/xxx` → 容器名 `fit-dev-feat..xxx`      |
 
 ## 文件说明
 
