@@ -42,10 +42,13 @@
 - SSH 密钥只读挂载，支持 git 操作
 - 多容器共享同一个 Colima VM 和 Docker 镜像
 
-## 前置条件
+## 平台要求
+
+> **仅支持 macOS**。本方案依赖 [Colima](https://github.com/abiosoft/colima)（macOS 专属的轻量级容器运行时），不支持 Linux / Windows。
 
 - macOS（Intel 或 Apple Silicon）
 - [Homebrew](https://brew.sh/)
+- Node.js 18+（运行 CLI 工具）
 ## 快速开始
 
 ### 1. 启动沙箱

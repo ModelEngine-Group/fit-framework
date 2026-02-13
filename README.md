@@ -128,6 +128,22 @@ build/
   - 请参考 [FEL 快速开始](docs/framework/fel/java/quick-start-guide/01.%20模型.md)，该指南将简要介绍如何使用 FEL
     构建端到端的大模型应用程序。
 
+## 开发工具
+
+### AI 编程沙箱（macOS）
+
+基于 Colima + Docker + Git Worktree 的隔离开发环境，将 AI 编程工具（Claude Code、Codex 等）运行在容器内，支持多容器并发、每个容器工作在独立分支上互不干扰。
+
+```bash
+cd docker/sandbox && npm install   # 首次安装依赖
+./sandbox.sh create feat-xxx       # 创建沙箱
+./sandbox.sh exec feat-xxx         # 进入沙箱
+./sandbox.sh ls                    # 查看所有沙箱
+./sandbox.sh rm feat-xxx           # 清理沙箱
+```
+
+详见 [AI 编程沙箱文档](docker/sandbox/README.md)。
+
 ## 文档
 
 您可以从 `docs` 目录查看项目的完整文档，文档包含框架的快速入门指南和用户指导手册，并以一个基于本框架开发的大模型应用编排平台（Model

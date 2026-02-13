@@ -11,7 +11,7 @@ const program = new Command();
 
 program
   .name('sandbox')
-  .description('AI Coding Sandbox - Docker 容器 + Git Worktree 隔离环境管理')
+  .description('AI Coding Sandbox (macOS only) - 基于 Colima + Docker + Git Worktree 的隔离开发环境')
   .version('3.6.3-SNAPSHOT');
 
 // ========== create ==========
