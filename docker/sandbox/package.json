@@ -1,0 +1,21 @@
+{
+  "name": "fit-sandbox-cli",
+  "version": "3.6.3-SNAPSHOT",
+  "description": "AI coding sandbox CLI - manage Docker sandboxes with Git Worktree isolation",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "commander": "^13.0.0",
+    "picocolors": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
