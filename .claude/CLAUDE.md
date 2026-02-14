@@ -109,6 +109,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### 任务管理
 ```bash
+/create-task <description>  # 从自然语言描述创建任务
 /analyze-issue <number>     # 分析 GitHub Issue
 /plan-task <task-id>        # 设计技术方案
 /implement-task <task-id>   # 实施任务
