@@ -15,6 +15,7 @@
     ├── commit.md
     ├── complete.md
     ├── create-pr.md
+    ├── create-task.md
     ├── implement.md
     ├── plan.md
     ├── refine-title.md
@@ -33,15 +34,16 @@
 
 完整的任务管理工作流命令：
 
-1. **`/analyze-issue <issue-number>`** - 分析 GitHub Issue 并创建需求分析文档
-2. **`/analyze-security <alert-number>`** - 分析 Dependabot 安全告警并创建安全分析文档
-3. **`/plan-task <task-id>`** - 为任务设计技术方案并输出实施计划
-4. **`/implement-task <task-id>`** - 根据技术方案实施任务并输出实现报告
-5. **`/review-task <task-id>`** - 审查任务实现并输出代码审查报告
-6. **`/refinement-task <task-id>`** - 处理代码审查反馈并修复问题
-7. **`/task-status <task-id>`** - 查看任务的当前状态和进度
-8. **`/complete-task <task-id>`** - 标记任务完成并归档到 completed 目录
-9. **`/block-task <task-id>`** - 标记任务阻塞并记录阻塞原因
+1. **`/create-task <description>`** - 根据自然语言描述创建任务并生成需求分析文档
+2. **`/analyze-issue <issue-number>`** - 分析 GitHub Issue 并创建需求分析文档
+3. **`/analyze-security <alert-number>`** - 分析 Dependabot 安全告警并创建安全分析文档
+4. **`/plan-task <task-id>`** - 为任务设计技术方案并输出实施计划
+5. **`/implement-task <task-id>`** - 根据技术方案实施任务并输出实现报告
+6. **`/review-task <task-id>`** - 审查任务实现并输出代码审查报告
+7. **`/refinement-task <task-id>`** - 处理代码审查反馈并修复问题
+8. **`/task-status <task-id>`** - 查看任务的当前状态和进度
+9. **`/complete-task <task-id>`** - 标记任务完成并归档到 completed 目录
+10. **`/block-task <task-id>`** - 标记任务阻塞并记录阻塞原因
 
 ### Git 和 PR 管理
 
@@ -69,7 +71,10 @@
 ### 完整的功能开发流程
 
 ```bash
-# 1. 分析 Issue #207
+# 0. 从自然语言描述创建任务（无 Issue 时使用）
+/create-task 给 fit-runtime 添加优雅停机功能
+
+# 1. 或者从 Issue 创建任务
 /analyze-issue 207
 
 # 2. 设计技术方案
