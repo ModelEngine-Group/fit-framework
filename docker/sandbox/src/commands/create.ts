@@ -166,6 +166,16 @@ export async function create(branch: string, base: string | undefined, opts: Cre
 
   // Result summary
   p.log.success(pc.green('Ready!'));
+
+  // Align management command comments dynamically
+  const mgmtCmds: [string, string][] = [
+    ['sandbox.sh ls', '# 查看所有沙箱'],
+    [`sandbox.sh exec ${branch}`, '# 进入此沙箱'],
+    [`sandbox.sh rm ${branch}`, '# 清理此沙箱'],
+  ];
+  const maxCmdLen = Math.max(...mgmtCmds.map(([c]) => c.length));
+  const mgmtLines = mgmtCmds.map(([cmd, comment]) => `  ${cmd.padEnd(maxCmdLen + 4)}${comment}`).join('\n');
+
   console.log(`
 ${pc.cyan('进入沙箱：')}
   docker exec -it ${container} bash
@@ -177,9 +187,7 @@ ${pc.cyan('沙箱信息：')}
   VM 资源:  ${vmCpu} CPU / ${vmMemory} GB
 
 ${pc.cyan('管理命令：')}
-  sandbox.sh ls                    # 查看所有沙箱
-  sandbox.sh exec ${branch}        # 进入此沙箱
-  sandbox.sh rm ${branch}          # 清理此沙箱
+${mgmtLines}
 
 ${pc.cyan('Claude Code：')}
   首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。
