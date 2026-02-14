@@ -1,6 +1,6 @@
 # macOS AI 编程沙箱环境
 
-> 基于 Colima + Docker + Git Worktree，将 AI TUI 工具（Claude Code、Codex 等）运行在容器内，物理隔离保护宿主机。
+> 基于 Colima + Docker + Git Worktree，将 AI TUI 工具（Claude Code、Codex、OpenCode 等）运行在容器内，物理隔离保护宿主机。
 > 支持多容器并发，每个容器工作在独立分支上互不干扰。
 
 ## 架构
@@ -17,17 +17,17 @@
 │  ┌─────────────────────────────────────┐ │
 │  │ Colima VM                           │ │
 │  │                                     │ │
-│  │  ┌─────────────────────┐            │ │
-│  │  │ fit-dev-feat-xxx    │            │ │
-│  │  │  claude / codex     │  ← 挂载 feat-xxx worktree
-│  │  │  java / mvn / python│            │ │
-│  │  └─────────────────────┘            │ │
+│  │  ┌────────────────────────────┐     │ │
+│  │  │ fit-dev-feat-xxx           │     │ │
+│  │  │  claude / codex / opencode │ ← 挂载 feat-xxx worktree
+│  │  │  java / mvn / python       │     │ │
+│  │  └────────────────────────────┘     │ │
 │  │                                     │ │
-│  │  ┌─────────────────────┐            │ │
-│  │  │ fit-dev-fix-bug-123 │            │ │
-│  │  │  claude / codex     │  ← 挂载 fix-bug-123 worktree
-│  │  │  java / mvn / python│            │ │
-│  │  └─────────────────────┘            │ │
+│  │  ┌────────────────────────────┐     │ │
+│  │  │ fit-dev-fix-bug-123        │     │ │
+│  │  │  claude / codex / opencode │ ← 挂载 fix-bug-123 worktree
+│  │  │  java / mvn / python       │     │ │
+│  │  └────────────────────────────┘     │ │
 │  │                                     │ │
 │  └─────────────────────────────────────┘ │
 │                                          │
@@ -77,6 +77,7 @@ cd docker/sandbox
 # 进入容器后，直接使用
 claude              # Claude Code
 codex               # OpenAI Codex
+opencode            # OpenCode
 
 # 也可以直接开发
 mvn clean install
@@ -187,8 +188,8 @@ docker start fit-dev-feat-xxx
 ```bash
 docker exec -it fit-dev-feat-xxx bash
 
-# 示例：安装 opencode
-go install github.com/opencode-ai/opencode@latest
+# 示例：安装 aider（额外 AI 工具）
+pip install -U aider-chat
 
 # 示例：配置 Maven 镜像加速
 mkdir -p ~/.m2 && cat > ~/.m2/settings.xml <<'EOF'
