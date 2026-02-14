@@ -54,7 +54,8 @@ ENV NPM_CONFIG_PREFIX=/home/devuser/.npm-global
 ENV PATH="/home/devuser/.npm-global/bin:${PATH}"
 
 RUN npm install -g @anthropic-ai/claude-code && \
-    npm install -g @openai/codex
+    npm install -g @openai/codex && \
+    npm install -g opencode-ai
 
 # 默认信任 /workspace 挂载目录（避免 dubious ownership 错误）
 RUN git config --global --add safe.directory /workspace
