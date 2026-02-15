@@ -1,16 +1,21 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+function detectRepoRoot(): string {
+  try {
+    return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+  } catch {
+    throw new Error('sandbox: 当前目录不在 git 仓库内，请在 fit-framework 仓库目录下运行');
+  }
+}
 
 export const IMAGE_NAME = 'fit-sandbox:latest';
-export const MAIN_REPO = path.resolve(__dirname, '..', '..', '..');
+export const MAIN_REPO = detectRepoRoot();
 export const WORKTREE_BASE = path.join(process.env.HOME!, '.fit-worktrees');
 export const CLAUDE_SANDBOX_BASE = path.join(process.env.HOME!, '.claude-sandboxes');
 export const DOCKERFILE = 'Dockerfile.runtime-only';
 export const CONTAINER_PREFIX = 'fit-dev';
-export const SCRIPTS_DIR = path.resolve(__dirname, '..');
+export const SCRIPTS_DIR = path.join(MAIN_REPO, 'docker', 'sandbox');
 const validatedBranches = new Set<string>();
 
 /**
