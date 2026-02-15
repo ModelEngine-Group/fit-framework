@@ -48,19 +48,32 @@
 
 - macOS（Intel 或 Apple Silicon）
 - [Homebrew](https://brew.sh/)
-- Node.js 18+（运行 CLI 工具）
-## 快速开始
+- Node.js 18+
 
-### 1. 启动沙箱
+## 编译构建
 
 ```bash
 cd docker/sandbox
+npm install          # 安装依赖
+npm run build        # 使用 esbuild 打包为单文件 dist/sandbox.cjs
+```
 
+`npm run build` 通过 esbuild 将 TypeScript 源码和所有依赖打包为单个 `dist/sandbox.cjs` 文件，可独立运行，不依赖 `node_modules/`。
+
+将 `dist/sandbox` 和 `dist/sandbox.cjs` 拷贝到系统 PATH 目录下即可全局使用 `sandbox` 命令。注意需要在 fit-framework 的 git 仓库目录内运行，因为 sandbox 依赖 git worktree 和仓库内的 Dockerfile 来创建容器。
+
+> 开发调试时也可跳过编译，直接通过 `./sandbox.sh` 运行源码（依赖 tsx 即时编译）。
+
+## 快速开始
+
+### 1. 创建沙箱
+
+```bash
 # 创建并启动一个工作在 feat-xxx 分支的沙箱
-./sandbox.sh create feat-xxx
+sandbox create feat-xxx
 
 # 基于 main 分支创建沙箱
-./sandbox.sh create fix-bug-123 main
+sandbox create fix-bug-123 main
 ```
 
 首次运行会自动安装 Colima、构建镜像，耗时几分钟。后续启动很快。
@@ -68,7 +81,7 @@ cd docker/sandbox
 ### 2. 进入沙箱
 
 ```bash
-./sandbox.sh exec feat-xxx
+sandbox exec feat-xxx
 ```
 
 ### 3. 使用 AI 工具
@@ -88,21 +101,21 @@ python3 script.py
 
 ```bash
 # 1. 同时启动多个沙箱，各自处理不同任务
-./sandbox.sh create feat-new-api main
-./sandbox.sh create fix-issue-42 main
+sandbox create feat-new-api main
+sandbox create fix-issue-42 main
 
 # 2. 查看所有运行中的沙箱
-./sandbox.sh ls
+sandbox ls
 
 # 3. 分别进入不同沙箱
-./sandbox.sh exec feat-new-api     # 终端 1
-./sandbox.sh exec fix-issue-42     # 终端 2
+sandbox exec feat-new-api     # 终端 1
+sandbox exec fix-issue-42     # 终端 2
 
 # 4. 各沙箱内的修改互不影响
 
 # 5. 完成后清理
-./sandbox.sh rm feat-new-api
-./sandbox.sh rm fix-issue-42
+sandbox rm feat-new-api
+sandbox rm fix-issue-42
 ```
 
 ## 日常工作流
@@ -112,7 +125,7 @@ python3 script.py
 docker start fit-dev-feat-xxx
 
 # 2. 进入容器
-./sandbox.sh exec feat-xxx
+sandbox exec feat-xxx
 
 # 3. 使用 AI 工具进行开发
 claude
@@ -128,29 +141,29 @@ docker stop fit-dev-feat-xxx
 
 ```bash
 # 查看所有沙箱状态
-./sandbox.sh ls
+sandbox ls
 
 # 停止/启动指定沙箱
 docker stop fit-dev-feat-xxx
 docker start fit-dev-feat-xxx
 
 # 清理指定沙箱（容器 + worktree + Claude 配置）
-./sandbox.sh rm feat-xxx
+sandbox rm feat-xxx
 
 # 清理所有沙箱
-./sandbox.sh rm --all
+sandbox rm --all
 
 # 强制重建 Docker 镜像
-./sandbox.sh rebuild
+sandbox rebuild
 ```
 
 ## Colima VM 管理
 
 ```bash
-./sandbox.sh vm status              # 查看状态
-./sandbox.sh vm stop                # 停止（释放 CPU/内存）
-./sandbox.sh vm start               # 启动
-./sandbox.sh vm start --cpu 6 --memory 8  # 自定义资源启动
+sandbox vm status              # 查看状态
+sandbox vm stop                # 停止（释放 CPU/内存）
+sandbox vm start               # 启动
+sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 ```
 
 ## Worktree 目录规划
@@ -174,13 +187,13 @@ docker start fit-dev-feat-xxx
 ### 调整 VM 资源
 
 ```bash
-./sandbox.sh create --cpu 6 --memory 8 feat-xxx
+sandbox create --cpu 6 --memory 8 feat-xxx
 ```
 
 ### 重建镜像（如需更新 AI 工具版本）
 
 ```bash
-./sandbox.sh rebuild
+sandbox rebuild
 ```
 
 ### 容器内安装额外工具

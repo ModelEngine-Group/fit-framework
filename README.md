@@ -88,14 +88,30 @@ AiProcessFlow<String, ChatMessage> agentFlow = AiFlows.<String>create()
 
 **构建命令**
 
-```
+```bash
+# 仅构建 Java 框架
 mvn clean install
+
+# 全局构建（Java 框架 + Sandbox CLI），默认跳过测试
+./build.sh
+
+# 全局构建（含测试）
+./build.sh --with-test
 ```
+
+`build.sh` 在 `mvn clean install` 基础上，额外编译 Sandbox CLI 并将产物输出到 `build/bin/`。
 
 **输出目录**
 
 ```
 build/
+├── bin/
+│   ├── fit          # FIT 启动命令
+│   └── sandbox      # AI 编程沙箱命令（build.sh 构建时生成）
+├── fit-discrete-launcher-*.jar
+├── lib/
+├── plugins/
+└── ...
 ```
 
 **启动命令**
@@ -104,7 +120,7 @@ build/
 ./build/bin/fit start
 ```
 
-> 以上编译构建出的 `fit` 命令可以通过系统操作（别名或添加系统路径）来简化输入。
+> 以上编译构建出的 `fit`、`sandbox` 命令可以通过系统操作（别名或添加系统路径）来简化输入。
 
 **配置系统环境变量及创建插件目录**
 
@@ -135,11 +151,10 @@ build/
 基于 Colima + Docker + Git Worktree 的隔离开发环境，将 AI 编程工具（Claude Code、Codex 等）运行在容器内，支持多容器并发、每个容器工作在独立分支上互不干扰。
 
 ```bash
-cd docker/sandbox && npm install   # 首次安装依赖
-./sandbox.sh create feat-xxx       # 创建沙箱
-./sandbox.sh exec feat-xxx         # 进入沙箱
-./sandbox.sh ls                    # 查看所有沙箱
-./sandbox.sh rm feat-xxx           # 清理沙箱
+sandbox create feat-xxx       # 创建沙箱
+sandbox exec feat-xxx         # 进入沙箱
+sandbox ls                    # 查看所有沙箱
+sandbox rm feat-xxx           # 清理沙箱
 ```
 
 详见 [AI 编程沙箱文档](docker/sandbox/README.md)。
