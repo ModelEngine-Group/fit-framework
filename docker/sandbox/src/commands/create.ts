@@ -169,9 +169,9 @@ export async function create(branch: string, base: string | undefined, opts: Cre
 
   // Align management command comments dynamically
   const mgmtCmds: [string, string][] = [
-    ['sandbox.sh ls', '# 查看所有沙箱'],
-    [`sandbox.sh exec ${branch}`, '# 进入此沙箱'],
-    [`sandbox.sh rm ${branch}`, '# 清理此沙箱'],
+    ['sandbox ls', '# 查看所有沙箱'],
+    [`sandbox exec ${branch}`, '# 进入此沙箱'],
+    [`sandbox rm ${branch}`, '# 清理此沙箱'],
   ];
   const maxCmdLen = Math.max(...mgmtCmds.map(([c]) => c.length));
   const mgmtLines = mgmtCmds.map(([cmd, comment]) => `  ${cmd.padEnd(maxCmdLen + 4)}${comment}`).join('\n');
