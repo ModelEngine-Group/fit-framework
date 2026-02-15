@@ -8,21 +8,28 @@ usage: "/create-pr [branch-name]"
 
 ## 功能说明
 
-创建 Pull Request 到指定分支，默认目标分支为 3.6.x。
+创建 Pull Request 到指定分支（默认: 当前分支）。
 
 ## 用法
 
-- `/create-pr` - 创建PR到默认分支 3.6.x
+- `/create-pr` - 创建PR到当前分支
 - `/create-pr main` - 创建PR到 main 分支
 - `/create-pr <branch-name>` - 创建PR到指定分支
 
 ## 执行步骤
 
-### 1. 解析目标分支
+### 1. 确定目标分支
 
 - 如果用户提供了参数（如 `main`, `3.5.x`, `develop` 等），使用该参数作为目标分支
-- 如果没有参数，默认使用 `3.6.x` 作为目标分支
-- 从命令参数中提取分支名：命令格式为 `/create-pr <branch>`，参数部分即为分支名
+- 如果没有参数，自动推断目标分支：
+  ```bash
+  git branch --show-current
+  git log --oneline --decorate --first-parent -20
+  ```
+  推断规则：
+  - 当前在核心分支上（main 或版本号分支如 大版本号.小版本号.x（如 3.6.x））→ 目标分支即为当前分支
+  - 当前在特性分支上 → 从 log 中的分支标记找到最近的父核心分支作为目标
+  - 无法确定时 → 询问用户
 
 ### 2. 读取 PR 模板
 

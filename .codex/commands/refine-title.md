@@ -1,97 +1,47 @@
 ---
-description: 深度分析 Issue 或 PR 内容，并将其标题重构为 Conventional Commits 格式
-usage: /refine-title <id>
+description: 深度分析 Issue 或 PR 内容并重构标题为 Conventional Commits 格式
 argument-hint: <id>
 ---
 
-# Refine Title Command
+针对 GitHub Issue 或 PR #$1,读取其详细描述、标签和代码变更,深度理解其意图,然后生成符合 type(scope): subject 规范的新标题并执行修改。
 
-## 使用前：自动识别仓库
+执行以下步骤:
 
-命令会默认使用当前工作目录所在的 Git 仓库作为目标，无需传入仓库参数。若当前目录不在 Git 仓库内，请先 `cd` 到目标仓库根目录后再执行。
+1. 识别对象与获取信息:
+   先尝试获取 Issue:
+   ```bash
+   gh issue view $1 --json number,title,body,labels,state
+   ```
+   如果失败,尝试获取 PR:
+   ```bash
+   gh pr view $1 --json number,title,body,labels,state,files
+   ```
 
-文中所有路径示例默认以仓库根目录为基准。
+2. 智能分析:
+   2.1 确定 Type: 阅读 body、检查 labels(bug→fix, feature→feat)、分析 files
+   2.2 确定 Scope: 分析涉及的模块(fit/waterflow/fel)
+   2.3 生成 Subject: 从 body 中提炼核心意图(忽略原标题),20字以内中文
 
-## 功能说明
+3. 生成建议与交互:
+   ```
+   🔍 分析对象: Issue/PR #$1
+   当前标题: <原标题>
+   🧠 分析依据: <推断类型和范围的依据>
+   ✨ 建议标题: <type>(<scope>): <subject>
+   ```
+   询问用户: "是否确认修改?(y/n)"
 
-针对指定的 GitHub Issue 或 PR，读取其详细描述（Body）、标签（Labels）以及代码变更（如果是 PR），深度理解其意图，然后生成符合 `type(scope): subject` 规范的新标题并执行修改。
+4. 执行修改:
+   Issue: `gh issue edit $1 --title "<new-title>"`
+   PR: `gh pr edit $1 --title "<new-title>"`
 
-## 执行流程
+5. 告知用户:
+   ```
+   ✅ 标题已更新
+   原标题: <old>
+   新标题: <new>
+   ```
 
-### 1. 识别对象与获取信息
-
-尝试判断 ID 是 Issue 还是 PR，并获取详细信息。
-
-```bash
-# 尝试获取 Issue 信息
-gh issue view <id> --json number,title,body,labels,state
-
-# 如果提示是 PR，或者查不到 Issue 但存在同号 PR，则获取 PR 信息
-gh pr view <id> --json number,title,body,labels,state,files
-```
-
-### 2. 智能分析
-
-根据获取到的 JSON 数据进行分析：
-
-1.  **确定 Type (类型)**：
-    - 阅读 `body` 中的 "变更类型" 或描述。
-    - 检查 `labels` (如 `type: bug` -> `fix`, `type: feature` -> `feat`)。
-    - 如果是 PR，分析 `files` (仅文档变动 -> `docs`，仅测试变动 -> `test`)。
-
-2.  **确定 Scope (范围)**：
-    - 阅读 `body` 提及的模块。
-    - 检查 `labels` (如 `in: fit` -> `fit`)。
-    - 如果是 PR，分析 `files` 路径 (如 `framework/fit/java/...` -> `fit`)。
-
-3.  **生成 Subject (摘要)**：
-    - **忽略原标题**（避免受干扰），直接从 `body` 中提炼核心意图。
-    - 确保简练（20字以内）、中文描述、无句号。
-
-### 3. 生成建议与交互
-
-输出分析结果供用户确认：
-
-```text
-🔍 分析对象: Issue #<id> / PR #<id>
-
-当前标题: [原标题]
---------------------------------------------------
-🧠 分析依据:
-- 原始意图: (从 Body 提取的一句话摘要)
-- 推断类型: Fix (依据: 标签 type:bug, Body 关键词 "修复")
-- 推断范围: fit (依据: 涉及文件路径 framework/fit/...)
---------------------------------------------------
-✨ 建议标题: fix(fit): 修复并发场景下的空指针异常
-```
-
-询问用户：*"是否确认修改？(y/n)"*
-
-### 4. 执行修改
-
-用户确认（y）后，根据对象类型执行命令：
-
-```bash
-# 如果是 Issue
-gh issue edit <id> --title "<new-title>"
-
-# 如果是 PR
-gh pr edit <id> --title "<new-title>"
-```
-
-## 参数说明
-
-- `<id>`: Issue 或 PR 的编号（必需）。
-
-## 使用示例
-
-```bash
-# 智能重命名 Issue #1024
-/refine-title 1024
-```
-
-## 优势
-
-相比于批量修改 (`/normalize-titles`)，本命令：
-1. **修正错误**：如果原标题是 "Help me"，此命令能读懂内容并改为 "fix(core): 修复启动报错"。
-2. **更精准的 Scope**：通过分析 PR 的文件变动，能自动判断是 `fit` 还是 `waterflow`，无需人工指定。
+**注意事项**:
+- 必须先分析内容,不要直接使用原标题
+- 确保用户确认后再执行修改

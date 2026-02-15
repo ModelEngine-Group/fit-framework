@@ -44,7 +44,7 @@
 ### 创建 Pull Request
 
 ```bash
-# 创建 PR 到默认分支（3.6.x）
+# 创建 PR（自动推断目标分支）
 /pr
 
 # 创建 PR 到 main 分支
