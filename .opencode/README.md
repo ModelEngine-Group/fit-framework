@@ -50,7 +50,7 @@
 代码提交和 PR 相关命令：
 
 - **`/commit`** - 提交当前变更到 Git（自动检查版权头年份）
-- **`/create-pr [branch-name]`** - 创建 Pull Request（默认到 3.6.x 分支）
+- **`/create-pr [branch-name]`** - 创建 Pull Request（自动推断目标分支）
 - **`/sync-issue <task-id>`** - 将任务进度同步到 GitHub Issue 评论
 - **`/sync-pr <task-id>`** - 将任务进度同步到 Pull Request 评论
 - **`/refine-title <id>`** - 深度分析 Issue/PR 内容并重构标题为 Conventional Commits 格式
@@ -159,11 +159,31 @@ OpenCode 支持使用 `!` 符号注入 bash 命令输出：
 
 ### 参数占位符
 
-- `$ARGUMENTS` - 所有参数
-- `$1` - 第一个参数
-- `$2` - 第二个参数
-- `$3` - 第三个参数
-- ...
+| 占位符 | 含义 | 适用场景 |
+|--------|------|----------|
+| `$1`, `$2`, `$3` ... `$9` | 位置参数（按空格分隔） | 结构化参数，如 task-id、issue 编号 |
+| `$ARGUMENTS` | 所有参数拼接为一个完整字符串 | 自由文本输入，如任务描述 |
+
+**`$1` vs `$ARGUMENTS` 的区别**：
+
+当用户输入 `/create-task 给 fit-runtime 添加优雅停机功能` 时：
+- `$1` = `给`（仅第一个词）
+- `$ARGUMENTS` = `给 fit-runtime 添加优雅停机功能`（完整字符串）
+
+因此，**自由文本参数**（如任务描述）必须使用 `$ARGUMENTS`，否则只能拿到第一个词。
+
+**可选参数处理**：
+
+未提供的参数会被替换为空字符串。对于可选参数，应使用「声明 + 判空」的写法：
+
+```markdown
+1. 确定目标分支:
+   用户指定的目标分支: $1
+   如果上述值为空,自动推断目标分支:
+   !`git branch --show-current`
+   !`git log --oneline --decorate --first-parent -20`
+   根据当前分支类型和 log 中的分支标记推断目标
+```
 
 ## 📝 自定义命令格式
 

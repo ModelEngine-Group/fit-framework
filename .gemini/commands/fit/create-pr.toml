@@ -2,11 +2,12 @@ description = "创建 Pull Request"
 prompt = """
 请创建 Pull Request。
 
-**目标分支**: {{args}} (默认为 3.6.x)
+**用户指定的目标分支**: {{args}}
 
 **当前状态**:
 !{git status --short}
 !{git branch --show-current}
+!{git log --oneline --decorate --first-parent -20}
 
 **最近的 PR**:
 !{gh pr list --limit 3 --state merged --json number,title,body 2>/dev/null || echo "No recent PRs"}
@@ -24,7 +25,12 @@ prompt = """
 
 3. **创建 PR**:
    - 使用 `run_shell_command` 执行 `gh pr create`.
-   - 指定 `--base` (默认 3.6.x 或 {{args}}).
+   - 指定 `--base`:
+     - 如果用户指定了目标分支({{args}} 非空),使用该值
+     - 如果未指定,根据当前分支和 git log 推断:
+       - 当前在核心分支上(main 或 大版本号.小版本号.x（如 3.6.x） 格式) → 目标分支即为当前分支
+       - 当前在特性分支上 → 从 log 中的分支标记找到最近的父核心分支
+       - 无法确定时 → 询问用户
 
 4. **告知用户**:
    - 输出 PR 链接。
