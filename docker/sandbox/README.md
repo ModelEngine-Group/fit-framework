@@ -91,16 +91,16 @@ sandbox exec feat-xxx
 ```bash
 # 进入容器后，直接使用
 claude              # Claude Code（首次需容器内 OAuth 登录）
-codex               # OpenAI Codex（自动预植入宿主机凭据）
-opencode            # OpenCode（自动预植入宿主机凭据）
-gemini              # Gemini CLI（自动预植入宿主机凭据）
+codex               # OpenAI Codex（实时同步宿主机凭据）
+opencode            # OpenCode（实时同步宿主机凭据）
+gemini              # Gemini CLI（实时同步宿主机凭据）
 
 # 也可以直接开发
 mvn clean install
 python3 script.py
 ```
 
-> **认证差异**：Codex、OpenCode、Gemini CLI 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
+> **认证差异**：Codex、OpenCode、Gemini CLI 的认证文件通过实时挂载（live mount）与宿主机双向同步，宿主机刷新 token 后容器自动生效；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
 
 ## 多容器并发工作流
 
@@ -308,7 +308,7 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 - 路径简短清晰
 - 不在项目目录内，天然被 `.gitignore` 排除
 
-每个沙箱拥有独立的 AI 工具配置目录（如 `~/.codex-sandboxes/{branch}/`），避免并发冲突和会话污染。Codex、OpenCode、Gemini CLI 创建沙箱时自动从宿主机预植入认证凭据；Claude Code 首次需在容器内 OAuth 登录一次。
+每个沙箱拥有独立的 AI 工具配置目录（如 `~/.codex-sandboxes/{branch}/`），避免并发冲突和会话污染。Codex、OpenCode、Gemini CLI 的认证文件通过实时挂载（live mount）与宿主机双向同步，宿主机刷新 token 后容器自动生效；Claude Code 首次需在容器内 OAuth 登录一次。
 
 > 详细的认证机制说明、注册表字段参考和添加新工具指南请参阅 [DEVELOPMENT.md](DEVELOPMENT.md)。
 

@@ -39,6 +39,12 @@ export interface AiTool {
    * Rewrites: HOST_HOME → container home, HOST_PROJECT → /workspace.
    */
   pathRewriteFiles?: string[];
+  /**
+   * Host files to live-mount into container (bidirectional, always in sync with host).
+   * Use for auth tokens that expire and need continuous refresh.
+   * Overlays the sandbox directory mount — file-level bind takes precedence.
+   */
+  hostLiveMounts?: Array<{ hostPath: string; containerSubpath: string }>;
 }
 
 /** Validate descriptor consistency at startup — fail fast on misconfiguration. */
@@ -89,9 +95,10 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.codex-sandboxes'),
     containerMount: '/home/devuser/.codex',
     versionCmd: 'codex --version',
-    hostAuthFile: path.join(HOME, '.codex', 'auth.json'),
-    authFileName: 'auth.json',
     noAuthHint: '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。',
+    hostLiveMounts: [
+      { hostPath: path.join(HOME, '.codex', 'auth.json'), containerSubpath: 'auth.json' },
+    ],
     postSetupCmds: [
       'test -d /workspace/.codex/commands && ln -sfn /workspace/.codex/commands /home/devuser/.codex/prompts || true',
     ],
@@ -102,9 +109,10 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.opencode-sandboxes'),
     containerMount: '/home/devuser/.local/share/opencode',
     versionCmd: 'opencode version',
-    hostAuthFile: path.join(HOME, '.local', 'share', 'opencode', 'auth.json'),
-    authFileName: 'auth.json',
     noAuthHint: '首次使用需在容器内配置认证凭据。',
+    hostLiveMounts: [
+      { hostPath: path.join(HOME, '.local', 'share', 'opencode', 'auth.json'), containerSubpath: 'auth.json' },
+    ],
   },
   {
     name: 'Gemini CLI',
@@ -112,9 +120,10 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.gemini-sandboxes'),
     containerMount: '/home/devuser/.gemini',
     versionCmd: 'gemini --version',
-    hostAuthFile: path.join(HOME, '.gemini', 'oauth_creds.json'),
-    authFileName: 'oauth_creds.json',
     noAuthHint: '首次使用需在容器内运行 gemini 完成认证（支持 Google 登录、API Key、Vertex AI）。',
+    hostLiveMounts: [
+      { hostPath: path.join(HOME, '.gemini', 'oauth_creds.json'), containerSubpath: 'oauth_creds.json' },
+    ],
     hostPreSeedFiles: [
       { hostPath: path.join(HOME, '.gemini', 'settings.json'), sandboxName: 'settings.json' },
       { hostPath: path.join(HOME, '.gemini', 'google_accounts.json'), sandboxName: 'google_accounts.json' },
