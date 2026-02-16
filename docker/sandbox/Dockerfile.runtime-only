@@ -14,6 +14,7 @@ ENV TZ=Asia/Shanghai
 # 创建非特权用户（UID/GID 与宿主机对齐，避免文件权限问题）
 ARG HOST_UID=1000
 ARG HOST_GID=1000
+ARG AI_TOOL_PACKAGES
 RUN (groupadd -g ${HOST_GID} devuser || true) && \
     useradd -u ${HOST_UID} -g ${HOST_GID} -m -s /bin/bash devuser
 
@@ -30,7 +31,7 @@ ENV LC_ALL=en_US.UTF-8
 ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
 
-# Node.js 20 LTS（Claude Code 和 Codex 需要 Node 18+）
+# Node.js 20 LTS（AI 工具依赖 Node 18+）
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
@@ -53,9 +54,14 @@ USER devuser
 ENV NPM_CONFIG_PREFIX=/home/devuser/.npm-global
 ENV PATH="/home/devuser/.npm-global/bin:${PATH}"
 
-RUN npm install -g @anthropic-ai/claude-code && \
-    npm install -g @openai/codex && \
-    npm install -g opencode-ai
+RUN if [ -z "${AI_TOOL_PACKAGES}" ]; then \
+      echo "AI_TOOL_PACKAGES build arg is required"; \
+      exit 1; \
+    fi && \
+    npm install -g ${AI_TOOL_PACKAGES}
+
+# 预创建 .local 目录结构（避免 Docker 卷挂载以 root 创建中间目录导致权限问题）
+RUN mkdir -p /home/devuser/.local/share /home/devuser/.local/state
 
 # 默认信任 /workspace 挂载目录（避免 dubious ownership 错误）
 RUN git config --global --add safe.directory /workspace
@@ -63,8 +69,7 @@ RUN git config --global --add safe.directory /workspace
 # 写入环境变量到 .bashrc（交互式 shell 自动加载）
 RUN echo 'export NPM_CONFIG_PREFIX=/home/devuser/.npm-global' >> /home/devuser/.bashrc && \
     echo 'export PATH="/home/devuser/.npm-global/bin:${PATH}"' >> /home/devuser/.bashrc && \
-    echo 'export GIT_CONFIG_GLOBAL=/home/devuser/.gitconfig' >> /home/devuser/.bashrc && \
-    echo 'export CLAUDE_CONFIG_DIR=/home/devuser/.claude' >> /home/devuser/.bashrc
+    echo 'export GIT_CONFIG_GLOBAL=/home/devuser/.gitconfig' >> /home/devuser/.bashrc
 
 WORKDIR /workspace
 

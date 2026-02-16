@@ -97,7 +97,7 @@ mvn clean install
 python3 script.py
 ```
 
-> **Claude Code vs Codex 认证差异**：Codex 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
+> **认证差异**：Codex 和 OpenCode 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
 
 ## 多容器并发工作流
 
@@ -149,7 +149,7 @@ sandbox ls
 docker stop fit-dev-feat-xxx
 docker start fit-dev-feat-xxx
 
-# 清理指定沙箱（容器 + worktree + Claude/Codex 配置）
+# 清理指定沙箱（容器 + worktree + AI 工具配置）
 sandbox rm feat-xxx
 
 # 清理所有沙箱
@@ -184,6 +184,10 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 ├── feat-xxx/                  # → 挂载到容器 /home/devuser/.codex
 └── fix-bug-123/
 
+~/.opencode-sandboxes/         # OpenCode 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.local/share/opencode
+└── fix-bug-123/
+
 主仓库: ~/projects/.../fit-framework/  （不变，不被容器挂载）
 ```
 
@@ -194,7 +198,7 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 
 ### 为什么每个沙箱使用独立的 AI 工具配置？
 
-Claude Code 和 Codex 都在配置目录（`~/.claude/`、`~/.codex/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
+Claude Code、Codex、OpenCode 都在各自的配置目录（`~/.claude/`、`~/.codex/`、`~/.local/share/opencode/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
 
 1. **并发写入冲突** — 多个容器同时写入 `history.jsonl`、`session-env/` 等文件会导致数据竞争和文件损坏
 2. **会话/记忆交叉污染** — 不同分支的项目上下文和会话历史会互相干扰
@@ -205,11 +209,12 @@ Claude Code 和 Codex 都在配置目录（`~/.claude/`、`~/.codex/`）中存�
 
 ### AI 工具认证机制
 
-Claude Code 和 Codex 在宿主机上使用不同的凭据存储方式，导致沙箱内的认证体验有所差异：
+各 AI 工具在宿主机上使用不同的凭据存储方式，导致沙箱内的认证体验有所差异：
 
 | | 宿主机凭据存储 | 沙箱认证方式 | 首次使用 |
 |---|---|---|---|
 | **Codex** | 文件（`~/.codex/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
+| **OpenCode** | 文件（`~/.local/share/opencode/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
 | **Claude Code** | macOS Keychain（`Claude Code-credentials`） | 容器内 OAuth 登录，凭据存入 `.credentials.json` | 需在容器内登录一次 |
 
 **为什么 Claude Code 不能预植入？**
@@ -218,9 +223,25 @@ Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主�
 
 登录后凭据持久化在 `~/.claude-sandboxes/{branch}/` 中，后续使用**无需再次登录**。
 
-**Codex 为什么可以？**
+**Codex / OpenCode 为什么可以？**
 
-Codex 始终使用文件存储凭据（`~/.codex/auth.json`），`sandbox create` 时自动将宿主机的 `auth.json` 复制到沙箱配置目录，容器内可直接使用。
+Codex 和 OpenCode 始终使用文件存储凭据（分别为 `~/.codex/auth.json` 和 `~/.local/share/opencode/auth.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。
+
+### AI 工具维护（单一事实源）
+
+AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表为唯一来源：
+
+- 每个工具在注册表中声明 `name`、`npmPackage`、`sandboxBase`、`containerMount`、`versionCmd` 等信息
+- `sandbox create` / `sandbox rebuild` 会自动把注册表中的 `npmPackage` 列表作为 `AI_TOOL_PACKAGES` 传给 Docker build
+- `sandbox create` 会把注册表中的 `envVars` 作为 `docker run -e` 注入容器
+- `Dockerfile.runtime-only` 不需要硬编码工具包名，只消费 `AI_TOOL_PACKAGES`
+
+这意味着新增工具时，通常只需：
+
+1. 在 `src/tools.ts` 的 `AI_TOOLS` 追加新描述符
+2. 运行 `sandbox rebuild` 重建镜像
+
+无需手工同步 Dockerfile 中的 `npm install -g` 包列表。
 
 ## 高级配置
 
@@ -281,6 +302,7 @@ docker/sandbox/
 └── src/
     ├── cli.ts                         # Commander 子命令分发
     ├── constants.ts                   # 共享常量 + 工具函数
+    ├── tools.ts                       # AI 工具注册表（声明式，新增工具只改这里）
     ├── shell.ts                       # 安全的命令执行封装
     └── commands/                      # 各子命令实现
         ├── create.ts

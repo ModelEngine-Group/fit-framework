@@ -1,6 +1,7 @@
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import { IMAGE_NAME, DOCKERFILE, SCRIPTS_DIR } from '../constants.js';
+import { toolNpmPackagesArg } from '../tools.js';
 import { run, runSafe, runVerbose } from '../shell.js';
 
 interface RebuildOptions {
@@ -31,6 +32,7 @@ export function rebuild(opts: RebuildOptions) {
     'build', '-t', IMAGE_NAME,
     '--build-arg', `HOST_UID=${hostUid}`,
     '--build-arg', `HOST_GID=${hostGid}`,
+    '--build-arg', `AI_TOOL_PACKAGES=${toolNpmPackagesArg()}`,
     '-f', DOCKERFILE, '.',
   ];
 

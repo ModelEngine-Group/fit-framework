@@ -6,10 +6,11 @@ import pc from 'picocolors';
 import {
   IMAGE_NAME, MAIN_REPO, DOCKERFILE, SCRIPTS_DIR,
   containerName, containerNameCandidates,
-  worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates,
+  worktreeDirCandidates,
   sanitizeBranchName, detectHostResources, assertValidBranchName,
   parsePositiveIntegerOption,
 } from '../constants.js';
+import { AI_TOOLS, toolConfigDirCandidates, toolNpmPackagesArg } from '../tools.js';
 import { run, runOk, runSafe } from '../shell.js';
 
 interface CreateOptions {
@@ -27,12 +28,14 @@ export async function create(branch: string, base: string | undefined, opts: Cre
   const safeName = sanitizeBranchName(branch);
   const container = containerName(branch);
   const worktreeCandidates = worktreeDirCandidates(branch);
-  const claudeDirCandidates = claudeConfigDirCandidates(branch);
-  const codexDirCandidates = codexConfigDirCandidates(branch);
   const worktree = worktreeCandidates.find((dir) => fs.existsSync(dir)) ?? worktreeCandidates[0];
-  const claudeDir = claudeDirCandidates.find((dir) => fs.existsSync(dir)) ?? claudeDirCandidates[0];
-  const codexDir = codexDirCandidates.find((dir) => fs.existsSync(dir)) ?? codexDirCandidates[0];
   const baseBranch = base ?? runSafe('git', ['-C', MAIN_REPO, 'branch', '--show-current']);
+
+  // Resolve per-branch config directory for each AI tool
+  const resolvedTools = AI_TOOLS.map((tool) => {
+    const candidates = toolConfigDirCandidates(tool, branch);
+    return { tool, dir: candidates.find((d) => fs.existsSync(d)) ?? candidates[0] };
+  });
 
   p.intro(pc.cyan('AI Coding Sandbox (Colima)'));
   p.log.info(`Branch: ${pc.bold(branch)} | Base: ${pc.bold(baseBranch)} | VM: ${vmCpu} CPU / ${vmMemory} GB`);
@@ -81,6 +84,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           'build', '-t', IMAGE_NAME,
           '--build-arg', `HOST_UID=${hostUid}`,
           '--build-arg', `HOST_GID=${hostGid}`,
+          '--build-arg', `AI_TOOL_PACKAGES=${toolNpmPackagesArg()}`,
           '-f', DOCKERFILE, '.',
         ], { cwd: SCRIPTS_DIR });
         return 'Image built';
@@ -122,19 +126,24 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           }
         }
 
-        const envArgs: string[] = [];
-        envArgs.push('-e', 'CLAUDE_CONFIG_DIR=/home/devuser/.claude');
-
-        // Ensure config dirs exist
-        fs.mkdirSync(claudeDir, { recursive: true });
-        fs.mkdirSync(codexDir, { recursive: true });
-
-        // Pre-seed Codex auth from host if available
-        const hostCodexAuth = path.join(process.env.HOME!, '.codex', 'auth.json');
-        const sandboxCodexAuth = path.join(codexDir, 'auth.json');
-        if (fs.existsSync(hostCodexAuth) && !fs.existsSync(sandboxCodexAuth)) {
-          fs.copyFileSync(hostCodexAuth, sandboxCodexAuth);
+        // Ensure config dirs exist + pre-seed auth from host
+        for (const { tool, dir } of resolvedTools) {
+          fs.mkdirSync(dir, { recursive: true });
+          if (tool.hostAuthFile && tool.authFileName) {
+            const sandboxAuth = path.join(dir, tool.authFileName);
+            if (fs.existsSync(tool.hostAuthFile) && !fs.existsSync(sandboxAuth)) {
+              fs.copyFileSync(tool.hostAuthFile, sandboxAuth);
+            }
+          }
         }
+
+        // Build env args and volume mounts from tool registry
+        const envArgs = resolvedTools.flatMap(({ tool }) =>
+          Object.entries(tool.envVars ?? {}).flatMap(([k, v]) => ['-e', `${k}=${v}`])
+        );
+        const toolVolumes = resolvedTools.flatMap(({ tool, dir }) =>
+          ['-v', `${dir}:${tool.containerMount}`]
+        );
 
         run('docker', [
           'run', '-d',
@@ -145,8 +154,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           '-v', `${worktree}:/workspace`,
           '-v', `${MAIN_REPO}/.git:${MAIN_REPO}/.git`,
           '-v', `${process.env.HOME}/.ssh:/home/devuser/.ssh:ro`,
-          '-v', `${claudeDir}:/home/devuser/.claude`,
-          '-v', `${codexDir}:/home/devuser/.codex`,
+          ...toolVolumes,
           ...envArgs,
           '-w', '/workspace',
           IMAGE_NAME,
@@ -168,11 +176,19 @@ export async function create(branch: string, base: string | undefined, opts: Cre
     { name: 'Container running', ok: runningContainers.includes(container) },
     { name: 'Java', ok: runOk('docker', ['exec', container, 'java', '-version']) },
     { name: 'Maven', ok: runOk('docker', ['exec', container, 'mvn', '--version']) },
-    { name: 'Claude Code', ok: runOk('docker', ['exec', container, 'bash', '-lc', 'claude --version']) },
-    { name: 'Codex', ok: runOk('docker', ['exec', container, 'bash', '-lc', 'codex --version']) },
   ];
+  const toolChecks = AI_TOOLS.map((tool) => ({
+    tool,
+    ok: runOk('docker', ['exec', container, 'bash', '-lc', tool.versionCmd]),
+  }));
   for (const c of checks) {
     p.log.info(`  ${c.ok ? pc.green('✓') : pc.yellow('?')} ${c.name}`);
+  }
+  for (const c of toolChecks) {
+    p.log.info(`  ${c.ok ? pc.green('✓') : pc.yellow('?')} ${c.tool.name}`);
+    if (!c.ok) {
+      p.log.warn(`    ${c.tool.name} 未安装或不可用（期望 npm 包：${c.tool.npmPackage}），可运行 sandbox rebuild`);
+    }
   }
 
   // Result summary
@@ -187,6 +203,13 @@ export async function create(branch: string, base: string | undefined, opts: Cre
   const maxCmdLen = Math.max(...mgmtCmds.map(([c]) => c.length));
   const mgmtLines = mgmtCmds.map(([cmd, comment]) => `  ${cmd.padEnd(maxCmdLen + 4)}${comment}`).join('\n');
 
+  // Tool credential hints
+  const toolHints = resolvedTools.map(({ tool, dir }) => {
+    const hasAuth = tool.authFileName && fs.existsSync(path.join(dir, tool.authFileName));
+    const hint = hasAuth ? '已从宿主机预植入认证凭据，可直接使用。' : tool.noAuthHint;
+    return `${pc.cyan(`${tool.name}：`)}\n  ${hint}\n  凭据持久化：${dir}/`;
+  }).join('\n\n');
+
   console.log(`
 ${pc.cyan('进入沙箱：')}
   docker exec -it ${container} bash
@@ -200,13 +223,7 @@ ${pc.cyan('沙箱信息：')}
 ${pc.cyan('管理命令：')}
 ${mgmtLines}
 
-${pc.cyan('Claude Code：')}
-  首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。
-  凭据持久化：${claudeDir}/
-
-${pc.cyan('Codex：')}
-  ${fs.existsSync(path.join(codexDir, 'auth.json')) ? '已从宿主机预植入认证凭据，可直接使用。' : '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。'}
-  凭据持久化：${codexDir}/
+${toolHints}
 `);
 }
 

@@ -29,7 +29,7 @@ program
 // ========== rm ==========
 program
   .command('rm')
-  .description('删除沙箱（容器 + worktree + Claude 配置）')
+  .description('删除沙箱（容器 + worktree + AI 工具配置）')
   .argument('[branch]', '分支名（省略时需搭配 --all）')
   .option('--all', '删除所有沙箱')
   .action(async (branch: string | undefined, opts) => {

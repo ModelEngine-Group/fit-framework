@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import {
-  IMAGE_NAME, MAIN_REPO, WORKTREE_BASE, CLAUDE_SANDBOX_BASE, CODEX_SANDBOX_BASE,
-  containerNameCandidates, worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates,
+  IMAGE_NAME, MAIN_REPO, WORKTREE_BASE,
+  containerNameCandidates, worktreeDirCandidates,
   sanitizeBranchName, assertValidBranchName,
 } from '../constants.js';
+import { AI_TOOLS, toolConfigDirCandidates } from '../tools.js';
 import { run, runOk, runSafe } from '../shell.js';
 
 export async function rmOne(branch: string) {
@@ -14,8 +15,10 @@ export async function rmOne(branch: string) {
   const safeName = sanitizeBranchName(branch);
   let effectiveBranch = branch;
   let worktreeCandidates = worktreeDirCandidates(effectiveBranch);
-  let claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
-  let codexDirCandidates = codexConfigDirCandidates(effectiveBranch);
+  let toolCandidates = AI_TOOLS.map((tool) => ({
+    tool,
+    candidates: toolConfigDirCandidates(tool, effectiveBranch),
+  }));
 
   p.intro(pc.cyan(`清理沙箱: ${safeName}`));
 
@@ -32,8 +35,10 @@ export async function rmOne(branch: string) {
     if (resolvedBranch) {
       effectiveBranch = resolvedBranch;
       worktreeCandidates = worktreeDirCandidates(effectiveBranch);
-      claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
-      codexDirCandidates = codexConfigDirCandidates(effectiveBranch);
+      toolCandidates = AI_TOOLS.map((tool) => ({
+        tool,
+        candidates: toolConfigDirCandidates(tool, effectiveBranch),
+      }));
     }
 
     const s = p.spinner();
@@ -81,21 +86,12 @@ export async function rmOne(branch: string) {
     }
   }
 
-  // Clean claude config directory
-  const existingClaudeDirs = claudeDirCandidates.filter((dir) => fs.existsSync(dir));
-  if (existingClaudeDirs.length > 0) {
-    for (const claudeDir of existingClaudeDirs) {
-      fs.rmSync(claudeDir, { recursive: true, force: true });
-      p.log.success(`Claude config removed: ${claudeDir}`);
-    }
-  }
-
-  // Clean codex config directory
-  const existingCodexDirs = codexDirCandidates.filter((dir) => fs.existsSync(dir));
-  if (existingCodexDirs.length > 0) {
-    for (const codexDir of existingCodexDirs) {
-      fs.rmSync(codexDir, { recursive: true, force: true });
-      p.log.success(`Codex config removed: ${codexDir}`);
+  // Clean AI tool config directories
+  for (const { tool, candidates } of toolCandidates) {
+    const existingDirs = candidates.filter((dir) => fs.existsSync(dir));
+    for (const dir of existingDirs) {
+      fs.rmSync(dir, { recursive: true, force: true });
+      p.log.success(`${tool.name} config removed: ${dir}`);
     }
   }
 
@@ -140,16 +136,12 @@ export async function rmAll() {
     }
   }
 
-  // Clean claude sandbox configs
-  if (fs.existsSync(CLAUDE_SANDBOX_BASE) && fs.readdirSync(CLAUDE_SANDBOX_BASE).length > 0) {
-    fs.rmSync(CLAUDE_SANDBOX_BASE, { recursive: true, force: true });
-    p.log.success('All Claude sandbox configs removed');
-  }
-
-  // Clean codex sandbox configs
-  if (fs.existsSync(CODEX_SANDBOX_BASE) && fs.readdirSync(CODEX_SANDBOX_BASE).length > 0) {
-    fs.rmSync(CODEX_SANDBOX_BASE, { recursive: true, force: true });
-    p.log.success('All Codex sandbox configs removed');
+  // Clean all AI tool sandbox configs
+  for (const tool of AI_TOOLS) {
+    if (fs.existsSync(tool.sandboxBase) && fs.readdirSync(tool.sandboxBase).length > 0) {
+      fs.rmSync(tool.sandboxBase, { recursive: true, force: true });
+      p.log.success(`All ${tool.name} sandbox configs removed`);
+    }
   }
 
   // Prune dangling images
