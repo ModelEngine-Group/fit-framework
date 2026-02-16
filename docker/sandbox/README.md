@@ -88,14 +88,16 @@ sandbox exec feat-xxx
 
 ```bash
 # 进入容器后，直接使用
-claude              # Claude Code
-codex               # OpenAI Codex
+claude              # Claude Code（首次需容器内 OAuth 登录）
+codex               # OpenAI Codex（自动预植入宿主机凭据）
 opencode            # OpenCode
 
 # 也可以直接开发
 mvn clean install
 python3 script.py
 ```
+
+> **Claude Code vs Codex 认证差异**：Codex 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
 
 ## 多容器并发工作流
 
@@ -147,7 +149,7 @@ sandbox ls
 docker stop fit-dev-feat-xxx
 docker start fit-dev-feat-xxx
 
-# 清理指定沙箱（容器 + worktree + Claude 配置）
+# 清理指定沙箱（容器 + worktree + Claude/Codex 配置）
 sandbox rm feat-xxx
 
 # 清理所有沙箱
@@ -166,13 +168,21 @@ sandbox vm start               # 启动
 sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 ```
 
-## Worktree 目录规划
+## 目录规划
 
 ```
 ~/.fit-worktrees/              # 所有 worktree 统一放这里
 ├── feat-xxx/                  # 分支 feat-xxx 的独立工作目录
 ├── fix-bug-123/               # 分支 fix-bug-123 的独立工作目录
 └── ...
+
+~/.claude-sandboxes/           # Claude Code 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.claude
+└── fix-bug-123/
+
+~/.codex-sandboxes/            # Codex 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.codex
+└── fix-bug-123/
 
 主仓库: ~/projects/.../fit-framework/  （不变，不被容器挂载）
 ```
@@ -181,6 +191,36 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 - 不污染主仓库
 - 路径简短清晰
 - 不在项目目录内，天然被 `.gitignore` 排除
+
+### 为什么每个沙箱使用独立的 AI 工具配置？
+
+Claude Code 和 Codex 都在配置目录（`~/.claude/`、`~/.codex/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
+
+1. **并发写入冲突** — 多个容器同时写入 `history.jsonl`、`session-env/` 等文件会导致数据竞争和文件损坏
+2. **会话/记忆交叉污染** — 不同分支的项目上下文和会话历史会互相干扰
+3. **清理困难** — `sandbox rm` 无法从共享目录中安全地只删除某个沙箱的数据
+4. **宿主机风险** — 容器内的破坏性操作可能损坏宿主机的凭据和配置
+
+因此每个沙箱拥有独立的配置目录，实现完全隔离。
+
+### AI 工具认证机制
+
+Claude Code 和 Codex 在宿主机上使用不同的凭据存储方式，导致沙箱内的认证体验有所差异：
+
+| | 宿主机凭据存储 | 沙箱认证方式 | 首次使用 |
+|---|---|---|---|
+| **Codex** | 文件（`~/.codex/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
+| **Claude Code** | macOS Keychain（`Claude Code-credentials`） | 容器内 OAuth 登录，凭据存入 `.credentials.json` | 需在容器内登录一次 |
+
+**为什么 Claude Code 不能预植入？**
+
+Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主机的 `~/.claude/` 目录内没有凭据文件。Docker 容器无法访问 macOS Keychain，因此 Claude Code 在容器内会回退到基于文件的凭据存储（`~/.claude/.credentials.json`），需要首次在容器内完成 OAuth 登录。
+
+登录后凭据持久化在 `~/.claude-sandboxes/{branch}/` 中，后续使用**无需再次登录**。
+
+**Codex 为什么可以？**
+
+Codex 始终使用文件存储凭据（`~/.codex/auth.json`），`sandbox create` 时自动将宿主机的 `auth.json` 复制到沙箱配置目录，容器内可直接使用。
 
 ## 高级配置
 

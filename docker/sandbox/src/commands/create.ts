@@ -6,7 +6,7 @@ import pc from 'picocolors';
 import {
   IMAGE_NAME, MAIN_REPO, DOCKERFILE, SCRIPTS_DIR,
   containerName, containerNameCandidates,
-  worktreeDirCandidates, claudeConfigDirCandidates,
+  worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates,
   sanitizeBranchName, detectHostResources, assertValidBranchName,
   parsePositiveIntegerOption,
 } from '../constants.js';
@@ -28,8 +28,10 @@ export async function create(branch: string, base: string | undefined, opts: Cre
   const container = containerName(branch);
   const worktreeCandidates = worktreeDirCandidates(branch);
   const claudeDirCandidates = claudeConfigDirCandidates(branch);
+  const codexDirCandidates = codexConfigDirCandidates(branch);
   const worktree = worktreeCandidates.find((dir) => fs.existsSync(dir)) ?? worktreeCandidates[0];
   const claudeDir = claudeDirCandidates.find((dir) => fs.existsSync(dir)) ?? claudeDirCandidates[0];
+  const codexDir = codexDirCandidates.find((dir) => fs.existsSync(dir)) ?? codexDirCandidates[0];
   const baseBranch = base ?? runSafe('git', ['-C', MAIN_REPO, 'branch', '--show-current']);
 
   p.intro(pc.cyan('AI Coding Sandbox (Colima)'));
@@ -123,8 +125,16 @@ export async function create(branch: string, base: string | undefined, opts: Cre
         const envArgs: string[] = [];
         envArgs.push('-e', 'CLAUDE_CONFIG_DIR=/home/devuser/.claude');
 
-        // Ensure claude config dir exists
+        // Ensure config dirs exist
         fs.mkdirSync(claudeDir, { recursive: true });
+        fs.mkdirSync(codexDir, { recursive: true });
+
+        // Pre-seed Codex auth from host if available
+        const hostCodexAuth = path.join(process.env.HOME!, '.codex', 'auth.json');
+        const sandboxCodexAuth = path.join(codexDir, 'auth.json');
+        if (fs.existsSync(hostCodexAuth) && !fs.existsSync(sandboxCodexAuth)) {
+          fs.copyFileSync(hostCodexAuth, sandboxCodexAuth);
+        }
 
         run('docker', [
           'run', '-d',
@@ -136,6 +146,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           '-v', `${MAIN_REPO}/.git:${MAIN_REPO}/.git`,
           '-v', `${process.env.HOME}/.ssh:/home/devuser/.ssh:ro`,
           '-v', `${claudeDir}:/home/devuser/.claude`,
+          '-v', `${codexDir}:/home/devuser/.codex`,
           ...envArgs,
           '-w', '/workspace',
           IMAGE_NAME,
@@ -192,6 +203,10 @@ ${mgmtLines}
 ${pc.cyan('Claude Code：')}
   首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。
   凭据持久化：${claudeDir}/
+
+${pc.cyan('Codex：')}
+  ${fs.existsSync(path.join(codexDir, 'auth.json')) ? '已从宿主机预植入认证凭据，可直接使用。' : '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。'}
+  凭据持久化：${codexDir}/
 `);
 }
 

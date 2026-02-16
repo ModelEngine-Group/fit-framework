@@ -13,6 +13,7 @@ export const IMAGE_NAME = 'fit-sandbox:latest';
 export const MAIN_REPO = detectRepoRoot();
 export const WORKTREE_BASE = path.join(process.env.HOME!, '.fit-worktrees');
 export const CLAUDE_SANDBOX_BASE = path.join(process.env.HOME!, '.claude-sandboxes');
+export const CODEX_SANDBOX_BASE = path.join(process.env.HOME!, '.codex-sandboxes');
 export const DOCKERFILE = 'Dockerfile.runtime-only';
 export const CONTAINER_PREFIX = 'fit-dev';
 export const SCRIPTS_DIR = path.join(MAIN_REPO, 'docker', 'sandbox');
@@ -93,6 +94,15 @@ export function claudeConfigDir(branch: string): string {
 
 export function claudeConfigDirCandidates(branch: string): string[] {
   return safeNameCandidates(branch).map((name) => path.join(CLAUDE_SANDBOX_BASE, name));
+}
+
+/** Codex config directory from branch */
+export function codexConfigDir(branch: string): string {
+  return path.join(CODEX_SANDBOX_BASE, sanitizeBranchName(branch));
+}
+
+export function codexConfigDirCandidates(branch: string): string[] {
+  return safeNameCandidates(branch).map((name) => path.join(CODEX_SANDBOX_BASE, name));
 }
 
 export function parsePositiveIntegerOption(value: string | undefined, optionName: string): number | undefined {
