@@ -28,6 +28,8 @@ export interface AiTool {
   noAuthHint: string;
   /** Additional host files to pre-seed into sandbox (e.g. settings, account info) */
   hostPreSeedFiles?: Array<{ hostPath: string; sandboxName: string }>;
+  /** Shell commands to run inside the container after setup (e.g. symlink prompts) */
+  postSetupCmds?: string[];
   /** Extra environment variables to pass to the container */
   envVars?: Record<string, string>;
 }
@@ -76,6 +78,9 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     hostAuthFile: path.join(HOME, '.codex', 'auth.json'),
     authFileName: 'auth.json',
     noAuthHint: '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。',
+    postSetupCmds: [
+      'test -d /workspace/.codex/commands && ln -sfn /workspace/.codex/commands /home/devuser/.codex/prompts || true',
+    ],
   },
   {
     name: 'OpenCode',

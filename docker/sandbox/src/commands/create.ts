@@ -172,6 +172,13 @@ export async function create(branch: string, base: string | undefined, opts: Cre
         message('Syncing git config...');
         syncGitConfig(container);
 
+        // Run post-setup commands inside container
+        for (const { tool } of resolvedTools) {
+          for (const cmd of tool.postSetupCmds ?? []) {
+            runSafe('docker', ['exec', container, 'bash', '-lc', cmd]);
+          }
+        }
+
         return 'Container started';
       },
     },

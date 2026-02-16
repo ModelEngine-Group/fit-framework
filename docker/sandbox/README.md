@@ -203,53 +203,9 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 - 路径简短清晰
 - 不在项目目录内，天然被 `.gitignore` 排除
 
-### 为什么每个沙箱使用独立的 AI 工具配置？
+每个沙箱拥有独立的 AI 工具配置目录（如 `~/.codex-sandboxes/{branch}/`），避免并发冲突和会话污染。Codex、OpenCode、Gemini CLI 创建沙箱时自动从宿主机预植入认证凭据；Claude Code 首次需在容器内 OAuth 登录一次。
 
-Claude Code、Codex、OpenCode、Gemini CLI 都在各自的配置目录（`~/.claude/`、`~/.codex/`、`~/.local/share/opencode/`、`~/.gemini/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
-
-1. **并发写入冲突** — 多个容器同时写入 `history.jsonl`、`session-env/` 等文件会导致数据竞争和文件损坏
-2. **会话/记忆交叉污染** — 不同分支的项目上下文和会话历史会互相干扰
-3. **清理困难** — `sandbox rm` 无法从共享目录中安全地只删除某个沙箱的数据
-4. **宿主机风险** — 容器内的破坏性操作可能损坏宿主机的凭据和配置
-
-因此每个沙箱拥有独立的配置目录，实现完全隔离。
-
-### AI 工具认证机制
-
-各 AI 工具在宿主机上使用不同的凭据存储方式，导致沙箱内的认证体验有所差异：
-
-| | 宿主机凭据存储 | 沙箱认证方式 | 首次使用 |
-|---|---|---|---|
-| **Codex** | 文件（`~/.codex/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
-| **OpenCode** | 文件（`~/.local/share/opencode/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
-| **Claude Code** | macOS Keychain（`Claude Code-credentials`） | 容器内 OAuth 登录，凭据存入 `.credentials.json` | 需在容器内登录一次 |
-| **Gemini CLI** | 文件（`~/.gemini/oauth_creds.json`） | 自动从宿主机预植入 `oauth_creds.json` + `settings.json` | 无需登录，直接使用 |
-
-**为什么 Claude Code 不能预植入？**
-
-Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主机的 `~/.claude/` 目录内没有凭据文件。Docker 容器无法访问 macOS Keychain，因此 Claude Code 在容器内会回退到基于文件的凭据存储（`~/.claude/.credentials.json`），需要首次在容器内完成 OAuth 登录。
-
-登录后凭据持久化在 `~/.claude-sandboxes/{branch}/` 中，后续使用**无需再次登录**。
-
-**Codex / OpenCode / Gemini CLI 为什么可以？**
-
-Codex、OpenCode 和 Gemini CLI 始终使用文件存储凭据（分别为 `~/.codex/auth.json`、`~/.local/share/opencode/auth.json` 和 `~/.gemini/oauth_creds.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。Gemini CLI 还会额外预植入 `settings.json` 和 `google_accounts.json`，确保容器内的模型选项和用户设置与宿主机一致。
-
-### AI 工具维护（单一事实源）
-
-AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表为唯一来源：
-
-- 每个工具在注册表中声明 `name`、`npmPackage`、`sandboxBase`、`containerMount`、`versionCmd` 等信息
-- `sandbox create` / `sandbox rebuild` 会自动把注册表中的 `npmPackage` 列表作为 `AI_TOOL_PACKAGES` 传给 Docker build
-- `sandbox create` 会把注册表中的 `envVars` 作为 `docker run -e` 注入容器
-- `Dockerfile.runtime-only` 不需要硬编码工具包名，只消费 `AI_TOOL_PACKAGES`
-
-这意味着新增工具时，通常只需：
-
-1. 在 `src/tools.ts` 的 `AI_TOOLS` 追加新描述符
-2. 运行 `sandbox rebuild` 重建镜像
-
-无需手工同步 Dockerfile 中的 `npm install -g` 包列表。
+> 详细的认证机制说明、注册表字段参考和添加新工具指南请参阅 [DEVELOPMENT.md](DEVELOPMENT.md)。
 
 ## 高级配置
 
@@ -302,7 +258,8 @@ EOF
 
 ```
 docker/sandbox/
-├── README.md                          # 本文件
+├── README.md                          # 用户指南（使用、管理、故障排查）
+├── DEVELOPMENT.md                     # 开发者指南（注册表、认证机制、添加新工具）
 ├── sandbox.sh                         # CLI 入口（thin wrapper）
 ├── Dockerfile.runtime-only            # 镜像定义（运行时 + AI 工具）
 ├── package.json                       # Node.js 依赖（commander + clack）
