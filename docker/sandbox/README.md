@@ -1,6 +1,6 @@
 # macOS AI 编程沙箱环境
 
-> 基于 Colima + Docker + Git Worktree，将 AI TUI 工具（Claude Code、Codex、OpenCode 等）运行在容器内，物理隔离保护宿主机。
+> 基于 Colima + Docker + Git Worktree，将 AI TUI 工具（Claude Code、Codex、OpenCode、Gemini CLI 等）运行在容器内，物理隔离保护宿主机。
 > 支持多容器并发，每个容器工作在独立分支上互不干扰。
 
 ## 架构
@@ -20,12 +20,14 @@
 │  │  ┌────────────────────────────┐     │ │
 │  │  │ fit-dev-feat-xxx           │     │ │
 │  │  │  claude / codex / opencode │ ← 挂载 feat-xxx worktree
+│  │  │  gemini                    │     │ │
 │  │  │  java / mvn / python       │     │ │
 │  │  └────────────────────────────┘     │ │
 │  │                                     │ │
 │  │  ┌────────────────────────────┐     │ │
 │  │  │ fit-dev-fix-bug-123        │     │ │
 │  │  │  claude / codex / opencode │ ← 挂载 fix-bug-123 worktree
+│  │  │  gemini                    │     │ │
 │  │  │  java / mvn / python       │     │ │
 │  │  └────────────────────────────┘     │ │
 │  │                                     │ │
@@ -90,14 +92,15 @@ sandbox exec feat-xxx
 # 进入容器后，直接使用
 claude              # Claude Code（首次需容器内 OAuth 登录）
 codex               # OpenAI Codex（自动预植入宿主机凭据）
-opencode            # OpenCode
+opencode            # OpenCode（自动预植入宿主机凭据）
+gemini              # Gemini CLI（自动预植入宿主机凭据）
 
 # 也可以直接开发
 mvn clean install
 python3 script.py
 ```
 
-> **认证差异**：Codex 和 OpenCode 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
+> **认证差异**：Codex、OpenCode、Gemini CLI 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
 
 ## 多容器并发工作流
 
@@ -188,6 +191,10 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 ├── feat-xxx/                  # → 挂载到容器 /home/devuser/.local/share/opencode
 └── fix-bug-123/
 
+~/.gemini-sandboxes/           # Gemini CLI 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.gemini
+└── fix-bug-123/
+
 主仓库: ~/projects/.../fit-framework/  （不变，不被容器挂载）
 ```
 
@@ -196,52 +203,9 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 - 路径简短清晰
 - 不在项目目录内，天然被 `.gitignore` 排除
 
-### 为什么每个沙箱使用独立的 AI 工具配置？
+每个沙箱拥有独立的 AI 工具配置目录（如 `~/.codex-sandboxes/{branch}/`），避免并发冲突和会话污染。Codex、OpenCode、Gemini CLI 创建沙箱时自动从宿主机预植入认证凭据；Claude Code 首次需在容器内 OAuth 登录一次。
 
-Claude Code、Codex、OpenCode 都在各自的配置目录（`~/.claude/`、`~/.codex/`、`~/.local/share/opencode/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
-
-1. **并发写入冲突** — 多个容器同时写入 `history.jsonl`、`session-env/` 等文件会导致数据竞争和文件损坏
-2. **会话/记忆交叉污染** — 不同分支的项目上下文和会话历史会互相干扰
-3. **清理困难** — `sandbox rm` 无法从共享目录中安全地只删除某个沙箱的数据
-4. **宿主机风险** — 容器内的破坏性操作可能损坏宿主机的凭据和配置
-
-因此每个沙箱拥有独立的配置目录，实现完全隔离。
-
-### AI 工具认证机制
-
-各 AI 工具在宿主机上使用不同的凭据存储方式，导致沙箱内的认证体验有所差异：
-
-| | 宿主机凭据存储 | 沙箱认证方式 | 首次使用 |
-|---|---|---|---|
-| **Codex** | 文件（`~/.codex/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
-| **OpenCode** | 文件（`~/.local/share/opencode/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
-| **Claude Code** | macOS Keychain（`Claude Code-credentials`） | 容器内 OAuth 登录，凭据存入 `.credentials.json` | 需在容器内登录一次 |
-
-**为什么 Claude Code 不能预植入？**
-
-Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主机的 `~/.claude/` 目录内没有凭据文件。Docker 容器无法访问 macOS Keychain，因此 Claude Code 在容器内会回退到基于文件的凭据存储（`~/.claude/.credentials.json`），需要首次在容器内完成 OAuth 登录。
-
-登录后凭据持久化在 `~/.claude-sandboxes/{branch}/` 中，后续使用**无需再次登录**。
-
-**Codex / OpenCode 为什么可以？**
-
-Codex 和 OpenCode 始终使用文件存储凭据（分别为 `~/.codex/auth.json` 和 `~/.local/share/opencode/auth.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。
-
-### AI 工具维护（单一事实源）
-
-AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表为唯一来源：
-
-- 每个工具在注册表中声明 `name`、`npmPackage`、`sandboxBase`、`containerMount`、`versionCmd` 等信息
-- `sandbox create` / `sandbox rebuild` 会自动把注册表中的 `npmPackage` 列表作为 `AI_TOOL_PACKAGES` 传给 Docker build
-- `sandbox create` 会把注册表中的 `envVars` 作为 `docker run -e` 注入容器
-- `Dockerfile.runtime-only` 不需要硬编码工具包名，只消费 `AI_TOOL_PACKAGES`
-
-这意味着新增工具时，通常只需：
-
-1. 在 `src/tools.ts` 的 `AI_TOOLS` 追加新描述符
-2. 运行 `sandbox rebuild` 重建镜像
-
-无需手工同步 Dockerfile 中的 `npm install -g` 包列表。
+> 详细的认证机制说明、注册表字段参考和添加新工具指南请参阅 [DEVELOPMENT.md](DEVELOPMENT.md)。
 
 ## 高级配置
 
@@ -294,7 +258,8 @@ EOF
 
 ```
 docker/sandbox/
-├── README.md                          # 本文件
+├── README.md                          # 用户指南（使用、管理、故障排查）
+├── DEVELOPMENT.md                     # 开发者指南（注册表、认证机制、添加新工具）
 ├── sandbox.sh                         # CLI 入口（thin wrapper）
 ├── Dockerfile.runtime-only            # 镜像定义（运行时 + AI 工具）
 ├── package.json                       # Node.js 依赖（commander + clack）

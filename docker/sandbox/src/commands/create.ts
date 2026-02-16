@@ -126,13 +126,21 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           }
         }
 
-        // Ensure config dirs exist + pre-seed auth from host
+        // Ensure config dirs exist + pre-seed auth & config from host
         for (const { tool, dir } of resolvedTools) {
           fs.mkdirSync(dir, { recursive: true });
           if (tool.hostAuthFile && tool.authFileName) {
             const sandboxAuth = path.join(dir, tool.authFileName);
             if (fs.existsSync(tool.hostAuthFile) && !fs.existsSync(sandboxAuth)) {
+              fs.mkdirSync(path.dirname(sandboxAuth), { recursive: true });
               fs.copyFileSync(tool.hostAuthFile, sandboxAuth);
+            }
+          }
+          for (const { hostPath, sandboxName } of tool.hostPreSeedFiles ?? []) {
+            const dest = path.join(dir, sandboxName);
+            if (fs.existsSync(hostPath) && !fs.existsSync(dest)) {
+              fs.mkdirSync(path.dirname(dest), { recursive: true });
+              fs.copyFileSync(hostPath, dest);
             }
           }
         }
@@ -163,6 +171,13 @@ export async function create(branch: string, base: string | undefined, opts: Cre
         // Sync git config
         message('Syncing git config...');
         syncGitConfig(container);
+
+        // Run post-setup commands inside container
+        for (const { tool } of resolvedTools) {
+          for (const cmd of tool.postSetupCmds ?? []) {
+            runSafe('docker', ['exec', container, 'bash', '-lc', cmd]);
+          }
+        }
 
         return 'Container started';
       },
