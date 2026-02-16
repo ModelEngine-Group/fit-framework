@@ -227,6 +227,22 @@ Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主�
 
 Codex 和 OpenCode 始终使用文件存储凭据（分别为 `~/.codex/auth.json` 和 `~/.local/share/opencode/auth.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。
 
+### AI 工具维护（单一事实源）
+
+AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表为唯一来源：
+
+- 每个工具在注册表中声明 `name`、`npmPackage`、`sandboxBase`、`containerMount`、`versionCmd` 等信息
+- `sandbox create` / `sandbox rebuild` 会自动把注册表中的 `npmPackage` 列表作为 `AI_TOOL_PACKAGES` 传给 Docker build
+- `sandbox create` 会把注册表中的 `envVars` 作为 `docker run -e` 注入容器
+- `Dockerfile.runtime-only` 不需要硬编码工具包名，只消费 `AI_TOOL_PACKAGES`
+
+这意味着新增工具时，通常只需：
+
+1. 在 `src/tools.ts` 的 `AI_TOOLS` 追加新描述符
+2. 运行 `sandbox rebuild` 重建镜像
+
+无需手工同步 Dockerfile 中的 `npm install -g` 包列表。
+
 ## 高级配置
 
 ### 调整 VM 资源

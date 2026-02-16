@@ -10,7 +10,7 @@ import {
   sanitizeBranchName, detectHostResources, assertValidBranchName,
   parsePositiveIntegerOption,
 } from '../constants.js';
-import { AI_TOOLS, toolConfigDirCandidates } from '../tools.js';
+import { AI_TOOLS, toolConfigDirCandidates, toolNpmPackagesArg } from '../tools.js';
 import { run, runOk, runSafe } from '../shell.js';
 
 interface CreateOptions {
@@ -84,6 +84,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           'build', '-t', IMAGE_NAME,
           '--build-arg', `HOST_UID=${hostUid}`,
           '--build-arg', `HOST_GID=${hostGid}`,
+          '--build-arg', `AI_TOOL_PACKAGES=${toolNpmPackagesArg()}`,
           '-f', DOCKERFILE, '.',
         ], { cwd: SCRIPTS_DIR });
         return 'Image built';
@@ -175,13 +176,19 @@ export async function create(branch: string, base: string | undefined, opts: Cre
     { name: 'Container running', ok: runningContainers.includes(container) },
     { name: 'Java', ok: runOk('docker', ['exec', container, 'java', '-version']) },
     { name: 'Maven', ok: runOk('docker', ['exec', container, 'mvn', '--version']) },
-    ...AI_TOOLS.map((tool) => ({
-      name: tool.name,
-      ok: runOk('docker', ['exec', container, 'bash', '-lc', tool.versionCmd]),
-    })),
   ];
+  const toolChecks = AI_TOOLS.map((tool) => ({
+    tool,
+    ok: runOk('docker', ['exec', container, 'bash', '-lc', tool.versionCmd]),
+  }));
   for (const c of checks) {
     p.log.info(`  ${c.ok ? pc.green('✓') : pc.yellow('?')} ${c.name}`);
+  }
+  for (const c of toolChecks) {
+    p.log.info(`  ${c.ok ? pc.green('✓') : pc.yellow('?')} ${c.tool.name}`);
+    if (!c.ok) {
+      p.log.warn(`    ${c.tool.name} 未安装或不可用（期望 npm 包：${c.tool.npmPackage}），可运行 sandbox rebuild`);
+    }
   }
 
   // Result summary

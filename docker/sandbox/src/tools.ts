@@ -12,6 +12,8 @@ const HOME = process.env.HOME!;
 export interface AiTool {
   /** Display name shown in CLI output (e.g. "Claude Code") */
   name: string;
+  /** npm package used to install the tool inside sandbox image */
+  npmPackage: string;
   /** Host-side sandbox config root (e.g. ~/.codex-sandboxes) */
   sandboxBase: string;
   /** Mount target inside container (e.g. /home/devuser/.codex) */
@@ -37,6 +39,10 @@ function validateTools(tools: readonly Readonly<AiTool>[]): void {
     }
     names.add(tool.name);
 
+    if (!tool.npmPackage || tool.npmPackage.trim().length === 0) {
+      throw new Error(`AI_TOOLS[${tool.name}]: npmPackage must be non-empty`);
+    }
+
     if (!tool.containerMount.startsWith('/')) {
       throw new Error(`AI_TOOLS[${tool.name}]: containerMount must be an absolute path`);
     }
@@ -52,6 +58,7 @@ function validateTools(tools: readonly Readonly<AiTool>[]): void {
 export const AI_TOOLS: readonly Readonly<AiTool>[] = [
   {
     name: 'Claude Code',
+    npmPackage: '@anthropic-ai/claude-code',
     sandboxBase: path.join(HOME, '.claude-sandboxes'),
     containerMount: '/home/devuser/.claude',
     versionCmd: 'claude --version',
@@ -60,6 +67,7 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
   },
   {
     name: 'Codex',
+    npmPackage: '@openai/codex',
     sandboxBase: path.join(HOME, '.codex-sandboxes'),
     containerMount: '/home/devuser/.codex',
     versionCmd: 'codex --version',
@@ -69,6 +77,7 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
   },
   {
     name: 'OpenCode',
+    npmPackage: 'opencode-ai',
     sandboxBase: path.join(HOME, '.opencode-sandboxes'),
     containerMount: '/home/devuser/.local/share/opencode',
     versionCmd: 'opencode version',
@@ -84,4 +93,9 @@ validateTools(AI_TOOLS);
 /** Per-branch config directory candidates for a tool (current + legacy naming) */
 export function toolConfigDirCandidates(tool: Readonly<AiTool>, branch: string): string[] {
   return safeNameCandidates(branch).map((name) => path.join(tool.sandboxBase, name));
+}
+
+/** Build-arg value used by Dockerfile to install all registered AI tools. */
+export function toolNpmPackagesArg(): string {
+  return AI_TOOLS.map((tool) => tool.npmPackage).join(' ');
 }
