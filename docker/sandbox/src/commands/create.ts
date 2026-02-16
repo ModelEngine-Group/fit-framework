@@ -6,7 +6,7 @@ import pc from 'picocolors';
 import {
   IMAGE_NAME, MAIN_REPO, DOCKERFILE, SCRIPTS_DIR,
   containerName, containerNameCandidates,
-  worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates,
+  worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates, opencodeConfigDirCandidates,
   sanitizeBranchName, detectHostResources, assertValidBranchName,
   parsePositiveIntegerOption,
 } from '../constants.js';
@@ -29,9 +29,11 @@ export async function create(branch: string, base: string | undefined, opts: Cre
   const worktreeCandidates = worktreeDirCandidates(branch);
   const claudeDirCandidates = claudeConfigDirCandidates(branch);
   const codexDirCandidates = codexConfigDirCandidates(branch);
+  const opencodeDirCandidates = opencodeConfigDirCandidates(branch);
   const worktree = worktreeCandidates.find((dir) => fs.existsSync(dir)) ?? worktreeCandidates[0];
   const claudeDir = claudeDirCandidates.find((dir) => fs.existsSync(dir)) ?? claudeDirCandidates[0];
   const codexDir = codexDirCandidates.find((dir) => fs.existsSync(dir)) ?? codexDirCandidates[0];
+  const opencodeDir = opencodeDirCandidates.find((dir) => fs.existsSync(dir)) ?? opencodeDirCandidates[0];
   const baseBranch = base ?? runSafe('git', ['-C', MAIN_REPO, 'branch', '--show-current']);
 
   p.intro(pc.cyan('AI Coding Sandbox (Colima)'));
@@ -128,12 +130,20 @@ export async function create(branch: string, base: string | undefined, opts: Cre
         // Ensure config dirs exist
         fs.mkdirSync(claudeDir, { recursive: true });
         fs.mkdirSync(codexDir, { recursive: true });
+        fs.mkdirSync(opencodeDir, { recursive: true });
 
         // Pre-seed Codex auth from host if available
         const hostCodexAuth = path.join(process.env.HOME!, '.codex', 'auth.json');
         const sandboxCodexAuth = path.join(codexDir, 'auth.json');
         if (fs.existsSync(hostCodexAuth) && !fs.existsSync(sandboxCodexAuth)) {
           fs.copyFileSync(hostCodexAuth, sandboxCodexAuth);
+        }
+
+        // Pre-seed OpenCode auth from host if available
+        const hostOpencodeAuth = path.join(process.env.HOME!, '.local', 'share', 'opencode', 'auth.json');
+        const sandboxOpencodeAuth = path.join(opencodeDir, 'auth.json');
+        if (fs.existsSync(hostOpencodeAuth) && !fs.existsSync(sandboxOpencodeAuth)) {
+          fs.copyFileSync(hostOpencodeAuth, sandboxOpencodeAuth);
         }
 
         run('docker', [
@@ -147,6 +157,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           '-v', `${process.env.HOME}/.ssh:/home/devuser/.ssh:ro`,
           '-v', `${claudeDir}:/home/devuser/.claude`,
           '-v', `${codexDir}:/home/devuser/.codex`,
+          '-v', `${opencodeDir}:/home/devuser/.local/share/opencode`,
           ...envArgs,
           '-w', '/workspace',
           IMAGE_NAME,
@@ -170,6 +181,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
     { name: 'Maven', ok: runOk('docker', ['exec', container, 'mvn', '--version']) },
     { name: 'Claude Code', ok: runOk('docker', ['exec', container, 'bash', '-lc', 'claude --version']) },
     { name: 'Codex', ok: runOk('docker', ['exec', container, 'bash', '-lc', 'codex --version']) },
+    { name: 'OpenCode', ok: runOk('docker', ['exec', container, 'bash', '-lc', 'opencode version']) },
   ];
   for (const c of checks) {
     p.log.info(`  ${c.ok ? pc.green('✓') : pc.yellow('?')} ${c.name}`);
@@ -207,6 +219,10 @@ ${pc.cyan('Claude Code：')}
 ${pc.cyan('Codex：')}
   ${fs.existsSync(path.join(codexDir, 'auth.json')) ? '已从宿主机预植入认证凭据，可直接使用。' : '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。'}
   凭据持久化：${codexDir}/
+
+${pc.cyan('OpenCode：')}
+  ${fs.existsSync(path.join(opencodeDir, 'auth.json')) ? '已从宿主机预植入认证凭据，可直接使用。' : '首次使用需在容器内配置认证凭据。'}
+  凭据持久化：${opencodeDir}/
 `);
 }
 

@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import {
-  IMAGE_NAME, MAIN_REPO, WORKTREE_BASE, CLAUDE_SANDBOX_BASE, CODEX_SANDBOX_BASE,
-  containerNameCandidates, worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates,
+  IMAGE_NAME, MAIN_REPO, WORKTREE_BASE, CLAUDE_SANDBOX_BASE, CODEX_SANDBOX_BASE, OPENCODE_SANDBOX_BASE,
+  containerNameCandidates, worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates, opencodeConfigDirCandidates,
   sanitizeBranchName, assertValidBranchName,
 } from '../constants.js';
 import { run, runOk, runSafe } from '../shell.js';
@@ -16,6 +16,7 @@ export async function rmOne(branch: string) {
   let worktreeCandidates = worktreeDirCandidates(effectiveBranch);
   let claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
   let codexDirCandidates = codexConfigDirCandidates(effectiveBranch);
+  let opencodeDirCandidates = opencodeConfigDirCandidates(effectiveBranch);
 
   p.intro(pc.cyan(`清理沙箱: ${safeName}`));
 
@@ -34,6 +35,7 @@ export async function rmOne(branch: string) {
       worktreeCandidates = worktreeDirCandidates(effectiveBranch);
       claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
       codexDirCandidates = codexConfigDirCandidates(effectiveBranch);
+      opencodeDirCandidates = opencodeConfigDirCandidates(effectiveBranch);
     }
 
     const s = p.spinner();
@@ -99,6 +101,15 @@ export async function rmOne(branch: string) {
     }
   }
 
+  // Clean opencode config directory
+  const existingOpencodeDirs = opencodeDirCandidates.filter((dir) => fs.existsSync(dir));
+  if (existingOpencodeDirs.length > 0) {
+    for (const opencodeDir of existingOpencodeDirs) {
+      fs.rmSync(opencodeDir, { recursive: true, force: true });
+      p.log.success(`OpenCode config removed: ${opencodeDir}`);
+    }
+  }
+
   p.outro(pc.green('Done'));
 }
 
@@ -150,6 +161,12 @@ export async function rmAll() {
   if (fs.existsSync(CODEX_SANDBOX_BASE) && fs.readdirSync(CODEX_SANDBOX_BASE).length > 0) {
     fs.rmSync(CODEX_SANDBOX_BASE, { recursive: true, force: true });
     p.log.success('All Codex sandbox configs removed');
+  }
+
+  // Clean opencode sandbox configs
+  if (fs.existsSync(OPENCODE_SANDBOX_BASE) && fs.readdirSync(OPENCODE_SANDBOX_BASE).length > 0) {
+    fs.rmSync(OPENCODE_SANDBOX_BASE, { recursive: true, force: true });
+    p.log.success('All OpenCode sandbox configs removed');
   }
 
   // Prune dangling images

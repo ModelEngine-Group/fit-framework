@@ -57,6 +57,9 @@ RUN npm install -g @anthropic-ai/claude-code && \
     npm install -g @openai/codex && \
     npm install -g opencode-ai
 
+# 预创建 .local 目录结构（避免 Docker 卷挂载以 root 创建中间目录导致权限问题）
+RUN mkdir -p /home/devuser/.local/share /home/devuser/.local/state
+
 # 默认信任 /workspace 挂载目录（避免 dubious ownership 错误）
 RUN git config --global --add safe.directory /workspace
 
