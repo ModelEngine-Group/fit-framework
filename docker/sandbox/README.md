@@ -142,6 +142,111 @@ exit
 docker stop fit-dev-feat-xxx
 ```
 
+## 命令行模式（非交互式）
+
+除了打开 TUI 界面，每个 AI 工具都支持直接在命令行传入 prompt 并获取输出，适合脚本自动化、快速提问和管道组合。
+
+### Claude Code
+
+```bash
+# 单次提问（-p = print mode，不打开 TUI）
+claude -p "解释一下这个项目的架构"
+
+# 管道输入
+cat src/main/java/App.java | claude -p "审查这段代码的安全性"
+
+# 指定输出格式（text / json / stream-json）
+claude -p "列出所有 TODO" --output-format json
+
+# 指定模型
+claude -p --model opus "设计一个缓存方案"
+
+# 限制轮次和预算
+claude -p --max-turns 3 --max-budget-usd 1.00 "重构数据库模块"
+
+# 继续上一次对话
+claude -c -p "为刚才的修改补充单元测试"
+
+# 跳过所有权限确认（CI/脚本场景）
+claude -p --dangerously-skip-permissions "运行所有测试并汇报结果"
+```
+
+### Codex
+
+```bash
+# 单次提问（exec 子命令 = 非交互模式）
+codex exec "为 User 类生成单元测试"
+
+# 管道输入
+echo "解释这个报错信息" | codex exec -
+
+# JSON 事件流输出
+codex exec --json "列出所有 API 端点"
+
+# 指定模型
+codex exec -m o4-mini "优化这个排序算法"
+
+# 全自动模式（无需确认，可写工作区）
+codex exec --full-auto "给所有 API 路由添加错误处理"
+
+# 将最终结果写入文件
+codex exec -o result.txt "分析项目依赖关系"
+```
+
+### OpenCode
+
+```bash
+# 单次提问（run 子命令 = 非交互模式）
+opencode run "解释 JavaScript 闭包的工作原理"
+
+# 指定模型（格式：provider/model-name）
+opencode run -m anthropic/claude-sonnet-4-20250514 "审查这段代码"
+
+# 指定 Agent
+opencode run --agent plan "分析项目结构并给出改进建议"
+
+# JSON 输出
+opencode run --format json "列出所有 API 端点"
+
+# 附加文件到 prompt
+opencode run --file src/auth.ts "审查这个文件的安全性"
+
+# 继续上一次对话
+opencode run --continue "为刚才的修改补充单元测试"
+```
+
+### Gemini CLI
+
+```bash
+# 单次提问（-p = prompt 模式，不打开 TUI）
+gemini -p "解释一下 Docker 的工作原理"
+
+# 管道输入
+cat src/auth.py | gemini -p "审查这段代码的安全性"
+
+# 指定输出格式（text / json / stream-json）
+gemini -p "列出所有 TODO" --output-format json
+
+# 指定模型
+gemini -p -m gemini-2.5-flash "快速解释这段代码"
+
+# 自动确认所有工具调用
+gemini -p --yolo "运行测试并汇报结果"
+
+# 将项目所有文件纳入上下文
+gemini -p --all-files "分析这个项目的架构"
+```
+
+### 快速对比
+
+| 功能 | Claude Code | Codex | OpenCode | Gemini CLI |
+|------|------------|-------|----------|------------|
+| 非交互标志 | `-p` | `exec` 子命令 | `run` 子命令 | `-p` |
+| 管道输入 | `cat f \| claude -p` | `echo x \| codex exec -` | `--file` 附加文件 | `cat f \| gemini -p` |
+| JSON 输出 | `--output-format json` | `--json` | `--format json` | `--output-format json` |
+| 指定模型 | `--model opus` | `-m o4-mini` | `-m provider/model` | `-m gemini-2.5-flash` |
+| 跳过确认 | `--dangerously-skip-permissions` | `--full-auto` | — | `--yolo` |
+
 ## 沙箱管理
 
 ```bash
