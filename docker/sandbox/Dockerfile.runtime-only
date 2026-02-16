@@ -60,6 +60,9 @@ RUN if [ -z "${AI_TOOL_PACKAGES}" ]; then \
     fi && \
     npm install -g ${AI_TOOL_PACKAGES}
 
+# LSP 语言服务器（Claude Code 的 pyright-lsp / jdtls-lsp 插件依赖）
+RUN npm install -g pyright
+
 # 预创建 .local 目录结构（避免 Docker 卷挂载以 root 创建中间目录导致权限问题）
 RUN mkdir -p /home/devuser/.local/share /home/devuser/.local/state
 

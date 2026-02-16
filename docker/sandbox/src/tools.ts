@@ -32,6 +32,13 @@ export interface AiTool {
   postSetupCmds?: string[];
   /** Extra environment variables to pass to the container */
   envVars?: Record<string, string>;
+  /** Host directories to recursively copy into sandbox (skipped if target already exists) */
+  hostPreSeedDirs?: Array<{ hostDir: string; sandboxSubdir: string }>;
+  /**
+   * Files (relative to sandbox dir) that need host→container path rewriting after copy.
+   * Rewrites: HOST_HOME → container home, HOST_PROJECT → /workspace.
+   */
+  pathRewriteFiles?: string[];
 }
 
 /** Validate descriptor consistency at startup — fail fast on misconfiguration. */
@@ -68,6 +75,13 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     versionCmd: 'claude --version',
     noAuthHint: '首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。',
     envVars: { CLAUDE_CONFIG_DIR: '/home/devuser/.claude' },
+    hostPreSeedDirs: [
+      { hostDir: path.join(HOME, '.claude', 'plugins'), sandboxSubdir: 'plugins' },
+    ],
+    pathRewriteFiles: [
+      'plugins/installed_plugins.json',
+      'plugins/known_marketplaces.json',
+    ],
   },
   {
     name: 'Codex',

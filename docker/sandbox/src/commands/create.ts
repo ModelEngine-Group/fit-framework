@@ -143,6 +143,28 @@ export async function create(branch: string, base: string | undefined, opts: Cre
               fs.copyFileSync(hostPath, dest);
             }
           }
+          // Recursively copy host directories into sandbox
+          for (const { hostDir, sandboxSubdir } of tool.hostPreSeedDirs ?? []) {
+            const dest = path.join(dir, sandboxSubdir);
+            if (fs.existsSync(hostDir) && !fs.existsSync(dest)) {
+              fs.cpSync(hostDir, dest, { recursive: true });
+            }
+          }
+          // Rewrite host paths to container paths in specified files
+          if (tool.pathRewriteFiles?.length) {
+            const hostHome = process.env.HOME!;
+            const containerHome = path.dirname(tool.containerMount);
+            for (const relFile of tool.pathRewriteFiles) {
+              const filePath = path.join(dir, relFile);
+              if (fs.existsSync(filePath)) {
+                let content = fs.readFileSync(filePath, 'utf8');
+                // Replace project path first (more specific), then home dir
+                content = content.replaceAll(MAIN_REPO, '/workspace');
+                content = content.replaceAll(hostHome, containerHome);
+                fs.writeFileSync(filePath, content);
+              }
+            }
+          }
         }
 
         // Build env args and volume mounts from tool registry
