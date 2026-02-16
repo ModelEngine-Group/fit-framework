@@ -26,6 +26,8 @@ export interface AiTool {
   authFileName?: string;
   /** Hint shown when auth is NOT pre-seeded */
   noAuthHint: string;
+  /** Additional host files to pre-seed into sandbox (e.g. settings, account info) */
+  hostPreSeedFiles?: Array<{ hostPath: string; sandboxName: string }>;
   /** Extra environment variables to pass to the container */
   envVars?: Record<string, string>;
 }
@@ -84,6 +86,20 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     hostAuthFile: path.join(HOME, '.local', 'share', 'opencode', 'auth.json'),
     authFileName: 'auth.json',
     noAuthHint: '首次使用需在容器内配置认证凭据。',
+  },
+  {
+    name: 'Gemini CLI',
+    npmPackage: '@google/gemini-cli',
+    sandboxBase: path.join(HOME, '.gemini-sandboxes'),
+    containerMount: '/home/devuser/.gemini',
+    versionCmd: 'gemini --version',
+    hostAuthFile: path.join(HOME, '.gemini', 'oauth_creds.json'),
+    authFileName: 'oauth_creds.json',
+    noAuthHint: '首次使用需在容器内运行 gemini 完成认证（支持 Google 登录、API Key、Vertex AI）。',
+    hostPreSeedFiles: [
+      { hostPath: path.join(HOME, '.gemini', 'settings.json'), sandboxName: 'settings.json' },
+      { hostPath: path.join(HOME, '.gemini', 'google_accounts.json'), sandboxName: 'google_accounts.json' },
+    ],
   },
 ];
 

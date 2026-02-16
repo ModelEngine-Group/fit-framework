@@ -1,6 +1,6 @@
 # macOS AI 编程沙箱环境
 
-> 基于 Colima + Docker + Git Worktree，将 AI TUI 工具（Claude Code、Codex、OpenCode 等）运行在容器内，物理隔离保护宿主机。
+> 基于 Colima + Docker + Git Worktree，将 AI TUI 工具（Claude Code、Codex、OpenCode、Gemini CLI 等）运行在容器内，物理隔离保护宿主机。
 > 支持多容器并发，每个容器工作在独立分支上互不干扰。
 
 ## 架构
@@ -20,12 +20,14 @@
 │  │  ┌────────────────────────────┐     │ │
 │  │  │ fit-dev-feat-xxx           │     │ │
 │  │  │  claude / codex / opencode │ ← 挂载 feat-xxx worktree
+│  │  │  gemini                    │     │ │
 │  │  │  java / mvn / python       │     │ │
 │  │  └────────────────────────────┘     │ │
 │  │                                     │ │
 │  │  ┌────────────────────────────┐     │ │
 │  │  │ fit-dev-fix-bug-123        │     │ │
 │  │  │  claude / codex / opencode │ ← 挂载 fix-bug-123 worktree
+│  │  │  gemini                    │     │ │
 │  │  │  java / mvn / python       │     │ │
 │  │  └────────────────────────────┘     │ │
 │  │                                     │ │
@@ -90,14 +92,15 @@ sandbox exec feat-xxx
 # 进入容器后，直接使用
 claude              # Claude Code（首次需容器内 OAuth 登录）
 codex               # OpenAI Codex（自动预植入宿主机凭据）
-opencode            # OpenCode
+opencode            # OpenCode（自动预植入宿主机凭据）
+gemini              # Gemini CLI（自动预植入宿主机凭据）
 
 # 也可以直接开发
 mvn clean install
 python3 script.py
 ```
 
-> **认证差异**：Codex 和 OpenCode 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
+> **认证差异**：Codex、OpenCode、Gemini CLI 创建沙箱时会自动从宿主机预植入认证凭据，可直接使用；Claude Code 首次需要在容器内完成一次 OAuth 登录（之后免登录）。详见[认证机制说明](#ai-工具认证机制)。
 
 ## 多容器并发工作流
 
@@ -188,6 +191,10 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 ├── feat-xxx/                  # → 挂载到容器 /home/devuser/.local/share/opencode
 └── fix-bug-123/
 
+~/.gemini-sandboxes/           # Gemini CLI 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.gemini
+└── fix-bug-123/
+
 主仓库: ~/projects/.../fit-framework/  （不变，不被容器挂载）
 ```
 
@@ -198,7 +205,7 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 
 ### 为什么每个沙箱使用独立的 AI 工具配置？
 
-Claude Code、Codex、OpenCode 都在各自的配置目录（`~/.claude/`、`~/.codex/`、`~/.local/share/opencode/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
+Claude Code、Codex、OpenCode、Gemini CLI 都在各自的配置目录（`~/.claude/`、`~/.codex/`、`~/.local/share/opencode/`、`~/.gemini/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
 
 1. **并发写入冲突** — 多个容器同时写入 `history.jsonl`、`session-env/` 等文件会导致数据竞争和文件损坏
 2. **会话/记忆交叉污染** — 不同分支的项目上下文和会话历史会互相干扰
@@ -216,6 +223,7 @@ Claude Code、Codex、OpenCode 都在各自的配置目录（`~/.claude/`、`~/.
 | **Codex** | 文件（`~/.codex/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
 | **OpenCode** | 文件（`~/.local/share/opencode/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
 | **Claude Code** | macOS Keychain（`Claude Code-credentials`） | 容器内 OAuth 登录，凭据存入 `.credentials.json` | 需在容器内登录一次 |
+| **Gemini CLI** | 文件（`~/.gemini/oauth_creds.json`） | 自动从宿主机预植入 `oauth_creds.json` + `settings.json` | 无需登录，直接使用 |
 
 **为什么 Claude Code 不能预植入？**
 
@@ -223,9 +231,9 @@ Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主�
 
 登录后凭据持久化在 `~/.claude-sandboxes/{branch}/` 中，后续使用**无需再次登录**。
 
-**Codex / OpenCode 为什么可以？**
+**Codex / OpenCode / Gemini CLI 为什么可以？**
 
-Codex 和 OpenCode 始终使用文件存储凭据（分别为 `~/.codex/auth.json` 和 `~/.local/share/opencode/auth.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。
+Codex、OpenCode 和 Gemini CLI 始终使用文件存储凭据（分别为 `~/.codex/auth.json`、`~/.local/share/opencode/auth.json` 和 `~/.gemini/oauth_creds.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。Gemini CLI 还会额外预植入 `settings.json` 和 `google_accounts.json`，确保容器内的模型选项和用户设置与宿主机一致。
 
 ### AI 工具维护（单一事实源）
 
