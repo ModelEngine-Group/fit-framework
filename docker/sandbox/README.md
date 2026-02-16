@@ -147,7 +147,7 @@ sandbox ls
 docker stop fit-dev-feat-xxx
 docker start fit-dev-feat-xxx
 
-# 清理指定沙箱（容器 + worktree + Claude 配置）
+# 清理指定沙箱（容器 + worktree + Claude/Codex 配置）
 sandbox rm feat-xxx
 
 # 清理所有沙箱
@@ -166,13 +166,21 @@ sandbox vm start               # 启动
 sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 ```
 
-## Worktree 目录规划
+## 目录规划
 
 ```
 ~/.fit-worktrees/              # 所有 worktree 统一放这里
 ├── feat-xxx/                  # 分支 feat-xxx 的独立工作目录
 ├── fix-bug-123/               # 分支 fix-bug-123 的独立工作目录
 └── ...
+
+~/.claude-sandboxes/           # Claude Code 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.claude
+└── fix-bug-123/
+
+~/.codex-sandboxes/            # Codex 沙箱配置（每分支独立）
+├── feat-xxx/                  # → 挂载到容器 /home/devuser/.codex
+└── fix-bug-123/
 
 主仓库: ~/projects/.../fit-framework/  （不变，不被容器挂载）
 ```
@@ -181,6 +189,17 @@ sandbox vm start --cpu 6 --memory 8  # 自定义资源启动
 - 不污染主仓库
 - 路径简短清晰
 - 不在项目目录内，天然被 `.gitignore` 排除
+
+### 为什么每个沙箱使用独立的 AI 工具配置？
+
+Claude Code 和 Codex 都在配置目录（`~/.claude/`、`~/.codex/`）中存储会话历史、项目记忆、锁文件等状态数据。如果多个沙箱容器共享同一个配置目录，会导致：
+
+1. **并发写入冲突** — 多个容器同时写入 `history.jsonl`、`session-env/` 等文件会导致数据竞争和文件损坏
+2. **会话/记忆交叉污染** — 不同分支的项目上下文和会话历史会互相干扰
+3. **清理困难** — `sandbox rm` 无法从共享目录中安全地只删除某个沙箱的数据
+4. **宿主机风险** — 容器内的破坏性操作可能损坏宿主机的凭据和配置
+
+因此每个沙箱拥有独立的配置目录，实现完全隔离。创建沙箱时会自动从宿主机预植入认证凭据（如 `auth.json`），免去容器内重新登录。
 
 ## 高级配置
 

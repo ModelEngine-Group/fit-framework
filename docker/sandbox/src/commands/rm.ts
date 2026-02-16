@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
 import {
-  IMAGE_NAME, MAIN_REPO, WORKTREE_BASE, CLAUDE_SANDBOX_BASE,
-  containerNameCandidates, worktreeDirCandidates, claudeConfigDirCandidates,
+  IMAGE_NAME, MAIN_REPO, WORKTREE_BASE, CLAUDE_SANDBOX_BASE, CODEX_SANDBOX_BASE,
+  containerNameCandidates, worktreeDirCandidates, claudeConfigDirCandidates, codexConfigDirCandidates,
   sanitizeBranchName, assertValidBranchName,
 } from '../constants.js';
 import { run, runOk, runSafe } from '../shell.js';
@@ -15,6 +15,7 @@ export async function rmOne(branch: string) {
   let effectiveBranch = branch;
   let worktreeCandidates = worktreeDirCandidates(effectiveBranch);
   let claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
+  let codexDirCandidates = codexConfigDirCandidates(effectiveBranch);
 
   p.intro(pc.cyan(`清理沙箱: ${safeName}`));
 
@@ -32,6 +33,7 @@ export async function rmOne(branch: string) {
       effectiveBranch = resolvedBranch;
       worktreeCandidates = worktreeDirCandidates(effectiveBranch);
       claudeDirCandidates = claudeConfigDirCandidates(effectiveBranch);
+      codexDirCandidates = codexConfigDirCandidates(effectiveBranch);
     }
 
     const s = p.spinner();
@@ -88,6 +90,15 @@ export async function rmOne(branch: string) {
     }
   }
 
+  // Clean codex config directory
+  const existingCodexDirs = codexDirCandidates.filter((dir) => fs.existsSync(dir));
+  if (existingCodexDirs.length > 0) {
+    for (const codexDir of existingCodexDirs) {
+      fs.rmSync(codexDir, { recursive: true, force: true });
+      p.log.success(`Codex config removed: ${codexDir}`);
+    }
+  }
+
   p.outro(pc.green('Done'));
 }
 
@@ -133,6 +144,12 @@ export async function rmAll() {
   if (fs.existsSync(CLAUDE_SANDBOX_BASE) && fs.readdirSync(CLAUDE_SANDBOX_BASE).length > 0) {
     fs.rmSync(CLAUDE_SANDBOX_BASE, { recursive: true, force: true });
     p.log.success('All Claude sandbox configs removed');
+  }
+
+  // Clean codex sandbox configs
+  if (fs.existsSync(CODEX_SANDBOX_BASE) && fs.readdirSync(CODEX_SANDBOX_BASE).length > 0) {
+    fs.rmSync(CODEX_SANDBOX_BASE, { recursive: true, force: true });
+    p.log.success('All Codex sandbox configs removed');
   }
 
   // Prune dangling images

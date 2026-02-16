@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import * as p from '@clack/prompts';
 import pc from 'picocolors';
-import { WORKTREE_BASE, CLAUDE_SANDBOX_BASE } from '../constants.js';
+import { WORKTREE_BASE, CLAUDE_SANDBOX_BASE, CODEX_SANDBOX_BASE } from '../constants.js';
 import { runSafe } from '../shell.js';
 
 export function ls() {
@@ -50,6 +50,21 @@ export function ls() {
     }
   } else {
     p.log.warn('  没有 Claude 沙箱配置');
+  }
+
+  // Codex config dirs
+  p.log.step('Codex 配置：');
+  if (fs.existsSync(CODEX_SANDBOX_BASE)) {
+    const entries = fs.readdirSync(CODEX_SANDBOX_BASE);
+    if (entries.length > 0) {
+      for (const entry of entries) {
+        console.log(`  ${entry} -> ${CODEX_SANDBOX_BASE}/${entry}`);
+      }
+    } else {
+      p.log.warn('  没有 Codex 沙箱配置');
+    }
+  } else {
+    p.log.warn('  没有 Codex 沙箱配置');
   }
 
 }
