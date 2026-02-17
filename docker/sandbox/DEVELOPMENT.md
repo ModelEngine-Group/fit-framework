@@ -19,9 +19,9 @@ Claude Code、Codex、OpenCode、Gemini CLI 都在各自的配置目录（`~/.cl
 
 | | 宿主机凭据存储 | 沙箱认证方式 | 首次使用 |
 |---|---|---|---|
-| **Codex** | 文件（`~/.codex/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
-| **OpenCode** | 文件（`~/.local/share/opencode/auth.json`） | 自动从宿主机预植入 `auth.json` | 无需登录，直接使用 |
-| **Gemini CLI** | 文件（`~/.gemini/oauth_creds.json`） | 自动从宿主机预植入 `oauth_creds.json` + `settings.json` | 无需登录，直接使用 |
+| **Codex** | 文件（`~/.codex/auth.json`） | 实时挂载（live mount）宿主机 `auth.json` | 无需登录，宿主机刷新后自动生效 |
+| **OpenCode** | 文件（`~/.local/share/opencode/auth.json`） | 实时挂载（live mount）宿主机 `auth.json` | 无需登录，宿主机刷新后自动生效 |
+| **Gemini CLI** | 文件（`~/.gemini/oauth_creds.json`） | 实时挂载 `oauth_creds.json` + 预植入 `settings.json` | 无需登录，宿主机刷新后自动生效 |
 | **Claude Code** | macOS Keychain（`Claude Code-credentials`） | 容器内 OAuth 登录，凭据存入 `.credentials.json` | 需在容器内登录一次 |
 
 ### 为什么 Claude Code 不能预植入？
@@ -32,7 +32,11 @@ Claude Code 在 macOS 上将 OAuth token 存储在系统 Keychain 中，宿主�
 
 ### Codex / OpenCode / Gemini CLI 为什么可以？
 
-Codex、OpenCode 和 Gemini CLI 始终使用文件存储凭据（分别为 `~/.codex/auth.json`、`~/.local/share/opencode/auth.json` 和 `~/.gemini/oauth_creds.json`），`sandbox create` 时自动将宿主机的凭据文件复制到沙箱配置目录，容器内可直接使用。Gemini CLI 还会额外预植入 `settings.json` 和 `google_accounts.json`，确保容器内的模型选项和用户设置与宿主机一致。
+Codex、OpenCode 和 Gemini CLI 始终使用文件存储凭据（分别为 `~/.codex/auth.json`、`~/.local/share/opencode/auth.json` 和 `~/.gemini/oauth_creds.json`）。这些认证文件通过 Docker bind mount（`hostLiveMounts`）直接从宿主机实时挂载到容器内，宿主机刷新 token 后容器自动生效，无需重建沙箱。
+
+> **为什么使用实时挂载而非复制？** OAuth token 通常有过期时间（如 OpenAI token 有效期约 7 天），一次性复制的 token 过期后需要手动重新同步。实时挂载使宿主机和容器始终共享同一份文件，彻底消除 token 过期问题。
+
+Gemini CLI 还会额外预植入（一次性复制）`settings.json` 和 `google_accounts.json`，确保容器内的模型选项和用户设置与宿主机一致。这些配置文件不含过期 token，无需实时同步。
 
 ## AI 工具注册表
 
@@ -52,9 +56,12 @@ AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表�
 | `containerMount` | `string` | 是 | 容器内挂载路径（绝对路径），如 `/home/devuser/.codex` |
 | `versionCmd` | `string` | 是 | 验证安装的命令，通过 `bash -lc` 执行 |
 | `noAuthHint` | `string` | 是 | 未预植入认证时的提示信息 |
-| `hostAuthFile` | `string` | 否 | 宿主机认证文件路径，与 `authFileName` 成对使用 |
+| `hostAuthFile` | `string` | 否 | 宿主机认证文件路径，与 `authFileName` 成对使用（一次性复制） |
 | `authFileName` | `string` | 否 | 沙箱内认证文件名（相对于 `sandboxBase/{branch}/`） |
 | `hostPreSeedFiles` | `Array<{hostPath, sandboxName}>` | 否 | 额外需要预植入的宿主机文件（如设置、账户信息） |
+| `hostPreSeedDirs` | `Array<{hostDir, sandboxSubdir}>` | 否 | 递归复制宿主机目录到沙箱（如插件目录） |
+| `pathRewriteFiles` | `string[]` | 否 | 预植入后需要路径重写的文件（宿主机路径 → 容器路径） |
+| `hostLiveMounts` | `Array<{hostPath, containerSubpath}>` | 否 | 实时挂载宿主机文件到容器（双向同步，用于认证 token） |
 | `postSetupCmds` | `string[]` | 否 | 容器启动后执行的 shell 命令（如创建符号链接） |
 | `envVars` | `Record<string, string>` | 否 | 注入容器的额外环境变量 |
 
@@ -68,15 +75,19 @@ AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表�
 
 ```
 1. 创建沙箱配置目录           sandboxBase/{branch}/
-2. 预植入认证文件             hostAuthFile → sandboxBase/{branch}/authFileName
+2. 预植入认证文件（一次性）     hostAuthFile → sandboxBase/{branch}/authFileName
 3. 预植入额外配置文件          hostPreSeedFiles[].hostPath → sandboxBase/{branch}/sandboxName
-4. 挂载配置目录到容器          sandboxBase/{branch}/ → containerMount
-5. 注入环境变量               envVars → docker run -e
-6. 容器启动后执行命令          postSetupCmds → docker exec bash -lc
-7. 验证安装                  versionCmd → docker exec bash -lc
+4. 递归复制宿主机目录          hostPreSeedDirs[].hostDir → sandboxBase/{branch}/sandboxSubdir
+5. 路径重写                  pathRewriteFiles[] 中的宿主机路径 → 容器路径
+6. 挂载配置目录到容器          sandboxBase/{branch}/ → containerMount
+7. 实时挂载认证文件            hostLiveMounts[].hostPath → containerMount/containerSubpath
+8. 注入环境变量               envVars → docker run -e
+9. 容器启动后执行命令          postSetupCmds → docker exec bash -lc
+10. 验证安装                 versionCmd → docker exec bash -lc
 ```
 
-所有预植入操作遵循"仅首次"策略：宿主机文件存在且沙箱中不存在时才复制，不会覆盖已有配置。
+- **一次性操作**（步骤 2–5）遵循"仅首次"策略：宿主机文件存在且沙箱中不存在时才复制，不会覆盖已有配置。
+- **实时挂载**（步骤 7）通过 Docker bind mount 将宿主机文件直接映射到容器内，文件始终保持同步，无需重建沙箱。适用于会过期的认证 token。
 
 ## 添加新工具
 
@@ -93,9 +104,12 @@ AI 工具的安装与运行配置以 `src/tools.ts` 中的 `AI_TOOLS` 注册表�
   sandboxBase: path.join(HOME, '.gemini-sandboxes'),
   containerMount: '/home/devuser/.gemini',
   versionCmd: 'gemini --version',
-  hostAuthFile: path.join(HOME, '.gemini', 'oauth_creds.json'),
-  authFileName: 'oauth_creds.json',
   noAuthHint: '首次使用需在容器内运行 gemini 完成认证。',
+  // 认证文件实时挂载（token 会过期，需与宿主机保持同步）
+  hostLiveMounts: [
+    { hostPath: path.join(HOME, '.gemini', 'oauth_creds.json'), containerSubpath: 'oauth_creds.json' },
+  ],
+  // 配置文件一次性预植入（不含过期 token，无需实时同步）
   hostPreSeedFiles: [
     { hostPath: path.join(HOME, '.gemini', 'settings.json'), sandboxName: 'settings.json' },
     { hostPath: path.join(HOME, '.gemini', 'google_accounts.json'), sandboxName: 'google_accounts.json' },

@@ -174,6 +174,13 @@ export async function create(branch: string, base: string | undefined, opts: Cre
         const toolVolumes = resolvedTools.flatMap(({ tool, dir }) =>
           ['-v', `${dir}:${tool.containerMount}`]
         );
+        // Live-mount auth files directly from host (bidirectional sync, always fresh)
+        const liveMountVolumes = resolvedTools.flatMap(({ tool }) =>
+          (tool.hostLiveMounts ?? [])
+            .filter(({ hostPath }) => fs.existsSync(hostPath))
+            .flatMap(({ hostPath, containerSubpath }) =>
+              ['-v', `${hostPath}:${path.join(tool.containerMount, containerSubpath)}`])
+        );
 
         run('docker', [
           'run', '-d',
@@ -185,6 +192,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
           '-v', `${MAIN_REPO}/.git:${MAIN_REPO}/.git`,
           '-v', `${process.env.HOME}/.ssh:/home/devuser/.ssh:ro`,
           ...toolVolumes,
+          ...liveMountVolumes,
           ...envArgs,
           '-w', '/workspace',
           IMAGE_NAME,
@@ -242,8 +250,12 @@ export async function create(branch: string, base: string | undefined, opts: Cre
 
   // Tool credential hints
   const toolHints = resolvedTools.map(({ tool, dir }) => {
-    const hasAuth = tool.authFileName && fs.existsSync(path.join(dir, tool.authFileName));
-    const hint = hasAuth ? '已从宿主机预植入认证凭据，可直接使用。' : tool.noAuthHint;
+    const hasLiveAuth = (tool.hostLiveMounts ?? []).some(({ hostPath }) => fs.existsSync(hostPath));
+    const hasCopiedAuth = tool.authFileName && fs.existsSync(path.join(dir, tool.authFileName));
+    const hasAuth = hasLiveAuth || hasCopiedAuth;
+    const hint = hasAuth
+      ? (hasLiveAuth ? '已与宿主机认证凭据实时同步，宿主机刷新后容器自动生效。' : '已从宿主机预植入认证凭据，可直接使用。')
+      : tool.noAuthHint;
     return `${pc.cyan(`${tool.name}：`)}\n  ${hint}\n  凭据持久化：${dir}/`;
   }).join('\n\n');
 
