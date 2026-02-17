@@ -144,7 +144,7 @@ docker stop fit-dev-feat-xxx
 
 ## 命令行模式（非交互式）
 
-除了打开 TUI 界面，每个 AI 工具都支持直接在命令行传入 prompt 并获取输出，适合脚本自动化、快速提问和管道组合。
+除了打开 TUI 界面，每个 AI 工具都支持直接在命令行传入 prompt 并获取输出，适合脚本自动化、快速提问和管道组合。每个工具还支持会话管理，可以在命令行实现多轮对话。
 
 ### Claude Code
 
@@ -164,11 +164,28 @@ claude -p --model opus "设计一个缓存方案"
 # 限制轮次和预算
 claude -p --max-turns 3 --max-budget-usd 1.00 "重构数据库模块"
 
-# 继续上一次对话
-claude -c -p "为刚才的修改补充单元测试"
-
 # 跳过所有权限确认（CI/脚本场景）
 claude -p --dangerously-skip-permissions "运行所有测试并汇报结果"
+
+# ── 多轮对话（会话管理）──
+
+# 预先生成 session ID，从第 1 轮起就使用（推荐）
+SID=$(uuidgen)
+
+# 第 1 轮：指定 session ID 开启对话
+claude -p --session-id "$SID" "分析认证模块的架构"
+
+# 第 2 轮：恢复同一个会话继续对话
+claude -p --resume "$SID" "重构登录函数"
+
+# 第 3 轮：继续同一个会话
+claude -p --resume "$SID" "为重构后的代码补充单元测试"
+
+# 快捷方式：继续当前目录下最近一次对话（无需 session ID）
+claude -p -c "为刚才的修改补充单元测试"
+
+# 从已有会话分叉出新会话（不影响原会话）
+claude -p --resume "$SID" --fork-session "尝试另一种实现方案"
 ```
 
 ### Codex
@@ -191,6 +208,22 @@ codex exec --full-auto "给所有 API 路由添加错误处理"
 
 # 将最终结果写入文件
 codex exec -o result.txt "分析项目依赖关系"
+
+# ── 多轮对话（会话管理）──
+# Codex 不支持预指定 thread ID，需从首轮 JSON 输出获取
+
+# 第 1 轮：启动会话，通过 JSON 事件流获取 thread_id
+TID=$(codex exec --json "分析数据库模块" 2>/dev/null \
+  | jq -r 'select(.type=="thread.started") | .thread_id')
+
+# 第 2 轮：通过 thread_id 恢复会话（注意 resume 是 exec 的子命令）
+codex exec resume "$TID" "添加连接池"
+
+# 第 3 轮：继续同一个会话
+codex exec resume "$TID" "补充单元测试"
+
+# 快捷方式：恢复最近一次会话
+codex exec resume --last "继续上次的任务"
 ```
 
 ### OpenCode
@@ -211,8 +244,27 @@ opencode run --format json "列出所有 API 端点"
 # 附加文件到 prompt
 opencode run --file src/auth.ts "审查这个文件的安全性"
 
-# 继续上一次对话
-opencode run --continue "为刚才的修改补充单元测试"
+# ── 多轮对话（会话管理）──
+# OpenCode 不支持预指定 session ID，需从首轮 JSON 输出获取
+
+# 第 1 轮：启动会话，通过 JSON 输出获取 sessionID
+SID=$(opencode run --format json "设计认证模块" | jq -r '.sessionID')
+
+# 第 2 轮：通过 session ID 恢复会话
+opencode run -s "$SID" "添加 JWT 校验"
+
+# 第 3 轮：继续同一个会话
+opencode run -s "$SID" "补充单元测试"
+
+# 快捷方式：继续最近一次对话（无需 session ID）
+opencode run -c "为刚才的修改补充单元测试"
+
+# 查看历史会话列表
+opencode session list
+opencode session list -n 10   # 只显示最近 10 个
+
+# 从已有会话分叉
+opencode run -s "$SID" --fork "尝试另一种实现方案"
 ```
 
 ### Gemini CLI
@@ -235,7 +287,27 @@ gemini -p --yolo "运行测试并汇报结果"
 
 # 将项目所有文件纳入上下文
 gemini -p --all-files "分析这个项目的架构"
+
+# ── 多轮对话（会话管理）──
+# Gemini CLI 不支持预指定 session ID，需从首轮 JSON 输出中提取。
+
+# 第 1 轮：启动会话，通过 JSON 输出获取 session_id
+SID=$(gemini --output-format json -p "分析项目的整体架构" | jq -r '.session_id')
+
+# 第 2 轮：通过 session_id 恢复会话
+gemini --resume "$SID" "针对刚才的分析，重构认证模块"
+
+# 第 3 轮：继续同一个会话
+gemini --resume "$SID" "补充单元测试"
+
+# 快捷方式：恢复最近一次会话（--resume 不带参数，仅适合非并发场景）
+gemini --resume "继续上次的对话"
+
+# 查看当前项目所有会话
+gemini --list-sessions
 ```
+
+> **注意**：Gemini CLI 的会话按项目（工作目录）隔离，切换目录后 `--list-sessions` 显示的是不同项目的会话。`-s` 是 `--sandbox` 的缩写（安全沙箱），不是会话管理，会话管理使用 `-r` / `--resume`。
 
 ### 快速对比
 
@@ -246,6 +318,11 @@ gemini -p --all-files "分析这个项目的架构"
 | JSON 输出 | `--output-format json` | `--json` | `--format json` | `--output-format json` |
 | 指定模型 | `--model opus` | `-m o4-mini` | `-m provider/model` | `-m gemini-2.5-flash` |
 | 跳过确认 | `--dangerously-skip-permissions` | `--full-auto` | — | `--yolo` |
+| 预指定会话 ID | `--session-id <UUID>` | — | — | — |
+| 恢复指定会话 | `--resume <ID>` | `exec resume <ID>` | `-s <ID>` | `--resume <ID>` |
+| 继续最近会话 | `-c` | `exec resume --last` | `-c` | `--resume`（无参数） |
+| 查看会话列表 | — | — | `session list` | `--list-sessions` |
+| 分叉会话 | `--fork-session` | — | `--fork` | — |
 
 ## 沙箱管理
 
