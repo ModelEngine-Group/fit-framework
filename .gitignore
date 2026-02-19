@@ -16,6 +16,9 @@ tmp/
 # Gemini
 .gemini-clipboard/
 
+# OpenCode
+.opencode/
+
 # Claude Code local settings
 **/settings.local.json
 
