@@ -1,0 +1,81 @@
+description = "执行版本发布流程（SNAPSHOT 替换、Release commit、Tag、发布分支、下一 SNAPSHOT）"
+prompt = """
+请执行版本 {{args}} 的标准化发布流程。
+
+**不含构建验证**：仅做版本号替换和 Git 操作。
+**不含自动推送**：仅做本地操作，推送由用户手动完成。
+
+**当前状态**:
+!{git status --short}
+!{git log -1 --oneline}
+!{git branch --show-current}
+
+执行以下步骤:
+
+1. **解析并验证参数**:
+   - 版本号 = {{args}}，必须匹配 `X.Y.Z` 格式（X、Y、Z 均为非负整数）
+   - 如果格式不正确，报错退出：`错误：版本号格式不正确，期望格式为 X.Y.Z（例如 3.6.3）`
+   - 解析: SNAPSHOT 版本 = `X.Y.Z-SNAPSHOT`，发布版本 = `X.Y.Z`，下一 SNAPSHOT = `X.Y.(Z+1)-SNAPSHOT`
+   - 使用 `search_files` 全局搜索 `X.Y.Z-SNAPSHOT`，确认存在。如果不存在则报错退出
+
+2. **确认工作区状态**:
+   - 如果 `git status --short` 有输出（存在未提交的更改），报错退出
+   - 工作区必须是干净的才能继续
+
+3. **全局替换 SNAPSHOT → Release**:
+   - 使用 `search_files` 搜索所有包含 `X.Y.Z-SNAPSHOT` 的文件
+   - 对于每个匹配的文件，使用 `replace` 将 `X.Y.Z-SNAPSHOT` 替换为 `X.Y.Z`
+   - 覆盖范围包括但不限于: `**/pom.xml`、`README.md`、`docs/**/*.md`、`*.java`、`*.js`、`package.json`
+   - 替换后再次搜索 `X.Y.Z-SNAPSHOT`，确认没有残留
+   - **记录所有替换过的文件列表**，步骤 8 需要用到
+
+4. **创建 Release commit**:
+   - 使用 `run_shell_command` 执行: `git add -A && git commit -m "Release X.Y.Z"`
+
+5. **创建轻量标签**:
+   - 使用 `run_shell_command` 执行: `git tag vX.Y.Z`
+
+6. **创建发布分支**:
+   - 使用 `run_shell_command` 执行: `git branch release-X.Y.Z`
+
+7. **回退当前分支到 Release commit 之前**:
+   - Release commit 和 tag 已通过 `release-X.Y.Z` 分支保留
+   - 使用 `run_shell_command` 执行: `git reset --hard HEAD~1`
+   - 这使当前开发分支回退到 Release commit 的父节点
+   - 下一个 SNAPSHOT commit 将与 Release commit 成为兄弟关系（共享同一个父节点），而非父子关系
+
+8. **全局替换当前 SNAPSHOT → 下一 SNAPSHOT**:
+   - 由于步骤 7 已回退，文件中的版本号已恢复为 `X.Y.Z-SNAPSHOT`
+   - **重要**: 只替换步骤 3 中已知的文件列表，避免误匹配
+   - 对于步骤 3 中每个替换过的文件，使用 `replace` 将 `X.Y.Z-SNAPSHOT` 替换为 `X.Y.(Z+1)-SNAPSHOT`
+   - 替换后抽查几个关键文件（如根 pom.xml），确认版本号正确
+
+9. **创建 SNAPSHOT commit**:
+   - 使用 `run_shell_command` 执行: `git add -A && git commit -m "Prepare the next SNAPSHOT version"`
+
+10. **输出总结**:
+    输出发布操作的完整总结，包含:
+    - 发布版本、下一开发版本
+    - Release commit hash、Tag、发布分支名
+    - SNAPSHOT commit hash
+    - 替换文件数
+    - 后续手动操作提示:
+      * `git push origin release-X.Y.Z`
+      * `git push origin vX.Y.Z`
+      * `git push origin <current-branch>`
+      * （可选）在 GitHub 上基于 vX.Y.Z 标签创建 Release
+
+**错误处理**:
+- 版本号格式错误 → 提示正确格式并退出
+- SNAPSHOT 不存在 → 提示确认当前代码版本并退出
+- 工作区不干净 → 提示先提交或暂存更改并退出
+- Git 操作失败 → 显示错误信息，提示用户手动处理
+
+**回滚方式**（如出错）:
+```
+git tag -d vX.Y.Z
+git branch -d release-X.Y.Z
+git reset --soft HEAD~2
+git checkout -- .
+```
+"""
