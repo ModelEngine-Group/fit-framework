@@ -12,7 +12,7 @@
 
     <groupId>org.fitframework</groupId>
     <artifactId>fit-spring-boot-starter</artifactId>
-    <version>3.6.3-SNAPSHOT</version>
+    <version>3.6.3</version>
 
     <name>FIT Spring Boot Starter</name>
     <description>FIT Framework Spring Boot Starter module provides a Spring-compatible runtime environment for FIT
@@ -27,7 +27,7 @@
         <java.version>17</java.version>
 
         <!-- FIT version -->
-        <fit.version>3.6.3-SNAPSHOT</fit.version>
+        <fit.version>3.6.3</fit.version>
 
         <!-- Byte-buddy version -->
         <byte-buddy.version>1.18.2</byte-buddy.version>

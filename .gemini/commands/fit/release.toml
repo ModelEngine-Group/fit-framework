@@ -14,7 +14,7 @@ prompt = """
 
 1. **解析并验证参数**:
    - 版本号 = {{args}}，必须匹配 `X.Y.Z` 格式（X、Y、Z 均为非负整数）
-   - 如果格式不正确，报错退出：`错误：版本号格式不正确，期望格式为 X.Y.Z（例如 3.6.3）`
+   - 如果格式不正确，报错退出：`错误：版本号格式不正确，期望格式为 X.Y.Z（例如 1.2.3）`
    - 解析: SNAPSHOT 版本 = `X.Y.Z-SNAPSHOT`，发布版本 = `X.Y.Z`，下一 SNAPSHOT = `X.Y.(Z+1)-SNAPSHOT`
    - 使用 `search_files` 全局搜索 `X.Y.Z-SNAPSHOT`，确认存在。如果不存在则报错退出
 
@@ -26,6 +26,7 @@ prompt = """
    - 使用 `search_files` 搜索所有包含 `X.Y.Z-SNAPSHOT` 的文件
    - 对于每个匹配的文件，使用 `replace` 将 `X.Y.Z-SNAPSHOT` 替换为 `X.Y.Z`
    - 覆盖范围包括但不限于: `**/pom.xml`、`README.md`、`docs/**/*.md`、`*.java`、`*.js`、`package.json`
+   - **必须排除以下目录**（包含 AI 工具配置、命令模板和示例，不应被版本替换影响）: `.ai-agents/`、`.ai-workspace/`、`.claude/`、`.codex/`、`.gemini/`、`.opencode/`
    - 替换后再次搜索 `X.Y.Z-SNAPSHOT`，确认没有残留
    - **记录所有替换过的文件列表**，步骤 8 需要用到
 

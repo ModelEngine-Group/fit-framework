@@ -1,6 +1,6 @@
 {
   "name": "fit-sandbox-cli",
-  "version": "3.6.3-SNAPSHOT",
+  "version": "3.6.3",
   "description": "AI coding sandbox CLI - manage Docker sandboxes with Git Worktree isolation",
   "type": "module",
   "scripts": {

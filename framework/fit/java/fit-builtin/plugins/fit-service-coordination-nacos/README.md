@@ -22,11 +22,11 @@ FIT Service Coordination Nacos 插件是 FIT Framework 的服务协调插件，�
        ```
     2. **放入 build/plugins 目录**：
        ```bash
-       cp fit-builtin/plugins/fit-service-coordination-nacos/target/fit-service-coordination-nacos-3.6.3-SNAPSHOT.jar ../../../build/plugins/
+       cp fit-builtin/plugins/fit-service-coordination-nacos/target/fit-service-coordination-nacos-3.6.3.jar ../../../build/plugins/
        ```
     3. **移除 Simple 插件**：
        ```bash
-       rm ../../../build/plugins/fit-service-coordination-simple-3.6.3-SNAPSHOT.jar
+       rm ../../../build/plugins/fit-service-coordination-simple-3.6.3.jar
        ```
 
 > **说明**：`build/plugins` 目录中只能有一个注册中心插件，Nacos 和 Simple 不能同时存在。
@@ -285,14 +285,14 @@ public class AssistantController {
 <dependency>
     <groupId>org.fitframework</groupId>
     <artifactId>fit-starter</artifactId>
-    <version>3.6.3-SNAPSHOT</version>
+    <version>3.6.3</version>
 </dependency>
 
 <!-- Nacos 注册中心插件 -->
 <dependency>
     <groupId>org.fitframework.plugin</groupId>
     <artifactId>fit-service-coordination-nacos</artifactId>
-    <version>3.6.3-SNAPSHOT</version>
+    <version>3.6.3</version>
     <scope>runtime</scope>
 </dependency>
 ```

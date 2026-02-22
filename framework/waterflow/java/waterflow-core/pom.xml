@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fitframework.waterflow</groupId>
         <artifactId>waterflow-parent</artifactId>
-        <version>3.6.3-SNAPSHOT</version>
+        <version>3.6.3</version>
     </parent>
 
     <artifactId>waterflow-core</artifactId>

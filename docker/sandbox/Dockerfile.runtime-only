@@ -6,7 +6,7 @@
 FROM ubuntu:22.04
 
 LABEL description="AI coding sandbox with runtime and TUI tools"
-LABEL version="3.6.3-SNAPSHOT"
+LABEL version="3.6.3"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai
