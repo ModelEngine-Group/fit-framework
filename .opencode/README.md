@@ -2,11 +2,25 @@
 
 本目录包含 FIT Framework 项目的 OpenCode 配置和自定义命令。
 
+## 🔌 插件安装
+
+本项目使用 [oh-my-opencode](https://www.npmjs.com/package/@opencode-ai/plugin) 插件扩展自定义命令能力。
+
+**安装依赖**（clone 项目后执行一次）：
+
+```bash
+cd .opencode && bun install
+```
+
+> 如未安装 Bun，也可使用 `npm install` 或 `pnpm install`。
+
 ## 📁 目录结构
 
 ```
 .opencode/
 ├── README.md              # 本文件
+├── package.json           # 插件依赖声明
+├── bun.lock               # 依赖版本锁定
 └── commands/              # 自定义 Slash Commands
     ├── analyze-issue.md
     ├── analyze-security.md
