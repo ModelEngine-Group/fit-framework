@@ -15,7 +15,7 @@ subtask: false
 
 版本号来自用户输入参数，格式必须为 `X.Y.Z`（X、Y、Z 均为非负整数）。
 
-如果格式不正确，报错退出：`❌ 错误：版本号格式不正确，期望格式为 X.Y.Z（例如 3.6.3）`
+如果格式不正确，报错退出：`❌ 错误：版本号格式不正确，期望格式为 X.Y.Z（例如 1.2.3）`
 
 解析版本组件:
 - SNAPSHOT 版本 = `X.Y.Z-SNAPSHOT`
@@ -47,6 +47,14 @@ subtask: false
 - `*.java` — 源码中硬编码的版本字符串
 - `*.js` — fit.js 中的 VERSION 常量
 - `package.json` — Node.js 版本号
+
+**必须排除的目录**（这些目录包含 AI 工具配置、命令模板和示例，不应被版本替换影响）:
+- `.ai-agents/`
+- `.ai-workspace/`
+- `.claude/`
+- `.codex/`
+- `.gemini/`
+- `.opencode/`
 
 **记录所有替换过的文件列表**，步骤 8 需要用到。
 

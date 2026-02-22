@@ -11,10 +11,10 @@ usage: /prompts:release <version>
 **不含自动推送**：仅做本地操作，推送由用户手动完成。
 
 **用法：**
-- `/prompts:release 3.6.3` - 发布 3.6.3 版本
+- `/prompts:release 1.2.3` - 发布 1.2.3 版本
 
 **参数说明：**
-- `<version>`: 发布版本号，格式为 `X.Y.Z`（必需），例如 `3.6.3`
+- `<version>`: 发布版本号，格式为 `X.Y.Z`（必需），例如 `1.2.3`
 
 ---
 
@@ -26,7 +26,7 @@ usage: /prompts:release <version>
 
 **版本号格式验证**：
 - 必须匹配 `X.Y.Z` 格式（X、Y、Z 均为非负整数）
-- 如果格式不正确，报错退出：`错误：版本号格式不正确，期望格式为 X.Y.Z（例如 3.6.3）`
+- 如果格式不正确，报错退出：`错误：版本号格式不正确，期望格式为 X.Y.Z（例如 1.2.3）`
 
 **解析版本组件**：
 - 主版本号 MAJOR = X
@@ -63,6 +63,14 @@ git status --short
 - `*.java` — 源码中硬编码的版本字符串
 - `*.js` — fit.js 中的 VERSION 常量
 - `package.json` — Node.js 版本号
+
+**必须排除的目录**（这些目录包含 AI 工具配置、命令模板和示例，不应被版本替换影响）：
+- `.ai-agents/`
+- `.ai-workspace/`
+- `.claude/`
+- `.codex/`
+- `.gemini/`
+- `.opencode/`
 
 **替换后验证**：
 
@@ -145,15 +153,15 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
 
 ## 使用示例
 
-### 示例 1：发布 3.6.3
+### 示例 1：发布 1.2.3
 
 ```bash
-/prompts:release 3.6.3
+/prompts:release 1.2.3
 ```
 
 执行后：
-- `3.6.4-SNAPSHOT` → `3.6.3`（Release commit + tag `v3.6.3` + 分支 `release-3.6.3`）
-- 回退当前分支，`3.6.4-SNAPSHOT` → `3.6.4-SNAPSHOT`（SNAPSHOT commit）
+- `1.2.3-SNAPSHOT` → `1.2.3`（Release commit + tag `v1.2.3` + 分支 `release-1.2.3`）
+- `1.2.3-SNAPSHOT` → `1.2.4-SNAPSHOT`（SNAPSHOT commit）
 
 ---
 
