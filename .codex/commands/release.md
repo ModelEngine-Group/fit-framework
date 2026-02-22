@@ -152,8 +152,8 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
 ```
 
 执行后：
-- `3.6.3-SNAPSHOT` → `3.6.3`（Release commit + tag `v3.6.3` + 分支 `release-3.6.3`）
-- 回退当前分支，`3.6.3-SNAPSHOT` → `3.6.4-SNAPSHOT`（SNAPSHOT commit）
+- `3.6.4-SNAPSHOT` → `3.6.3`（Release commit + tag `v3.6.3` + 分支 `release-3.6.3`）
+- 回退当前分支，`3.6.4-SNAPSHOT` → `3.6.4-SNAPSHOT`（SNAPSHOT commit）
 
 ---
 

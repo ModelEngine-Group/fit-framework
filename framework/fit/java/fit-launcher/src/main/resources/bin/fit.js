@@ -6,7 +6,7 @@ const { spawn } = require('child_process');
 const readline = require('readline');
 
 // 定义版本号
-const VERSION = '3.6.3-SNAPSHOT';
+const VERSION = '3.6.4-SNAPSHOT';
 
 // 获取脚本所在的路径
 const scriptDir = __dirname;

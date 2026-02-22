@@ -42,7 +42,7 @@ public class McpSseServerConfig {
     public McpSyncServer mcpSyncSseServer(FitMcpSseServerTransportProvider transportProvider,
             @Value("${mcp.server.request.timeout-seconds}") int requestTimeoutSeconds) {
         return McpServer.sync(transportProvider)
-                .serverInfo("FIT Store MCP SSE Server", "3.6.3-SNAPSHOT")
+                .serverInfo("FIT Store MCP SSE Server", "3.6.4-SNAPSHOT")
                 .capabilities(McpSchema.ServerCapabilities.builder().tools(true).logging().build())
                 .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
                 .build();

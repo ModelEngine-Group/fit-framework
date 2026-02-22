@@ -199,7 +199,7 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
 ```
 
 执行后：
-- `3.6.3-SNAPSHOT` → `3.6.3`（Release commit + tag `v3.6.3` + 分支 `release-3.6.3`）
+- `3.6.4-SNAPSHOT` → `3.6.3`（Release commit + tag `v3.6.3` + 分支 `release-3.6.3`）
 - `3.6.3` → `3.6.4-SNAPSHOT`（SNAPSHOT commit）
 
 ### 示例 2：发布 4.0.0

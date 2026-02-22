@@ -50,7 +50,7 @@ public class FitAnnotationIntrospector extends AnnotationIntrospector {
 
     @Override
     public Version version() {
-        return VersionUtil.parseVersion("3.6.3-SNAPSHOT", "org.fitframework.plugin", "fit-message-serializer-json-jackson");
+        return VersionUtil.parseVersion("3.6.4-SNAPSHOT", "org.fitframework.plugin", "fit-message-serializer-json-jackson");
     }
 
     @Override

@@ -12,7 +12,7 @@
         <java.version>17</java.version>
 
         <!-- FIT version -->
-        <fit.version>3.6.3-SNAPSHOT</fit.version>
+        <fit.version>3.6.4-SNAPSHOT</fit.version>
 
         <!-- Maven plugin versions -->
         <maven.compiler.version>3.14.0</maven.compiler.version>
