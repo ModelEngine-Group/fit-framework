@@ -55,7 +55,7 @@
 
     <properties>
         <maven.gpg.version>3.2.7</maven.gpg.version>
-        <central-publishing.maven-plugin.version>0.9.0</central-publishing.maven-plugin.version>
+        <central-publishing.maven-plugin.version>0.10.0</central-publishing.maven-plugin.version>
     </properties>
 
     <build>
