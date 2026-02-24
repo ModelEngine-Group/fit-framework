@@ -72,6 +72,9 @@ prompt = """
 - 工作区不干净 → 提示先提交或暂存更改并退出
 - Git 操作失败 → 显示错误信息，提示用户手动处理
 
+**相关命令**:
+- `create-release-note` - 生成 Release Notes 并创建 GitHub Draft Release
+
 **回滚方式**（如出错）:
 ```
 git tag -d vX.Y.Z

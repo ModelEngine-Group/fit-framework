@@ -1,37 +1,25 @@
 ---
-name: "create-release-note"
-description: "从 PR/commit 中自动生成结构化的 Release Notes，并可选创建 GitHub Draft Release"
-usage: "/create-release-note <version> [prev-version]"
+description: 从 PR/commit 中自动生成结构化的 Release Notes，并可选创建 GitHub Draft Release
+usage: /prompts:create-release-note <version> [prev-version]
+argument-hint: <version> [prev-version]
 ---
 
 # Create Release Note Command
-
-## 功能说明
 
 自动从 PR、commit 和 Issue 中收集变更信息，按模块和类型分类，生成符合项目格式的 Release Notes。支持创建 GitHub Draft Release。
 
 对于 x.y.0 版本，支持合并前一 minor 系列的已发布 release notes，无需重复计算。
 
-## 用法
+**用法：**
+- `/prompts:create-release-note 3.6.3` — 自动推断上一版本为 3.6.2
+- `/prompts:create-release-note 3.6.3 3.6.2` — 手动指定范围
+- `/prompts:create-release-note 3.7.0` — x.y.0 版本：合并 3.6.x 系列的所有 release notes
 
-```bash
-/release-notes <version>                # 自动推断上一版本
-/release-notes <version> <prev-version> # 手动指定版本范围
-```
-
-例如：
-```bash
-/create-release-note 3.6.3           # 自动推断上一版本为 3.6.2
-/create-release-note 3.6.3 3.6.2     # 手动指定范围
-/create-release-note 3.7.0           # x.y.0 版本：合并 3.6.x 系列的所有 release notes
-```
-
-## 参数说明
-
+**参数说明：**
 - `<version>`: 当前发布版本号，格式为 `X.Y.Z`（必需）
 - `<prev-version>`: 上一版本号，格式为 `X.Y.Z`（可选，不提供则自动推断）
 
-参数来源：`$ARGUMENTS`
+---
 
 ## 执行步骤
 
@@ -299,7 +287,7 @@ gh release create v<version> \
 ## 注意事项
 
 1. **需要 `gh` CLI**：本命令依赖 GitHub CLI（`gh`），请确保已安装并认证
-2. **Tag 必须已存在**：运行本命令前，确保 `v<version>` 和上一版本的 tag 已创建（通常由 `/release` 命令完成）
+2. **Tag 必须已存在**：运行本命令前，确保 `v<version>` 和上一版本的 tag 已创建（通常由 `/prompts:release` 命令完成）
 3. **Draft 模式**：创建的是草稿 Release，不会自动发布，需要人工审核后在 GitHub 上发布
 4. **PR 搜索范围**：基于日期范围搜索，可能包含少量超出范围的 PR，命令会尽力过滤
 5. **模块分类准确性**：自动分类基于 title/scope/文件路径推断，复杂 PR 可能需要人工调整
@@ -308,7 +296,7 @@ gh release create v<version> \
 ## 错误处理
 
 - **版本号格式错误**：提示正确格式并退出
-- **Tag 不存在**：提示确认 tag 已创建（可能需要先执行 `/release`）
+- **Tag 不存在**：提示确认 tag 已创建（可能需要先执行 `/prompts:release`）
 - **`gh` CLI 未安装或未认证**：提示安装/认证方法
 - **无合并 PR**：提示版本范围内没有找到合并的 PR，建议检查 tag 和分支
 - **GitHub API 限流**：提示稍后重试
@@ -316,6 +304,6 @@ gh release create v<version> \
 
 ## 相关命令
 
-- `/release <version>` - 执行版本发布流程（创建 tag 和发布分支）
-- `/commit` - 提交代码
-- `/create-pr` - 创建 Pull Request
+- `/prompts:release` - 执行版本发布流程（创建 tag 和发布分支）
+- `/prompts:commit` - 提交代码
+- `/prompts:create-pr` - 创建 Pull Request

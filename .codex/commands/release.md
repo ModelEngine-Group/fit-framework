@@ -200,6 +200,7 @@ git checkout -- .
 
 ## 相关命令
 
+- `/prompts:create-release-note` - 生成 Release Notes 并创建 GitHub Draft Release
 - `/prompts:commit` - 提交代码
 - `/prompts:test` - 运行测试
 - `/prompts:create-pr` - 创建 Pull Request
