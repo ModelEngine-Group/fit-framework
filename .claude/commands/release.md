@@ -195,7 +195,8 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
 2. 推送当前开发分支（下一 SNAPSHOT）：
    git push origin <current-branch>
 
-3. （可选）在 GitHub 上基于 vX.Y.Z 标签创建 Release
+3. （可选）生成 Release Notes 并创建 Draft Release：
+   /create-release-note X.Y.Z
 ```
 
 ## 使用示例
@@ -255,6 +256,7 @@ git checkout -- .
 
 ## 相关命令
 
+- `/create-release-note <version>` - 生成 Release Notes 并创建 Draft Release
 - `/commit` - 提交代码
 - `/test` - 运行测试
 - `/create-pr` - 创建 Pull Request
