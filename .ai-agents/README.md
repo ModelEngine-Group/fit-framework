@@ -525,7 +525,7 @@ A: 不是。工作流是推荐的最佳实践，你可以灵活调整。
 A: 可以。这个配置也支持单 AI 工作，只是提供了多 AI 协作的能力。
 
 ### Q: 如何知道任务当前在哪一步？
-A: 查看任务文件的 `current_step` 字段和 `context/` 目录下的文件。ClaudeCode 用户可使用 `/task-status` 命令。
+A: 查看任务文件的 `current_step` 字段和 `context/` 目录下的文件。ClaudeCode 用户可使用 `/check-task` 命令。
 
 ### Q: .ai-workspace 需要提交到 git 吗？
 A: 不需要，这是临时工作目录，已在 `.gitignore` 中忽略。

@@ -267,7 +267,7 @@ A: 使用 `/sync-issue` 会更新 Issue 状态，但是否关闭由用户决定�
 
 ## 相关命令
 
-- `/task-status` - 查看任务状态，确认是否满足完成条件
+- `/check-task` - 查看任务状态，确认是否满足完成条件
 - `/sync-issue` - 同步任务状态到 GitHub Issue
 - `/block-task` - 如果发现任务无法完成，使用此命令标记阻塞
 

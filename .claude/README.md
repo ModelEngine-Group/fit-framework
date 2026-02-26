@@ -19,7 +19,7 @@
     ├── analyze-issue.md   # 分析 Issue 并创建任务
     ├── plan.md            # 设计技术方案
     ├── implement.md       # 实施任务
-    ├── task-status.md     # 查看任务状态
+    ├── check-task.md      # 查看任务状态
     └── sync-issue.md      # 同步进度到 Issue
 ```
 
@@ -132,7 +132,7 @@
 /implement TASK-20251227-104654
 
 # 查看任务状态
-/task-status TASK-20251227-104654
+/check-task TASK-20251227-104654
 
 # 同步进度到 Issue
 /sync-issue TASK-20251227-104654

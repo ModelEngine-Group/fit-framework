@@ -210,7 +210,7 @@ pytest                        # Python 项目
 
 - `/plan-task <task-id>` - 设计技术方案（前置步骤）
 - `/review-task <task-id>` 或 `/code-review:code-review` - 代码审查（后续步骤）
-- `/task-status <task-id>` - 查看任务状态
+- `/check-task <task-id>` - 查看任务状态
 
 ## 错误处理
 

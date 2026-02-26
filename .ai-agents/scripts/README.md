@@ -100,7 +100,7 @@ exit $TEST_RESULT
 ```
 .opencode/commands/
 ├── test.md              → 调用 fit-service.sh（完整测试）
-└── integration-test.md  → 调用 fit-service.sh（仅集成测试）
+└── test-integration.md  → 调用 fit-service.sh（仅集成测试）
 
 .ai-agents/scripts/
 ├── fit-service.sh       ← 被测试命令调用

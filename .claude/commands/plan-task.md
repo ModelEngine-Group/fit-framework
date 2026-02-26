@@ -229,7 +229,7 @@ usage: "/plan-task <task-id>"
 
 **后续步骤**：
 - `/implement-task <task-id>` - 实施任务
-- `/task-status <task-id>` - 查看任务状态
+- `/check-task <task-id>` - 查看任务状态
 
 ## 错误处理
 

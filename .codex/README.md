@@ -94,9 +94,9 @@ usage: /prompts:test
 - `plan-task` - 设计技术方案并输出实施计划
 - `implement-task` - 根据技术方案实施任务
 - `review-task` - 审查任务实现并输出代码审查报告
-- `refinement-task` - 处理代码审查反馈并修复问题
+- `refine-task` - 处理代码审查反馈并修复问题
 - `complete-task` - 标记任务完成并归档到 completed 目录
-- `task-status` - 查看任务的当前状态和进度
+- `check-task` - 查看任务的当前状态和进度
 - `block-task` - 标记任务阻塞并记录阻塞原因
 
 **Git 操作**：

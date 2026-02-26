@@ -131,7 +131,7 @@ CURRENT_YEAR=$(date +%Y)
 - "分析 issue XXX" → `/analyze-issue`
 - "设计方案/plan" → `/plan-task`
 - "实施/实现" → `/implement-task`
-- "查看状态/进度" → `/task-status`
+- "查看状态/进度" → `/check-task`
 - "同步进度/更新issue" → `/sync-issue`
 
 **执行流程**: 识别意图 → 查找任务(.ai-workspace) → 执行工作流 → 更新状态 → 告知用户
@@ -214,9 +214,9 @@ mvn test              # 运行测试
 
 **PR 相关**: `/pr [branch]`, `/pr-update <pr-number>`
 
-**任务管理**: `/analyze-issue`, `/plan-task`, `/implement-task`, `/review-task`, `/complete-task`, `/block-task`, `/task-status`, `/sync-issue`
+**任务管理**: `/analyze-issue`, `/plan-task`, `/implement-task`, `/review-task`, `/complete-task`, `/block-task`, `/check-task`, `/sync-issue`
 
-**开发工具**: `/commit [message]`, `/upgrade-dep`, `/test`, `/integration-test`
+**开发工具**: `/commit [message]`, `/upgrade-dep`, `/test`, `/test-integration`
 
 **参数传递**: 使用空格分隔，包含空格时用引号包裹
 - 单参数: `/pr main`

@@ -42,7 +42,7 @@ prompt = """
    - 输出审查结果摘要。
    - 根据结果建议:
      - 无问题 -> `/fit:commit`
-     - 有问题 -> `/fit:refinement-task {{args}}`
+     - 有问题 -> `/fit:refine-task {{args}}`
      - 重大问题 -> `/fit:implement-task {{args}}`
 
 **原则**:

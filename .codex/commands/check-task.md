@@ -53,5 +53,5 @@ argument-hint: <task-id>
 - 技术方案完成 → ⚠️ 等待人工审查,审查通过后 /implement-task $1
 - 实现完成 → /review-task $1
 - 审查完成(批准) → /commit
-- 审查完成(需修改) → /refinement-task $1
+- 审查完成(需修改) → /refine-task $1
 - 任务阻塞 → 显示阻塞原因和解除条件

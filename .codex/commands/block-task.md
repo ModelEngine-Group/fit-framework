@@ -13,7 +13,7 @@ argument-hint: <task-id> [reason]
 - ⏳ 等待外部依赖
 
 **不应该标记为阻塞**:
-- ✅ 代码审查发现问题 → 使用 /refinement-task $1 修复
+- ✅ 代码审查发现问题 → 使用 /refine-task $1 修复
 - ✅ 实现遇到困难但可以解决 → 继续实施
 
 执行以下步骤:
