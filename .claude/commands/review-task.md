@@ -217,7 +217,7 @@ usage: "/review-task <task-id> [--pr-number]"
 - [ ] 已在 task.md 中标记 review.md 为已完成
 - [ ] 已告知用户下一步操作（根据审查结果）
 - [ ] 如果审查通过，告知用户可以使用 /commit 提交
-- [ ] 如果需要修复，告知用户使用 /refinement-task 修复问题
+- [ ] 如果需要修复，告知用户使用 /refine-task 修复问题
 
 ## 参数说明
 

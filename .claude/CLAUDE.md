@@ -104,7 +104,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 /commit [message]           # 提交代码
 /upgrade-dep <name> <old> <new>  # 升级依赖
 /test                       # 运行完整测试
-/integration-test           # 运行集成测试
+/test-integration           # 运行集成测试
 ```
 
 ### 任务管理
@@ -115,7 +115,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 /implement-task <task-id>   # 实施任务
 /review-task <task-id>      # 审查代码
 /complete-task <task-id>    # 完成任务
-/task-status <task-id>      # 查看状态
+/check-task <task-id>       # 查看状态
 ```
 
 ### PR 和同步

@@ -1,7 +1,7 @@
 ---
-name: "task-status"
+name: "check-task"
 description: "查看任务的当前状态和进度"
-usage: "/task-status <task-id>"
+usage: "/check-task <task-id>"
 ---
 
 # Task Status Command
@@ -83,10 +83,10 @@ usage: "/task-status <task-id>"
 
 ```bash
 # 查看任务状态
-/task-status TASK-20251227-104654
+/check-task TASK-20251227-104654
 
 # 也可以简写
-/task-status TASK-20251227-104654
+/check-task TASK-20251227-104654
 ```
 
 ## 状态说明

@@ -47,7 +47,7 @@ argument-hint: <task-id> [--pr-number]
 
 6. 告知用户:
    - 输出审查结论(批准/需修改)
-   - 如果需要修改,提示使用 /refinement-task $1 修复
+   - 如果需要修改,提示使用 /refine-task $1 修复
    - 如果批准,提示使用 /commit 提交代码
 
 **注意事项**:

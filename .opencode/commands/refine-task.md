@@ -1,7 +1,7 @@
 ---
-name: "refinement-task"
+name: "refine-task"
 description: "处理代码审查反馈并修复问题"
-usage: "/refinement-task <task-id>"
+usage: "/refine-task <task-id>"
 ---
 
 # Refinement Task Command
@@ -245,5 +245,5 @@ A: 可以，但必须在 refinement-report.md 中说明原因。阻塞问题必�
 
 ```bash
 # 处理 TASK-20260103-135501 的审查反馈
-/refinement-task TASK-20260103-135501
+/refine-task TASK-20260103-135501
 ```

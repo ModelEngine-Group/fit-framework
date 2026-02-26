@@ -233,7 +233,7 @@ ghsa_id: <GHSA-ID>
 
 - `/close-security <alert-number>` - 关闭安全告警（需提供理由）
 - `/plan-task <task-id>` - 设计修复方案
-- `/task-status <task-id>` - 查看任务状态
+- `/check-task <task-id>` - 查看任务状态
 - `/upgrade-dependency` - 升级依赖
 
 ## 错误处理

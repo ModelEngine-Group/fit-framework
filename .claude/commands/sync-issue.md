@@ -268,7 +268,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 - `/analyze-issue <number>` - 分析 Issue 并创建任务
 - `/plan-task <task-id>` - 设计技术方案
 - `/implement-task <task-id>` - 实施任务
-- `/task-status <task-id>` - 查看任务状态
+- `/check-task <task-id>` - 查看任务状态
 
 ## 错误处理
 

@@ -11,7 +11,7 @@
 | `/analyze-issue <number>` | 分析 GitHub Issue 并创建任务 | `/analyze-issue 207` |
 | `/plan <task-id>` | 为任务设计技术方案 | `/plan TASK-20251227-104654` |
 | `/implement <task-id>` | 实施任务（编写代码和测试） | `/implement TASK-20251227-104654` |
-| `/task-status <task-id>` | 查看任务当前状态和进度 | `/task-status TASK-20251227-104654` |
+| `/check-task <task-id>` | 查看任务当前状态和进度 | `/check-task TASK-20251227-104654` |
 | `/sync-issue <task-id>` | 同步任务进度到 GitHub Issue | `/sync-issue TASK-20251227-104654` |
 
 ### 已有命令
@@ -90,7 +90,7 @@
 "TASK-xxx 当前在哪一步"
 ```
 
-**等效命令**：`/task-status TASK-20251227-104654`
+**等效命令**：`/check-task TASK-20251227-104654`
 
 **AI 会输出**：
 - 任务基本信息
@@ -228,7 +228,7 @@
 ### Q: 如何知道任务当前在哪一步？
 
 ```bash
-/task-status TASK-xxx
+/check-task TASK-xxx
 ```
 
 ### Q: 忘记任务 ID 怎么办？

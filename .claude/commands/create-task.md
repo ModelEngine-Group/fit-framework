@@ -210,7 +210,7 @@ assigned_to: claude
 
 - `/analyze-issue <number>` - 从 GitHub Issue 创建任务
 - `/plan-task <task-id>` - 设计技术方案
-- `/task-status <task-id>` - 查看任务状态
+- `/check-task <task-id>` - 查看任务状态
 
 ## 错误处理
 

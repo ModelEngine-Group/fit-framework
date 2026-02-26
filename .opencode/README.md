@@ -37,7 +37,7 @@ cd .opencode && bun install
     ├── review.md
     ├── sync-issue.md
     ├── sync-pr.md
-    ├── task-status.md
+    ├── check-task.md
     ├── test.md
     └── upgrade-dependency.md
 ```
@@ -54,8 +54,8 @@ cd .opencode && bun install
 4. **`/plan-task <task-id>`** - 为任务设计技术方案并输出实施计划
 5. **`/implement-task <task-id>`** - 根据技术方案实施任务并输出实现报告
 6. **`/review-task <task-id>`** - 审查任务实现并输出代码审查报告
-7. **`/refinement-task <task-id>`** - 处理代码审查反馈并修复问题
-8. **`/task-status <task-id>`** - 查看任务的当前状态和进度
+7. **`/refine-task <task-id>`** - 处理代码审查反馈并修复问题
+8. **`/check-task <task-id>`** - 查看任务的当前状态和进度
 9. **`/complete-task <task-id>`** - 标记任务完成并归档到 completed 目录
 10. **`/block-task <task-id>`** - 标记任务阻塞并记录阻塞原因
 
@@ -101,7 +101,7 @@ cd .opencode && bun install
 /review-task TASK-20260120-104654
 
 # 5. 如果有问题需要修复
-/refinement-task TASK-20260120-104654
+/refine-task TASK-20260120-104654
 
 # 6. 提交代码
 /commit
@@ -223,7 +223,7 @@ model: anthropic/claude-3-5-sonnet-20241022  # 可选：指定模型
 
 1. **使用完整工作流**：按照 analyze → plan → implement → review → commit 的顺序执行
 2. **人工检查点**：在 plan 和 review 步骤后进行人工审查
-3. **任务状态管理**：使用 `/task-status` 随时查看任务进度
+3. **任务状态管理**：使用 `/check-task` 随时查看任务进度
 4. **及时同步**：使用 `/sync-issue` 和 `/sync-pr` 保持沟通
 5. **阻塞处理**：遇到无法解决的问题及时使用 `/block` 标记
 
