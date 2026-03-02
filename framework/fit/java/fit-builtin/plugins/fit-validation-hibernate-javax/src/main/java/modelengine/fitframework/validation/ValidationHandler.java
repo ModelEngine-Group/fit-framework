@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2025-2026 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -18,6 +18,7 @@ import org.hibernate.validator.HibernateValidator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Locale;
@@ -73,11 +74,12 @@ public class ValidationHandler implements AutoCloseable {
      */
     @Before(value = "@target(validated) && execution(public * *(..))", argNames = "joinPoint, validated")
     private void handle(JoinPoint joinPoint, Validated validated) {
+        Method method = joinPoint.getMethod();
         // 检查方法参数是否包含被 javax.validation.Constraint 标注的校验注解。
-        if (hasJavaxConstraintAnnotations(joinPoint.getMethod().getParameters())) {
+        if (hasJavaxConstraintAnnotations(method)) {
             ExecutableValidator execVal = this.validator.forExecutables();
             Set<ConstraintViolation<Object>> result = execVal.validateParameters(joinPoint.getTarget(),
-                    joinPoint.getMethod(),
+                    method,
                     joinPoint.getArgs(),
                     validated.value());
             if (!result.isEmpty()) {
@@ -95,11 +97,32 @@ public class ValidationHandler implements AutoCloseable {
     /**
      * 检查方法参数是否包含 {@code javax.validation} 校验注解。
      *
-     * @param parameters 表示可能携带校验注解的方法参数数组 {@link Parameter}{@code []}。
+     * @param method 表示待检查的方法 {@link Method}。
      * @return 如果包含 {@code javax.validation} 标注的校验注解则返回 {@code true}，否则返回 {@code false}。
      */
-    private boolean hasJavaxConstraintAnnotations(Parameter[] parameters) {
-        return Arrays.stream(parameters).anyMatch(this::hasConstraintAnnotationsInParameter);
+    private boolean hasJavaxConstraintAnnotations(Method method) {
+        if (Arrays.stream(method.getParameters()).anyMatch(this::hasConstraintAnnotationsInParameter)) {
+            return true;
+        }
+        return this.hasConstraintAnnotationsInInterfaces(method);
+    }
+
+    private boolean hasConstraintAnnotationsInInterfaces(Method method) {
+        Class<?> clazz = method.getDeclaringClass();
+        while (clazz != null) {
+            for (Class<?> iface : clazz.getInterfaces()) {
+                try {
+                    Method interfaceMethod = iface.getMethod(method.getName(), method.getParameterTypes());
+                    if (Arrays.stream(interfaceMethod.getParameters()).anyMatch(this::hasConstraintAnnotationsInParameter)) {
+                        return true;
+                    }
+                } catch (NoSuchMethodException ignored) {
+                    // 当前接口未声明该方法，继续检查其他接口。
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return false;
     }
 
     /**
@@ -109,6 +132,9 @@ public class ValidationHandler implements AutoCloseable {
      * @return 如果包含 {@code javax.validation} 标注的校验注解则返回 {@code true}，否则返回 {@code false}。
      */
     private boolean hasConstraintAnnotationsInParameter(Parameter parameter) {
+        if (Arrays.stream(parameter.getAnnotations()).anyMatch(this::isJavaxConstraintAnnotation)) {
+            return true;
+        }
         return hasConstraintAnnotationsInType(parameter.getAnnotatedType());
     }
 
@@ -120,8 +146,8 @@ public class ValidationHandler implements AutoCloseable {
      */
     private boolean hasConstraintAnnotationsInType(AnnotatedType annotatedType) {
         // 检查当前类型上的注解。
-        if (annotatedType.getAnnotations().length > 0) {
-            return Arrays.stream(annotatedType.getAnnotations()).anyMatch(this::isJavaxConstraintAnnotation);
+        if (Arrays.stream(annotatedType.getAnnotations()).anyMatch(this::isJavaxConstraintAnnotation)) {
+            return true;
         }
         // 如果是参数化类型，递归检查类型参数。
         if (annotatedType instanceof AnnotatedParameterizedType parameterizedType) {

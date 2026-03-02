@@ -87,6 +87,12 @@
                 <configuration>
                     <category>system</category>
                     <level>4</level>
+                    <sharedDependencies>
+                        <sharedDependency>
+                            <groupId>jakarta.validation</groupId>
+                            <artifactId>jakarta.validation-api</artifactId>
+                        </sharedDependency>
+                    </sharedDependencies>
                 </configuration>
             </plugin>
             <plugin>

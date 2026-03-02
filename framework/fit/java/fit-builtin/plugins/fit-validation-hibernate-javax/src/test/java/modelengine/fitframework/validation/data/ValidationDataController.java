@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2025-2026 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -9,10 +9,12 @@ package modelengine.fitframework.validation.data;
 import modelengine.fit.http.annotation.PostMapping;
 import modelengine.fit.http.annotation.RequestBody;
 import modelengine.fit.http.annotation.RequestMapping;
+import modelengine.fit.http.annotation.RequestParam;
 import modelengine.fitframework.annotation.Component;
 import modelengine.fitframework.validation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 /**
  * 表示评估注解验证数据接口集。
@@ -39,4 +41,12 @@ public class ValidationDataController {
      */
     @PostMapping(path = "/company/companyGroup", description = "验证 Company 类特定分组注解")
     public void validateCompanyGroup(@RequestBody @Valid Company company) {}
+
+    /**
+     * 验证 RequestParam 参数的 NotBlank 约束。
+     *
+     * @param name 表示待校验的名字参数的 {@link String}。
+     */
+    @PostMapping(path = "/param/notblank", description = "验证 RequestParam 参数的 NotBlank 约束")
+    public void validateRequestParamNotBlank(@RequestParam("name") @NotBlank String name) {}
 }
