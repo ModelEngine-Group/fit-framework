@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2025-2026 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -40,8 +40,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
+import javax.validation.Constraint;
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
+import javax.validation.Payload;
+import javax.validation.Valid;
 
 /**
  * {@link ValidationHandler} 的单元测试。
@@ -66,18 +74,71 @@ public class ValidationHandlerTest {
     }
 
     private ConstraintViolationException invokeHandleMethod(Method targetMethod, Object[] args) {
+        return this.invokeHandleMethod(targetMethod, this.validateService, args);
+    }
+
+    private ConstraintViolationException invokeHandleMethod(Method targetMethod, Object target, Object[] args) {
         Method handleValidatedMethod =
                 ReflectionUtils.getDeclaredMethod(ValidationHandler.class, "handle", JoinPoint.class, Validated.class);
         handleValidatedMethod.setAccessible(true);
         JoinPoint joinPoint = mock(JoinPoint.class);
         when(joinPoint.getMethod()).thenReturn(targetMethod);
         when(joinPoint.getArgs()).thenReturn(args);
-        when(joinPoint.getTarget()).thenReturn(validateService);
+        when(joinPoint.getTarget()).thenReturn(target);
 
         InvocationTargetException invocationTargetException = catchThrowableOfType(InvocationTargetException.class,
                 () -> handleValidatedMethod.invoke(handler, joinPoint, validated));
 
         return ObjectUtils.cast(invocationTargetException.getTargetException());
+    }
+
+    private boolean invokeHasJavaxConstraintAnnotations(Method targetMethod) {
+        Method hasJavaxConstraintAnnotationsMethod =
+                ReflectionUtils.getDeclaredMethod(ValidationHandler.class, "hasJavaxConstraintAnnotations",
+                        Method.class);
+        hasJavaxConstraintAnnotationsMethod.setAccessible(true);
+        try {
+            return ObjectUtils.cast(hasJavaxConstraintAnnotationsMethod.invoke(this.handler, targetMethod));
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            throw new IllegalStateException("调用 hasJavaxConstraintAnnotations 失败", exception);
+        }
+    }
+
+    @Test
+    @DisplayName("仅 PARAMETER 目标的约束注解应被检测")
+    void shouldDetectParameterConstraintWithoutTypeUse() {
+        Method method =
+                ReflectionUtils.getDeclaredMethod(GuardValidationService.class, "validateParameterOnly", String.class);
+        boolean hasConstraintAnnotations = invokeHasJavaxConstraintAnnotations(method);
+        assertThat(hasConstraintAnnotations).isTrue();
+    }
+
+    @Test
+    @DisplayName("存在非约束类型注解时仍应检测泛型参数中的约束注解")
+    void shouldDetectConstraintInGenericTypeWhenTypeHasNonConstraintAnnotation() {
+        Method method = ReflectionUtils.getDeclaredMethod(GuardValidationService.class, "validateEmployeeList",
+                List.class);
+        boolean hasConstraintAnnotations = invokeHasJavaxConstraintAnnotations(method);
+        assertThat(hasConstraintAnnotations).isTrue();
+    }
+
+    @Test
+    @DisplayName("接口声明约束注解时实现类方法也应被检测")
+    void shouldDetectConstraintAnnotationsFromInterface() {
+        Method method =
+                ReflectionUtils.getDeclaredMethod(ValidatedCommandHandlerImpl.class, "handle", Employee.class);
+        boolean hasConstraintAnnotations = invokeHasJavaxConstraintAnnotations(method);
+        assertThat(hasConstraintAnnotations).isTrue();
+    }
+
+    @Test
+    @DisplayName("接口声明约束注解时校验应生效")
+    void shouldValidateWhenConstraintAnnotationsOnInterface() {
+        Method method =
+                ReflectionUtils.getDeclaredMethod(ValidatedCommandHandlerImpl.class, "handle", Employee.class);
+        ConstraintViolationException exception =
+                invokeHandleMethod(method, new ValidatedCommandHandlerImpl(), new Object[] {null});
+        assertThat(exception.getMessage()).contains("Command cannot be null.");
     }
 
     @Test
@@ -774,4 +835,34 @@ public class ValidationHandlerTest {
             assertThat(exception.getMessage()).isNotNull();
         }
     }
+
+    private static class GuardValidationService {
+        public void validateParameterOnly(@ParameterOnlyConstraint String name) {}
+
+        public void validateEmployeeList(@NoConstraintTypeUse List<@Valid Employee> employees) {}
+    }
+
+    private interface ValidatedCommandHandler {
+        void handle(@Valid @NotNull(message = "Command cannot be null.") Employee employee);
+    }
+
+    private static class ValidatedCommandHandlerImpl implements ValidatedCommandHandler {
+        @Override
+        public void handle(Employee employee) {}
+    }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Constraint(validatedBy = {})
+    private @interface ParameterOnlyConstraint {
+        String message() default "参数不合法";
+
+        Class<?>[] groups() default {};
+
+        Class<? extends Payload>[] payload() default {};
+    }
+
+    @Target(ElementType.TYPE_USE)
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface NoConstraintTypeUse {}
 }

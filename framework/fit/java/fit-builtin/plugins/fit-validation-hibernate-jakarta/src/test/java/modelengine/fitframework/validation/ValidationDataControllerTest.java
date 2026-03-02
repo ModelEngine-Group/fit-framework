@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) 2025 Huawei Technologies Co., Ltd. All rights reserved.
+ *  Copyright (c) 2025-2026 Huawei Technologies Co., Ltd. All rights reserved.
  *  This file is a part of the ModelEngine Project.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -91,5 +91,25 @@ public class ValidationDataControllerTest {
                 .responseType(Void.class);
         this.response = this.mockMvc.perform(requestBuilder);
         assertThat(this.response.statusCode()).isEqualTo(500);
+    }
+
+    @Test
+    @DisplayName("RequestParam 参数 NotBlank 校验 - 空白值应返回 500")
+    void shouldFailWhenRequestParamIsBlank() {
+        MockRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/validation/param/notblank")
+                .param("name", "  ")
+                .responseType(Void.class);
+        this.response = this.mockMvc.perform(requestBuilder);
+        assertThat(this.response.statusCode()).isEqualTo(500);
+    }
+
+    @Test
+    @DisplayName("RequestParam 参数 NotBlank 校验 - 合法值应返回 200")
+    void shouldOkWhenRequestParamIsNotBlank() {
+        MockRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/validation/param/notblank")
+                .param("name", "validName")
+                .responseType(Void.class);
+        this.response = this.mockMvc.perform(requestBuilder);
+        assertThat(this.response.statusCode()).isEqualTo(200);
     }
 }
