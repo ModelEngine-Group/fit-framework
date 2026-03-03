@@ -32,7 +32,12 @@ public class QueryFetcher extends AbstractSourceFetcher {
      */
     public QueryFetcher(String queryKey) {
         super(false, null);
-        this.queryKey = notBlank(queryKey, () -> new RequestParamFetchException("The query key cannot be blank."));
+        this.queryKey = notBlank(queryKey, () -> new RequestParamFetchException(
+                "RequestParam 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestParam(name = \"userId\")，" +
+                "2) 使用 value 属性：@RequestParam(value = \"userId\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestParam boolean test（test 将作为参数名）"));
     }
 
     /**
@@ -43,8 +48,12 @@ public class QueryFetcher extends AbstractSourceFetcher {
      */
     public QueryFetcher(ParamValue paramValue) {
         super(paramValue.required(), paramValue.defaultValue());
-        this.queryKey =
-                notBlank(paramValue.name(), () -> new RequestParamFetchException("The query key cannot be blank."));
+        this.queryKey = notBlank(paramValue.name(), () -> new RequestParamFetchException(
+                "RequestParam 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestParam(name = \"userId\")，" +
+                "2) 使用 value 属性：@RequestParam(value = \"userId\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestParam boolean test（test 将作为参数名）"));
     }
 
     @Override

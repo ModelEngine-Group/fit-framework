@@ -30,7 +30,12 @@ public class FormUrlEncodedEntityFetcher extends EntityFetcher {
      * @param key 表示参数的键的 {@link String}。
      */
     public FormUrlEncodedEntityFetcher(String key) {
-        this.key = notBlank(key, () -> new RequestParamFetchException("The key cannot be blank."));
+        this.key = notBlank(key, () -> new RequestParamFetchException(
+                "RequestForm 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestForm(name = \"username\")，" +
+                "2) 使用 value 属性：@RequestForm(value = \"username\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestForm String username（username 将作为参数名）"));
     }
 
     /**
@@ -39,7 +44,12 @@ public class FormUrlEncodedEntityFetcher extends EntityFetcher {
      * @param paramValue 表示参数元数据的 {@link ParamValue}。
      */
     public FormUrlEncodedEntityFetcher(ParamValue paramValue) {
-        this.key = notBlank(paramValue.name(), () -> new RequestParamFetchException("The key cannot be blank."));
+        this.key = notBlank(paramValue.name(), () -> new RequestParamFetchException(
+                "RequestForm 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestForm(name = \"username\")，" +
+                "2) 使用 value 属性：@RequestForm(value = \"username\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestForm String username（username 将作为参数名）"));
     }
 
     @Override

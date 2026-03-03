@@ -23,11 +23,25 @@ import org.junit.jupiter.api.DisplayName;
 @DisplayName("参数测试模型类")
 abstract class HttpParamTest {
     /**
-     * 表示测试用的查询参数或表单参数。
+     * 表示测试用的查询参数或表单参数（指定 name 属性）。
      *
      * @param str 表示查询参数或表单参数的 {@link String}。
      */
     protected abstract void requestParam(@RequestParam(name = "p1") String str);
+
+    /**
+     * 表示测试用的查询参数或表单参数（使用参数名作为 fallback）。
+     *
+     * @param username 表示查询参数或表单参数的 {@link String}。
+     */
+    protected abstract void requestParamWithParameterName(@RequestParam String username);
+
+    /**
+     * 表示测试用的查询参数或表单参数（使用 value 属性）。
+     *
+     * @param str 表示查询参数或表单参数的 {@link String}。
+     */
+    protected abstract void requestParamWithValue(@RequestParam("user_id") String str);
 
     /**
      * 表示测试用的消息头参数。

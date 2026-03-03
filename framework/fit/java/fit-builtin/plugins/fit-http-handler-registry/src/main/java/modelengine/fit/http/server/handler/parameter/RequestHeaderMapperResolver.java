@@ -13,6 +13,7 @@ import modelengine.fit.http.server.handler.SourceFetcher;
 import modelengine.fit.http.server.handler.support.HeaderFetcher;
 import modelengine.fit.http.server.handler.support.ParamValue;
 import modelengine.fitframework.ioc.annotation.AnnotationMetadataResolver;
+import modelengine.fitframework.value.PropertyValue;
 
 import java.lang.annotation.Annotation;
 
@@ -39,9 +40,12 @@ public class RequestHeaderMapperResolver extends AbstractRequestParamMapperResol
     }
 
     @Override
-    protected SourceFetcher createSourceFetcher(RequestParam requestParam) {
+    protected SourceFetcher createSourceFetcher(RequestParam requestParam, PropertyValue propertyValue) {
+        // 获取参数名，优先级：name > value > 参数名
+        String name = this.resolveParamName(requestParam, propertyValue);
+
         return new HeaderFetcher(ParamValue.custom()
-                .name(requestParam.name())
+                .name(name)
                 .in(requestParam.in())
                 .defaultValue(requestParam.defaultValue())
                 .required(requestParam.required())

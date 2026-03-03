@@ -32,8 +32,12 @@ public class HeaderFetcher extends AbstractSourceFetcher {
      */
     public HeaderFetcher(String headerName) {
         super(false, null);
-        this.headerName =
-                notBlank(headerName, () -> new RequestParamFetchException("The header name cannot be blank."));
+        this.headerName = notBlank(headerName, () -> new RequestParamFetchException(
+                "RequestHeader 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestHeader(name = \"Content-Type\")，" +
+                "2) 使用 value 属性：@RequestHeader(value = \"Content-Type\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestHeader String contentType（contentType 将作为参数名）"));
     }
 
     /**
@@ -44,8 +48,12 @@ public class HeaderFetcher extends AbstractSourceFetcher {
      */
     public HeaderFetcher(ParamValue paramValue) {
         super(paramValue.required(), paramValue.defaultValue());
-        this.headerName =
-                notBlank(paramValue.name(), () -> new RequestParamFetchException("The header name cannot be blank."));
+        this.headerName = notBlank(paramValue.name(), () -> new RequestParamFetchException(
+                "RequestHeader 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestHeader(name = \"Content-Type\")，" +
+                "2) 使用 value 属性：@RequestHeader(value = \"Content-Type\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestHeader String contentType（contentType 将作为参数名）"));
     }
 
     @Override

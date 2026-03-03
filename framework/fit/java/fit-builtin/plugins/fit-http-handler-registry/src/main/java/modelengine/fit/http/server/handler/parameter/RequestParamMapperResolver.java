@@ -19,6 +19,7 @@ import modelengine.fit.http.server.handler.support.PathVariableFetcher;
 import modelengine.fit.http.server.handler.support.QueryFetcher;
 import modelengine.fitframework.ioc.annotation.AnnotationMetadataResolver;
 import modelengine.fitframework.util.MapBuilder;
+import modelengine.fitframework.value.PropertyValue;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -51,10 +52,13 @@ public class RequestParamMapperResolver extends AbstractRequestParamMapperResolv
     }
 
     @Override
-    protected SourceFetcher createSourceFetcher(RequestParam requestParam) {
+    protected SourceFetcher createSourceFetcher(RequestParam requestParam, PropertyValue propertyValue) {
+        // 获取参数名，优先级：name > value > 参数名
+        String name = this.resolveParamName(requestParam, propertyValue);
+
         Function<ParamValue, SourceFetcher> function = SOURCE_FETCHER_MAPPING.get(requestParam.in());
         return function.apply(ParamValue.custom()
-                .name(requestParam.name())
+                .name(name)
                 .in(requestParam.in())
                 .defaultValue(requestParam.defaultValue())
                 .required(requestParam.required())

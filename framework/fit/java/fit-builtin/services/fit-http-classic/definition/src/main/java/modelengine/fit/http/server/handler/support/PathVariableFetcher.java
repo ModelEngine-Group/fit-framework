@@ -42,8 +42,12 @@ public class PathVariableFetcher implements SourceFetcher {
      * @throws IllegalArgumentException 当 {@code variableName} 为 {@code null} 或空白字符串时。
      */
     public PathVariableFetcher(String variableName) {
-        this.variableName =
-                notBlank(variableName, () -> new RequestParamFetchException("The path variable cannot be blank."));
+        this.variableName = notBlank(variableName, () -> new RequestParamFetchException(
+                "PathVariable 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@PathVariable(name = \"id\")，" +
+                "2) 使用 value 属性：@PathVariable(value = \"id\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@PathVariable String id（id 将作为参数名）"));
     }
 
     /**
@@ -53,8 +57,12 @@ public class PathVariableFetcher implements SourceFetcher {
      * @throws IllegalArgumentException 当 {@code variableName} 为 {@code null} 或空白字符串时。
      */
     public PathVariableFetcher(ParamValue paramValue) {
-        this.variableName =
-                notBlank(paramValue.name(), () -> new RequestParamFetchException("The path variable cannot be blank."));
+        this.variableName = notBlank(paramValue.name(), () -> new RequestParamFetchException(
+                "PathVariable 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@PathVariable(name = \"id\")，" +
+                "2) 使用 value 属性：@PathVariable(value = \"id\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@PathVariable String id（id 将作为参数名）"));
     }
 
     @Override

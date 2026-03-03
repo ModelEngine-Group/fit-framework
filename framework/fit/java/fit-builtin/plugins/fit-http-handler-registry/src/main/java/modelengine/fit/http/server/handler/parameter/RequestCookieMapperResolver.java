@@ -45,9 +45,12 @@ public class RequestCookieMapperResolver extends AbstractRequestParamMapperResol
     }
 
     @Override
-    protected SourceFetcher createSourceFetcher(RequestParam requestParam) {
+    protected SourceFetcher createSourceFetcher(RequestParam requestParam, PropertyValue propertyValue) {
+        // 获取参数名，优先级：name > value > 参数名
+        String name = this.resolveParamName(requestParam, propertyValue);
+
         return new CookieFetcher(ParamValue.custom()
-                .name(requestParam.name())
+                .name(name)
                 .in(requestParam.in())
                 .defaultValue(requestParam.defaultValue())
                 .required(requestParam.required())

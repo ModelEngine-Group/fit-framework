@@ -14,9 +14,12 @@ import modelengine.fit.http.server.handler.support.TypeTransformationPropertyVal
 import modelengine.fit.http.server.handler.support.UniqueSourcePropertyValueMapper;
 import modelengine.fitframework.ioc.annotation.AnnotationMetadata;
 import modelengine.fitframework.ioc.annotation.AnnotationMetadataResolver;
+import modelengine.fitframework.util.StringUtils;
 import modelengine.fitframework.value.PropertyValue;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,11 +49,48 @@ public abstract class AbstractRequestParamMapperResolver extends AbstractPropert
     protected Optional<PropertyValueMapper> resolve(PropertyValue propertyValue, AnnotationMetadata annotations) {
         boolean isArray = this.isArray(propertyValue);
         RequestParam requestParam = annotations.getAnnotation(RequestParam.class);
-        SourceFetcher sourceFetcher = this.createSourceFetcher(requestParam);
+        SourceFetcher sourceFetcher = this.createSourceFetcher(requestParam, propertyValue);
         PropertyValueMapper mapper = new UniqueSourcePropertyValueMapper(sourceFetcher, isArray);
         TypeTransformationPropertyValueMapper typeTransformationHttpMapper =
                 new TypeTransformationPropertyValueMapper(mapper, propertyValue.getParameterizedType());
         return Optional.of(typeTransformationHttpMapper);
+    }
+
+    /**
+     * 解析参数名，支持 fallback 机制。
+     * <p>
+     * 优先级：注解的 name > 注解的 value > 方法参数名
+     *
+     * @param requestParam 表示数据参数上的注解的 {@link RequestParam}。
+     * @param propertyValue 表示属性值的 {@link PropertyValue}，用于获取参数名。
+     * @return 表示解析后的参数名的 {@link String}。
+     */
+    protected String resolveParamName(RequestParam requestParam, PropertyValue propertyValue) {
+        // 1. 优先使用 name 属性
+        String name = requestParam.name();
+        if (StringUtils.isNotBlank(name)) {
+            return name;
+        }
+
+        // 2. 尝试 value 属性（name 和 value 通过@Forward 关联，通常是同一个值）
+        name = requestParam.value();
+        if (StringUtils.isNotBlank(name)) {
+            return name;
+        }
+
+        // 3. 使用参数名作为 fallback
+        if (propertyValue != null && propertyValue.getElement().isPresent()) {
+            AnnotatedElement element = propertyValue.getElement().get();
+            if (element instanceof Parameter) {
+                name = ((Parameter) element).getName();
+                if (StringUtils.isNotBlank(name)) {
+                    return name;
+                }
+            }
+        }
+
+        // 4. 如果都为空，返回空字符串（由下游的 Fetcher 抛出更清晰的异常）
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -67,7 +107,8 @@ public abstract class AbstractRequestParamMapperResolver extends AbstractPropert
      * 创建一个数据来源的获取器。
      *
      * @param requestParam 表示数据参数上的注解的 {@link RequestParam}。
+     * @param propertyValue 表示属性值的 {@link PropertyValue}，用于获取参数名。
      * @return 表示创建出来的数据来源的获取器的 {@link SourceFetcher}。
      */
-    protected abstract SourceFetcher createSourceFetcher(RequestParam requestParam);
+    protected abstract SourceFetcher createSourceFetcher(RequestParam requestParam, PropertyValue propertyValue);
 }

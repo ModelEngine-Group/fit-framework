@@ -33,8 +33,12 @@ public class CookieFetcher extends AbstractSourceFetcher {
      */
     public CookieFetcher(String cookieName) {
         super(false, null);
-        this.cookieName =
-                notBlank(cookieName, () -> new RequestParamFetchException("The cookie name cannot be blank."));
+        this.cookieName = notBlank(cookieName, () -> new RequestParamFetchException(
+                "RequestCookie 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestCookie(name = \"sessionId\")，" +
+                "2) 使用 value 属性：@RequestCookie(value = \"sessionId\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestCookie String sessionId（sessionId 将作为参数名）"));
     }
 
     /**
@@ -45,8 +49,12 @@ public class CookieFetcher extends AbstractSourceFetcher {
      */
     public CookieFetcher(ParamValue paramValue) {
         super(paramValue.required(), paramValue.defaultValue());
-        this.cookieName =
-                notBlank(paramValue.name(), () -> new RequestParamFetchException("The cookie name cannot be blank."));
+        this.cookieName = notBlank(paramValue.name(), () -> new RequestParamFetchException(
+                "RequestCookie 必须指定参数名。" +
+                "可以通过以下方式之一指定：" +
+                "1) 使用 name 属性：@RequestCookie(name = \"sessionId\")，" +
+                "2) 使用 value 属性：@RequestCookie(value = \"sessionId\")，" +
+                "3) 编译时添加 -parameters 参数，然后使用参数名：@RequestCookie String sessionId（sessionId 将作为参数名）"));
     }
 
     @Override

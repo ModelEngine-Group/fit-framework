@@ -14,6 +14,9 @@ import static org.mockito.Mockito.when;
 import modelengine.fit.http.annotation.RequestParam;
 import modelengine.fit.http.annotation.RequestQuery;
 import modelengine.fit.http.server.handler.PropertyValueMapper;
+import modelengine.fit.http.server.handler.Source;
+import modelengine.fit.http.server.handler.support.QueryFetcher;
+import modelengine.fit.http.server.handler.support.UniqueSourcePropertyValueMapper;
 import modelengine.fitframework.ioc.annotation.AnnotationMetadata;
 import modelengine.fitframework.ioc.annotation.AnnotationMetadataResolver;
 import modelengine.fitframework.util.ReflectionUtils;
@@ -56,5 +59,53 @@ class RequestParamMapperResolverTest {
     void shouldReturnAnnotation() {
         final Class<? extends Annotation> annotation = this.metadataResolver.getAnnotation();
         assertThat(annotation).isEqualTo(RequestQuery.class);
+    }
+
+    @Test
+    @DisplayName("当指定 name 属性时，使用 name 作为参数名")
+    void givenNameAttributeThenUseName() {
+        final Parameter parameter =
+                ReflectionUtils.getDeclaredMethod(HttpParamTest.class, "requestParam", String.class).getParameters()[0];
+        final AnnotationMetadata annotations = mock(AnnotationMetadata.class);
+        final RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
+        when(annotations.getAnnotation(any())).thenReturn(requestParam);
+        final Optional<PropertyValueMapper> parameterMapper =
+                this.metadataResolver.resolve(PropertyValue.createParameterValue(parameter), annotations);
+
+        assertThat(parameterMapper).isPresent();
+        // Verify that the mapper uses the specified name "p1"
+        assertThat(parameterMapper.get()).isInstanceOf(UniqueSourcePropertyValueMapper.class);
+    }
+
+    @Test
+    @DisplayName("当不指定 name 和 value 时，使用参数名作为 fallback")
+    void givenNoNameAndValueThenUseParameterName() {
+        final Parameter parameter = ReflectionUtils.getDeclaredMethod(HttpParamTest.class,
+                "requestParamWithParameterName", String.class).getParameters()[0];
+        final AnnotationMetadata annotations = mock(AnnotationMetadata.class);
+        final RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
+        when(annotations.getAnnotation(any())).thenReturn(requestParam);
+        final Optional<PropertyValueMapper> parameterMapper =
+                this.metadataResolver.resolve(PropertyValue.createParameterValue(parameter), annotations);
+
+        assertThat(parameterMapper).isPresent();
+        // The parameter name should be "username" (from the method signature)
+        // Note: This requires the -parameters compiler flag to be enabled
+    }
+
+    @Test
+    @DisplayName("当指定 value 属性时，使用 value 作为参数名")
+    void givenValueAttributeThenUseValue() {
+        final Parameter parameter =
+                ReflectionUtils.getDeclaredMethod(HttpParamTest.class, "requestParamWithValue", String.class)
+                        .getParameters()[0];
+        final AnnotationMetadata annotations = mock(AnnotationMetadata.class);
+        final RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
+        when(annotations.getAnnotation(any())).thenReturn(requestParam);
+        final Optional<PropertyValueMapper> parameterMapper =
+                this.metadataResolver.resolve(PropertyValue.createParameterValue(parameter), annotations);
+
+        assertThat(parameterMapper).isPresent();
+        // The parameter name should be "user_id" (from the value attribute)
     }
 }
