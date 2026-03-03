@@ -1,6 +1,6 @@
 ---
 description: 提交当前变更到 Git（提供最佳实践指南）
-usage: /prompts:commit
+usage: /prompts:fit-commit
 ---
 
 # Commit Command
@@ -10,7 +10,7 @@ usage: /prompts:commit
 **此命令提供 Git 提交的最佳实践指南。**
 
 **用法：**
-- `/prompts:commit` - 查看提交指南
+- `/prompts:fit-commit` - 查看提交指南
 
 **功能说明：**
 
@@ -431,9 +431,9 @@ git push origin feature/user-auth
 
 ## 相关命令
 
-- `/prompts:review-task <task-id>` - 代码审查（提交前）
-- `/prompts:create-pr <target-branch>` - 创建 Pull Request（提交后）
-- `/prompts:complete-task <task-id>` - 归档任务（工作完成后）
+- `/prompts:fit-review-task <task-id>` - 代码审查（提交前）
+- `/prompts:fit-create-pr <target-branch>` - 创建 Pull Request（提交后）
+- `/prompts:fit-complete-task <task-id>` - 归档任务（工作完成后）
 
 ---
 

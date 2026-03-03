@@ -1,6 +1,6 @@
 ---
 description: 执行完整的测试流程
-usage: /prompts:test
+usage: /prompts:fit-test
 ---
 
 # Test Command

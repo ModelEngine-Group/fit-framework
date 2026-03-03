@@ -1,6 +1,6 @@
 ---
 description: 执行集成测试（需要先完成构建）
-usage: /prompts:test-integration
+usage: /prompts:fit-test-integration
 ---
 
 # Integration Test Command
@@ -15,10 +15,10 @@ usage: /prompts:test-integration
 
 执行 FIT Framework 的集成测试，包括服务启动和接口验证。
 
-**前置条件**：需要先完成 Maven 构建，确保 `build/` 目录存在。如果还没有构建，请先运行 `/prompts:test` 命令。
+**前置条件**：需要先完成 Maven 构建，确保 `build/` 目录存在。如果还没有构建，请先运行 `/prompts:fit-test` 命令。
 
 **用法：**
-- `/prompts:test-integration` - 执行集成测试流程
+- `/prompts:fit-test-integration` - 执行集成测试流程
 
 **执行方式：**
 
@@ -27,7 +27,7 @@ usage: /prompts:test-integration
 **步骤 1：验证构建产物**
 ```bash
 if [ ! -d "build" ]; then
-    echo "错误: 构建产物不存在，请先运行 /prompts:test 命令"
+    echo "错误: 构建产物不存在，请先运行 /prompts:fit-test 命令"
     exit 1
 fi
 ```
@@ -72,7 +72,7 @@ exit $test_result
 
 **注意事项：**
 
-1. **前置条件**：必须先运行 `/prompts:test` 完成构建，或确保 `build/` 目录存在
+1. **前置条件**：必须先运行 `/prompts:fit-test` 完成构建，或确保 `build/` 目录存在
 2. **端口冲突**：确保 8080 端口未被占用（脚本会自动检测并清理）
 3. **超时设置**：服务启动步骤设置 90 秒超时，验证步骤设置 30 秒超时
 4. **并行执行**：各步骤需按顺序执行，不可并行
@@ -85,6 +85,6 @@ exit $test_result
 
 ## 相关命令
 
-- `/prompts:test` - 执行完整测试流程（包含构建）
-- `/prompts:commit` - 提交代码变更
-- `/prompts:create-pr` - 创建 Pull Request
+- `/prompts:fit-test` - 执行完整测试流程（包含构建）
+- `/prompts:fit-commit` - 提交代码变更
+- `/prompts:fit-create-pr` - 创建 Pull Request

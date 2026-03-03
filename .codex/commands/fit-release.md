@@ -1,6 +1,6 @@
 ---
 description: 执行版本发布流程（SNAPSHOT 替换、Release commit、Tag、发布分支、下一 SNAPSHOT）
-usage: /prompts:release <version>
+usage: /prompts:fit-release <version>
 ---
 
 # Release Command
@@ -11,7 +11,7 @@ usage: /prompts:release <version>
 **不含自动推送**：仅做本地操作，推送由用户手动完成。
 
 **用法：**
-- `/prompts:release 1.2.3` - 发布 1.2.3 版本
+- `/prompts:fit-release 1.2.3` - 发布 1.2.3 版本
 
 **参数说明：**
 - `<version>`: 发布版本号，格式为 `X.Y.Z`（必需），例如 `1.2.3`
@@ -156,7 +156,7 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
 ### 示例 1：发布 1.2.3
 
 ```bash
-/prompts:release 1.2.3
+/prompts:fit-release 1.2.3
 ```
 
 执行后：
@@ -200,7 +200,7 @@ git checkout -- .
 
 ## 相关命令
 
-- `/prompts:create-release-note` - 生成 Release Notes 并创建 GitHub Draft Release
-- `/prompts:commit` - 提交代码
-- `/prompts:test` - 运行测试
-- `/prompts:create-pr` - 创建 Pull Request
+- `/prompts:fit-create-release-note` - 生成 Release Notes 并创建 GitHub Draft Release
+- `/prompts:fit-commit` - 提交代码
+- `/prompts:fit-test` - 运行测试
+- `/prompts:fit-create-pr` - 创建 Pull Request
