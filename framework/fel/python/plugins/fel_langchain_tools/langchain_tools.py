@@ -1,10 +1,11 @@
 # -- encoding: utf-8 --
-# Copyright (c) 2024 Huawei Technologies Co., Ltd. All Rights Reserved.
+# Copyright (c) 2024-2026 Huawei Technologies Co., Ltd. All Rights Reserved.
 # This file is a part of the ModelEngine Project.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # ======================================================================================================================
+import ipaddress
 import json
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 
 from langchain.agents import AgentExecutor
 from langchain_community.agent_toolkits import JsonToolkit, create_json_agent
@@ -29,6 +30,69 @@ from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 
 from .langchain_registers import register_function_tools, register_api_tools
+
+
+# SSRF 防护黑名单网络段
+_BLOCKED_NETWORKS = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("0.0.0.0/8"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+]
+_BLOCKED_HOSTNAMES = {"localhost", "0.0.0.0"}
+
+
+def _validate_url(url: str) -> None:
+    """校验 URL 是否安全，拦截 SSRF 攻击目标地址。"""
+    parsed_url = urlparse(url)
+    hostname = parsed_url.hostname
+    if not hostname:
+        raise ValueError(f"Invalid URL: {url}")
+    if hostname.lower() in _BLOCKED_HOSTNAMES:
+        raise ValueError(f"Request blocked: URL '{url}' targets a restricted host ({hostname})")
+
+    try:
+        ip = ipaddress.ip_address(hostname)
+    except ValueError:
+        # 域名先放行，不在此处执行 DNS 解析。
+        return
+
+    mapped_ipv4 = getattr(ip, "ipv4_mapped", None)
+    if mapped_ipv4:
+        ip = mapped_ipv4
+
+    for network in _BLOCKED_NETWORKS:
+        if ip in network:
+            raise ValueError(f"Request blocked: URL '{url}' targets a restricted network ({network})")
+
+
+class SafeRequestsWrapper(TextRequestsWrapper):
+    """带 SSRF 防护的 HTTP 请求包装器。"""
+
+    def get(self, url: str, **kwargs) -> str:
+        _validate_url(url)
+        return super().get(url, **kwargs)
+
+    def post(self, url: str, data: dict, **kwargs) -> str:
+        _validate_url(url)
+        return super().post(url, data, **kwargs)
+
+    def patch(self, url: str, data: dict, **kwargs) -> str:
+        _validate_url(url)
+        return super().patch(url, data, **kwargs)
+
+    def put(self, url: str, data: dict, **kwargs) -> str:
+        _validate_url(url)
+        return super().put(url, data, **kwargs)
+
+    def delete(self, url: str, **kwargs) -> str:
+        _validate_url(url)
+        return super().delete(url, **kwargs)
 
 
 # 从app_engine加密传输敏感信息
@@ -113,35 +177,35 @@ def langchain_sql_agent(kwargs) -> AgentExecutor:
 
 def langchain_request_get(kwargs) -> BaseTool:
     return RequestsGetTool(
-        requests_wrapper=TextRequestsWrapper(headers={}),
+        requests_wrapper=SafeRequestsWrapper(headers={}),
         allow_dangerous_requests=True,
     )
 
 
 def langchain_request_post(kwargs) -> BaseTool:
     return RequestsPostTool(
-        requests_wrapper=TextRequestsWrapper(headers={}),
+        requests_wrapper=SafeRequestsWrapper(headers={}),
         allow_dangerous_requests=True,
     )
 
 
 def langchain_request_patch(kwargs) -> BaseTool:
     return RequestsPatchTool(
-        requests_wrapper=TextRequestsWrapper(headers={}),
+        requests_wrapper=SafeRequestsWrapper(headers={}),
         allow_dangerous_requests=True,
     )
 
 
 def langchain_request_delete(kwargs) -> BaseTool:
     return RequestsDeleteTool(
-        requests_wrapper=TextRequestsWrapper(headers={}),
+        requests_wrapper=SafeRequestsWrapper(headers={}),
         allow_dangerous_requests=True,
     )
 
 
 def langchain_request_put(kwargs) -> BaseTool:
     return RequestsPutTool(
-        requests_wrapper=TextRequestsWrapper(headers={}),
+        requests_wrapper=SafeRequestsWrapper(headers={}),
         allow_dangerous_requests=True,
     )
 
