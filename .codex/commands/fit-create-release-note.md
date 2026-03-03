@@ -1,6 +1,6 @@
 ---
 description: 从 PR/commit 中自动生成结构化的 Release Notes，并可选创建 GitHub Draft Release
-usage: /prompts:create-release-note <version> [prev-version]
+usage: /prompts:fit-create-release-note <version> [prev-version]
 argument-hint: <version> [prev-version]
 ---
 
@@ -11,9 +11,9 @@ argument-hint: <version> [prev-version]
 对于 x.y.0 版本，支持合并前一 minor 系列的已发布 release notes，无需重复计算。
 
 **用法：**
-- `/prompts:create-release-note 3.6.3` — 自动推断上一版本为 3.6.2
-- `/prompts:create-release-note 3.6.3 3.6.2` — 手动指定范围
-- `/prompts:create-release-note 3.7.0` — x.y.0 版本：合并 3.6.x 系列的所有 release notes
+- `/prompts:fit-create-release-note 3.6.3` — 自动推断上一版本为 3.6.2
+- `/prompts:fit-create-release-note 3.6.3 3.6.2` — 手动指定范围
+- `/prompts:fit-create-release-note 3.7.0` — x.y.0 版本：合并 3.6.x 系列的所有 release notes
 
 **参数说明：**
 - `<version>`: 当前发布版本号，格式为 `X.Y.Z`（必需）
@@ -287,7 +287,7 @@ gh release create v<version> \
 ## 注意事项
 
 1. **需要 `gh` CLI**：本命令依赖 GitHub CLI（`gh`），请确保已安装并认证
-2. **Tag 必须已存在**：运行本命令前，确保 `v<version>` 和上一版本的 tag 已创建（通常由 `/prompts:release` 命令完成）
+2. **Tag 必须已存在**：运行本命令前，确保 `v<version>` 和上一版本的 tag 已创建（通常由 `/prompts:fit-release` 命令完成）
 3. **Draft 模式**：创建的是草稿 Release，不会自动发布，需要人工审核后在 GitHub 上发布
 4. **PR 搜索范围**：基于日期范围搜索，可能包含少量超出范围的 PR，命令会尽力过滤
 5. **模块分类准确性**：自动分类基于 title/scope/文件路径推断，复杂 PR 可能需要人工调整
@@ -296,7 +296,7 @@ gh release create v<version> \
 ## 错误处理
 
 - **版本号格式错误**：提示正确格式并退出
-- **Tag 不存在**：提示确认 tag 已创建（可能需要先执行 `/prompts:release`）
+- **Tag 不存在**：提示确认 tag 已创建（可能需要先执行 `/prompts:fit-release`）
 - **`gh` CLI 未安装或未认证**：提示安装/认证方法
 - **无合并 PR**：提示版本范围内没有找到合并的 PR，建议检查 tag 和分支
 - **GitHub API 限流**：提示稍后重试
@@ -304,6 +304,6 @@ gh release create v<version> \
 
 ## 相关命令
 
-- `/prompts:release` - 执行版本发布流程（创建 tag 和发布分支）
-- `/prompts:commit` - 提交代码
-- `/prompts:create-pr` - 创建 Pull Request
+- `/prompts:fit-release` - 执行版本发布流程（创建 tag 和发布分支）
+- `/prompts:fit-commit` - 提交代码
+- `/prompts:fit-create-pr` - 创建 Pull Request
