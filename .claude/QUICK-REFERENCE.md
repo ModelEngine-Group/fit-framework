@@ -264,9 +264,9 @@ grep -r "#207" .ai-workspace/active/
 
 ## 📚 更多信息
 
-- **详细文档**：`.ai-agents/README.md`
-- **快速开始**：`.ai-agents/QUICKSTART.md`
-- **工作流定义**：`.ai-agents/workflows/`
+- **详细文档**：`.agents/README.md`
+- **快速开始**：`.agents/QUICKSTART.md`
+- **工作流定义**：`.agents/workflows/`
 - **项目规则**：`.claude/project-rules.md`
 
 ---

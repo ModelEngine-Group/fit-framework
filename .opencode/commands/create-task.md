@@ -40,7 +40,7 @@ subtask: false
 3. 创建任务目录:
    !`mkdir -p .ai-workspace/active/TASK-$(date +%Y%m%d-%H%M%S)/ && echo "✅ 任务目录创建成功" || echo "❌ ERROR: 目录创建失败"`
 
-   使用 Write 工具基于 .ai-agents/templates/task.md 模板创建 task.md 文件:
+   使用 Write 工具基于 .agents/templates/task.md 模板创建 task.md 文件:
    - 填写任务元数据: id, type, workflow, status, created_at, updated_at 等
    - created_by: human (任务来源于用户的自然语言描述)
    - current_step: requirement-analysis
@@ -77,7 +77,7 @@ subtask: false
    - 提示下一步使用 /plan-task $TASK_ID 设计技术方案
 
 **注意事项**:
-- 严格遵循 .ai-agents/workflows/feature-development.yaml 工作流定义
+- 严格遵循 .agents/workflows/feature-development.yaml 工作流定义
 - 分析完成后建议人工审查
 - 与 analyze-issue 的区别: create-task 从用户自然语言描述创建，相关Issue标记为"无"
 - 如果用户描述模糊或缺少关键信息，先向用户确认

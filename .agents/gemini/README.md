@@ -13,8 +13,8 @@
 在开始工作前，Gemini 应该：
 
 1. 读取 `AGENTS.md`（项目根目录）了解项目基本信息
-2. 读取 `.ai-agents/README.md` 了解协作流程
-3. 读取 `.ai-agents/workflows/` 了解工作流定义
+2. 读取 `.agents/README.md` 了解协作流程
+3. 读取 `.agents/workflows/` 了解工作流定义
 
 ### 2. 接手任务
 

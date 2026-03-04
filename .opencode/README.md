@@ -230,8 +230,8 @@ model: anthropic/claude-3-5-sonnet-20241022  # 可选：指定模型
 ## 📚 相关文档
 
 - [OpenCode 官方文档](https://opencode.ai/docs/commands)
-- [FIT Framework AI 协作指南](../.ai-agents/README.md)
-- [AI 协作快速开始](../.ai-agents/QUICKSTART.md)
+- [FIT Framework AI 协作指南](../.agents/README.md)
+- [AI 协作快速开始](../.agents/QUICKSTART.md)
 
 ## 🤝 贡献
 

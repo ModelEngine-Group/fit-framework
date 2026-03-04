@@ -10,7 +10,7 @@
 
 ```bash
 # 复制任务模板
-cp .ai-agents/templates/task.md .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md
+cp .agents/templates/task.md .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md
 ```
 
 编辑任务文件，填写：
@@ -91,7 +91,7 @@ ClaudeCode 会：
 
 ```bash
 # 1. 创建 Bug 任务
-cp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/task.md
+cp .agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/task.md
 # 编辑：type: bugfix, workflow: bug-fix
 
 # 2. ClaudeCode 分析 Bug
@@ -111,7 +111,7 @@ cp .ai-agents/templates/task.md .ai-workspace/active/BUG-{yyyyMMdd}-{task-id}/ta
 
 ```bash
 # 1. 创建审查任务
-cp .ai-agents/templates/task.md .ai-workspace/active/REVIEW-PR-{task-id}/task.md
+cp .agents/templates/task.md .ai-workspace/active/REVIEW-PR-{task-id}/task.md
 # 编辑：type: review, workflow: code-review
 
 # 2. ClaudeCode 执行审查
@@ -126,7 +126,7 @@ cp .ai-agents/templates/task.md .ai-workspace/active/REVIEW-PR-{task-id}/task.md
 
 ```bash
 # 1. 创建重构任务
-cp .ai-agents/templates/task.md .ai-workspace/active/REFACTOR-{yyyyMMdd}-{task-id}/task.md
+cp .agents/templates/task.md .ai-workspace/active/REFACTOR-{yyyyMMdd}-{task-id}/task.md
 # 编辑：type: refactor, workflow: refactoring
 
 # 2. ClaudeCode 分析和规划
@@ -230,19 +230,19 @@ cat .ai-workspace/active/TASK-{yyyyMMdd}-{task-id}/task.md
 
 **解决方案**：查看工作流定义
 ```bash
-cat .ai-agents/workflows/feature-development.yaml
+cat .agents/workflows/feature-development.yaml
 ```
 
 ---
 
 ## 📚 进一步学习
 
-- **协作总指南**：`.ai-agents/README.md`
-- **工作流定义**：`.ai-agents/workflows/`
-- **任务模板**：`.ai-agents/templates/`
+- **协作总指南**：`.agents/README.md`
+- **工作流定义**：`.agents/workflows/`
+- **任务模板**：`.agents/templates/`
 - **ClaudeCode 配置**：`.claude/README.md`
-- **Codex 配置**：`.ai-agents/codex/README.md`
-- **GeminiCli 配置**：`.ai-agents/gemini/README.md`
+- **Codex 配置**：`.agents/codex/README.md`
+- **GeminiCli 配置**：`.agents/gemini/README.md`
 
 ---
 
@@ -267,15 +267,15 @@ cat .ai-agents/workflows/feature-development.yaml
 **Codex** (OpenAI/ChatGPT) - 执行型专家
 - 擅长：代码实现、快速迭代、单元测试
 - 特点：代码生成速度快、补全准确
-- 配置：`.ai-agents/codex/` 目录
+- 配置：`.agents/codex/` 目录
 
 **GeminiCli** (Google Gemini) - 全能型专家
 - 擅长：大规模代码分析、复杂问题修复
 - 特点：超大上下文窗口（2M tokens）
-- 配置：`.ai-agents/gemini/` 目录
+- 配置：`.agents/gemini/` 目录
 
 ---
 
 **祝协作愉快！** 🎉
 
-有问题查看 `.ai-agents/README.md` 或询问项目维护者。
+有问题查看 `.agents/README.md` 或询问项目维护者。

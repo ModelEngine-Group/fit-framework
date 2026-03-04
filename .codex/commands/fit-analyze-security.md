@@ -18,7 +18,7 @@ argument-hint: <alert-number>
    date +%Y%m%d-%H%M%S
    mkdir -p .ai-workspace/active/TASK-<timestamp>/
    ```
-   使用 Write 工具基于 .ai-agents/templates/task.md 模板创建 task.md:
+   使用 Write 工具基于 .agents/templates/task.md 模板创建 task.md:
    - security_alert_number: $1
    - severity, cve_id, ghsa_id
    - current_step: security-analysis

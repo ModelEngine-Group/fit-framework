@@ -35,7 +35,7 @@
 #!/bin/bash
 
 # 加载公共脚本
-source .ai-agents/scripts/fit-service.sh
+source .agents/scripts/fit-service.sh
 
 # 初始化环境
 init_log_dir
@@ -61,19 +61,19 @@ exit $TEST_RESULT
 
 ```bash
 # 启动服务
-.ai-agents/scripts/fit-service.sh start
+.agents/scripts/fit-service.sh start
 
 # 验证接口
-.ai-agents/scripts/fit-service.sh verify
+.agents/scripts/fit-service.sh verify
 
 # 停止服务
-.ai-agents/scripts/fit-service.sh stop
+.agents/scripts/fit-service.sh stop
 
 # 清理环境（保留构建产物）
-.ai-agents/scripts/fit-service.sh cleanup
+.agents/scripts/fit-service.sh cleanup
 
 # 清理环境（包含构建产物）
-.ai-agents/scripts/fit-service.sh cleanup true
+.agents/scripts/fit-service.sh cleanup true
 ```
 
 #### 特性
@@ -92,7 +92,7 @@ exit $TEST_RESULT
 #### 使用方法
 
 ```bash
-.ai-agents/scripts/run-test.sh
+.agents/scripts/run-test.sh
 ```
 
 ## 调用关系
@@ -102,7 +102,7 @@ exit $TEST_RESULT
 ├── test.md              → 调用 fit-service.sh（完整测试）
 └── test-integration.md  → 调用 fit-service.sh（仅集成测试）
 
-.ai-agents/scripts/
+.agents/scripts/
 ├── fit-service.sh       ← 被测试命令调用
 └── run-test.sh          ← 独立测试脚本
 ```

@@ -49,7 +49,7 @@ subtask: false
 - `package.json` — Node.js 版本号
 
 **必须排除的目录**（这些目录包含 AI 工具配置、命令模板和示例，不应被版本替换影响）:
-- `.ai-agents/`
+- `.agents/`
 - `.ai-workspace/`
 - `.claude/`
 - `.codex/`

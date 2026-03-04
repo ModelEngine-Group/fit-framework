@@ -18,7 +18,7 @@ Issue 信息:
 3. **创建任务目录**:
    使用 `run_shell_command` 创建目录: `.ai-workspace/active/TASK-{timestamp}/`
    
-   使用 `write_file` 基于 `.ai-agents/templates/task.md` (如果存在) 或创建新的 `task.md` 文件:
+   使用 `write_file` 基于 `.agents/templates/task.md` (如果存在) 或创建新的 `task.md` 文件:
    - 填写任务元数据: issue_number, title, created_at, workflow 等。
    - created_at 和 updated_at 使用当前时间。
 
@@ -49,6 +49,6 @@ Issue 信息:
    - 提示下一步使用 `/fit:plan-task {{args}}` 设计技术方案
 
 **注意事项**:
-- 严格遵循 `.ai-agents/workflows/feature-development.yaml` 工作流定义
+- 严格遵循 `.agents/workflows/feature-development.yaml` 工作流定义
 - 分析完成后建议人工审查
 """

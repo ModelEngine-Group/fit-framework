@@ -34,7 +34,7 @@ prompt = """
 3. **创建任务目录**:
    使用 `run_shell_command` 创建目录: `.ai-workspace/active/TASK-{timestamp}/`
 
-   使用 `write_file` 基于 `.ai-agents/templates/task.md` (如果存在) 或创建新的 `task.md` 文件:
+   使用 `write_file` 基于 `.agents/templates/task.md` (如果存在) 或创建新的 `task.md` 文件:
    - 填写任务元数据: id, type, workflow, status, created_at, updated_at 等。
    - created_by: human (任务来源于用户的自然语言描述)
    - current_step: requirement-analysis
@@ -70,7 +70,7 @@ prompt = """
    - 提示下一步使用 `/fit:plan-task {task-id}` 设计技术方案
 
 **注意事项**:
-- 严格遵循 `.ai-agents/workflows/feature-development.yaml` 工作流定义
+- 严格遵循 `.agents/workflows/feature-development.yaml` 工作流定义
 - 分析完成后建议人工审查
 - 与 analyze-issue 的区别: create-task 从用户自然语言描述创建，相关Issue标记为"无"
 

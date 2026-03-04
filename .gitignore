@@ -28,8 +28,8 @@ tmp/
 !.ai-workspace/logs/.gitkeep
 
 # AI Agents local settings
-.ai-agents/*/local/
-.ai-agents/*/cache/
+.agents/*/local/
+.agents/*/cache/
 
 # Python
 __pycache__/

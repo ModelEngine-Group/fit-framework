@@ -39,7 +39,7 @@ argument-hint: <description>
    ```bash
    mkdir -p .ai-workspace/active/TASK-<timestamp>/
    ```
-   使用 Write 工具基于 .ai-agents/templates/task.md 模板创建 task.md 文件:
+   使用 Write 工具基于 .agents/templates/task.md 模板创建 task.md 文件:
    - 填写任务元数据: id, type, workflow, status, created_at, updated_at 等
    - created_by: human(任务来源于用户的自然语言描述)
    - current_step: requirement-analysis

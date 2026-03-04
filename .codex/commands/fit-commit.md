@@ -310,7 +310,7 @@ git add <file-path>
 **scope 参考（按目录）**：
 - `.codex/` → `codex`（如：`docs(codex): ...`）
 - `.claude/` → `claude`（如：`docs(claude): ...`）
-- `.ai-agents/` → `agents`
+- `.agents/` → `agents`
 - `framework/fit/java` → `fit`
 - `framework/waterflow` → `waterflow`
 - `framework/fel` → `fel`

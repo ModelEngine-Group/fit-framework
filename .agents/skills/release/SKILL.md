@@ -18,7 +18,7 @@ description: 执行标准化的版本发布流程（SNAPSHOT 替换、Release co
 2. **确认工作区状态**: 工作区必须干净（无未提交更改）。
 
 3. **全局替换 SNAPSHOT -> Release**: 将 `X.Y.Z-SNAPSHOT` 替换为 `X.Y.Z`。
-   排除目录: `.ai-agents/`, `.ai-workspace/`, `.claude/`, `.codex/`, `.gemini/`, `.opencode/`
+   排除目录: `.agents/`, `.ai-workspace/`, `.claude/`, `.codex/`, `.gemini/`, `.opencode/`
 
 4. **创建 Release commit**: `git add -A && git commit -m "Release X.Y.Z"`
 

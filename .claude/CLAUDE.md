@@ -15,7 +15,7 @@ cd framework/fit/java && mvn clean install
 ./build/bin/fit start
 
 # 完整验证流程（构建 + 启动 + 健康检查）
-./.ai-agents/scripts/run-test.sh
+./.agents/scripts/run-test.sh
 ```
 
 ## 编码规范
@@ -136,10 +136,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 本项目支持 Claude、ChatGPT、Gemini、Cursor 等多个 AI 工具协同工作。
 
 **协作配置目录**：
-- `.ai-agents/` - AI 配置和工作流定义（版本控制）
+- `.agents/` - AI 配置和工作流定义（版本控制）
 - `.ai-workspace/` - 协作工作区（临时文件，已被 git ignore）
 
-**详细协作指南**：`.ai-agents/README.md`
+**详细协作指南**：`.agents/README.md`
 
 ---
 

@@ -33,10 +33,10 @@
       "Bash(rm -rf coverage)",
       "Bash(rm -rf .pytest_cache)",
       "Bash(rm -rf __pycache__)",
-      "Bash(.ai-agents/scripts/run-test.sh)",
-      "Bash(./.ai-agents/scripts/run-test.sh)",
-      "Bash(bash .ai-agents/scripts/run-test.sh)",
-      "Bash(sh .ai-agents/scripts/run-test.sh)",
+      "Bash(.agents/scripts/run-test.sh)",
+      "Bash(./.agents/scripts/run-test.sh)",
+      "Bash(bash .agents/scripts/run-test.sh)",
+      "Bash(sh .agents/scripts/run-test.sh)",
       "Read(//tmp/**)"
     ],
     "deny": [

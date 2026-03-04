@@ -39,7 +39,7 @@ fi
 ### 步骤 3：加载公共脚本并初始化环境
 
 ```bash
-source .ai-agents/scripts/fit-service.sh
+source .agents/scripts/fit-service.sh
 
 init_plugin_dir
 ```

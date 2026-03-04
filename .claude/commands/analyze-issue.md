@@ -28,11 +28,11 @@ gh issue view <issue-number> --json number,title,body,labels
 - 在 `.ai-workspace/active/` 中搜索相关任务
 - 如果找到，询问是否重新分析
 - 如果没有，创建任务目录：`.ai-workspace/active/TASK-{yyyyMMdd-HHmmss}/`
-- 使用 `.ai-agents/templates/task.md` 模板创建任务文件：`task.md`
+- 使用 `.agents/templates/task.md` 模板创建任务文件：`task.md`
 
 ### 3. 执行需求分析
 
-按照 `.ai-agents/workflows/feature-development.yaml` 中的 `requirement-analysis` 步骤：
+按照 `.agents/workflows/feature-development.yaml` 中的 `requirement-analysis` 步骤：
 
 **必须完成的任务**：
 - [ ] 阅读并理解 Issue 描述
@@ -137,7 +137,7 @@ gh issue view <issue-number> --json number,title,body,labels
      - 继续使用现有分析
 
 3. **工作流遵循**：
-   - 严格遵循 `.ai-agents/workflows/feature-development.yaml` 定义
+   - 严格遵循 `.agents/workflows/feature-development.yaml` 定义
    - 输出文件必须符合工作流要求
 
 4. **人工检查点**：

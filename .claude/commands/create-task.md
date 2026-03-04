@@ -40,7 +40,7 @@ usage: "/create-task <description>"
 ### 2. 创建任务目录和文件
 
 - 创建任务目录：`.ai-workspace/active/TASK-{yyyyMMdd-HHmmss}/`
-- 使用 `.ai-agents/templates/task.md` 模板创建任务文件：`task.md`
+- 使用 `.agents/templates/task.md` 模板创建任务文件：`task.md`
 
 ⚠️ **重要**：
 - 任务目录命名：`TASK-{yyyyMMdd-HHmmss}`（**必须**包含 `TASK-` 前缀）
@@ -64,7 +64,7 @@ assigned_to: claude
 
 ### 3. 执行需求分析
 
-按照 `.ai-agents/workflows/feature-development.yaml` 中的 `requirement-analysis` 步骤：
+按照 `.agents/workflows/feature-development.yaml` 中的 `requirement-analysis` 步骤：
 
 **必须完成的任务**（仅分析，不编写任何业务代码）：
 - [ ] 理解用户描述的需求

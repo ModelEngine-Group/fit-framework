@@ -255,7 +255,7 @@ updated_at: 2026-01-23 10:30:00
 !`for file in $(git diff --cached --name-only); do grep -l "Copyright" "$file" && ...; done`
 
 # ✅ 推荐 - 抽取为独立脚本
-!`./.ai-agents/scripts/update-copyright.sh`
+!`./.agents/scripts/update-copyright.sh`
 ```
 
 ---
