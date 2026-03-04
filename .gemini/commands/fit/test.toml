@@ -18,4 +18,10 @@ prompt = """
 
 4. **报告**:
    - 输出测试摘要 (成功/失败)。
+
+**下一步**:
+测试通过后，使用以下命令提交代码:
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
 """

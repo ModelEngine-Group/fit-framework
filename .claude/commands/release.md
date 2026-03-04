@@ -196,7 +196,9 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
    git push origin <current-branch>
 
 3. （可选）生成 Release Notes 并创建 Draft Release：
-   /create-release-note X.Y.Z
+   - Claude Code / OpenCode: `/create-release-note X.Y.Z`
+   - Gemini CLI: `/fit:create-release-note X.Y.Z`
+   - Codex CLI: `/prompts:fit-create-release-note X.Y.Z`
 ```
 
 ## 使用示例

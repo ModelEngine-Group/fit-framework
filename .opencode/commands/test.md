@@ -80,6 +80,13 @@ exit $TEST_RESULT
 - **端口要求：** 确保 8080 端口未被占用
 - **预计时间：** 整个流程约 15-20 分钟
 
+**下一步：**
+
+测试通过后，使用以下命令提交代码：
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
+
 ## 输出文件
 
 - `.ai-workspace/logs/maven-build-{timestamp}.log` - Maven 构建完整日志

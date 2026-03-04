@@ -99,6 +99,12 @@ subtask: false
    - ✅ 代码审查报告
    - ✅ 代码提交并合并
    
+   **下一步**：
+   如果还有其他待处理任务，可以使用以下命令查看：
+   - Claude Code / OpenCode: `/check-task {task-id}`
+   - Gemini CLI: `/fit:check-task {task-id}`
+   - Codex CLI: `/prompts:fit-check-task {task-id}`
+
    任务已成功归档!🎊
    ```
 

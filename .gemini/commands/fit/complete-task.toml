@@ -34,6 +34,11 @@ prompt = """
 5. **告知用户**:
    - 任务已归档到 `.ai-workspace/completed/{{args}}/`。
    - 列出交付成果。
+   - 提示下一步:
+     - 如果还有其他待处理任务:
+       - Claude Code / OpenCode: `/check-task {task-id}`
+       - Gemini CLI: `/fit:check-task {task-id}`
+       - Codex CLI: `/prompts:fit-check-task {task-id}`
 
 **注意**: 只有在真正完成所有工作后才执行此操作。
 """

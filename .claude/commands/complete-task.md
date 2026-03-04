@@ -195,6 +195,12 @@ test -d .ai-workspace/completed/{task-id} && echo "已归档到 completed" || ec
 - 代码行数: +{新增行数} -{删除行数}
 - 工作时长: {从创建到完成的时间}
 
+**下一步**：
+如果还有其他待处理任务，可以使用以下命令查看：
+- Claude Code / OpenCode: `/check-task {task-id}`
+- Gemini CLI: `/fit:check-task {task-id}`
+- Codex CLI: `/prompts:fit-check-task {task-id}`
+
 任务已成功归档！🎊
 ```
 

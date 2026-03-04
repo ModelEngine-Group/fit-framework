@@ -141,6 +141,12 @@ closed_comment: {用户的详细说明}
 **查看链接**:
 {html_url}
 
+**下一步**：
+如果还有其他待处理的安全告警，可以使用以下命令分析：
+- Claude Code / OpenCode: `/analyze-codescan {alert-number}`
+- Gemini CLI: `/fit:analyze-codescan {alert-number}`
+- Codex CLI: `/prompts:fit-analyze-codescan {alert-number}`
+
 ⚠️ 注意: 如果将来发现此告警应该修复，可以在 GitHub 网页上重新打开。
 ```
 

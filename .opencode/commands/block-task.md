@@ -115,8 +115,14 @@ subtask: false
    
    **下一步**:
    1. 查看任务文件中的"阻塞信息"章节了解详情
-   2. 解决阻塞问题
-   3. 手动移回 active 目录并更新状态
+   2. 解决阻塞问题后，手动移回 active 目录：
+      ```bash
+      mv .ai-workspace/blocked/{task-id} .ai-workspace/active/
+      ```
+   3. 恢复后查看任务状态，继续工作流：
+      - Claude Code / OpenCode: `/check-task {task-id}`
+      - Gemini CLI: `/fit:check-task {task-id}`
+      - Codex CLI: `/prompts:fit-check-task {task-id}`
    ```
 
 **解除阻塞**:

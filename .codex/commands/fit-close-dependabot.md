@@ -44,6 +44,11 @@ argument-hint: <alert-number>
    关闭理由: <理由>
    查看链接: https://github.com/<owner>/<repo>/security/dependabot/$1
    ```
+   - 提示下一步:
+     - 如果还有其他待处理的安全告警:
+       - Claude Code / OpenCode: /analyze-dependabot {alert-number}
+       - Gemini CLI: /fit:analyze-dependabot {alert-number}
+       - Codex CLI: /prompts:fit-analyze-dependabot {alert-number}
 
 **注意事项**:
 - 谨慎关闭高危告警(Critical/High)

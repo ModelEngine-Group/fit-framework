@@ -41,6 +41,11 @@ argument-hint: <alert-number>
    ✅ Code Scanning 告警 #$1 已关闭
    关闭理由: <理由>
    ```
+   - 提示下一步:
+     - 如果还有其他待处理的安全告警:
+       - Claude Code / OpenCode: /analyze-codescan {alert-number}
+       - Gemini CLI: /fit:analyze-codescan {alert-number}
+       - Codex CLI: /prompts:fit-analyze-codescan {alert-number}
 
 **注意事项**:
 - 谨慎关闭高危告警(Critical/High)

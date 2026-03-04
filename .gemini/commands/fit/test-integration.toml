@@ -26,4 +26,10 @@ prompt = """
 3. **报告**:
    - 输出集成测试结果。
    - 日志位于 `.ai-workspace/logs/fit-server-*.log`。
+
+**下一步**:
+测试通过后，使用以下命令提交代码:
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
 """

@@ -54,6 +54,11 @@ argument-hint: <task-id>
    🎉 任务 $1 已完成并归档
    归档位置: .ai-workspace/completed/$1/
    ```
+   - 提示下一步:
+     - 如果还有其他待处理任务:
+       - Claude Code / OpenCode: /check-task {task-id}
+       - Gemini CLI: /fit:check-task {task-id}
+       - Codex CLI: /prompts:fit-check-task {task-id}
 
 **注意事项**:
 - 只有在真正完成所有工作后才归档

@@ -44,6 +44,12 @@ usage: /prompts:fit-test
 4. ✅/✗ 健康检查接口响应
 5. ✅/✗ Swagger 文档页面可访问性
 
+**下一步**:
+测试通过后，使用以下命令提交代码:
+- Claude Code / OpenCode: /commit
+- Gemini CLI: /fit:commit
+- Codex CLI: /prompts:fit-commit
+
 **注意事项：**
 
 1. **端口冲突**：确保 8080 端口未被占用

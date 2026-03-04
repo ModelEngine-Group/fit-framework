@@ -45,6 +45,13 @@ usage: "/test"
 - `maven-build-{timestamp}.log` - Maven 构建日志
 - `fit-server-{timestamp}.log` - FIT 服务启动日志
 
+**下一步：**
+
+测试通过后，使用以下命令提交代码：
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
+
 **注意事项：**
 
 1. **端口冲突**：确保 8080 端口未被占用

@@ -20,4 +20,8 @@ prompt = """
      - dismissed_reason 有效值: "false positive", "won't fix", "used in tests".
      - 记录到关联任务 (如有).
      - 告知用户结果。
+   - 提示下一步: 如果还有其他待处理的安全告警:
+     - Claude Code / OpenCode: `/analyze-codescan {alert-number}`
+     - Gemini CLI: `/fit:analyze-codescan {alert-number}`
+     - Codex CLI: `/prompts:fit-analyze-codescan {alert-number}`
 """

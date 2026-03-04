@@ -28,4 +28,8 @@ prompt = """
 5. **告知用户**:
    - 任务已标记为阻塞。
    - 归档位置: `.ai-workspace/blocked/{{args}}/`。
+   - 恢复后查看任务状态:
+     - Claude Code / OpenCode: `/check-task {{args}}`
+     - Gemini CLI: `/fit:check-task {{args}}`
+     - Codex CLI: `/prompts:fit-check-task {{args}}`
 """

@@ -162,6 +162,12 @@ closed_comment: {用户的详细说明}
 **查看链接**:
 https://github.com/{owner}/{repo}/security/dependabot/{alert-number}
 
+**下一步**：
+如果还有其他待处理的安全告警，可以使用以下命令分析：
+- Claude Code / OpenCode: `/analyze-dependabot {alert-number}`
+- Gemini CLI: `/fit:analyze-dependabot {alert-number}`
+- Codex CLI: `/prompts:fit-analyze-dependabot {alert-number}`
+
 ⚠️ 注意: 如果将来发现此告警应该修复，可以在 GitHub 网页上重新打开。
 ```
 

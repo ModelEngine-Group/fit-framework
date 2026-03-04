@@ -65,6 +65,13 @@ exit $TEST_RESULT
 所有测试日志保存在 `.ai-workspace/logs/` 目录（已被 git 忽略）：
 - `fit-server-{timestamp}.log` - FIT 服务启动日志
 
+**下一步：**
+
+测试通过后，使用以下命令提交代码：
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
+
 **注意事项：**
 
 1. **前置条件**：必须先运行 `/test` 完成构建，或确保 `build/` 目录存在
