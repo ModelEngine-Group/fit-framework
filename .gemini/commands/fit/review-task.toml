@@ -41,9 +41,18 @@ prompt = """
 5. **告知用户**:
    - 输出审查结果摘要。
    - 根据结果建议:
-     - 无问题 -> `/fit:commit`
-     - 有问题 -> `/fit:refine-task {{args}}`
-     - 重大问题 -> `/fit:implement-task {{args}}`
+     - 无问题:
+       - Claude Code / OpenCode: `/commit`
+       - Gemini CLI: `/fit:commit`
+       - Codex CLI: `/prompts:fit-commit`
+     - 有问题:
+       - Claude Code / OpenCode: `/refine-task {{args}}`
+       - Gemini CLI: `/fit:refine-task {{args}}`
+       - Codex CLI: `/prompts:fit-refine-task {{args}}`
+     - 重大问题:
+       - Claude Code / OpenCode: `/implement-task {{args}}`
+       - Gemini CLI: `/fit:implement-task {{args}}`
+       - Codex CLI: `/prompts:fit-implement-task {{args}}`
 
 **原则**:
 - 严格但公正。

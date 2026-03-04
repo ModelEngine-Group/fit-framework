@@ -51,7 +51,10 @@ argument-hint: <task-id>
 
 7. 告知用户:
    - 输出修改文件数、新增文件数、测试通过数
-   - 提示下一步使用 /review-task $1 进行代码审查
+   - 提示下一步进行代码审查:
+     - Claude Code / OpenCode: /review-task $1
+     - Gemini CLI: /fit:review-task $1
+     - Codex CLI: /prompts:fit-review-task $1
 
 **注意事项**:
 - 严格遵循 plan.md,不要偏离技术方案或添加计划外功能

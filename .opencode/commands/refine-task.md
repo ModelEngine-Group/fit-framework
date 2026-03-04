@@ -187,8 +187,14 @@ updated_at: {当前时间，格式: yyyy-MM-dd HH:mm:ss}
 
 **下一步**：
 请执行以下操作之一：
-1. 使用 /review-task {task-id} 重新审查代码
-2. 如果你对修复有信心且修改较小，可以直接 /commit 提交
+1. 重新审查代码：
+   - Claude Code / OpenCode: `/review-task {task-id}`
+   - Gemini CLI: `/fit:review-task {task-id}`
+   - Codex CLI: `/prompts:fit-review-task {task-id}`
+2. 如果修改较小且有信心，直接提交：
+   - Claude Code / OpenCode: `/commit`
+   - Gemini CLI: `/fit:commit`
+   - Codex CLI: `/prompts:fit-commit`
 3. 如果修复涉及大量更改，建议重新审查
 ```
 

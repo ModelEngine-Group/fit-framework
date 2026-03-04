@@ -40,7 +40,10 @@ prompt = """
 
 6. **告知用户**:
    - 输出实现概要
-   - 提示下一步使用 `/fit:review-task {{args}}` 进行代码审查。
+   - 提示下一步进行代码审查:
+     - Claude Code / OpenCode: `/review-task {{args}}`
+     - Gemini CLI: `/fit:review-task {{args}}`
+     - Codex CLI: `/prompts:fit-review-task {{args}}`
 
 **原则**:
 - 严格遵循方案。

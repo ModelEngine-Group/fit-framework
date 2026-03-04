@@ -45,8 +45,14 @@ argument-hint: <task-id>
 
 7. 告知用户:
    - 输出修复的问题数量(按级别)
-   - 提示重新审查: /review-task $1
-   - 或直接提交: /commit
+   - 提示重新审查:
+     - Claude Code / OpenCode: /review-task $1
+     - Gemini CLI: /fit:review-task $1
+     - Codex CLI: /prompts:fit-review-task $1
+   - 或直接提交:
+     - Claude Code / OpenCode: /commit
+     - Gemini CLI: /fit:commit
+     - Codex CLI: /prompts:fit-commit
 
 **注意事项**:
 - 严格按照审查报告修复,不要添加额外变更

@@ -13,7 +13,7 @@ prompt = """
 1. **验证前置条件**:
    - 如果任务文件未找到，报错并退出。
    - 读取 `task.md` 和 `analysis.md` (使用 `read_file`)。
-   - 如果 `analysis.md` 不存在，提示用户先运行 `/fit:analyze-issue`。
+   - 如果 `analysis.md` 不存在，提示用户先运行 `/fit:analyze-issue` (或对应 TUI 的等价命令)。
 
 2. **理解问题本质和约束条件**:
    - 基于 `analysis.md` 理解根本原因、影响范围和技术约束。
@@ -47,7 +47,10 @@ prompt = """
 6. **告知用户**:
    - 输出方案概要
    - 显示输出文件路径
-   - **提示这是人工审查检查点**: 使用 `/fit:implement-task {{args}}` 开始实施前必须经过审查。
+   - **提示这是人工审查检查点**: 审查通过后开始实施:
+     - Claude Code / OpenCode: `/implement-task {{args}}`
+     - Gemini CLI: `/fit:implement-task {{args}}`
+     - Codex CLI: `/prompts:fit-implement-task {{args}}`
 
 **注意事项**:
 - 必须先完成需求分析。

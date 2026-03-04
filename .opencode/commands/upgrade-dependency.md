@@ -79,7 +79,10 @@ subtask: false
    - 测试状态: <通过/失败/未运行>
    
    **下一步**:
-   请人工检查变更内容,确认无误后提交: /commit
+   请人工检查变更内容,确认无误后提交:
+   - Claude Code / OpenCode: /commit
+   - Gemini CLI: /fit:commit
+   - Codex CLI: /prompts:fit-commit
    ```
 
 **注意事项**:

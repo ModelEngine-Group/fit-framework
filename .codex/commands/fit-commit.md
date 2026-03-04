@@ -252,7 +252,12 @@ grep "Copyright" src/main/java/com/fit/Example.java
 
 **下一步命令**：
 ```bash
+# Claude Code / OpenCode:
 /review-task <task-id>
+# Gemini CLI:
+/fit:review-task <task-id>
+# Codex CLI:
+/prompts:fit-review-task <task-id>
 ```
 
 ### 情况 4：提交后需要创建 PR

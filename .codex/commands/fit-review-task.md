@@ -47,8 +47,14 @@ argument-hint: <task-id> [--pr-number]
 
 6. 告知用户:
    - 输出审查结论(批准/需修改)
-   - 如果需要修改,提示使用 /refine-task $1 修复
-   - 如果批准,提示使用 /commit 提交代码
+   - 如果需要修改,提示修复:
+     - Claude Code / OpenCode: /refine-task $1
+     - Gemini CLI: /fit:refine-task $1
+     - Codex CLI: /prompts:fit-refine-task $1
+   - 如果批准,提示提交代码:
+     - Claude Code / OpenCode: /commit
+     - Gemini CLI: /fit:commit
+     - Codex CLI: /prompts:fit-commit
 
 **注意事项**:
 - 对照 plan.md 审查,确保实现符合设计意图

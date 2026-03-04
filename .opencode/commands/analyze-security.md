@@ -184,10 +184,14 @@ ghsa_id: <GHSA-ID>
 
 **下一步**:
 审查安全分析后，使用以下命令设计修复方案：
-/plan-task {task-id}
+- Claude Code / OpenCode: `/plan-task {task-id}`
+- Gemini CLI: `/fit:plan-task {task-id}`
+- Codex CLI: `/prompts:fit-plan-task {task-id}`
 
 如果是误报，可以使用以下命令关闭告警：
-/close-security {alert-number}
+- Claude Code / OpenCode: `/close-security {alert-number}`
+- Gemini CLI: `/fit:close-security {alert-number}`
+- Codex CLI: `/prompts:fit-close-security {alert-number}`
 ```
 
 ## 参数说明
