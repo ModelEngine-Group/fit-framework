@@ -25,7 +25,7 @@ export interface AiTool {
   /** Auth file name inside the per-branch sandbox dir (e.g. "auth.json") */
   authFileName?: string;
   /** Hint shown when auth is NOT pre-seeded */
-  noAuthHint: string;
+  setupHint: string;
   /** Additional host files to pre-seed into sandbox (e.g. settings, account info) */
   hostPreSeedFiles?: Array<{ hostPath: string; sandboxName: string }>;
   /** Shell commands to run inside the container after setup (e.g. symlink prompts) */
@@ -79,7 +79,7 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.claude-sandboxes'),
     containerMount: '/home/devuser/.claude',
     versionCmd: 'claude --version',
-    noAuthHint: '首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。',
+    setupHint: '首次使用需在容器内运行 claude 完成一次 OAuth 登录，之后免登录。',
     envVars: { CLAUDE_CONFIG_DIR: '/home/devuser/.claude' },
     hostPreSeedDirs: [
       { hostDir: path.join(HOME, '.claude', 'plugins'), sandboxSubdir: 'plugins' },
@@ -95,7 +95,7 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.codex-sandboxes'),
     containerMount: '/home/devuser/.codex',
     versionCmd: 'codex --version',
-    noAuthHint: '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。',
+    setupHint: '首次使用需在容器内运行 codex，按 Esc 选择 Device Code 方式登录。',
     hostLiveMounts: [
       { hostPath: path.join(HOME, '.codex', 'auth.json'), containerSubpath: 'auth.json' },
     ],
@@ -109,7 +109,7 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.opencode-sandboxes'),
     containerMount: '/home/devuser/.local/share/opencode',
     versionCmd: 'opencode version',
-    noAuthHint: '首次使用需在容器内配置认证凭据。',
+    setupHint: '首次使用需在容器内配置认证凭据。',
     hostLiveMounts: [
       { hostPath: path.join(HOME, '.local', 'share', 'opencode', 'auth.json'), containerSubpath: 'auth.json' },
     ],
@@ -120,7 +120,7 @@ export const AI_TOOLS: readonly Readonly<AiTool>[] = [
     sandboxBase: path.join(HOME, '.gemini-sandboxes'),
     containerMount: '/home/devuser/.gemini',
     versionCmd: 'gemini --version',
-    noAuthHint: '首次使用需在容器内运行 gemini 完成认证（支持 Google 登录、API Key、Vertex AI）。',
+    setupHint: '首次使用需在容器内运行 gemini 完成认证（支持 Google 登录、API Key、Vertex AI）。',
     hostLiveMounts: [
       { hostPath: path.join(HOME, '.gemini', 'oauth_creds.json'), containerSubpath: 'oauth_creds.json' },
     ],
