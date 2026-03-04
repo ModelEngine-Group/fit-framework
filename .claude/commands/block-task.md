@@ -231,13 +231,15 @@ test -d .ai-workspace/blocked/{task-id} && echo "已移动到 blocked" || echo "
 
 **下一步**：
 1. 查看任务文件中的"阻塞信息"章节了解详情
-2. 解决阻塞问题
-3. 使用 /unblock-task 命令解除阻塞（如果实现了该命令）
-   或手动移回 active 目录：
+2. 解决阻塞问题后，手动移回 active 目录：
    ```bash
    mv .ai-workspace/blocked/{task-id} .ai-workspace/active/
    # 然后更新 task.md 中的 status 为 active，移除 blocked_* 字段
    ```
+3. 恢复后查看任务状态，继续工作流：
+   - Claude Code / OpenCode: `/check-task {task-id}`
+   - Gemini CLI: `/fit:check-task {task-id}`
+   - Codex CLI: `/prompts:fit-check-task {task-id}`
 
 **关联资源**：
 - Issue: #{issue-number}（已同步）

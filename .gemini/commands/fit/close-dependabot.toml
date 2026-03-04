@@ -19,4 +19,8 @@ prompt = """
      - 使用 `gh api --method PATCH ...` 关闭 Alert (state=dismissed).
      - 记录到关联任务 (如有).
      - 告知用户结果。
+   - 提示下一步: 如果还有其他待处理的安全告警:
+     - Claude Code / OpenCode: `/analyze-dependabot {alert-number}`
+     - Gemini CLI: `/fit:analyze-dependabot {alert-number}`
+     - Codex CLI: `/prompts:fit-analyze-dependabot {alert-number}`
 """

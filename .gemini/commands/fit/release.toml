@@ -65,6 +65,10 @@ prompt = """
       * `git push origin vX.Y.Z`
       * `git push origin <current-branch>`
       * （可选）在 GitHub 上基于 vX.Y.Z 标签创建 Release
+     - （可选）生成 Release Notes:
+       - Claude Code / OpenCode: `/create-release-note X.Y.Z`
+       - Gemini CLI: `/fit:create-release-note X.Y.Z`
+       - Codex CLI: `/prompts:fit-create-release-note X.Y.Z`
 
 **错误处理**:
 - 版本号格式错误 → 提示正确格式并退出

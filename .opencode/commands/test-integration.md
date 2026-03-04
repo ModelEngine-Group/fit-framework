@@ -67,6 +67,13 @@ exit $TEST_RESULT
 - **预计时间：** 整个流程约 1-2 分钟（不包含构建时间）
 - **构建产物：** 不会删除 `build/` 目录，便于重复测试
 
+**下一步：**
+
+测试通过后，使用以下命令提交代码：
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
+
 ## 输出文件
 
 - `.ai-workspace/logs/fit-server-{timestamp}.log` - FIT 服务启动日志

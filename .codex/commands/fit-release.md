@@ -146,7 +146,10 @@ git add -A && git commit -m "Prepare the next SNAPSHOT version"
 2. 推送当前开发分支（下一 SNAPSHOT）：
    git push origin <current-branch>
 
-3. （可选）在 GitHub 上基于 vX.Y.Z 标签创建 Release
+3. （可选）生成 Release Notes:
+       - Claude Code / OpenCode: /create-release-note X.Y.Z
+       - Gemini CLI: /fit:create-release-note X.Y.Z
+       - Codex CLI: /prompts:fit-create-release-note X.Y.Z
 ```
 
 ---

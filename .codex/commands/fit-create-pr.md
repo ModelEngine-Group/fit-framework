@@ -60,6 +60,16 @@ argument-hint: <target-branch>
    )"
    ```
 
+7. 提示下一步:
+   - 如果在任务工作流中，同步进度:
+     - Claude Code / OpenCode: /sync-pr {task-id}
+     - Gemini CLI: /fit:sync-pr {task-id}
+     - Codex CLI: /prompts:fit-sync-pr {task-id}
+   - 或标记任务完成:
+     - Claude Code / OpenCode: /complete-task {task-id}
+     - Gemini CLI: /fit:complete-task {task-id}
+     - Codex CLI: /prompts:fit-complete-task {task-id}
+
 **注意事项**:
 - 必须严格遵循 PR 模板格式
 - 所有必填项都要填写完整

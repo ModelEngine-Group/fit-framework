@@ -60,8 +60,13 @@ argument-hint: <task-id> [reason]
    ```
    ⚠️  任务 $1 已标记为阻塞
    阻塞位置: .ai-workspace/blocked/$1/
-   下一步: 解决阻塞问题后手动移回 active 目录
    ```
+   - 提示下一步:
+     - 解决阻塞问题后手动移回 active 目录
+     - 恢复后查看任务状态:
+       - Claude Code / OpenCode: /check-task $1
+       - Gemini CLI: /fit:check-task $1
+       - Codex CLI: /prompts:fit-check-task $1
 
 **解除阻塞**:
 ```bash
