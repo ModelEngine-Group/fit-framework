@@ -206,7 +206,7 @@ npm test
 
 ## 相关命令
 
-- `/analyze-security <alert-number>` - 分析安全告警（如果是安全相关升级）
+- `/analyze-dependabot <alert-number>` - 分析 Dependabot 告警（如果是安全相关升级）
 - `/commit` - 提交代码
 - `/test` - 运行测试
 

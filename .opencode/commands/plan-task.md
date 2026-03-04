@@ -206,7 +206,7 @@ usage: "/plan-task <task-id>"
 
 1. **前置条件**：
    - 必须先完成需求分析（analysis.md 存在）
-   - 如果没有，提示用户先执行 `/analyze-issue` 或 `/analyze-security`
+   - 如果没有，提示用户先执行 `/analyze-issue`、`/analyze-dependabot` 或 `/analyze-codescan`
 
 2. **人工检查点**：
    - 这是一个**必须**的人工检查点
@@ -227,7 +227,8 @@ usage: "/plan-task <task-id>"
 
 **前置步骤**：
 - `/analyze-issue <number>` - 分析 GitHub Issue
-- `/analyze-security <alert-number>` - 分析 Dependabot 安全告警
+- `/analyze-dependabot <alert-number>` - 分析 Dependabot 依赖漏洞告警
+- `/analyze-codescan <alert-number>` - 分析 Code Scanning 源码安全告警
 
 **后续步骤**：
 - `/implement-task <task-id>` - 实施任务
@@ -236,5 +237,5 @@ usage: "/plan-task <task-id>"
 ## 错误处理
 
 - 任务不存在：提示 "任务 {task-id} 不存在，请检查任务ID"
-- 缺少需求分析：提示 "需求分析文档不存在，请先执行 /analyze-issue 或 /analyze-security"
+- 缺少需求分析：提示 "需求分析文档不存在，请先执行 /analyze-issue、/analyze-dependabot 或 /analyze-codescan"
 - plan.md 已存在：询问是否覆盖或创建新版本

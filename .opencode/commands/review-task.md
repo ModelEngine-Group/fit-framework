@@ -294,7 +294,7 @@ usage: "/review-task <task-id> [--pr-number]"
 **安全修复流程**：
 ```bash
 # 1. 分析安全告警
-/analyze-security 23
+/analyze-dependabot 23
 
 # 2. 设计修复方案
 /plan-task TASK-20251227-110000

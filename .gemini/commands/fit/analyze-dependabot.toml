@@ -1,4 +1,4 @@
-description = "分析 Security Alert 并创建任务"
+description = "分析 Dependabot Alert 并创建任务"
 prompt = """
 请分析 Dependabot Security Alert #{{args}}。
 
@@ -33,7 +33,7 @@ prompt = """
      - Gemini CLI: `/fit:plan-task`
      - Codex CLI: `/prompts:fit-plan-task`
    - 如果是误报，关闭告警:
-     - Claude Code / OpenCode: `/close-security {{args}}`
-     - Gemini CLI: `/fit:close-security {{args}}`
-     - Codex CLI: `/prompts:fit-close-security {{args}}`
+     - Claude Code / OpenCode: `/close-dependabot {{args}}`
+     - Gemini CLI: `/fit:close-dependabot {{args}}`
+     - Codex CLI: `/prompts:fit-close-dependabot {{args}}`
 """

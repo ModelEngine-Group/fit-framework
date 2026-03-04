@@ -23,9 +23,11 @@ cd .opencode && bun install
 ├── bun.lock               # 依赖版本锁定
 └── commands/              # 自定义 Slash Commands
     ├── analyze-issue.md
-    ├── analyze-security.md
+    ├── analyze-codescan.md
+    ├── analyze-dependabot.md
     ├── block.md
-    ├── close-security.md
+    ├── close-codescan.md
+    ├── close-dependabot.md
     ├── commit.md
     ├── complete.md
     ├── create-pr.md
@@ -50,7 +52,8 @@ cd .opencode && bun install
 
 1. **`/create-task <description>`** - 根据自然语言描述创建任务并生成需求分析文档
 2. **`/analyze-issue <issue-number>`** - 分析 GitHub Issue 并创建需求分析文档
-3. **`/analyze-security <alert-number>`** - 分析 Dependabot 安全告警并创建安全分析文档
+3. **`/analyze-dependabot <alert-number>`** - 分析 Dependabot 依赖漏洞告警并创建安全分析文档
+3b. **`/analyze-codescan <alert-number>`** - 分析 Code Scanning 源码安全告警并创建安全分析文档
 4. **`/plan-task <task-id>`** - 为任务设计技术方案并输出实施计划
 5. **`/implement-task <task-id>`** - 根据技术方案实施任务并输出实现报告
 6. **`/review-task <task-id>`** - 审查任务实现并输出代码审查报告
@@ -74,7 +77,8 @@ cd .opencode && bun install
 依赖升级和安全告警处理命令：
 
 - **`/upgrade-dependency <package> <from> <to>`** - 升级项目依赖
-- **`/close-security <alert-number>`** - 关闭 Dependabot 安全告警（需提供合理理由）
+- **`/close-dependabot <alert-number>`** - 关闭 Dependabot 安全告警（需提供合理理由）
+- **`/close-codescan <alert-number>`** - 关闭 Code Scanning 告警（需提供合理理由）
 
 ### 测试
 
@@ -126,8 +130,8 @@ cd .opencode && bun install
 ### 安全告警处理流程
 
 ```bash
-# 1. 分析安全告警
-/analyze-security 23
+# 1. 分析 Dependabot 安全告警
+/analyze-dependabot 23
 
 # 2. 设计修复方案
 /plan-task TASK-20260120-110000
@@ -148,7 +152,7 @@ cd .opencode && bun install
 /complete-task TASK-20260120-110000
 
 # 或者如果是误报
-/close-security 23
+/close-dependabot 23
 ```
 
 ## 🔧 命令语法说明

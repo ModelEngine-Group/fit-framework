@@ -54,9 +54,9 @@ argument-hint: <alert-number>
      - Gemini CLI: /fit:plan-task <task-id>
      - Codex CLI: /prompts:fit-plan-task <task-id>
    - 如果是误报，关闭告警:
-     - Claude Code / OpenCode: /close-security $1
-     - Gemini CLI: /fit:close-security $1
-     - Codex CLI: /prompts:fit-close-security $1
+     - Claude Code / OpenCode: /close-dependabot $1
+     - Gemini CLI: /fit:close-dependabot $1
+     - Codex CLI: /prompts:fit-close-dependabot $1
 
 **注意事项**:
 - Critical/High 级别立即处理,Medium 计划处理,Low 可延后
