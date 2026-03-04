@@ -149,7 +149,9 @@ pytest                        # Python 项目
 
 **下一步**：
 使用以下命令进行代码审查：
-/review-task {task-id}
+- Claude Code / OpenCode: `/review-task {task-id}`
+- Gemini CLI: `/fit:review-task {task-id}`
+- Codex CLI: `/prompts:fit-review-task {task-id}`
 
 或使用项目的 code-review 插件：
 /code-review:code-review

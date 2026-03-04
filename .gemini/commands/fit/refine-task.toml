@@ -29,5 +29,13 @@ prompt = """
      - updated_at: 当前时间
 
 5. **告知用户**:
-   - 提示下一步: 重新审查 (`/fit:review-task {{args}}`) 或 提交 (`/fit:commit`)。
+   - 提示下一步:
+     - 重新审查:
+       - Claude Code / OpenCode: `/review-task {{args}}`
+       - Gemini CLI: `/fit:review-task {{args}}`
+       - Codex CLI: `/prompts:fit-review-task {{args}}`
+     - 或直接提交:
+       - Claude Code / OpenCode: `/commit`
+       - Gemini CLI: `/fit:commit`
+       - Codex CLI: `/prompts:fit-commit`
 """

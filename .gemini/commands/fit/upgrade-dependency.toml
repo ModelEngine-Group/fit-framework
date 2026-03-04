@@ -25,5 +25,8 @@ prompt = """
 
 5. **输出摘要**:
    - 显示变更文件、验证结果。
-   - 提示用户提交 (`/fit:commit`).
+   - 提示用户提交:
+     - Claude Code / OpenCode: `/commit`
+     - Gemini CLI: `/fit:commit`
+     - Codex CLI: `/prompts:fit-commit`
 """

@@ -173,7 +173,9 @@ usage: "/plan-task <task-id>"
 ⚠️  **人工审查检查点** - 请审查技术方案是否合理
 
 审查通过后，使用以下命令开始实施：
-/implement-task {task-id}
+- Claude Code / OpenCode: `/implement-task {task-id}`
+- Gemini CLI: `/fit:implement-task {task-id}`
+- Codex CLI: `/prompts:fit-implement-task {task-id}`
 ```
 
 ## ✅ 完成检查清单

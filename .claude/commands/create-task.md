@@ -137,7 +137,9 @@ assigned_to: claude
 
 **下一步**：
 审查需求分析后，使用以下命令设计技术方案：
-/plan-task {task-id}
+- Claude Code / OpenCode: `/plan-task {task-id}`
+- Gemini CLI: `/fit:plan-task {task-id}`
+- Codex CLI: `/prompts:fit-plan-task {task-id}`
 ```
 
 ## ✅ 完成检查清单

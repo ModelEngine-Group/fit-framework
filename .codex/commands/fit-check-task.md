@@ -49,9 +49,24 @@ argument-hint: <task-id>
    ```
 
 **下一步建议规则**:
-- 需求分析完成 → /plan-task $1
-- 技术方案完成 → ⚠️ 等待人工审查,审查通过后 /implement-task $1
-- 实现完成 → /review-task $1
-- 审查完成(批准) → /commit
-- 审查完成(需修改) → /refine-task $1
+- 需求分析完成:
+  - Claude Code / OpenCode: /plan-task $1
+  - Gemini CLI: /fit:plan-task $1
+  - Codex CLI: /prompts:fit-plan-task $1
+- 技术方案完成 → ⚠️ 等待人工审查,审查通过后:
+  - Claude Code / OpenCode: /implement-task $1
+  - Gemini CLI: /fit:implement-task $1
+  - Codex CLI: /prompts:fit-implement-task $1
+- 实现完成:
+  - Claude Code / OpenCode: /review-task $1
+  - Gemini CLI: /fit:review-task $1
+  - Codex CLI: /prompts:fit-review-task $1
+- 审查完成(批准):
+  - Claude Code / OpenCode: /commit
+  - Gemini CLI: /fit:commit
+  - Codex CLI: /prompts:fit-commit
+- 审查完成(需修改):
+  - Claude Code / OpenCode: /refine-task $1
+  - Gemini CLI: /fit:refine-task $1
+  - Codex CLI: /prompts:fit-refine-task $1
 - 任务阻塞 → 显示阻塞原因和解除条件

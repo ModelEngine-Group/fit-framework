@@ -142,7 +142,9 @@ npm test
 
 **下一步**:
 请人工检查变更内容，确认无误后提交：
-/commit
+- Claude Code / OpenCode: `/commit`
+- Gemini CLI: `/fit:commit`
+- Codex CLI: `/prompts:fit-commit`
 ```
 
 ## 参数说明

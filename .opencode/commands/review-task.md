@@ -198,9 +198,18 @@ usage: "/review-task <task-id> [--pr-number]"
 {根据审查结果给出建议}
 
 例如：
-- 如果无阻塞问题：使用 /commit 提交代码
-- 如果有需要修改项：修复问题后重新审查
-- 如果需要重大修改：回到 /implement-task 重新实施
+- 如果无阻塞问题：
+  - Claude Code / OpenCode: `/commit`
+  - Gemini CLI: `/fit:commit`
+  - Codex CLI: `/prompts:fit-commit`
+- 如果有需要修改项：
+  - Claude Code / OpenCode: `/refine-task {task-id}`
+  - Gemini CLI: `/fit:refine-task {task-id}`
+  - Codex CLI: `/prompts:fit-refine-task {task-id}`
+- 如果需要重大修改：
+  - Claude Code / OpenCode: `/implement-task {task-id}`
+  - Gemini CLI: `/fit:implement-task {task-id}`
+  - Codex CLI: `/prompts:fit-implement-task {task-id}`
 ```
 
 ## ✅ 完成检查清单

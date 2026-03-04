@@ -52,7 +52,10 @@ argument-hint: <package-name> <from-version> <to-version>
    变更文件: <列表>
    编译状态: <成功/失败>
    测试状态: <通过/失败/未运行>
-   下一步: 请人工检查变更后提交 /commit
+   下一步: 请人工检查变更后提交:
+   - Claude Code / OpenCode: /commit
+   - Gemini CLI: /fit:commit
+   - Codex CLI: /prompts:fit-commit
    ```
 
 **注意事项**:

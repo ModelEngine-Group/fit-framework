@@ -50,7 +50,10 @@ argument-hint: <task-id>
 6. 告知用户:
    - 输出方案名称、工作量、风险等级
    - ⚠️ 提示这是**人工审查检查点**,请审查技术方案是否合理
-   - 审查通过后使用 /implement-task $1 开始实施
+   - 审查通过后开始实施:
+     - Claude Code / OpenCode: /implement-task $1
+     - Gemini CLI: /fit:implement-task $1
+     - Codex CLI: /prompts:fit-implement-task $1
 
 **注意事项**:
 - 充分思考,不要急于实施

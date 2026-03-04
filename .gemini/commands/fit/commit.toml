@@ -33,5 +33,8 @@ prompt = """
    - 运行 `git status` 确认提交成功。
 
 **后置操作**:
-- 如果是任务相关的提交，提示用户更新任务状态 (`/fit:check-task` 或 `/fit:complete-task`).
+- 如果是任务相关的提交，提示用户更新任务状态:
+  - Claude Code / OpenCode: `/check-task` 或 `/complete-task`
+  - Gemini CLI: `/fit:check-task` 或 `/fit:complete-task`
+  - Codex CLI: `/prompts:fit-check-task` 或 `/prompts:fit-complete-task`
 """

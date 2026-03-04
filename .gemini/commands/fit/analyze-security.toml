@@ -28,6 +28,12 @@ prompt = """
 
 6. **告知用户**:
    - 输出分析摘要。
-   - 提示下一步: `/fit:plan-task`.
-   - 如果是误报: `/fit:close-security {{args}}`.
+   - 提示下一步设计修复方案:
+     - Claude Code / OpenCode: `/plan-task`
+     - Gemini CLI: `/fit:plan-task`
+     - Codex CLI: `/prompts:fit-plan-task`
+   - 如果是误报，关闭告警:
+     - Claude Code / OpenCode: `/close-security {{args}}`
+     - Gemini CLI: `/fit:close-security {{args}}`
+     - Codex CLI: `/prompts:fit-close-security {{args}}`
 """

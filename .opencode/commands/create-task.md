@@ -74,7 +74,10 @@ subtask: false
 7. 告知用户:
    - 输出任务ID、标题、类型、工作流
    - 显示输出文件路径
-   - 提示下一步使用 /plan-task $TASK_ID 设计技术方案
+   - 提示下一步设计技术方案:
+     - Claude Code / OpenCode: /plan-task $TASK_ID
+     - Gemini CLI: /fit:plan-task $TASK_ID
+     - Codex CLI: /prompts:fit-plan-task $TASK_ID
 
 **注意事项**:
 - 严格遵循 .agents/workflows/feature-development.yaml 工作流定义

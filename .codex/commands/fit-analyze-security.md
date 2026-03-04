@@ -49,8 +49,14 @@ argument-hint: <alert-number>
 
 7. 告知用户:
    - 输出漏洞严重程度、任务ID、风险等级
-   - 提示下一步: /plan-task <task-id> 设计修复方案
-   - 如果是误报: /close-security $1 关闭告警
+   - 提示下一步设计修复方案:
+     - Claude Code / OpenCode: /plan-task <task-id>
+     - Gemini CLI: /fit:plan-task <task-id>
+     - Codex CLI: /prompts:fit-plan-task <task-id>
+   - 如果是误报，关闭告警:
+     - Claude Code / OpenCode: /close-security $1
+     - Gemini CLI: /fit:close-security $1
+     - Codex CLI: /prompts:fit-close-security $1
 
 **注意事项**:
 - Critical/High 级别立即处理,Medium 计划处理,Low 可延后
