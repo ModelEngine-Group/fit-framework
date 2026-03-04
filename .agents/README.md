@@ -26,8 +26,8 @@
 
 **配置文件**：
 - **`AGENTS.md`** - 项目开发规范（根目录）
-- **`.ai-agents/codex/preferences.yaml`** - Codex 特定配置
-- **`.ai-agents/gemini/preferences.yaml`** - Gemini 特定配置
+- **`.agents/codex/preferences.yaml`** - Codex 特定配置
+- **`.agents/gemini/preferences.yaml`** - Gemini 特定配置
 
 **特点**：
 - 遵循 [AGENTS.md 标准](https://agents.md)（Linux Foundation AAIF）
@@ -44,10 +44,10 @@
     │
     └── 体系 B：AGENTS.md (其他工具使用)
         ├── AGENTS.md (项目规范)
-        └── .ai-agents/{tool}/preferences.yaml (工具配置)
+        └── .agents/{tool}/preferences.yaml (工具配置)
 
 协作机制（两套体系共享）
-    └── .ai-agents/ (多 AI 协作配置)
+    └── .agents/ (多 AI 协作配置)
         ├── workflows/ (工作流定义)
         ├── templates/ (任务模板)
         └── README.md (本文件 - 协作指南)
@@ -67,7 +67,7 @@
 ## 📋 目录说明
 
 ```
-.ai-agents/                  # AI配置目录（版本控制）
+.agents/                  # AI配置目录（版本控制）
 ├── README.md               # 本文件
 ├── workflows/              # 工作流定义（推荐流程）
 │   ├── feature-development.yaml
@@ -158,14 +158,14 @@
 - 💡 **核心优势**: 代码生成速度快、补全准确、快速迭代
 - 🎯 **定位**: 超级程序员
 - 📝 **特色**: 代码生成效率最高，实现阶段首选
-- 🔧 **配置**: `.ai-agents/codex/` 目录
+- 🔧 **配置**: `.agents/codex/` 目录
 
 **GeminiCli** (Google Gemini)
 - 🧠 **最擅长**: 需求分析、代码实现、问题修复
 - 💡 **核心优势**: 超大上下文 (2M tokens)、全局分析、快速编码
 - 🎯 **定位**: 全能助手 + 分析师
 - 📝 **特色**: 可一次性加载海量代码进行全局分析
-- 🔧 **配置**: `.ai-agents/gemini/` 目录
+- 🔧 **配置**: `.agents/gemini/` 目录
 
 #### 实战选择建议
 
@@ -189,7 +189,7 @@
 
 ```bash
 # 复制任务模板
-cp .ai-agents/templates/task.md .ai-workspace/active/TASK-{task-id}/task.md
+cp .agents/templates/task.md .ai-workspace/active/TASK-{task-id}/task.md
 
 # 编辑任务描述
 vim .ai-workspace/active/TASK-{task-id}/task.md
@@ -464,17 +464,17 @@ ClaudeCode 的配置保持在 `.claude/` 目录（项目根目录），包括：
 
 ### Codex 配置
 
-Codex (OpenAI/ChatGPT) 的配置在 `.ai-agents/codex/` 目录。
+Codex (OpenAI/ChatGPT) 的配置在 `.agents/codex/` 目录。
 
 ### GeminiCli 配置
 
-GeminiCli 的配置在 `.ai-agents/gemini/` 目录。
+GeminiCli 的配置在 `.agents/gemini/` 目录。
 
 ### 通用配置
 
 所有 AI 都应该：
 1. 读取 `AGENTS.md`（项目根目录）获取项目开发规范
-2. 遵循 `.ai-agents/workflows/` 中的工作流定义
+2. 遵循 `.agents/workflows/` 中的工作流定义
 3. 使用 `.ai-workspace/` 进行任务跟踪和上下文共享
 
 ## ⚠️ 注意事项
@@ -502,8 +502,8 @@ GeminiCli 的配置在 `.ai-agents/gemini/` 目录。
 
 - **主配置文件**：`AGENTS.md`（中文）、`AGENTS.en.md`（英文）
 - **ClaudeCode 配置**：`.claude/README.md`
-- **Codex 配置**：`.ai-agents/codex/README.md`
-- **GeminiCli 配置**：`.ai-agents/gemini/README.md`
+- **Codex 配置**：`.agents/codex/README.md`
+- **GeminiCli 配置**：`.agents/gemini/README.md`
 - **贡献指南**：`CONTRIBUTING.md`
 - **PR 模板**：`.github/PULL_REQUEST_TEMPLATE.md`
 
@@ -511,7 +511,7 @@ GeminiCli 的配置在 `.ai-agents/gemini/` 目录。
 
 如果你之前使用单一 AI 工具，现在想启用多 AI 协作：
 
-1. ✅ 保持现有配置（`.claude/`、`.ai-agents/codex/`、`.ai-agents/gemini/`）
+1. ✅ 保持现有配置（`.claude/`、`.agents/codex/`、`.agents/gemini/`）
 2. ✅ 创建 `.ai-workspace/` 目录（已被 git ignore）
 3. ✅ 开始使用任务模板进行协作
 4. ✅ 不需要修改现有工作流程

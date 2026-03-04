@@ -78,7 +78,7 @@ usage: "/sync-issue <task-id>"
 - 技术方案: `.ai-workspace/{status}/{task-id}/plan.md`
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 **摘要原则**：
@@ -160,7 +160,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 2. 设计技术方案（使用 `/plan-task TASK-20251227-104654`）
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 ### 示例 2：技术方案完成
@@ -194,7 +194,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 ```
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 ### 示例 3：实现完成
@@ -232,7 +232,7 @@ https://github.com/{owner}/{repo}/issues/{issue-number}
 ```
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 ## 注意事项

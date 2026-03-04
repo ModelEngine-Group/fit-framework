@@ -36,7 +36,7 @@ usage: "/review-task <task-id> [--pr-number]"
 
 ### 3. 执行代码审查
 
-按照 `.ai-agents/workflows/feature-development.yaml` 中的 `code-review` 步骤：
+按照 `.agents/workflows/feature-development.yaml` 中的 `code-review` 步骤：
 
 **必须审查的内容**：
 - [ ] 代码质量和编码规范（遵循 CLAUDE.md）

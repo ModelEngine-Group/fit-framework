@@ -45,7 +45,7 @@ gh api repos/{owner}/{repo}/dependabot/alerts/<alert-number>
 **任务目录结构**：
 ```
 .ai-workspace/active/TASK-{yyyyMMdd-HHmmss}/
-├── task.md          ← 使用 .ai-agents/templates/task.md 模板创建
+├── task.md          ← 使用 .agents/templates/task.md 模板创建
 └── analysis.md      ← 本命令将创建此文件
 ```
 

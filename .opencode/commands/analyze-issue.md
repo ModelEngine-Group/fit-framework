@@ -19,7 +19,7 @@ subtask: false
 3. 创建任务目录:
    !`mkdir -p .ai-workspace/active/TASK-$(date +%Y%m%d-%H%M%S)/`
    
-   使用 Write 工具基于 .ai-agents/templates/task.md 模板创建 task.md 文件:
+   使用 Write 工具基于 .agents/templates/task.md 模板创建 task.md 文件:
    - 填写任务元数据: issue_number, title, created_at, workflow 等
    - created_at 和 updated_at 使用步骤2获取的时间戳
 
@@ -49,6 +49,6 @@ subtask: false
    - 提示下一步使用 /plan $TASK_ID 设计技术方案
 
 **注意事项**:
-- 严格遵循 .ai-agents/workflows/feature-development.yaml 工作流定义
+- 严格遵循 .agents/workflows/feature-development.yaml 工作流定义
 - 分析完成后建议人工审查
 - 如果已存在相关任务,询问是否重新分析

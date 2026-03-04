@@ -36,7 +36,7 @@ usage: "/implement-task <task-id>"
 
 ### 3. 执行代码实现
 
-按照 `.ai-agents/workflows/feature-development.yaml` 中的 `implementation` 步骤：
+按照 `.agents/workflows/feature-development.yaml` 中的 `implementation` 步骤：
 
 **必须完成的任务**：
 - [ ] 按照方案实现功能代码

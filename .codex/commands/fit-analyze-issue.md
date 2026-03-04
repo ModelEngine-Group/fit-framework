@@ -22,7 +22,7 @@ argument-hint: <issue-number>
    ```bash
    mkdir -p .ai-workspace/active/TASK-<timestamp>/
    ```
-   使用 Write 工具基于 .ai-agents/templates/task.md 模板创建 task.md 文件:
+   使用 Write 工具基于 .agents/templates/task.md 模板创建 task.md 文件:
    - 填写任务元数据: issue_number=$1, title, created_at, workflow 等
    - created_by: human
    - current_step: requirement-analysis
@@ -55,7 +55,7 @@ argument-hint: <issue-number>
    - 提示下一步使用 /plan-task <task-id> 设计技术方案
 
 **注意事项**:
-- 严格遵循 .ai-agents/workflows/feature-development.yaml 工作流定义
+- 严格遵循 .agents/workflows/feature-development.yaml 工作流定义
 - 🔴 禁止编写、修改任何业务代码,只做分析
 - 分析完成后建议人工审查
 - 如果已存在相关任务,询问是否重新分析

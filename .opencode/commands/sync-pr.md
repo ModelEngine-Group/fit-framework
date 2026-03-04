@@ -83,7 +83,7 @@ usage: "/sync-pr <task-id>"
 - 实现报告: `.ai-workspace/active/{task-id}/implementation.md`
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 **摘要原则**：
@@ -196,7 +196,7 @@ https://github.com/{owner}/{repo}/pull/{pr-number}
 - 实现报告: `.ai-workspace/active/TASK-20251227-104654/implementation.md`
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 ### 示例 2：审查完成，准备合并
@@ -239,7 +239,7 @@ https://github.com/{owner}/{repo}/pull/{pr-number}
 **向后兼容**: 是
 
 ---
-*由 Claude Code 自动生成 - [任务管理系统](../.ai-agents/README.md)*
+*由 Claude Code 自动生成 - [任务管理系统](../.agents/README.md)*
 ```
 
 ## 注意事项

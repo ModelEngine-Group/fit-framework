@@ -25,7 +25,7 @@
 
 ```bash
 # 复制模板
-cp .ai-agents/templates/task.md .ai-workspace/tasks/active/TASK-$(date +%Y%m%d-%H%M%S).md
+cp .agents/templates/task.md .ai-workspace/tasks/active/TASK-$(date +%Y%m%d-%H%M%S).md
 
 # 编辑任务
 vim .ai-workspace/tasks/active/TASK-*.md
@@ -75,4 +75,4 @@ rm -f .ai-workspace/logs/*.log
 
 ## 示例任务
 
-查看 `.ai-agents/templates/task.md` 了解任务文件的格式。
+查看 `.agents/templates/task.md` 了解任务文件的格式。

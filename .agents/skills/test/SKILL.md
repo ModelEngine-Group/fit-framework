@@ -13,7 +13,7 @@ description: 执行 FIT Framework 完整测试流程（Maven 构建 + FIT 服务
 
 使用自动化测试脚本执行完整的测试流程：
 ```bash timeout=900000
-./.ai-agents/scripts/run-test.sh
+./.agents/scripts/run-test.sh
 ```
 
 ## 测试流程

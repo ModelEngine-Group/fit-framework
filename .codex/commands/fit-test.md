@@ -22,7 +22,7 @@ usage: /prompts:fit-test
 
 使用自动化测试脚本执行完整的测试流程：
 ```bash timeout=900000
-./.ai-agents/scripts/run-test.sh
+./.agents/scripts/run-test.sh
 ```
 
 **测试流程包括：**

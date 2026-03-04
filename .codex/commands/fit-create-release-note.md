@@ -173,7 +173,7 @@ gh issue view <N> --json number,title,labels,url
 | `fit`, `python`, `docker`, `fit-launcher`, `framework/fit/**` | **FIT Function Platform** |
 | `fel`, `FEL`, `framework/fel/**` | **FIT Expression for LLM** |
 | `waterflow`, `framework/waterflow/**` | **Waterflow Flow Scheduling Platform** |
-| `claude`, `.claude/`, `.ai-agents/`, AI 相关配置 | **🤖 AI Development Configuration** |
+| `claude`, `.claude/`, `.agents/`, AI 相关配置 | **🤖 AI Development Configuration** |
 
 ### 步骤 11：分类 — 按类型分组
 

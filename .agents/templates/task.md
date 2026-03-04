@@ -45,7 +45,7 @@ assigned_to: {当前处理的AI或空}
 
 ## 工作流进度
 
-根据 `.ai-agents/workflows/{workflow}.yaml`:
+根据 `.agents/workflows/{workflow}.yaml`:
 
 - [ ] {step-1} ({推荐AI}, {日期或待完成})
 - [ ] {step-2} (待认领)

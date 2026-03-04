@@ -42,7 +42,7 @@ usage: "/plan-task <task-id>"
 
 ### 4. 设计解决方案
 
-按照对应的工作流（如 `.ai-agents/workflows/feature-development.yaml`）中的 `technical-design` 步骤：
+按照对应的工作流（如 `.agents/workflows/feature-development.yaml`）中的 `technical-design` 步骤：
 
 - [ ] 基于 analysis.md 中的信息，提出多个可行方案
 - [ ] 对比各方案的优劣（效果、成本、风险、可维护性）
