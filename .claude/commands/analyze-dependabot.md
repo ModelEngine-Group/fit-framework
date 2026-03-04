@@ -1,10 +1,10 @@
 ---
-name: "analyze-security"
+name: "analyze-dependabot"
 description: "分析 Dependabot 安全告警并创建安全分析文档"
-usage: "/analyze-security <alert-number>"
+usage: "/analyze-dependabot <alert-number>"
 ---
 
-# Analyze Security Command
+# Analyze Dependabot Command
 
 ## 功能说明
 
@@ -189,9 +189,9 @@ ghsa_id: <GHSA-ID>
 - Codex CLI: `/prompts:fit-plan-task {task-id}`
 
 如果是误报，可以使用以下命令关闭告警：
-- Claude Code / OpenCode: `/close-security {alert-number}`
-- Gemini CLI: `/fit:close-security {alert-number}`
-- Codex CLI: `/prompts:fit-close-security {alert-number}`
+- Claude Code / OpenCode: `/close-dependabot {alert-number}`
+- Gemini CLI: `/fit:close-dependabot {alert-number}`
+- Codex CLI: `/prompts:fit-close-dependabot {alert-number}`
 ```
 
 ## 参数说明
@@ -201,8 +201,8 @@ ghsa_id: <GHSA-ID>
 ## 使用示例
 
 ```bash
-# 分析安全告警 #23
-/analyze-security 23
+# 分析 Dependabot 安全告警 #23
+/analyze-dependabot 23
 ```
 
 ## 注意事项
@@ -228,14 +228,14 @@ ghsa_id: <GHSA-ID>
 5. **误报识别**：
    - 检查漏洞代码路径是否被使用
    - 评估实际可利用性
-   - 如确认是误报，建议使用 `/close-security` 关闭
+   - 如确认是误报，建议使用 `/close-dependabot` 关闭
 
 6. **紧急程度标注**：
    - Critical/High 级别的漏洞需要明确标注紧急程度
 
 ## 相关命令
 
-- `/close-security <alert-number>` - 关闭安全告警（需提供理由）
+- `/close-dependabot <alert-number>` - 关闭 Dependabot 告警（需提供理由）
 - `/plan-task <task-id>` - 设计修复方案
 - `/check-task <task-id>` - 查看任务状态
 - `/upgrade-dependency` - 升级依赖

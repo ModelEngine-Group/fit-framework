@@ -101,4 +101,4 @@ subtask: false
 - 关闭应该是最后选择,优先考虑修复
 - 定期复查被关闭的告警
 - 重要的关闭决定应与团队讨论
-- 建议先使用 /analyze-security $1 进行详细分析
+- 建议先使用 /analyze-dependabot $1 进行详细分析

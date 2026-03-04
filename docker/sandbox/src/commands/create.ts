@@ -255,7 +255,7 @@ export async function create(branch: string, base: string | undefined, opts: Cre
     const hasAuth = hasLiveAuth || hasCopiedAuth;
     const hint = hasAuth
       ? (hasLiveAuth ? '已与宿主机认证凭据实时同步，宿主机刷新后容器自动生效。' : '已从宿主机预植入认证凭据，可直接使用。')
-      : tool.noAuthHint;
+      : tool.setupHint;
     return `${pc.cyan(`${tool.name}：`)}\n  ${hint}\n  凭据持久化：${dir}/`;
   }).join('\n\n');
 

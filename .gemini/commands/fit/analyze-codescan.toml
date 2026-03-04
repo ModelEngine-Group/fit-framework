@@ -1,0 +1,41 @@
+description = "分析 Code Scanning Alert 并创建任务"
+prompt = """
+请分析 Code Scanning Alert #{{args}}。
+
+**前置检查**:
+- 检查是否已有任务处理此 Alert (grep "codescan_alert_number: {{args}}").
+
+执行以下步骤:
+
+1. **获取信息**:
+   - 获取 Repo 信息: `gh repo view --json owner,name`.
+   - 获取 Alert 详情: `gh api repos/:owner/:repo/code-scanning/alerts/{{args}}`.
+
+2. **创建任务**:
+   - 如果无现有任务，创建 `.ai-workspace/active/TASK-{timestamp}/`.
+   - 创建 `task.md` (记录 severity, rule_id, tool).
+
+3. **分析**:
+   - 根据 most_recent_instance.location 定位源码文件和行号。
+   - 读取告警所在的源码上下文。
+   - 理解 CodeQL 规则的含义和检测逻辑。
+   - 检查是否有其他位置也存在相同问题。
+   - 评估风险 (代码路径可达性, 可利用性).
+
+4. **输出文档**:
+   - 创建 `analysis.md` (包含告警详情, 源码位置, 影响评估, 风险评估, 修复建议).
+
+5. **更新状态**:
+   - `current_step: security-analysis`.
+
+6. **告知用户**:
+   - 输出分析摘要。
+   - 提示下一步设计修复方案:
+     - Claude Code / OpenCode: `/plan-task`
+     - Gemini CLI: `/fit:plan-task`
+     - Codex CLI: `/prompts:fit-plan-task`
+   - 如果是误报，关闭告警:
+     - Claude Code / OpenCode: `/close-codescan {{args}}`
+     - Gemini CLI: `/fit:close-codescan {{args}}`
+     - Codex CLI: `/prompts:fit-close-codescan {{args}}`
+"""

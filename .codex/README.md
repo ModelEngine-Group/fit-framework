@@ -121,8 +121,10 @@ usage: /prompts:fit-test
 
 **依赖和安全**：
 - `fit-upgrade-dependency` - 升级项目依赖
-- `fit-analyze-security` - 分析 Dependabot 安全告警并创建修复任务
-- `fit-close-security` - 关闭 Dependabot 安全告警（需提供合理理由）
+- `fit-analyze-dependabot` - 分析 Dependabot 依赖漏洞告警并创建修复任务
+- `fit-close-dependabot` - 关闭 Dependabot 安全告警（需提供合理理由）
+- `fit-analyze-codescan` - 分析 Code Scanning 源码安全告警并创建修复任务
+- `fit-close-codescan` - 关闭 Code Scanning 告警（需提供合理理由）
 
 **测试**：
 - `fit-test` - 执行完整的测试流程

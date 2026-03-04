@@ -48,5 +48,5 @@ argument-hint: <alert-number>
 **注意事项**:
 - 谨慎关闭高危告警(Critical/High)
 - 关闭应该是最后选择,优先考虑修复
-- 建议先使用 /analyze-security $1 进行详细分析
+- 建议先使用 /analyze-dependabot $1 进行详细分析
 - 定期复查被关闭的告警
