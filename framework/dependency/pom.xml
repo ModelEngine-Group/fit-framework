@@ -59,7 +59,8 @@
         <guava.version>32.0.1-jre</guava.version>
         <hanlp.version>portable-1.8.4</hanlp.version>
         <lombok.version>1.18.36</lombok.version>
-        <jackson.version>2.19.1</jackson.version>
+        <jackson.version>2.21.1</jackson.version>
+        <jackson-annotations.version>2.21</jackson-annotations.version>
         <mybatis.version>3.5.19</mybatis.version>
 
         <!-- Test framework versions -->
@@ -474,7 +475,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson-annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
