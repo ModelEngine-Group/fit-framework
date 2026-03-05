@@ -194,10 +194,7 @@ usage: "/review-task <task-id> [--pr-number]"
 **输出文件**：
 - 审查报告: .ai-workspace/active/{task-id}/review.md
 
-**下一步**：
-{根据审查结果给出建议}
-
-例如：
+**下一步**（根据审查结果，选择对应操作）：
 - 如果无阻塞问题：
   - Claude Code / OpenCode: `/commit`
   - Gemini CLI: `/fit:commit`
@@ -255,8 +252,10 @@ usage: "/review-task <task-id> [--pr-number]"
 **输出文件**：
 - 审查报告: .ai-workspace/active/TASK-20251227-104654/review.md
 
-**下一步**：
-发现 2 个必须修复的问题，请修复后重新审查
+**下一步**（有需要修改项）：
+- Claude Code / OpenCode: `/refine-task TASK-20251227-104654`
+- Gemini CLI: `/fit:refine-task TASK-20251227-104654`
+- Codex CLI: `/prompts:fit-refine-task TASK-20251227-104654`
 ```
 
 ### 示例2：结合 PR 进行深度审查
