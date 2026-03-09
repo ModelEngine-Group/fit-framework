@@ -167,6 +167,21 @@ claude -p --max-turns 3 --max-budget-usd 1.00 "重构数据库模块"
 # 跳过所有权限确认（CI/脚本场景）
 claude -p --dangerously-skip-permissions "运行所有测试并汇报结果"
 
+# 自定义系统提示词（覆盖默认，适合定制化自动化流水线）
+claude -p --system-prompt "你是代码审查专家，只关注安全漏洞" "审查 src/ 目录"
+
+# 追加系统提示词（保留默认行为 + 额外指令）
+claude -p --append-system-prompt "所有输出必须使用 JSON 格式" "分析项目依赖"
+
+# 限制可用工具（白名单模式，限制 AI 可执行的操作）
+claude -p --allowedTools Read --allowedTools Grep --allowedTools Glob "分析代码结构"
+
+# 禁用特定工具（黑名单模式）
+claude -p --disallowedTools Bash --disallowedTools Write "解释这段代码的逻辑"
+
+# 加载 MCP 服务器配置
+claude -p --mcp-config mcp-servers.json "查询数据库中的用户数"
+
 # ── 多轮对话（会话管理）──
 
 # 预先生成 session ID，从第 1 轮起就使用（推荐）
@@ -206,6 +221,18 @@ codex exec -m o4-mini "优化这个排序算法"
 # 全自动模式（无需确认，可写工作区）
 codex exec --full-auto "给所有 API 路由添加错误处理"
 
+# 审批模式（比 --full-auto 更细粒度的控制）
+# suggest:    只读，所有操作需人工确认
+# auto-edit:  自动执行文件编辑，命令仍需确认
+# full-auto:  全自动（等同 --full-auto）
+codex exec --approval-mode auto-edit "重构数据库模块"
+
+# 静默模式（抑制 TUI 输出，适合 CI/CD 管道）
+codex -q --json "解释 utils.ts 的功能"
+
+# 临时模式（不持久化会话，适合一次性任务）
+codex exec --ephemeral "生成单元测试"
+
 # 将最终结果写入文件
 codex exec -o result.txt "分析项目依赖关系"
 
@@ -243,6 +270,12 @@ opencode run --format json "列出所有 API 端点"
 
 # 附加文件到 prompt
 opencode run --file src/auth.ts "审查这个文件的安全性"
+
+# 无头服务器模式（后台常驻，避免每次冷启动 MCP）
+opencode serve --hostname 127.0.0.1 --port 4096
+
+# 连接已运行的服务器执行任务（跳过 MCP 冷启动）
+opencode run --attach http://localhost:4096 "解释认证模块的架构"
 
 # ── 多轮对话（会话管理）──
 # OpenCode 不支持预指定 session ID，需从首轮 JSON 输出获取
@@ -323,6 +356,12 @@ gemini --list-sessions
 | 继续最近会话 | `-c` | `exec resume --last` | `-c` | `--resume`（无参数） |
 | 查看会话列表 | — | — | `session list` | `--list-sessions` |
 | 分叉会话 | `--fork-session` | — | `--fork` | — |
+| 自定义系统提示 | `--system-prompt` / `--append-system-prompt` | — | — | — |
+| 工具限制 | `--allowedTools` / `--disallowedTools` | — | — | — |
+| MCP 配置 | `--mcp-config` | — | — | — |
+| 审批粒度 | — | `--approval-mode` | — | — |
+| 静默输出 | — | `-q` / `--quiet` | — | — |
+| 无头服务器 | — | — | `serve` + `--attach` | — |
 
 ## 沙箱管理
 
