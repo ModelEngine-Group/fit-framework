@@ -218,13 +218,17 @@ codex exec --json "列出所有 API 端点"
 # 指定模型
 codex exec -m o4-mini "优化这个排序算法"
 
-# 全自动模式（无需确认，可写工作区）
+# 全自动模式（自动执行大部分操作，但高危命令如 rm -rf 仍需确认）
 codex exec --full-auto "给所有 API 路由添加错误处理"
+
+# 完全跳过所有确认（仅限沙箱/容器等外部隔离环境！）
+# --yolo 是 --dangerously-bypass-approvals-and-sandbox 的别名
+codex exec --yolo "给所有 API 路由添加错误处理"
 
 # 审批模式（比 --full-auto 更细粒度的控制）
 # suggest:    只读，所有操作需人工确认
 # auto-edit:  自动执行文件编辑，命令仍需确认
-# full-auto:  全自动（等同 --full-auto）
+# full-auto:  自动执行大部分操作，高危命令仍需确认
 codex exec --approval-mode auto-edit "重构数据库模块"
 
 # 静默模式（抑制 TUI 输出，适合 CI/CD 管道）
@@ -270,6 +274,10 @@ opencode run --format json "列出所有 API 端点"
 
 # 附加文件到 prompt
 opencode run --file src/auth.ts "审查这个文件的安全性"
+
+# 跳过所有确认（仅限沙箱/容器等外部隔离环境！）
+# 也可通过环境变量：OPENCODE_DANGEROUSLY_SKIP_PERMISSIONS=true
+opencode run --dangerously-skip-permissions "给所有 API 路由添加错误处理"
 
 # 无头服务器模式（后台常驻，避免每次冷启动 MCP）
 opencode serve --hostname 127.0.0.1 --port 4096
@@ -350,7 +358,8 @@ gemini --list-sessions
 | 管道输入 | `cat f \| claude -p` | `echo x \| codex exec -` | `--file` 附加文件 | `cat f \| gemini -p` |
 | JSON 输出 | `--output-format json` | `--json` | `--format json` | `--output-format json` |
 | 指定模型 | `--model opus` | `-m o4-mini` | `-m provider/model` | `-m gemini-2.5-flash` |
-| 跳过确认 | `--dangerously-skip-permissions` | `--full-auto` | — | `--yolo` |
+| 跳过所有确认 | `--dangerously-skip-permissions` | `--yolo` | `--dangerously-skip-permissions` | `--yolo` |
+| 半自动模式 | — | `--full-auto`（高危命令仍确认） | — | — |
 | 预指定会话 ID | `--session-id <UUID>` | — | — | — |
 | 恢复指定会话 | `--resume <ID>` | `exec resume <ID>` | `-s <ID>` | `--resume <ID>` |
 | 继续最近会话 | `-c` | `exec resume --last` | `-c` | `--resume`（无参数） |
